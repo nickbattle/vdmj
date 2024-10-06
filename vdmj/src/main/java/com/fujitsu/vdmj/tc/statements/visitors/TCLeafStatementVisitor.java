@@ -278,7 +278,11 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 			}
 		}
 		
-		all.addAll(visitorSet.applyStatementVisitor(node.elseStmt, arg));
+		if (node.elseStmt != null)
+		{
+			all.addAll(visitorSet.applyStatementVisitor(node.elseStmt, arg));
+		}
+		
 		return all;
 	}
 

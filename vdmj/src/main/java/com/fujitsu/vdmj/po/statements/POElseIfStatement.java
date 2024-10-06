@@ -57,12 +57,6 @@ public class POElseIfStatement extends POStatement
 		obligations.addAll(thenStmt.getProofObligations(ctxt, env));
 		return obligations;
 	}
-	
-	@Override
-	public boolean stopsPOG()
-	{
-		return elseIfExp.stopsPOG();
-	}
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

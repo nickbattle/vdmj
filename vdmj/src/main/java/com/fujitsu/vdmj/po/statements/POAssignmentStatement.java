@@ -94,7 +94,7 @@ public class POAssignmentStatement extends POStatement
 	}
 	
 	@Override
-	public boolean stopsPOG()
+	public boolean updatesState()
 	{
 		return true;
 	}

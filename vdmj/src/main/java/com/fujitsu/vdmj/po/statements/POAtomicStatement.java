@@ -61,12 +61,6 @@ public class POAtomicStatement extends POStatement
 
 		return obligations;
 	}
-
-	@Override
-	public boolean stopsPOG()
-	{
-		return true;
-	}
 	
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

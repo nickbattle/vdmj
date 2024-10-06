@@ -36,7 +36,6 @@ abstract public class POSimpleBlockStatement extends POStatement
 {
 	private static final long serialVersionUID = 1L;
 	public final POStatementList statements;
-	private boolean stoppedPOG;
 
 	public POSimpleBlockStatement(LexLocation location, POStatementList statements)
 	{
@@ -70,28 +69,35 @@ abstract public class POSimpleBlockStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		stoppedPOG = false;
+		boolean updated = false;
 
 		for (POStatement stmt: statements)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, env));
-			
-			if (!stoppedPOG && stmt.stopsPOG())
+			if (stmt.updatesState())	// updates state, so don't check
 			{
 				ctxt.push(new PONoCheckContext());
-				stoppedPOG = true;
+				obligations.addAll(stmt.getProofObligations(ctxt, env));
+				ctxt.pop();
+				
+				updated = true;
+			}
+			else if (!stmt.readsState())	// pure local variables
+			{
+				obligations.addAll(stmt.getProofObligations(ctxt, env));
+			}
+			else if (updated)	// reads state, so unchecked if it has been updated
+			{
+				ctxt.push(new PONoCheckContext());
+				obligations.addAll(stmt.getProofObligations(ctxt, env));
+				ctxt.pop();
+			}
+			else	// reads state but unmodified, so okay
+			{
+				obligations.addAll(stmt.getProofObligations(ctxt, env));
 			}
 		}
 		
-		if (stoppedPOG) ctxt.pop();
-
 		return obligations;
-	}
-
-	@Override
-	public boolean stopsPOG()
-	{
-		return stoppedPOG;	// Something in this block is dodgy
 	}
 
 	@Override

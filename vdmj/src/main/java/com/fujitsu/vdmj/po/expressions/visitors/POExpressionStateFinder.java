@@ -22,34 +22,46 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.statements.visitors;
+package com.fujitsu.vdmj.po.expressions.visitors;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.statements.POStatement;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
- * A visitor set to explore the PO tree and update the NameScopes accessed.
+ * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class POStatementNameScopeVisitor extends POLeafStatementVisitor<PONode, Set<PONode>, Object>
+public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Boolean>
 {
-	public POStatementNameScopeVisitor(POVisitorSet<PONode, Set<PONode>, Object> visitors)
+	public POExpressionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
 	{
-		super(false);
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	protected Set<PONode> newCollection()
+	public TCNameSet caseVariableExpression(POVariableExpression node, Boolean updates)
 	{
-		return new HashSet<PONode>();
+		TCNameSet all = newCollection();
+		
+		if (!updates && node.vardef.nameScope == NameScope.STATE)
+		{
+			all.add(node.name);
+		}
+		
+		return all;
+	}
+	
+	@Override
+	protected TCNameSet newCollection()
+	{
+		return new TCNameSet();
 	}
 
 	@Override
-	public Set<PONode> caseStatement(POStatement node, Object arg)
+	public TCNameSet caseExpression(POExpression node, Boolean updates)
 	{
 		return newCollection();
 	}

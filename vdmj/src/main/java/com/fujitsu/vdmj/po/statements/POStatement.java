@@ -28,9 +28,11 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -82,13 +84,18 @@ public abstract class POStatement extends PONode implements Serializable
 		return stmttype;
 	}
 
-	/**
-	 * If true, this statement prevents the POG from generating checkable obligations
-	 * beyond this point in the block - for example, assignments and loops.
-	 */
-	public boolean stopsPOG()
+	public boolean updatesState()
 	{
-		return false;
+		POStatementStateFinder visitor = new POStatementStateFinder();
+		TCNameSet names = this.apply(visitor, true);
+		return !names.isEmpty();
+	}
+
+	public boolean readsState()
+	{
+		POStatementStateFinder visitor = new POStatementStateFinder();
+		TCNameSet names = this.apply(visitor, false);
+		return !names.isEmpty();
 	}
 
 	/**

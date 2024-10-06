@@ -209,6 +209,18 @@ public class POExplicitOperationDefinition extends PODefinition
 		list.add(parameterPatterns);
 		return list;
 	}
+	
+	@Override
+	public boolean updatesState()
+	{
+		return body.updatesState();
+	}
+	
+	@Override
+	public boolean readsState()
+	{
+		return body.readsState();
+	}
 
 	@Override
 	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)

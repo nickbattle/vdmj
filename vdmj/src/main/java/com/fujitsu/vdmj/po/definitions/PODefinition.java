@@ -129,6 +129,22 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 		list.addAll(apply(new POGetVariableNamesVisitor(), null));
 		return list;
 	}
+	
+	/**
+	 * True, if the definition contains executable statements that update state.
+	 */
+	public boolean updatesState()
+	{
+		return false;
+	}
+	
+	/**
+	 * True, if the definition contains executable statements that read state.
+	 */
+	public boolean readsState()
+	{
+		return false;
+	}
 
 	/**
 	 * Return the static type of the definition. For example, the type of a

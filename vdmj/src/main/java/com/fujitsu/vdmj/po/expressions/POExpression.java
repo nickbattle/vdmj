@@ -29,7 +29,6 @@ import java.io.Serializable;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
-import com.fujitsu.vdmj.po.expressions.visitors.POStopsPOGVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -158,16 +157,6 @@ public abstract class POExpression extends PONode implements Serializable
 		}
 
 		return obligations;
-	}
-
-	/**
-	 * Check whether anything in this expression stops a POG run (eg. accessing state or operation calls).
-	 */
-	public boolean stopsPOG()
-	{
-		POStopsPOGVisitor visitor = new POStopsPOGVisitor();
-		this.apply(visitor, null);
-		return visitor.stopsPOG();
 	}
 
 	/**

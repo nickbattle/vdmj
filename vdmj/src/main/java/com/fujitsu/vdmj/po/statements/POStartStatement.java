@@ -55,12 +55,6 @@ public class POStartStatement extends POStatement
 	}
 
 	@Override
-	public boolean stopsPOG()
-	{
-		return true;
-	}
-
-	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseStartStatement(this, arg);

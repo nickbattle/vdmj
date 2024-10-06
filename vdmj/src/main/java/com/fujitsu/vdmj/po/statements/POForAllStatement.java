@@ -63,12 +63,6 @@ public class POForAllStatement extends POStatement
 	}
 
 	@Override
-	public boolean stopsPOG()
-	{
-		return true;
-	}
-
-	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseForAllStatement(this, arg);

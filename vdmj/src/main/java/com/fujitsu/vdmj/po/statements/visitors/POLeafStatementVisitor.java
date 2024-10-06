@@ -301,7 +301,11 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 			}
 		}
 		
-		all.addAll(node.elseStmt.apply(this, arg));
+		if (node.elseStmt != null)
+		{
+			all.addAll(node.elseStmt.apply(this, arg));
+		}
+		
 		return all;
 	}
 

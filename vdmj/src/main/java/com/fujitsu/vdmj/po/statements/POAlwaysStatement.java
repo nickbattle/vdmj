@@ -61,12 +61,6 @@ public class POAlwaysStatement extends POStatement
 		obligations.addAll(body.getProofObligations(ctxt, env));
 		return obligations;
 	}
-	
-	@Override
-	public boolean stopsPOG()
-	{
-		return true;
-	}
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
