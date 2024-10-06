@@ -171,11 +171,20 @@ public class POExplicitOperationDefinition extends PODefinition
 		}
 		else if (classDefinition != null)
 		{
-			ctxt.push(new PONoCheckContext());
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
-			obligations.addAll(body.getProofObligations(ctxt, env));
-			ctxt.pop();
-			ctxt.pop();
+			if (precondition == null)
+			{
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
+				obligations.addAll(body.getProofObligations(ctxt, env));
+				ctxt.pop();
+			}
+			else	// Can't check "pre_op(args, new X(args)) => ..."
+			{
+				ctxt.push(new PONoCheckContext());
+				ctxt.push(new POOperationDefinitionContext(this, true, classDefinition, true));
+				obligations.addAll(body.getProofObligations(ctxt, env));
+				ctxt.pop();
+				ctxt.pop();
+			}
 		}
 		else
 		{
