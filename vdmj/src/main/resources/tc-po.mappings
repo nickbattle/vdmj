@@ -36,7 +36,7 @@ map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, init
 map TCSystemDefinition{name, classtype, definitions, nameScope} to POSystemDefinition(name, classtype, definitions, this) set nameScope;
 map TCThreadDefinition{statement, nameScope} to POThreadDefinition(statement) set nameScope;
 map TCTypeDefinition{annotations, name, type, invPattern, invExpression, invdef, eqPattern1, eqPattern2, eqExpression, eqdef, ordPattern1, ordPattern2, ordExpression, orddef, nameScope} to POTypeDefinition(annotations, name, type, invPattern, invExpression, invdef, eqPattern1, eqPattern2, eqExpression, eqdef, ordPattern1, ordPattern2, ordExpression, orddef) set nameScope;
-map TCValueDefinition{annotations, pattern, type, exp, expType, nameScope} to POValueDefinition(annotations, pattern, type, exp, expType) set nameScope;
+map TCValueDefinition{annotations, pattern, type, exp, expType, defs, nameScope} to POValueDefinition(annotations, pattern, type, exp, expType, defs) set nameScope;
 map TCUntypedDefinition{location, name, nameScope} to POUntypedDefinition(location, name) set nameScope;
 map TCQualifiedDefinition{def, type, nameScope} to POQualifiedDefinition(def, type) set nameScope;
 
