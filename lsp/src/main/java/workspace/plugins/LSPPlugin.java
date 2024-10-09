@@ -1407,7 +1407,7 @@ public class LSPPlugin extends AnalysisPlugin
 			{
 				StringBuilder buffer = projectFiles.get(pfile);
 				
-				if (buffer.indexOf(word) > 0)
+				if (buffer.indexOf(word) >= 0)
 				{
 					JSONArray list = Utils.findWords(buffer, word);
 					
