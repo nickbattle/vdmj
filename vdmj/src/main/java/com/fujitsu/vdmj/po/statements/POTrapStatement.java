@@ -60,7 +60,7 @@ public class POTrapStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -88,10 +88,10 @@ public class POTrapStatement extends POStatement
 		}
 
 		ctxt.push(new PONoCheckContext());
-		list.addAll(with.getProofObligations(ctxt, env));
+		list.addAll(with.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
 		
-		list.addAll(body.getProofObligations(ctxt, env));
+		list.addAll(body.getProofObligations(ctxt, globals, env));
 		return list;
 	}
 

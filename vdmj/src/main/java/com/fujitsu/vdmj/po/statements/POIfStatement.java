@@ -72,24 +72,25 @@ public class POIfStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, env);
+		
 		ctxt.push(new POImpliesContext(ifExp));
-		obligations.addAll(thenStmt.getProofObligations(ctxt, env));
+		obligations.addAll(thenStmt.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, env));
+			obligations.addAll(stmt.getProofObligations(ctxt, globals, env));
 			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 
 		if (elseStmt != null)
 		{
-			obligations.addAll(elseStmt.getProofObligations(ctxt, env));
+			obligations.addAll(elseStmt.getProofObligations(ctxt, globals, env));
 		}
 
 		for (int i=0; i<elseList.size(); i++)

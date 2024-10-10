@@ -166,7 +166,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		if (stateDefinition != null)
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
-			obligations.addAll(body.getProofObligations(ctxt, env));
+			obligations.addAll(body.getProofObligations(ctxt, null, env));
 			ctxt.pop();
 		}
 		else if (classDefinition != null)
@@ -174,14 +174,14 @@ public class POExplicitOperationDefinition extends PODefinition
 			if (precondition == null)
 			{
 				ctxt.push(new POOperationDefinitionContext(this, false, classDefinition, true));
-				obligations.addAll(body.getProofObligations(ctxt, env));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
 				ctxt.pop();
 			}
 			else	// Can't check "pre_op(args, new X(args)) => ..."
 			{
 				ctxt.push(new PONoCheckContext());
 				ctxt.push(new POOperationDefinitionContext(this, true, classDefinition, true));
-				obligations.addAll(body.getProofObligations(ctxt, env));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
 				ctxt.pop();
 				ctxt.pop();
 			}
@@ -189,7 +189,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		else	// Flat spec with no state defined
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
-			obligations.addAll(body.getProofObligations(ctxt, env));
+			obligations.addAll(body.getProofObligations(ctxt, null, env));
 			ctxt.pop();
 		}
 

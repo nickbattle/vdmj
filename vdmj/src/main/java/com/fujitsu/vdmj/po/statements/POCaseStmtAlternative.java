@@ -52,10 +52,10 @@ public class POCaseStmtAlternative extends PONode
 		return "case " + pattern + " -> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.addAll(statement.getProofObligations(ctxt, env));
+		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
 		return obligations;
 	}
 }

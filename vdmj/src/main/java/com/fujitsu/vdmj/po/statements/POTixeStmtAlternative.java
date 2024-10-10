@@ -52,7 +52,7 @@ public class POTixeStmtAlternative implements Mappable
 		return patternBind + " |-> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -80,7 +80,7 @@ public class POTixeStmtAlternative implements Mappable
 		}
 
 
-		list.addAll(statement.getProofObligations(ctxt, env));
+		list.addAll(statement.getProofObligations(ctxt, globals, env));
 		return list;
 	}
 }

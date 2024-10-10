@@ -62,9 +62,11 @@ public abstract class POStatement extends PONode implements Serializable
 	 * Get a list of proof obligations from the statement.
 	 *
 	 * @param ctxt The call context.
+	 * @param globals The global context created by this statement, if any.
+	 * @param env The Environment to lookup symbols.
 	 * @return The list of proof obligations.
 	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		return new ProofObligationList();
 	}

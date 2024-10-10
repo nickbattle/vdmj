@@ -58,7 +58,7 @@ public class POLetBeStStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.add(new LetBeExistsObligation(this, ctxt));
@@ -70,7 +70,7 @@ public class POLetBeStStatement extends POStatement
 		}
 
 		ctxt.push(new POScopeContext());
-		obligations.addAll(statement.getProofObligations(ctxt, env));
+		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
 
 		return obligations;

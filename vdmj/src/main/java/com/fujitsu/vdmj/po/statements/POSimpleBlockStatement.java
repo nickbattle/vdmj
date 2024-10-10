@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -66,35 +65,13 @@ abstract public class POSimpleBlockStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		boolean updated = false;
 
 		for (POStatement stmt: statements)
 		{
-			if (stmt.updatesState())	// updates state, so don't check
-			{
-				ctxt.push(new PONoCheckContext());
-				obligations.addAll(stmt.getProofObligations(ctxt, env));
-				ctxt.pop();
-				
-				updated = true;
-			}
-			else if (!stmt.readsState())	// pure local variables
-			{
-				obligations.addAll(stmt.getProofObligations(ctxt, env));
-			}
-			else if (updated)	// reads state, so unchecked if it has been updated
-			{
-				ctxt.push(new PONoCheckContext());
-				obligations.addAll(stmt.getProofObligations(ctxt, env));
-				ctxt.pop();
-			}
-			else	// reads state but unmodified, so okay
-			{
-				obligations.addAll(stmt.getProofObligations(ctxt, env));
-			}
+			obligations.addAll(stmt.getProofObligations(ctxt, globals, env));
 		}
 		
 		return obligations;
