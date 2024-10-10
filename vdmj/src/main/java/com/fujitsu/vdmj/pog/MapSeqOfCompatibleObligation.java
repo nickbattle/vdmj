@@ -55,6 +55,6 @@ public class MapSeqOfCompatibleObligation extends ProofObligation
 		sb.append("} &\n  forall " + d1 + " in set dom " + m1 + ", " + d2 + " in set dom " + m2 + " &\n");
 		sb.append("    " + d1 + " = " + d2 + " => " + m1 + "(" + d1 + ") = " + m2 + "(" + d2 + ")");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getObligation(sb.toString());
 	}
 }

@@ -66,10 +66,10 @@ public class POForAllPredicateContext extends POForAllContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(super.getContext());
+		sb.append(super.getSource());
 
 		if (predicate != null)
 		{

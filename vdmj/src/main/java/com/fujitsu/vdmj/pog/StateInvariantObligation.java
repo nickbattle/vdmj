@@ -59,7 +59,7 @@ public class StateInvariantObligation extends ProofObligation
 			sb.append(def.invExpression);
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getObligation(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -71,7 +71,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append("After instance variable initializers\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getObligation(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -85,7 +85,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getObligation(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -99,7 +99,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getObligation(sb.toString());
 	}
 
 	private String invDefs(POClassDefinition def)

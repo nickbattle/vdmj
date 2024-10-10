@@ -38,6 +38,6 @@ public class UniqueExistenceObligation extends ProofObligation
 		sb.append(" & ");
 		sb.append(poIotaExpression.predicate);
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getObligation(sb.toString());
 	}
 }

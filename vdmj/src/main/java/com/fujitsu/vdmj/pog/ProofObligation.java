@@ -51,7 +51,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public final String name;
 
 	public int number;
-	public String value;
+	public String source;
 	public POStatus status;
 	public PODefinition definition;
 	public boolean isCheckable;
@@ -92,9 +92,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
 
-	public String getValue()
+	public String getSource()
 	{
-		return value;
+		return source;
 	}
 	
 	public void setStatus(POStatus status)
@@ -187,7 +187,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		sb.append(" obligation ");
 		sb.append(location);
 		sb.append("\n");
-		sb.append(value);
+		sb.append(source);
 		
 		return sb.toString();
 	}
@@ -272,7 +272,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		else if (kind.isStandAlone())
 		{
 			// PO is a stand alone expression, so just execute that
-			return value.trim();
+			return source.trim();
 		}
 
 		return null;	// Unexpected definition

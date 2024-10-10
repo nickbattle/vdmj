@@ -32,12 +32,12 @@ public class SeqApplyObligation extends ProofObligation
 	public SeqApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
-		value = ctxt.getObligation(poExpression + " in set inds " + root);
+		source = ctxt.getObligation(poExpression + " in set inds " + root);
 	}
 
 	public SeqApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
-		value = ctxt.getObligation(arg + " > 0 and " + arg + " <= len (" + root + ") + 1");
+		source = ctxt.getObligation(arg + " > 0 and " + arg + " <= len (" + root + ") + 1");
 	}
 }

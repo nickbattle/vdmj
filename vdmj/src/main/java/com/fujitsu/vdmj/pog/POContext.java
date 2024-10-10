@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.pog;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
@@ -42,8 +41,12 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 abstract public class POContext
 {
-	abstract public String getContext();
 	private Map<POExpression, TCType> knownTypes = new HashMap<POExpression, TCType>();
+
+	/**
+	 * Generate the VDM source of the context.
+	 */
+	abstract public String getSource();
 
 	public String getName()
 	{
@@ -79,14 +82,10 @@ abstract public class POContext
 	{
 		return knownTypes.get(exp);
 	}
-	
-	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, POPatternList paramPatternList, POExpression body)
-	{
-		List<POPatternList> pplist = new Vector<POPatternList>();
-		pplist.add(paramPatternList);
-		return preconditionCall(name, typeParams, pplist, body);
-	}
-	
+
+	/**
+	 * Generate a precondition check for a function, possibly with type parameters.
+	 */
 	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, List<POPatternList> paramPatternList, POExpression body)
 	{
 		if (body == null)
@@ -120,6 +119,9 @@ abstract public class POContext
 		return call.toString();
 	}
 	
+	/**
+	 * Generate a precondition call for an operation, passing the state (ie. a StateDefinition or ClassDefinition).
+	 */
 	protected String preconditionCall(TCNameToken name, POPatternList paramPatternList, PODefinition state)
 	{
 		StringBuilder call = new StringBuilder();
@@ -150,8 +152,11 @@ abstract public class POContext
 		return call.toString();
 	}
 
+	/**
+	 * Return the PODefinition of the enclosing definition (eg. func or operation).
+	 */
 	public PODefinition getDefinition()
 	{
-		return null;	// See fn/op contexts, also overridden by various POs
+		return null;	// See fn/op definition contexts
 	}
 }

@@ -54,7 +54,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.FUNC_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getObligation(
 			generate(def.paramPatternList, def.type.parameters, def.type.result));
 	}
 
@@ -63,7 +63,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.FUNC_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getObligation(
 			generate(def.getParamPatternList(), def.type.parameters, def.type.result));
 	}
 
@@ -72,7 +72,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.OPERATION_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getObligation(
 			generate(def.getParamPatternList(), def.type.parameters, def.type.result));
 	}
 
@@ -81,7 +81,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.OPERATION_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getObligation(
 			generate(def.getListParamPatternList(), def.type.parameters, def.type.result));
 	}
 

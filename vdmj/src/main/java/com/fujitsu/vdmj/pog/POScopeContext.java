@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.pog;
 public class POScopeContext extends POContext
 {
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		return "";
 	}

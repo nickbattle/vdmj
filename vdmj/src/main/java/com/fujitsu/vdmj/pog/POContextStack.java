@@ -85,7 +85,7 @@ public class POContextStack extends Stack<POContext>
 
 		for (POContext ctxt: this)
 		{
-			String po = ctxt.getContext();
+			String po = ctxt.getSource();
 
 			if (po.length() > 0)
 			{

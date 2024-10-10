@@ -174,7 +174,7 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			Console.out.println("/* " + ++i + " */ \"" + po.value.replaceAll("\n", "\\\\n") + "\",");
+			Console.out.println("/* " + ++i + " */ \"" + po.source.replaceAll("\n", "\\\\n") + "\",");
 			assertTrue("PO type checked failed", !po.isCheckable || po.getCheckedExpression() != null);
 		}
 
@@ -183,11 +183,11 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			if (!expected[i].equals(po.value))
+			if (!expected[i].equals(po.source))
 			{
 				Console.out.println("PO# " + (i+1));
 				Console.out.print("Expected: " + expected[i]);
-				Console.out.print("Actual: " + po.value);
+				Console.out.print("Actual: " + po.source);
 				errs++;
 			}
 

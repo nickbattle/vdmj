@@ -31,6 +31,6 @@ public class WhileLoopObligation extends ProofObligation
 	public WhileLoopObligation(POWhileStatement stmt, POContextStack ctxt)
 	{
 		super(stmt.location, POType.WHILE_LOOP, ctxt);
-		value = ctxt.getObligation("while " + stmt.exp + " do ...");
+		source = ctxt.getObligation("while " + stmt.exp + " do ...");
 	}
 }

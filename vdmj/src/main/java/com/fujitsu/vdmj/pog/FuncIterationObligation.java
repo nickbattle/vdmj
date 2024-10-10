@@ -59,6 +59,6 @@ public class FuncIterationObligation extends ProofObligation
     		sb.append("(arg))");
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getObligation(sb.toString());
 	}
 }

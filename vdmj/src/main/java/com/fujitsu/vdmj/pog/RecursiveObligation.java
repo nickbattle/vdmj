@@ -52,7 +52,7 @@ public class RecursiveObligation extends ProofObligation
 		String lhs = getLHS(defs.get(0));
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
-		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
+		source = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 	
 	private String getLHS(PODefinition def)
