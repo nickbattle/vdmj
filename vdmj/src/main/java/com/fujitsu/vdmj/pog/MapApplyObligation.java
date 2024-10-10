@@ -33,12 +33,12 @@ public class MapApplyObligation extends ProofObligation
 	public MapApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
 	{
 		super(root.location, POType.MAP_APPLY, ctxt);
-		source = ctxt.getObligation(poExpression + " in set dom " + root);
+		source = ctxt.getSource(poExpression + " in set dom " + root);
 	}
 
 	public MapApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
 	{
 		super(root.location, POType.MAP_APPLY, ctxt);
-		source = ctxt.getObligation(arg + " in set dom " + root);
+		source = ctxt.getSource(arg + " in set dom " + root);
 	}
 }

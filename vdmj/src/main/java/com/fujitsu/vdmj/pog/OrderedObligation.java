@@ -62,6 +62,6 @@ public class OrderedObligation extends ProofObligation
 			}
 		}
 		
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

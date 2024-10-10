@@ -31,6 +31,6 @@ public class NonEmptySeqObligation extends ProofObligation
 	public NonEmptySeqObligation(POExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.NON_EMPTY_SEQ, ctxt);
-		source = ctxt.getObligation(exp + " <> []");
+		source = ctxt.getSource(exp + " <> []");
 	}
 }

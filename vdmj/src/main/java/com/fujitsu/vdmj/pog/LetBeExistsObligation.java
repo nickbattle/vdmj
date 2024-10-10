@@ -47,7 +47,7 @@ public class LetBeExistsObligation extends ProofObligation
 			sb.append(" & true");
 		}
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public LetBeExistsObligation(POLetBeStStatement stmt, POContextStack ctxt)
@@ -68,6 +68,6 @@ public class LetBeExistsObligation extends ProofObligation
 			sb.append(" & true");
 		}
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

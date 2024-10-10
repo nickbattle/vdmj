@@ -40,7 +40,7 @@ public class InvariantObligation extends ProofObligation
 		sb.append(arg);
 		sb.append(")");
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public InvariantObligation(POMapInverseExpression exp, POContextStack ctxt)
@@ -56,6 +56,6 @@ public class InvariantObligation extends ProofObligation
 		sb.append(explicitType(exp.type.to, exp.location));
 		sb.append(")");
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

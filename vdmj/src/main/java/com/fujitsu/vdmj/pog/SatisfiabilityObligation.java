@@ -66,7 +66,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(func.result.pattern);
 		sb.append(")");
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public SatisfiabilityObligation(POImplicitOperationDefinition op,
@@ -105,7 +105,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		appendStatePatterns(sb, stateDefinition, false, false);
 		sb.append(")");
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
@@ -131,7 +131,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(" & ");
 		sb.append(typedef.invExpression);
 		
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
@@ -148,7 +148,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(" & ");
 		sb.append(statedef.invExpression);
 		
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	private void appendResult(StringBuilder sb, POPatternTypePair ptp)

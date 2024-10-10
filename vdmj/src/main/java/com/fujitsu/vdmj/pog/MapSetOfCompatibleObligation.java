@@ -33,7 +33,7 @@ public class MapSetOfCompatibleObligation extends ProofObligation
 		super(exp.location, POType.MAP_SET_OF_COMPATIBLE, ctxt);
 		StringBuilder sb = new StringBuilder();
 		append(sb, exp.toString());
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	private void append(StringBuilder sb, String exp)

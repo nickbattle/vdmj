@@ -32,6 +32,6 @@ public class NonZeroObligation extends ProofObligation
 	public NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
 	{
 		super(location, POType.NON_ZERO, ctxt);
-		source = ctxt.getObligation(right + " <> 0");
+		source = ctxt.getSource(right + " <> 0");
 	}
 }

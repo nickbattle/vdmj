@@ -56,6 +56,6 @@ public class FunctionApplyObligation extends ProofObligation
 			sb.append(Utils.listToString("(", args, ", ", ")"));
 		}
 
-		source = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }
