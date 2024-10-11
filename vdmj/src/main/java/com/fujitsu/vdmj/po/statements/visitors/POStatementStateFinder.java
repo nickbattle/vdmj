@@ -81,6 +81,11 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 				POIdentifierDesignator id = (POIdentifierDesignator)node.target;
 				all.add(id.name);
 			}
+			else
+			{
+				// Updates something...
+				all.add(new TCNameToken(node.location, "?", node.target.toString()));
+			}
 		}
 		
 		return all;
@@ -90,7 +95,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	public TCNameSet caseCallStatement(POCallStatement node, Boolean updates)
 	{
 		TCNameSet all = newCollection();
-		all.add(node.name);		// Not state, but assumed to access state.
+		all.add(new TCNameToken(node.location, "?", "?"));	// Not state, but assumed to access state.
 		return all;
 	}
 	

@@ -163,15 +163,28 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
+		boolean updatesState = body.updatesState();
+		
 		if (stateDefinition != null)
 		{
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
-			obligations.addAll(body.getProofObligations(ctxt, null, env));
-			ctxt.pop();
+			if (!updatesState)
+			{
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+			}
+			else
+			{
+				ctxt.push(new PONoCheckContext());
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+				ctxt.pop();
+			}
 		}
 		else if (classDefinition != null)
 		{
-			if (precondition == null)
+			if (precondition == null && !updatesState)
 			{
 				ctxt.push(new POOperationDefinitionContext(this, false, classDefinition, true));
 				obligations.addAll(body.getProofObligations(ctxt, null, env));
@@ -188,9 +201,20 @@ public class POExplicitOperationDefinition extends PODefinition
 		}
 		else	// Flat spec with no state defined
 		{
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
-			obligations.addAll(body.getProofObligations(ctxt, null, env));
-			ctxt.pop();
+			if (!updatesState)
+			{
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+			}
+			else
+			{
+				ctxt.push(new PONoCheckContext());
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+				ctxt.pop();
+			}
 		}
 
 		if (isConstructor &&

@@ -190,7 +190,16 @@ public class POImplicitOperationDefinition extends PODefinition
 		
 		if (body != null)
 		{
-			obligations.addAll(body.getProofObligations(ctxt, null, env));
+			if (body.updatesState())
+			{
+				ctxt.push(new PONoCheckContext());
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+			}
+			else
+			{
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+			}
 
 			if (isConstructor &&
 				classDefinition != null &&
