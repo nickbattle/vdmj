@@ -80,6 +80,10 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		{
 			ctxt.push(new PONameContext(d.getVariableNames()));
 			obligations.addAll(d.getProofObligations(ctxt, env));
+		}
+		
+		for (int i=0; i < this.size(); i++)
+		{
 			ctxt.pop();
 		}
 
