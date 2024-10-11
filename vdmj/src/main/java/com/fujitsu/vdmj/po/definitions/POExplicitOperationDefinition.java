@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -184,19 +185,22 @@ public class POExplicitOperationDefinition extends PODefinition
 		}
 		else if (classDefinition != null)
 		{
-			if (precondition == null && !updatesState)
+			if (Settings.release == Release.VDM_10)		// Uses the obj_C pattern
 			{
-				ctxt.push(new POOperationDefinitionContext(this, false, classDefinition, true));
-				obligations.addAll(body.getProofObligations(ctxt, null, env));
-				ctxt.pop();
-			}
-			else	// Can't check "pre_op(args, new X(args)) => ..."
-			{
-				ctxt.push(new PONoCheckContext());
-				ctxt.push(new POOperationDefinitionContext(this, true, classDefinition, true));
-				obligations.addAll(body.getProofObligations(ctxt, null, env));
-				ctxt.pop();
-				ctxt.pop();
+				if (precondition == null && !updatesState)
+				{
+					ctxt.push(new POOperationDefinitionContext(this, false, classDefinition, true));
+					obligations.addAll(body.getProofObligations(ctxt, null, env));
+					ctxt.pop();
+				}
+				else	// Can't check "pre_op(args, new X(args)) => ..."
+				{
+					ctxt.push(new PONoCheckContext());
+					ctxt.push(new POOperationDefinitionContext(this, true, classDefinition, true));
+					obligations.addAll(body.getProofObligations(ctxt, null, env));
+					ctxt.pop();
+					ctxt.pop();
+				}
 			}
 		}
 		else	// Flat spec with no state defined
@@ -221,7 +225,9 @@ public class POExplicitOperationDefinition extends PODefinition
 			classDefinition != null &&
 			classDefinition.invariant != null)
 		{
+			ctxt.push(new PONoCheckContext());
 			obligations.add(new StateInvariantObligation(this, ctxt));
+			ctxt.pop();
 		}
 
 		if (!isConstructor &&

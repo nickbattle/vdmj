@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -205,7 +206,9 @@ public class POImplicitOperationDefinition extends PODefinition
 				classDefinition != null &&
 				classDefinition.invariant != null)
 			{
+				ctxt.push(new PONoCheckContext());
 				obligations.add(new StateInvariantObligation(this, ctxt));
+				ctxt.pop();
 			}
 
 			if (!isConstructor &&
@@ -218,7 +221,8 @@ public class POImplicitOperationDefinition extends PODefinition
 		}
 		else
 		{
-			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
+			if (postcondition != null && Settings.dialect == Dialect.VDM_SL &&
+				Settings.release == Release.VDM_10)		// Uses obj_C pattern
 			{
 				ctxt.push(new POOperationDefinitionContext(this, false, state, false));
 				obligations.add(new SatisfiabilityObligation(this, state, ctxt));
