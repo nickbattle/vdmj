@@ -75,6 +75,7 @@ public class POForIndexStatement extends POStatement
 		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
 
+		obligations.markUnchecked("Loop statement");
 		return obligations;
 	}
 

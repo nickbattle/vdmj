@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.WhileLoopObligation;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -56,11 +55,11 @@ public class POWhileStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		ctxt.push(new PONoCheckContext());
 		obligations.add(new WhileLoopObligation(this, ctxt));
 		obligations.addAll(exp.getProofObligations(ctxt, env));
 		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
-		ctxt.pop();
+		obligations.markUnchecked("Loop statement");
+
 		return obligations;
 	}
 

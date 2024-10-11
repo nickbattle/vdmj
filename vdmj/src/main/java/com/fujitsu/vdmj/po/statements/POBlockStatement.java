@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -48,13 +47,16 @@ public class POBlockStatement extends POSimpleBlockStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
-		ctxt.push(new PONoCheckContext());
 		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt, env);
-		ctxt.pop();
 
 		ctxt.push(new POScopeContext());
 		obligations.addAll(super.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
+		
+		if (!assignmentDefs.isEmpty())
+		{
+			obligations.markUnchecked("dcl statement block");
+		}
 
 		return obligations;
 	}
