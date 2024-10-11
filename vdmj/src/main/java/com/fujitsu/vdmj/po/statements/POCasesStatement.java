@@ -83,12 +83,18 @@ public class POCasesStatement extends POStatement
 				hasIgnore = true;
 			}
 
-			obligations.addAll(alt.getProofObligations(ctxt, globals, env));
+			// Pushes PONotCaseContext
+			obligations.addAll(alt.getProofObligations(ctxt, globals, getStmttype(), env));
 		}
 
 		if (others != null && !hasIgnore)
 		{
 			obligations.addAll(others.getProofObligations(ctxt, globals, env));
+		}
+
+		for (int i=0; i<cases.size(); i++)
+		{
+			ctxt.pop();
 		}
 
 		return obligations;

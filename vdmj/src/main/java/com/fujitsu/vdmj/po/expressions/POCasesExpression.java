@@ -66,7 +66,6 @@ public class POCasesExpression extends POExpression
 	{
 		ProofObligationList obligations = exp.getProofObligations(ctxt, env);
 
-		int count = 0;
 		boolean hasIgnore = false;
 		TCNameList hidden = new TCNameList();
 		ProofObligationList _obligations = new ProofObligationList();
@@ -82,7 +81,6 @@ public class POCasesExpression extends POExpression
 			
 			// PONotCaseContext pushed by the POCaseAlternative...
 			_obligations.addAll(alt.getProofObligations(ctxt, expType, env));
-			count++;
 		}
 		
 		if (others != null)
@@ -90,7 +88,7 @@ public class POCasesExpression extends POExpression
 			_obligations.addAll(others.getProofObligations(ctxt, env));
 		}
 
-		for (int i=0; i<count; i++)
+		for (int i=0; i<cases.size(); i++)
 		{
 			ctxt.pop();
 		}
@@ -99,7 +97,6 @@ public class POCasesExpression extends POExpression
 		{
 			_obligations.add(new CasesExhaustiveObligation(this, ctxt));
 		}
-
 
 		if (!hidden.isEmpty())
 		{
