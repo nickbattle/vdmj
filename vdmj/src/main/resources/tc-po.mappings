@@ -120,7 +120,7 @@ map TCNumericBinaryExpression{} to PONumericBinaryExpression();
 map TCOrExpression{left, op, right, ltype, rtype, exptype} to POOrExpression(left, op, right, ltype, rtype) set exptype;
 map TCPlusExpression{left, op, right, ltype, rtype, exptype} to POPlusExpression(left, op, right, ltype, rtype) set exptype;
 map TCPlusPlusExpression{left, op, right, ltype, rtype, exptype} to POPlusPlusExpression(left, op, right, ltype, rtype) set exptype;
-map TCPostOpExpression{postexpression, exptype} to POPostOpExpression(postexpression) set exptype;
+map TCPostOpExpression{location, postexpression, exptype} to POPostOpExpression(location, postexpression) set exptype;
 map TCPowerSetExpression{location, exp, exptype} to POPowerSetExpression(location, exp) set exptype;
 map TCPreExpression{location, function, args, exptype} to POPreExpression(location, function, args) set exptype;
 map TCPreOpExpression{expression, exptype} to POPreOpExpression(expression) set exptype;

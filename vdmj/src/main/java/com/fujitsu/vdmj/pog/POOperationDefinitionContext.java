@@ -96,7 +96,7 @@ public class POOperationDefinitionContext extends POContext
 				sb.append(sep);
 				sb.append(p.removeIgnorePatterns());
 				sb.append(":");
-				sb.append(types.next());
+				sb.append(types.next().toExplicitString(name.getLocation()));
 				sep = ", ";
 			}
 

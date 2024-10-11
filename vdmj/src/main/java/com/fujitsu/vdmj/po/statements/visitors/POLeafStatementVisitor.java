@@ -99,6 +99,11 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		}
 	};
 	
+	public POVisitorSet<E, C, S> getVistorSet()
+	{
+		return visitorSet;
+	}
+	
 	private final boolean allNodes;
 	
 	public POLeafStatementVisitor(boolean allNodes)

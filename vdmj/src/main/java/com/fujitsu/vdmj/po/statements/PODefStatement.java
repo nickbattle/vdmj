@@ -28,7 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POScopeContext;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
@@ -55,9 +55,9 @@ public class PODefStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
-		ProofObligationList obligations = equalsDefs.getProofObligations(ctxt, env);
+		ProofObligationList obligations = equalsDefs.getDefProofObligations(ctxt, env);
 
-		ctxt.push(new POScopeContext());
+		ctxt.push(new POLetDefContext(equalsDefs));
 		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
 
