@@ -37,6 +37,6 @@ public class StrictOrderObligation extends ProofObligation
 			+ "(forall x:%T, y:%T, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
 		po = po.replaceAll("%N", ordT.getName());
 		po = po.replaceAll("%T", def.name.getName());
-		value = ctxt.getObligation(po);
+		source = ctxt.getSource(po);
 	}
 }

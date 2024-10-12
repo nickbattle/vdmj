@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -190,29 +191,40 @@ public class POImplicitOperationDefinition extends PODefinition
 		
 		if (body != null)
 		{
-			ctxt.push(new PONoCheckContext());
-			obligations.addAll(body.getProofObligations(ctxt, env));
+			if (body.updatesState())
+			{
+				ctxt.push(new PONoCheckContext());
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+			}
+			else
+			{
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+			}
 
 			if (isConstructor &&
 				classDefinition != null &&
 				classDefinition.invariant != null)
 			{
+				ctxt.push(new PONoCheckContext());
 				obligations.add(new StateInvariantObligation(this, ctxt));
+				ctxt.pop();
 			}
 
 			if (!isConstructor &&
 				!TypeComparator.isSubType(actualResult, type.result))
 			{
+				ctxt.push(new PONoCheckContext());
 				obligations.add(new SubTypeObligation(this, actualResult, ctxt));
+				ctxt.pop();
 			}
-			
-			ctxt.pop();
 		}
 		else
 		{
-			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
+			if (postcondition != null && Settings.dialect == Dialect.VDM_SL &&
+				Settings.release == Release.VDM_10)		// Uses obj_C pattern
 			{
-				ctxt.push(new POOperationDefinitionContext(this, false, state));
+				ctxt.push(new POOperationDefinitionContext(this, false, state, false));
 				obligations.add(new SatisfiabilityObligation(this, state, ctxt));
 				ctxt.pop();
 			}
@@ -246,6 +258,17 @@ public class POImplicitOperationDefinition extends PODefinition
 		return plist;
 	}
 
+	@Override
+	public boolean updatesState()
+	{
+		return body == null ? false : body.updatesState();
+	}
+	
+	@Override
+	public boolean readsState()
+	{
+		return body == null ? false : body.readsState();
+	}
 
 	@Override
 	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)

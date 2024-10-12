@@ -31,6 +31,6 @@ public class SeqMemberObligation extends ProofObligation
 	public SeqMemberObligation(POExpression test, POExpression sequence, POContextStack ctxt)
 	{
 		super(test.location, POType.SEQ_MEMBER, ctxt);
-		value = ctxt.getObligation(test + " in set elems " + sequence);
+		source = ctxt.getSource(test + " in set elems " + sequence);
 	}
 }

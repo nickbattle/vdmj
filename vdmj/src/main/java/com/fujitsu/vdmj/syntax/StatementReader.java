@@ -988,7 +988,7 @@ public class StatementReader extends SyntaxReader
 
 		ASTCaseStmtAlternativeList cases = new ASTCaseStmtAlternativeList();
 		ASTStatement others = null;
-		cases.addAll(readCaseAlternatives());
+		cases.addAll(readCaseAlternatives(exp));
 
 		while (lastToken().is(Token.COMMA))
 		{
@@ -1001,7 +1001,7 @@ public class StatementReader extends SyntaxReader
 			}
 			else
 			{
-				cases.addAll(readCaseAlternatives());
+				cases.addAll(readCaseAlternatives(exp));
 			}
 		}
 
@@ -1009,7 +1009,7 @@ public class StatementReader extends SyntaxReader
 		return new ASTCasesStatement(token, exp, cases, others);
 	}
 
-	private ASTCaseStmtAlternativeList readCaseAlternatives()
+	private ASTCaseStmtAlternativeList readCaseAlternatives(ASTExpression exp)
     	throws ParserException, LexException
     {
     	ASTCaseStmtAlternativeList alts = new ASTCaseStmtAlternativeList();
@@ -1019,7 +1019,7 @@ public class StatementReader extends SyntaxReader
 
     	for (ASTPattern p: plist)
     	{
-    		alts.add(new ASTCaseStmtAlternative(p, result));
+    		alts.add(new ASTCaseStmtAlternative(exp, p, result));
     	}
 
     	return alts;

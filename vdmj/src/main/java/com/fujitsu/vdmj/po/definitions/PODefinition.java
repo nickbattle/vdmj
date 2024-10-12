@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * The abstract parent of all definitions. A definition can represent a data
@@ -50,6 +51,9 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 
 	/** The name of the object being defined. */
 	public final TCNameToken name;
+	
+	/** The scope of the name */
+	public NameScope nameScope = null;
 	
 	/** A pointer to the enclosing class definition, if any. */
 	public POClassDefinition classDefinition = null;	// Set in subclass constructors.
@@ -65,10 +69,24 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 		super(location);
 		this.name = tcNameToken;
 	}
+	
+	public void setNameScope(NameScope scope)
+	{
+		this.nameScope = scope;
+	}
 
 	@Override
 	abstract public String toString();
 	
+	/**
+	 * For a state definition S, return a pattern like mk_S(a, b, ...) where the field patterns
+	 * are the names of the state fields. Similarly with objects, using "obj_C" patterns.
+	 */
+	public String toPattern()
+	{
+		return "?";		// Only defined for state and ClassDefinitions
+	}
+
 	/**
 	 * The definition with its types' module/class(es) explicit, if we are not the same as the
 	 * location of this definition.
@@ -110,6 +128,22 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 		TCNameList list = new TCNameList();
 		list.addAll(apply(new POGetVariableNamesVisitor(), null));
 		return list;
+	}
+	
+	/**
+	 * True, if the definition contains executable statements that update state.
+	 */
+	public boolean updatesState()
+	{
+		return false;
+	}
+	
+	/**
+	 * True, if the definition contains executable statements that read state.
+	 */
+	public boolean readsState()
+	{
+		return false;
 	}
 
 	/**

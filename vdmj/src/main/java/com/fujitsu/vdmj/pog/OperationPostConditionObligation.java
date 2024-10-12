@@ -37,14 +37,14 @@ public class OperationPostConditionObligation extends ProofObligation
 		POExplicitOperationDefinition op, POContextStack ctxt)
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
-		value = ctxt.getObligation(getExp(op.precondition, op.postcondition, null));
+		source = ctxt.getSource(getExp(op.precondition, op.postcondition, null));
 	}
 
 	public OperationPostConditionObligation(
 		POImplicitOperationDefinition op, POContextStack ctxt)
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
-		value = ctxt.getObligation(getExp(op.precondition, op.postcondition, op.errors));
+		source = ctxt.getSource(getExp(op.precondition, op.postcondition, op.errors));
 	}
 
 	private String getExp(POExpression preexp, POExpression postexp, List<POErrorCase> errs)

@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.pog;
 public class PONoCheckContext extends POContext
 {
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		return "";
 	}

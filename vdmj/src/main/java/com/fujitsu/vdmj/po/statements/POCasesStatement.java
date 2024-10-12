@@ -71,7 +71,7 @@ public class POCasesStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		boolean hasIgnore = false;
@@ -83,12 +83,18 @@ public class POCasesStatement extends POStatement
 				hasIgnore = true;
 			}
 
-			obligations.addAll(alt.getProofObligations(ctxt, env));
+			// Pushes PONotCaseContext
+			obligations.addAll(alt.getProofObligations(ctxt, globals, getStmttype(), env));
 		}
 
 		if (others != null && !hasIgnore)
 		{
-			obligations.addAll(others.getProofObligations(ctxt, env));
+			obligations.addAll(others.getProofObligations(ctxt, globals, env));
+		}
+
+		for (int i=0; i<cases.size(); i++)
+		{
+			ctxt.pop();
 		}
 
 		return obligations;

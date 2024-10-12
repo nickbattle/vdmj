@@ -40,9 +40,8 @@ public class StateInvariantObligation extends ProofObligation
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("After ");
-		sb.append(ass);
-		sb.append("\n");
+		// Note a StateDesignator is not a pattern, so this may not work!
+		sb.append("let " + ass.target + " = " + ass.exp + " in\n");
 
 		if (ass.classDefinition != null)
 		{
@@ -60,7 +59,7 @@ public class StateInvariantObligation extends ProofObligation
 			sb.append(def.invExpression);
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -72,7 +71,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append("After instance variable initializers\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getSource(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -86,7 +85,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getSource(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -100,7 +99,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getSource(sb.toString());
 	}
 
 	private String invDefs(POClassDefinition def)

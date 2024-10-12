@@ -28,10 +28,14 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -157,6 +161,22 @@ public abstract class POExpression extends PONode implements Serializable
 		}
 
 		return obligations;
+	}
+
+	public boolean updatesState()
+	{
+		POStatementStateFinder finder = new POStatementStateFinder();
+		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		TCNameSet names = vset.applyExpressionVisitor(this, true);
+		return !names.isEmpty();
+	}
+
+	public boolean readsState()
+	{
+		POStatementStateFinder finder = new POStatementStateFinder();
+		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		TCNameSet names = vset.applyExpressionVisitor(this, false);
+		return !names.isEmpty();
 	}
 
 	/**

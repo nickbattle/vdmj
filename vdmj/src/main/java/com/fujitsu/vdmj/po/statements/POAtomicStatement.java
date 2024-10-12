@@ -50,18 +50,18 @@ public class POAtomicStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POAssignmentStatement stmt: assignments)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, env));
+			obligations.addAll(stmt.getProofObligations(ctxt, globals, env));
 		}
 
 		return obligations;
 	}
-
+	
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{

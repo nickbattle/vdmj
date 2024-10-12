@@ -29,6 +29,7 @@ import java.util.Collection;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.annotations.POAnnotatedStatement;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.POAlwaysStatement;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
@@ -39,6 +40,7 @@ import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.statements.POCaseStmtAlternative;
 import com.fujitsu.vdmj.po.statements.POCasesStatement;
 import com.fujitsu.vdmj.po.statements.POCyclesStatement;
+import com.fujitsu.vdmj.po.statements.PODefStatement;
 import com.fujitsu.vdmj.po.statements.PODurationStatement;
 import com.fujitsu.vdmj.po.statements.POElseIfStatement;
 import com.fujitsu.vdmj.po.statements.POErrorCase;
@@ -96,6 +98,11 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 			return POLeafStatementVisitor.this.newCollection();
 		}
 	};
+	
+	public POVisitorSet<E, C, S> getVistorSet()
+	{
+		return visitorSet;
+	}
 	
 	private final boolean allNodes;
 	
@@ -224,6 +231,20 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C caseDefStatement(PODefStatement node, S arg)
+ 	{
+		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		
+		for (PODefinition def: node.equalsDefs)
+		{
+			all.addAll(visitorSet.applyDefinitionVisitor(def, arg));
+		}
+		
+		all.addAll(node.statement.apply(this, arg));
+		return all;
+ 	}
 
  	@Override
 	public C caseElseIfStatement(POElseIfStatement node, S arg)
@@ -301,7 +322,11 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 			}
 		}
 		
-		all.addAll(node.elseStmt.apply(this, arg));
+		if (node.elseStmt != null)
+		{
+			all.addAll(node.elseStmt.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -322,7 +347,11 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
 		for (PODefinition def: node.localDefs)
 		{
-			all.addAll(visitorSet.applyDefinitionVisitor(def, arg));
+ 			if (def instanceof POValueDefinition)
+ 			{
+ 				POValueDefinition vdef = (POValueDefinition)def;
+ 				all.addAll(visitorSet.applyExpressionVisitor(vdef.exp, arg));
+ 			}
 		}
 		
 		all.addAll(node.statement.apply(this, arg));

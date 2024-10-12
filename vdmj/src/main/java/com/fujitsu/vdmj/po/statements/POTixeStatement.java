@@ -50,16 +50,16 @@ public class POTixeStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POTixeStmtAlternative alt: traps)
 		{
-			obligations.addAll(alt.getProofObligations(ctxt, env));
+			obligations.addAll(alt.getProofObligations(ctxt, globals, env));
 		}
 
-		obligations.addAll(body.getProofObligations(ctxt, env));
+		obligations.addAll(body.getProofObligations(ctxt, globals, env));
 		return obligations;
 	}
 

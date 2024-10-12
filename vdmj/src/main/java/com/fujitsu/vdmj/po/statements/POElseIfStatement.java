@@ -51,10 +51,10 @@ public class POElseIfStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = elseIfExp.getProofObligations(ctxt, env);
-		obligations.addAll(thenStmt.getProofObligations(ctxt, env));
+		obligations.addAll(thenStmt.getProofObligations(ctxt, globals, env));
 		return obligations;
 	}
 

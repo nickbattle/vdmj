@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
@@ -85,6 +86,89 @@ public class POClassDefinition extends PODefinition
 	public String toString()
 	{
 		return	"class " + name.getName() + "\n";
+	}
+
+	@Override
+	public String toPattern()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("obj_");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				sb.append(sep);
+				sb.append(field.name.getName());
+				sb.append(" |-> ");
+				sb.append(field.name.getName());
+				sep = ", ";
+			}
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
+	
+	public String toNew()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("new ");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				sb.append(sep);
+				sb.append(field.name.getName());
+				sep = ", ";
+			}
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
+	
+	/**
+	 * True if the class has a constructor that has one parameter for each variable.
+	 * This is used in POs that need to call "new X(a, b, c)".
+	 */
+	public boolean hasNew()
+	{
+		TCTypeList allvars = new TCTypeList();
+		
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				POInstanceVariableDefinition iv = (POInstanceVariableDefinition)field;
+				allvars.add(iv.type);
+			}
+		}
+
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition op = (POExplicitOperationDefinition)field;
+				
+				if (op.isConstructor)
+				{
+					if (op.type.parameters.equals(allvars))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	@Override

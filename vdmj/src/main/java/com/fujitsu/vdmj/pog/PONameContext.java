@@ -41,7 +41,7 @@ public class PONameContext extends POContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		return "";
 	}

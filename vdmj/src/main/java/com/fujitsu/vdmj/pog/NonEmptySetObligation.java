@@ -31,6 +31,6 @@ public class NonEmptySetObligation extends ProofObligation
 	public NonEmptySetObligation(POExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.NON_EMPTY_SET, ctxt);
-		value = ctxt.getObligation(exp + " <> {}");
+		source = ctxt.getSource(exp + " <> {}");
 	}
 }

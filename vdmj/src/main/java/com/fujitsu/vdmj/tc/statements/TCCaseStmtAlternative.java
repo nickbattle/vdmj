@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.patterns.TCExpressionPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -41,14 +42,16 @@ public class TCCaseStmtAlternative extends TCNode
 	private static final long serialVersionUID = 1L;
 
 	public final LexLocation location;
+	public final TCExpression exp;
 	public final TCPattern pattern;
 	public final TCStatement statement;
 
 	private TCDefinitionList defs = null;
 
-	public TCCaseStmtAlternative(TCPattern pattern, TCStatement stmt)
+	public TCCaseStmtAlternative(TCExpression exp, TCPattern pattern, TCStatement stmt)
 	{
 		this.location = pattern.location;
+		this.exp = exp;
 		this.pattern = pattern;
 		this.statement = stmt;
 	}

@@ -53,10 +53,10 @@ public class POAnnotatedStatement extends POStatement
 	}
 	
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		annotation.poBefore(this, ctxt);
-		ProofObligationList obligations = statement.getProofObligations(ctxt, env);
+		ProofObligationList obligations = statement.getProofObligations(ctxt, null, env);
 		annotation.poAfter(this, obligations, ctxt);
 		return obligations;
 	}

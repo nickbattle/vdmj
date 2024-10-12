@@ -260,7 +260,7 @@ map ASTBlockStatement{location, assignmentDefs, statements, comments} to TCBlock
 map ASTCallObjectStatement{designator, classname, fieldname, args, comments} to TCCallObjectStatement(designator, classname, fieldname, args) set comments;
 map ASTCallStatement{name, args, comments} to TCCallStatement(name, args) set comments;
 map ASTCasesStatement{location, exp, cases, others, comments} to TCCasesStatement(location, exp, cases, others) set comments;
-map ASTCaseStmtAlternative{pattern, statement} to TCCaseStmtAlternative(pattern, statement);
+map ASTCaseStmtAlternative{exp, pattern, statement} to TCCaseStmtAlternative(exp, pattern, statement);
 map ASTCaseStmtAlternativeList{} to TCCaseStmtAlternativeList(this);
 map ASTClassInvariantStatement{name, invdefs, comments} to TCClassInvariantStatement(name, invdefs) set comments;
 map ASTCyclesStatement{location, cycles, statement, comments} to TCCyclesStatement(location, cycles, statement) set comments;

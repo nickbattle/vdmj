@@ -69,6 +69,6 @@ public class FuncComposeObligation extends ProofObligation
     		sb.append("(arg))");
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

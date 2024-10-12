@@ -213,7 +213,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
-					"source",	splitPO(po.value),
+					"source",	splitPO(po.source),
 					"status",	po.status.toString());
 			
 			poList.add(json);

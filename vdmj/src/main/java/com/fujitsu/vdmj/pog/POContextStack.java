@@ -74,7 +74,7 @@ public class POContextStack extends Stack<POContext>
 		return true;
 	}
 
-	public String getObligation(String root)
+	public String getSource(String poSource)
 	{
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before stack
 
@@ -85,7 +85,7 @@ public class POContextStack extends Stack<POContext>
 
 		for (POContext ctxt: this)
 		{
-			String po = ctxt.getContext();
+			String po = ctxt.getSource();
 
 			if (po.length() > 0)
 			{
@@ -99,7 +99,7 @@ public class POContextStack extends Stack<POContext>
 		}
 
 		result.append(indent);
-		result.append(indentNewLines(root, indent));
+		result.append(indentNewLines(poSource, indent));
 		result.append(tail);
 		result.append("\n");
 

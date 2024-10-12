@@ -143,12 +143,12 @@ public class PogTest extends TestCase
 		/* 77 */ "(forall mk_(x, y):(nat1) * (nat1) &\n  (x - y) >= 0)\n",
 		/* 78 */ "(forall mk_(n, x):(nat1) * (nat1) &\n  (not (n < 2) =>\n    ((n - 1) > 0) and ((x - 1) > 0)))\n",
 		/* 79 */ "(forall mk_(n, x):(nat1) * (nat1) &\n  (not (n < 2) =>\n    (let lhs = id3(mk_(n, x)), rhs = id3(mk_((n - 1), (x - 1))) in if lhs.#1 <> rhs.#1 then lhs.#1 > rhs.#1 else lhs.#2 > rhs.#2)))\n",
-		/* 80 */ "1 in set dom m\n",
-		/* 81 */ "1 in set dom m\n",
-		/* 82 */ "2 in set dom m\n",
-		/* 83 */ "3 in set dom m\n",
-		/* 84 */ "while (x > 0) do ...\n",
-		/* 85 */ "After iv := (iv + 1) (iv < 10)\n"
+		/* 80 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    1 in set dom m))\n",
+		/* 81 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    ((m(1) < 10) =>\n      1 in set dom m)))\n",
+		/* 82 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    (not (m(1) < 10) =>\n      2 in set dom m)))\n",
+		/* 83 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (not 1 = i =>\n    (2 = i => \n      3 in set dom m)))\n",
+		/* 84 */ "(forall obj_A(iv |-> iv):A & pre_op2(new A(iv)) =>\n  while (x > 0) do ...)\n",
+		/* 85 */ "(forall obj_A(iv |-> iv):A & pre_op2(new A(iv)) =>\n  let iv = (iv + 1) in (iv < 10))\n"
 	};
 
 	public void testPOG() throws Exception
@@ -174,7 +174,7 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			Console.out.println("/* " + ++i + " */ \"" + po.value.replaceAll("\n", "\\\\n") + "\",");
+			Console.out.println("/* " + ++i + " */ \"" + po.source.replaceAll("\n", "\\\\n") + "\",");
 			assertTrue("PO type checked failed", !po.isCheckable || po.getCheckedExpression() != null);
 		}
 
@@ -183,11 +183,11 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			if (!expected[i].equals(po.value))
+			if (!expected[i].equals(po.source))
 			{
 				Console.out.println("PO# " + (i+1));
 				Console.out.print("Expected: " + expected[i]);
-				Console.out.print("Actual: " + po.value);
+				Console.out.print("Actual: " + po.source);
 				errs++;
 			}
 
