@@ -86,7 +86,7 @@ public class SetValue extends Value
 		for (Value k: values)
 		{
 			Value v = k.getUpdatable(listeners);
-			nset.add(v);
+			nset.addNoSort(v);
 		}
 
 		return UpdatableValue.factory(new SetValue(nset, false), listeners);
@@ -100,7 +100,7 @@ public class SetValue extends Value
 		for (Value k: values)
 		{
 			Value v = k.getConstant();
-			nset.add(v);
+			nset.addNoSort(v);
 		}
 
 		return new SetValue(nset, false);
@@ -191,7 +191,7 @@ public class SetValue extends Value
 
 			for (Value v: values)
 			{
-				ns.add(v.convertValueTo(setto.setof, ctxt));
+				ns.addNoSort(v.convertValueTo(setto.setof, ctxt));
 			}
 
 			return new SetValue(ns, true);	// Re-sort, as ord_T may be different

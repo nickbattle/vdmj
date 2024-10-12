@@ -83,6 +83,11 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 			add(v);
 		}
 	}
+	
+	public boolean isSorted()
+	{
+		return isSorted;
+	}
 
 	@Override
 	public boolean equals(Object other)
