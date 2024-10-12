@@ -114,26 +114,47 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	
 	/**
 	 * Return the lowest integer power of n that is &lt;= limit. If n &lt; 2,
-	 * just return 1.
+	 * just return limit.
+	 * 
+	 * Used to calculate how many field values to generate for an n-field object.
+	 * For example, a three field tuple/record with one value each gives 1x1x1=1 records;
+	 * with two values each it gives 2x2x2=8 values, with three 3x3x3=27 values. So to
+	 * generate up to N values from F field combinations, we need to find the largest n,
+	 * such that n^F < N.
+	 * 
+	 * If there is only one field, we can generate N values.
 	 */
-	protected int leastPower(int n, int limit)
+	protected int leastPower(int F, int N)
 	{
-		int power = 1;
-
-		if (n > 1)
+		if (F > 1)
 		{
-			int value = n;
+			int n = 2;
 			
-			while (value < limit)
+			while (power(n, F) < N)
 			{
-				value = value * n;
-				power++;
+				n++;
 			}
+
+			return n-1;
 		}
-		
-		return power;
+		else
+		{
+			return N;
+		}
 	}
 	
+	private long power(int n, int p)
+	{
+		long result = n;
+		
+		for (int i=1; i<p; i++)
+		{
+			result = result * n;
+		}
+		
+		return result;
+	}
+
 	/**
 	 * Attempt to produce a function that matches a (possibly polymorphic) TCFunctionType.
 	 */
