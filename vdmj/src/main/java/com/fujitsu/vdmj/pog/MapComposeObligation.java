@@ -39,6 +39,6 @@ public class MapComposeObligation extends ProofObligation
 		sb.append(poCompExpression.left);
 		sb.append(")");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

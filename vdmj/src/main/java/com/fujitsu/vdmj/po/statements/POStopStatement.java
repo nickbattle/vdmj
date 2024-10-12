@@ -43,7 +43,7 @@ public class POStopStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		return objects.getProofObligations(ctxt, env);
 	}

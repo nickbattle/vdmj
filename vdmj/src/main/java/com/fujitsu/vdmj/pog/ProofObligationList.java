@@ -184,7 +184,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 	private void typeCheck(ProofObligation obligation, String mname, Environment env) throws Exception
 	{
 		// Some POs from VDM++ specs can include "new" etc, so parse as the given dialect
-		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Settings.dialect);
+		LexTokenReader ltr = new LexTokenReader(obligation.getSource(), Settings.dialect);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		
 		// Treat the PO as if it is an expression within the module that defines it.

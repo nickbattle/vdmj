@@ -63,6 +63,6 @@ public class FiniteMapObligation extends ProofObligation
 		sb.append(exp.first);
 		sb.append("}");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

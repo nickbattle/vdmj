@@ -52,8 +52,9 @@ public class POValueDefinition extends PODefinition
 	public final TCType type;
 	public final POExpression exp;
 	public final TCType expType;
+	public final PODefinitionList defs;
 
-	public POValueDefinition(POAnnotationList annotations, POPattern p, TCType type, POExpression exp, TCType expType)
+	public POValueDefinition(POAnnotationList annotations, POPattern p, TCType type, POExpression exp, TCType expType, PODefinitionList defs)
 	{
 		super(p.location, null);
 		
@@ -62,6 +63,7 @@ public class POValueDefinition extends PODefinition
 		this.type = type;
 		this.exp = exp;
 		this.expType = expType;
+		this.defs = defs;
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class CasesExhaustiveObligation extends ProofObligation
 		}
 
 		hasCorrelatedBinds = correlated;
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	@Override

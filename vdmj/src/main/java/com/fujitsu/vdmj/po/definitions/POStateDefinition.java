@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInitObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -81,6 +82,26 @@ public class POStateDefinition extends PODefinition
 				(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
 	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
 	    		"\nend";
+	}
+	
+	@Override
+	public String toPattern()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("mk_");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (TCField field: fields)
+		{
+			sb.append(sep);
+			sb.append(field.tag);
+			sep = ", ";
+		}
+		
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override

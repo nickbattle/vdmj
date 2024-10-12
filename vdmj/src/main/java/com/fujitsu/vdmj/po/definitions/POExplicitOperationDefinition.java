@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -40,6 +41,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONoCheckContext;
+import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
@@ -67,7 +69,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final POExplicitFunctionDefinition predef;
 	public final POExplicitFunctionDefinition postdef;
 	public final PODefinitionList paramDefinitions;
-	public final POStateDefinition state;
+	public final POStateDefinition stateDefinition;
 	public final TCType actualResult;
 	public final boolean isConstructor;
 
@@ -79,6 +81,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		POExplicitFunctionDefinition postdef,
 		PODefinitionList paramDefinitions,
 		POStateDefinition state,
+		POClassDefinition classDefinition,
 		TCType actualResult, boolean isConstructor)
 	{
 		super(name.getLocation(), name);
@@ -92,7 +95,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.predef = predef;
 		this.postdef = postdef;
 		this.paramDefinitions = paramDefinitions;
-		this.state = state;
+		this.stateDefinition = state;
+		this.classDefinition = classDefinition;
 		this.actualResult = actualResult;
 		this.isConstructor = isConstructor;
 	}
@@ -160,24 +164,80 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
-		ctxt.push(new PONoCheckContext());
-		obligations.addAll(body.getProofObligations(ctxt, env));
+		boolean updatesState = body.updatesState();
+		
+		if (stateDefinition != null)
+		{
+			if (!updatesState)
+			{
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+			}
+			else
+			{
+				ctxt.push(new PONoCheckContext());
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+				ctxt.pop();
+			}
+		}
+		else if (classDefinition != null)
+		{
+			if (Settings.release == Release.VDM_10)		// Uses the obj_C pattern
+			{
+				if (precondition == null && !updatesState)
+				{
+					ctxt.push(new POOperationDefinitionContext(this, false, classDefinition, true));
+					obligations.addAll(body.getProofObligations(ctxt, null, env));
+					ctxt.pop();
+				}
+				else	// Can't check "pre_op(args, new X(args)) => ..."
+				{
+					ctxt.push(new PONoCheckContext());
+					ctxt.push(new POOperationDefinitionContext(this, true, classDefinition, true));
+					obligations.addAll(body.getProofObligations(ctxt, null, env));
+					ctxt.pop();
+					ctxt.pop();
+				}
+			}
+		}
+		else	// Flat spec with no state defined
+		{
+			if (!updatesState)
+			{
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+			}
+			else
+			{
+				ctxt.push(new PONoCheckContext());
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
+				obligations.addAll(body.getProofObligations(ctxt, null, env));
+				ctxt.pop();
+				ctxt.pop();
+			}
+		}
 
 		if (isConstructor &&
 			classDefinition != null &&
 			classDefinition.invariant != null)
 		{
+			ctxt.push(new PONoCheckContext());
 			obligations.add(new StateInvariantObligation(this, ctxt));
+			ctxt.pop();
 		}
 
 		if (!isConstructor &&
 			!TypeComparator.isSubType(actualResult, type.result))
 		{
+			ctxt.push(new PONoCheckContext());
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
+			ctxt.pop();
 		}
 		
-		ctxt.pop();
-
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
@@ -187,6 +247,18 @@ public class POExplicitOperationDefinition extends PODefinition
 		List<POPatternList> list = new Vector<POPatternList>();
 		list.add(parameterPatterns);
 		return list;
+	}
+	
+	@Override
+	public boolean updatesState()
+	{
+		return body.updatesState();
+	}
+	
+	@Override
+	public boolean readsState()
+	{
+		return body.readsState();
 	}
 
 	@Override

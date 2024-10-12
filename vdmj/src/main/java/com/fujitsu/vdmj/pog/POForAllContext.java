@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
 
 public class POForAllContext extends POContext
 {
@@ -98,6 +99,11 @@ public class POForAllContext extends POContext
 		this.bindings = exp.bind.getMultipleBindList();
 	}
 
+	public POForAllContext(POLetBeStStatement stmt)
+	{
+		this.bindings = stmt.bind.getMultipleBindList();
+	}
+
 	@Override
 	public boolean isScopeBoundary()
 	{
@@ -105,7 +111,7 @@ public class POForAllContext extends POContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 

@@ -36,7 +36,7 @@ public class PONotImpliesContext extends POContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 

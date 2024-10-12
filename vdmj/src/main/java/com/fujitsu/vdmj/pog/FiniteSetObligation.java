@@ -64,6 +64,6 @@ public class FiniteSetObligation extends ProofObligation
 			" & " + finmap + "(" + findex + ") = ");
 		sb.append(exp.first);
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 }

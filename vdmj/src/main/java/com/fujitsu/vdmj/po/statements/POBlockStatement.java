@@ -45,13 +45,18 @@ public class POBlockStatement extends POSimpleBlockStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt, env);
 
 		ctxt.push(new POScopeContext());
-		obligations.addAll(super.getProofObligations(ctxt, env));
+		obligations.addAll(super.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
+		
+		if (!assignmentDefs.isEmpty())
+		{
+			obligations.markUnchecked("dcl statement block");
+		}
 
 		return obligations;
 	}

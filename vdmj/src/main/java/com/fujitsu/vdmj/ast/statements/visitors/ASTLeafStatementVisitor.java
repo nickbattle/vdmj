@@ -277,7 +277,11 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 			}
 		}
 		
-		all.addAll(visitorSet.applyStatementVisitor(node.elseStmt, arg));
+		if (node.elseStmt != null)
+		{
+			all.addAll(visitorSet.applyStatementVisitor(node.elseStmt, arg));
+		}
+		
 		return all;
 	}
 

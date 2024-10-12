@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -45,17 +46,32 @@ public class POOperationDefinitionContext extends POContext
 	public final String precondition;
 	public final PODefinition definition;
 	public final PODefinition stateDefinition;
+	public final boolean expandState;
+
+	public POOperationDefinitionContext(POExplicitOperationDefinition definition,
+		boolean precond, PODefinition stateDefinition, boolean expandState)
+	{
+		this.name = definition.name;
+		this.deftype = definition.type;
+		this.addPrecond = precond;
+		this.paramPatternList = definition.parameterPatterns;
+		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
+		this.stateDefinition = stateDefinition;
+		this.definition = definition;
+		this.expandState = expandState;
+	}
 
 	public POOperationDefinitionContext(POImplicitOperationDefinition definition,
-		boolean precond, PODefinition stateDefinition)
+		boolean precond, PODefinition stateDefinition, boolean expandState)
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		this.precondition = preconditionCall(name, null, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
 		this.stateDefinition = stateDefinition;
 		this.definition = definition;
+		this.expandState = expandState;
 	}
 	
 	@Override
@@ -65,7 +81,7 @@ public class POOperationDefinitionContext extends POContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -80,7 +96,7 @@ public class POOperationDefinitionContext extends POContext
 				sb.append(sep);
 				sb.append(p.removeIgnorePatterns());
 				sb.append(":");
-				sb.append(types.next());
+				sb.append(types.next().toExplicitString(name.getLocation()));
 				sep = ", ";
 			}
 
@@ -112,14 +128,34 @@ public class POOperationDefinitionContext extends POContext
 		else if (stateDefinition instanceof POStateDefinition)
 		{
 			POStateDefinition def = (POStateDefinition)stateDefinition;
-			sb.append("oldstate:");
-			sb.append(def.name.getName());
+			
+			if (expandState)
+			{
+				sb.append(def.toPattern());
+				sb.append(":");
+				sb.append(def.name.getName());
+			}
+			else
+			{
+				sb.append("oldstate:");
+				sb.append(def.name.getName());
+			}
 		}
 		else
 		{
 			POClassDefinition def = (POClassDefinition)stateDefinition;
-			sb.append("oldself:");
-			sb.append(def.name.getName());
+
+			if (expandState)
+			{
+				sb.append(def.toPattern());
+				sb.append(":");
+				sb.append(def.name.getName());
+			}
+			else
+			{
+				sb.append("oldself:");
+				sb.append(def.name.getName());
+			}
 		}
 	}
 }

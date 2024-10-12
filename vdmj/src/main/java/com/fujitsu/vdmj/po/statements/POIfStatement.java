@@ -28,6 +28,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -38,7 +40,7 @@ public class POIfStatement extends POStatement
 	public final POStatement thenStmt;
 	public final POElseIfStatementList elseList;
 	public final POStatement elseStmt;
-
+	
 	public POIfStatement(LexLocation location, POExpression ifExp, POStatement thenStmt,
 		POElseIfStatementList elseList, POStatement elseStmt)
 	{
@@ -70,21 +72,33 @@ public class POIfStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
 	{
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, env);
-		obligations.addAll(thenStmt.getProofObligations(ctxt, env));
+		
+		ctxt.push(new POImpliesContext(ifExp));
+		obligations.addAll(thenStmt.getProofObligations(ctxt, globals, env));
+		ctxt.pop();
+
+		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, env));
+			obligations.addAll(stmt.getProofObligations(ctxt, globals, env));
+			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 
 		if (elseStmt != null)
 		{
-			obligations.addAll(elseStmt.getProofObligations(ctxt, env));
+			obligations.addAll(elseStmt.getProofObligations(ctxt, globals, env));
 		}
 
+		for (int i=0; i<elseList.size(); i++)
+		{
+			ctxt.pop();
+		}
+
+		ctxt.pop();
 		return obligations;
 	}
 

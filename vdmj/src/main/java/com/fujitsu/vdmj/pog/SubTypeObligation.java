@@ -83,7 +83,7 @@ public class SubTypeObligation extends ProofObligation
 		POExpression exp, TCType etype, TCType atype, POContextStack ctxt)
 	{
 		super(exp.location, POType.SUB_TYPE, ctxt);
-		value = ctxt.getObligation(oneType(false, exp, etype, atype));
+		source = ctxt.getSource(oneType(false, exp, etype, atype));
 		return;
 	}
 
@@ -127,7 +127,7 @@ public class SubTypeObligation extends ProofObligation
 			body = func.body;
 		}
 
-		value = ctxt.getObligation(oneType(false, body, etype, atype));
+		source = ctxt.getSource(oneType(false, body, etype, atype));
 		definition = func;
 	}
 
@@ -162,7 +162,7 @@ public class SubTypeObligation extends ProofObligation
 			body = func.body;
 		}
 
-		value = ctxt.getObligation(oneType(false, body, etype, atype));
+		source = ctxt.getSource(oneType(false, body, etype, atype));
 		definition = func;
 	}
 
@@ -174,7 +174,7 @@ public class SubTypeObligation extends ProofObligation
 		POVariableExpression result = new POVariableExpression(
 			new TCNameToken(def.location, def.name.getModule(), "RESULT"), null);
 
-		value = ctxt.getObligation(oneType(false, result, def.type.result, actualResult));
+		source = ctxt.getSource(oneType(false, result, def.type.result, actualResult));
 	}
 
 	public SubTypeObligation(
@@ -202,7 +202,7 @@ public class SubTypeObligation extends ProofObligation
 			result = new POTupleExpression(def.location, args, null);
 		}
 
-		value = ctxt.getObligation(oneType(false, result, def.type.result, actualResult));
+		source = ctxt.getSource(oneType(false, result, def.type.result, actualResult));
 	}
 
 	private String oneType(boolean rec, POExpression exp, TCType etype, TCType atype)

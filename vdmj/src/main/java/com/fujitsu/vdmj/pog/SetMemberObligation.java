@@ -31,6 +31,6 @@ public class SetMemberObligation extends ProofObligation
 	public SetMemberObligation(POExpression test, POExpression set, POContextStack ctxt)
 	{
 		super(test.location, POType.SET_MEMBER, ctxt);
-		value = ctxt.getObligation(test + " in set " + set);
+		source = ctxt.getSource(test + " in set " + set);
 	}
 }

@@ -33,6 +33,6 @@ public class TotalOrderObligation extends ProofObligation
 		super(def.location, POType.TOTAL_ORDER, ctxt);
 		String po = "(forall x:%T, y:%T & x <= y or y <= x)";
 		po = po.replaceAll("%T", def.name.getName());
-		value = ctxt.getObligation(po);
+		source = ctxt.getSource(po);
 	}
 }

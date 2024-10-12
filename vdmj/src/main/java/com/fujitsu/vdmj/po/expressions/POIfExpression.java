@@ -81,7 +81,6 @@ public class POIfExpression extends POExpression
 
 		ctxt.push(new POImpliesContext(ifExp));
 		obligations.addAll(thenExp.getProofObligations(ctxt, env));
-		// obligations.addAll(checkUnionQualifiers(thenExp, TCTypeQualifier.getBoolQualifier(), ctxt));
 		ctxt.pop();
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
