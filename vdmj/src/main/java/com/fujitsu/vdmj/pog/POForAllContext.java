@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
 
 public class POForAllContext extends POContext
 {
@@ -96,6 +97,11 @@ public class POForAllContext extends POContext
 	public POForAllContext(POLetBeStExpression exp)
 	{
 		this.bindings = exp.bind.getMultipleBindList();
+	}
+
+	public POForAllContext(POLetBeStStatement stmt)
+	{
+		this.bindings = stmt.bind.getMultipleBindList();
 	}
 
 	@Override

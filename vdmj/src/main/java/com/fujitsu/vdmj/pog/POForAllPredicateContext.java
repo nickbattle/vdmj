@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.expressions.POLetBeStExpression;
 import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
+import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
 
 public class POForAllPredicateContext extends POForAllContext
 {
@@ -63,6 +64,12 @@ public class POForAllPredicateContext extends POForAllContext
 	{
 		super(exp);
 		this.predicate = exp.suchThat;
+	}
+
+	public POForAllPredicateContext(POLetBeStStatement stmt)
+	{
+		super(stmt);
+		this.predicate = stmt.suchThat;
 	}
 
 	@Override
