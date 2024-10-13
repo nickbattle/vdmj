@@ -38,6 +38,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, null));
+		markUnchecked("Unchecked in operations");
 	}
 
 	public OperationPostConditionObligation(
@@ -45,6 +46,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, op.errors));
+		markUnchecked("Unchecked in operations");
 	}
 
 	private String getExp(POExpression preexp, POExpression postexp, List<POErrorCase> errs)

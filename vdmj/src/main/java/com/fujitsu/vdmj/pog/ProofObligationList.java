@@ -261,13 +261,15 @@ public class ProofObligationList extends Vector<ProofObligation>
 	}
 
 	/**
-	 * This is used by POG to mark obligations as unchecked, with a reason.
+	 * This is used by POG to mark all obligations as unchecked, with a reason.
 	 */
-	public void markUnchecked(String message)
+	public ProofObligationList markUnchecked(String message)
 	{
 		for (ProofObligation obligation: this)
 		{
 			obligation.markUnchecked(message);
 		}
+		
+		return this;	// Convenient for getProofObligations(ctxt, env).markUnchecked("Some reason")
 	}
 }

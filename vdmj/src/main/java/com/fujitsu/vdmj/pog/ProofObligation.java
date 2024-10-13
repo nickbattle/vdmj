@@ -76,18 +76,13 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.status = POStatus.UNPROVED;
 		this.definition = ctxt.getDefinition();
 		this.number = 0;
-		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
+		this.isCheckable = true;	// Set false for some operation POs
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
 		this.counterexample = null;
 		this.witness = null;
 		this.message = null;
 		this.provedBy = null;
-		
-		if (!isCheckable)
-		{
-			this.status = POStatus.UNCHECKED;	// Implies unproved
-		}
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
@@ -153,11 +148,13 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	/**
 	 * This is used to mark obligations as unchecked, with a reason.
 	 */
-	public void markUnchecked(String message)
+	public ProofObligation markUnchecked(String message)
 	{
 		this.isCheckable = false;
 		this.setStatus(POStatus.UNCHECKED);
 		this.setMessage(message);
+		
+		return this;	// Convenient for new XYZObligation().markUnchecked("Some reason")
 	}
 
 	public boolean isExistential()

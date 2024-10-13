@@ -45,7 +45,6 @@ import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POImpliesContext;
-import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -184,18 +183,14 @@ public class POImplicitOperationDefinition extends PODefinition
 				obligations.addAll(postdef.getProofObligations(ctxt, env));
 			}
 			
-			ctxt.push(new PONoCheckContext());
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
-			ctxt.pop();
 		}
 		
 		if (body != null)
 		{
 			if (body.updatesState())
 			{
-				ctxt.push(new PONoCheckContext());
-				obligations.addAll(body.getProofObligations(ctxt, null, env));
-				ctxt.pop();
+				obligations.addAll(body.getProofObligations(ctxt, null, env).markUnchecked("Body updates state"));
 			}
 			else
 			{
@@ -206,17 +201,14 @@ public class POImplicitOperationDefinition extends PODefinition
 				classDefinition != null &&
 				classDefinition.invariant != null)
 			{
-				ctxt.push(new PONoCheckContext());
 				obligations.add(new StateInvariantObligation(this, ctxt));
-				ctxt.pop();
 			}
 
 			if (!isConstructor &&
 				!TypeComparator.isSubType(actualResult, type.result))
 			{
-				ctxt.push(new PONoCheckContext());
-				obligations.add(new SubTypeObligation(this, actualResult, ctxt));
-				ctxt.pop();
+				obligations.add(new SubTypeObligation(this, actualResult, ctxt).
+					markUnchecked("Unchecked in operations"));
 			}
 		}
 		else
