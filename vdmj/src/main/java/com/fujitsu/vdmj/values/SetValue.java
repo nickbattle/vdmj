@@ -89,7 +89,7 @@ public class SetValue extends Value
 			nset.addNoSort(v);
 		}
 
-		return UpdatableValue.factory(new SetValue(nset, false), listeners);
+		return UpdatableValue.factory(new SetValue(nset, !values.isSorted()), listeners);
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class SetValue extends Value
 			nset.addNoSort(v);
 		}
 
-		return new SetValue(nset, false);
+		return new SetValue(nset, !values.isSorted());
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class SetValue extends Value
 				ns.addNoSort(v.convertValueTo(setto.setof, ctxt));
 			}
 
-			return new SetValue(ns, true);	// Re-sort, as ord_T may be different
+			return new SetValue(ns, true);	// Re-sort, as new type's ord_T may be different
 		}
 		else
 		{
