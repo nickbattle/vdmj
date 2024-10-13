@@ -128,31 +128,21 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	{
 		if (F > 1)
 		{
-			int n = 2;
+			int power = 1;
+			int value = F;
 			
-			while (power(n, F) < N)
+			while (value < N)
 			{
-				n++;
+				value = value * F;
+				power++;
 			}
 
-			return n-1;
+			return power - 1;
 		}
 		else
 		{
 			return N;
 		}
-	}
-	
-	private long power(int n, int p)
-	{
-		long result = n;
-		
-		for (int i=1; i<p; i++)
-		{
-			result = result * n;
-		}
-		
-		return result;
 	}
 
 	/**
