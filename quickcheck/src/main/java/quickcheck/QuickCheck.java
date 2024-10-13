@@ -408,7 +408,8 @@ public class QuickCheck
 
 			if (!po.isCheckable)
 			{
-				infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED\n", po.number);
+				infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED %s\n",
+					po.number, (po.message == null ? "" : po.message));
 				return;
 			}
 			else if (sresults.provedBy != null)
