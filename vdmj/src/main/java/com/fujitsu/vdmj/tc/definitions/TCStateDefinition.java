@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -271,7 +272,9 @@ public class TCStateDefinition extends TCDefinition
 		parameters.add(params);
 
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(new TCUnresolvedType(name));
+		TCInvariantType param = recordType.copy(true);
+		ptypes.add(param);
+		// ptypes.add(new TCUnresolvedType(name));
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, TCAccessSpecifier.DEFAULT,
