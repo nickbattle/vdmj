@@ -47,6 +47,7 @@ import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
@@ -190,7 +191,8 @@ public class POImplicitOperationDefinition extends PODefinition
 		{
 			if (body.updatesState())
 			{
-				obligations.addAll(body.getProofObligations(ctxt, null, env).markUnchecked("Body updates state"));
+				obligations.addAll(body.getProofObligations(ctxt, null, env).
+					markUnchecked(ProofObligation.BODY_UPDATES_STATE));
 			}
 			else
 			{
@@ -208,7 +210,7 @@ public class POImplicitOperationDefinition extends PODefinition
 				!TypeComparator.isSubType(actualResult, type.result))
 			{
 				obligations.add(new SubTypeObligation(this, actualResult, ctxt).
-					markUnchecked("Unchecked in operations"));
+					markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 			}
 		}
 		else

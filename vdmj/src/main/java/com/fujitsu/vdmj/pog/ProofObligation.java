@@ -46,6 +46,15 @@ import com.fujitsu.vdmj.values.ParameterValue;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
+	// Arguments for the markUnchecked method.
+	public static final String NOT_YET_SUPPORTED	= "Not yet supported for operations";
+	public static final String MISSING_MEASURE		= "Obligation for missing measure function";
+	public static final String UNCHECKED_VDMPP		= "Unchecked in VDM++";
+	public static final String HIDDEN_VARIABLES		= "Obligation patterns contain hidden variables";
+	public static final String REQUIRES_VDM10		= "Obigation requires VDM10";
+	public static final String BODY_UPDATES_STATE	= "Operation body updates state";
+	public static final String LOOP_STATEMENT		= "Loop statement encountered";
+	
 	public final LexLocation location;
 	public final POType kind;
 	public final String name;
@@ -146,7 +155,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	}
 	
 	/**
-	 * This is used to mark obligations as unchecked, with a reason.
+	 * This is used to mark obligations as unchecked, with a reason code.
 	 */
 	public ProofObligation markUnchecked(String message)
 	{
@@ -154,7 +163,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.setStatus(POStatus.UNCHECKED);
 		this.setMessage(message);
 		
-		return this;	// Convenient for new XYZObligation().markUnchecked("Some reason")
+		return this;	// Convenient for new XYZObligation().markUnchecked(REASON)
 	}
 
 	public boolean isExistential()

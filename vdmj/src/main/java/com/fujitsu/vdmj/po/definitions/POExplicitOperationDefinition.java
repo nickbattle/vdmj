@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -171,7 +172,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			
 			if (updatesState)
 			{
-				oblist.markUnchecked("Body updates state");
+				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
 			}
 			
 			obligations.addAll(oblist);
@@ -182,13 +183,13 @@ public class POExplicitOperationDefinition extends PODefinition
 			ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
 			ctxt.pop();
 			
-			if (Settings.release == Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
+			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
 			{
-				oblist.markUnchecked("Obigation requires VDM10");
+				oblist.markUnchecked(ProofObligation.REQUIRES_VDM10);
 			}
 			else if (updatesState)
 			{
-				oblist.markUnchecked("Body updates state");
+				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
 			}
 				
 			obligations.addAll(oblist);
@@ -201,7 +202,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			
 			if (updatesState)
 			{
-				oblist.markUnchecked("Body updates state");
+				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
 			}
 			
 			obligations.addAll(oblist);
@@ -218,7 +219,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			!TypeComparator.isSubType(actualResult, type.result))
 		{
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt).
-				markUnchecked("Unchecked in operations"));
+				markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 		}
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);

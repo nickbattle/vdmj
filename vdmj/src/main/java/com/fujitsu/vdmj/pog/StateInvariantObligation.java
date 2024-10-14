@@ -72,7 +72,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(invDefs(def.classDefinition));
 
     	source = ctxt.getSource(sb.toString());
-    	markUnchecked("Unchecked in VDM++");
+    	markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 	}
 
 	public StateInvariantObligation(
@@ -87,7 +87,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(invDefs(def.classDefinition));
 
     	source = ctxt.getSource(sb.toString());
-    	markUnchecked("Unchecked in VDM++");
+    	markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 	}
 
 	public StateInvariantObligation(
@@ -102,7 +102,7 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(invDefs(def.classDefinition));
 
     	source = ctxt.getSource(sb.toString());
-    	markUnchecked("Unchecked in VDM++");
+    	markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 	}
 
 	private String invDefs(POClassDefinition def)

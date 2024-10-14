@@ -100,18 +100,6 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 			{
 				return false;
 			}
-			else if (isSorted && os.isSorted)
-			{
-				for (int i=0; i<size(); i++)
-				{
-					if (!this.get(i).equals(os.get(i)))
-					{
-						return false;
-					}
-				}
-				
-				return true;
-			}
 			else
 			{
 				return os.containsAll(this);	// Lookup for every element...

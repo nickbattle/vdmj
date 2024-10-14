@@ -52,11 +52,6 @@ public class POBlockStatement extends POSimpleBlockStatement
 		ctxt.push(new POScopeContext());
 		obligations.addAll(super.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
-		
-		if (!assignmentDefs.isEmpty())
-		{
-			obligations.markUnchecked("dcl statement block");
-		}
 
 		return obligations;
 	}

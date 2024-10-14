@@ -175,7 +175,7 @@ public class SubTypeObligation extends ProofObligation
 			new TCNameToken(def.location, def.name.getModule(), "RESULT"), null);
 
 		source = ctxt.getSource(oneType(false, result, def.type.result, actualResult));
-		markUnchecked("Undefined for operations");
+		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
 	public SubTypeObligation(
