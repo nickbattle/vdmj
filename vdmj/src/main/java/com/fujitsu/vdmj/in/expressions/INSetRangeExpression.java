@@ -67,7 +67,7 @@ public class INSetRangeExpression extends INSetExpression
 
     		while (from.compareTo(to) <= 0)
     		{
-    			set.addNoCheck(new IntegerValue(from));
+    			set.addSorted(new IntegerValue(from));
     			from = from.add(BigInteger.ONE);
     		}
 

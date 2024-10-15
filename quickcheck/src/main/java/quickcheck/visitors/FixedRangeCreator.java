@@ -193,7 +193,7 @@ public class FixedRangeCreator extends RangeCreator
 		{
 			try
 			{
-				result.addNoSort(new NaturalOneValue(a));
+				result.addSorted(new NaturalOneValue(a));
 			}
 			catch (Exception e)
 			{
@@ -213,7 +213,7 @@ public class FixedRangeCreator extends RangeCreator
 		{
 			try
 			{
-				result.addNoSort(new NaturalValue(a));
+				result.addSorted(new NaturalValue(a));
 			}
 			catch (Exception e)
 			{
@@ -235,11 +235,11 @@ public class FixedRangeCreator extends RangeCreator
 			case 1:		return new ValueSet(new IntegerValue(0));
 			default:
 				int a = -limit/2;
-				result.addNoSort(new IntegerValue(a++));
+				result.addSorted(new IntegerValue(a++));
 				
 				while (result.size() < limit)
 				{
-					result.addNoSort(new IntegerValue(a));
+					result.addSorted(new IntegerValue(a));
 					a++;
 				}
 		

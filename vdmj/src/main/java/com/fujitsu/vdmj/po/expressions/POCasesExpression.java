@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -100,7 +101,7 @@ public class POCasesExpression extends POExpression
 
 		if (!hidden.isEmpty())
 		{
-			_obligations.markUnchecked("Obligation patterns contain hidden variables: " + hidden);
+			_obligations.markUnchecked(ProofObligation.HIDDEN_VARIABLES + ": " + hidden);
 		}
 
 		obligations.addAll(_obligations);

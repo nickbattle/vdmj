@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -59,7 +60,7 @@ public class POForAllStatement extends POStatement
 	{
 		ProofObligationList obligations = set.getProofObligations(ctxt, env);
 		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
-		obligations.markUnchecked("Loop statement");
+		obligations.markUnchecked(ProofObligation.LOOP_STATEMENT);
 		return obligations;
 	}
 

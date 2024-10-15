@@ -65,7 +65,7 @@ public class INPowerSetExpression extends INUnaryExpression
 
     		for (ValueSet v: psets)
     		{
-    			rs.addNoCheck(new SetValue(v));
+    			rs.addSorted(new SetValue(v, false));	// Already sorted
     		}
 
     		// The additions above can take a while, because all of the SetValues are
