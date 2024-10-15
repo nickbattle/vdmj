@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.statements.POSimpleBlockStatement;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -162,7 +163,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
 		}
 		
-		boolean updatesState = body.updatesState();
+		boolean updatesState = !(body instanceof POSimpleBlockStatement) && body.updatesState();
 		
 		if (stateDefinition != null)
 		{
@@ -186,6 +187,10 @@ public class POExplicitOperationDefinition extends PODefinition
 			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
 			{
 				oblist.markUnchecked(ProofObligation.REQUIRES_VDM10);
+			}
+			else if (precondition != null)				// pre_op undefined in VDM++
+			{
+				oblist.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 			}
 			else if (updatesState)
 			{
