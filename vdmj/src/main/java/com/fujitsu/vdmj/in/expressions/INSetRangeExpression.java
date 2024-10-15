@@ -65,7 +65,7 @@ public class INSetRangeExpression extends INSetExpression
 
     		for (long i=from; i<= to; i++)
     		{
-    			set.addNoCheck(new IntegerValue(i));
+    			set.addSorted(new IntegerValue(i));
     		}
 
     		return new SetValue(set, false);

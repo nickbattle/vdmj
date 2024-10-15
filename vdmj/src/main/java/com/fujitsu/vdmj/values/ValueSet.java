@@ -100,6 +100,18 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 			{
 				return false;
 			}
+			else if (isSorted && os.isSorted)
+			{
+				for (int i=0; i<size(); i++)	// Faster than containsAll
+				{
+					if (!this.get(i).equals(os.get(i)))
+					{
+						return false;
+					}
+				}
+				
+				return true;
+			}
 			else
 			{
 				return os.containsAll(this);	// Lookup for every element...
@@ -137,18 +149,25 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 	}
 	
 	/**
-	 * Add an item, given we know it is already sorted after the add.
-	 * This is used by powersets, for efficiency.
+	 * Add an item, given we know it is already sorted after the add and that the item
+	 * does not already exist in the set. This is used by powersets, for efficiency.
 	 */
-	public boolean addNoSort(Value v)
+	public boolean addSorted(Value v)
 	{
+		isSorted = true;
 		return super.add(v);
 	}
 
-	public boolean addNoCheck(Value v)
+	public boolean addUnsorted(Value v)
 	{
 		isSorted = false;
-		return super.add(v);	// Used by power set function
+		return super.add(v);
+	}
+	
+	public boolean addSorted(Value v, boolean sorted)
+	{
+		isSorted = sorted;
+		return super.add(v);
 	}
 
 	@Override
@@ -200,7 +219,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
     			for (int i=0; i<size; i++)
     			{
-    				m.add(get(perm[i]));
+    				m.add(get(perm[i]));	// Note, unsorted
     			}
 
     			results.add(m);
@@ -246,7 +265,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 					for (int i=0; i<ss; i++)
 					{
-						ns.addNoSort(get(kc[i]));	// set it still sorted
+						ns.addSorted(get(kc[i]));	// set is still sorted
 					}
 					
 					if (++check >= 100)
