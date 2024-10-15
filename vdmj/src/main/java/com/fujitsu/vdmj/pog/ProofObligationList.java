@@ -229,7 +229,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					{
 						// Probably an implicit missing measure
 						iter.remove();
-						obligation.markUnchecked("Obligation for missing measure function");
+						obligation.markUnchecked(ProofObligation.MISSING_MEASURE);
 					}
 					break;
 					
@@ -261,13 +261,16 @@ public class ProofObligationList extends Vector<ProofObligation>
 	}
 
 	/**
-	 * This is used by POG to mark obligations as unchecked, with a reason.
+	 * This is used by POG to mark all obligations as unchecked, with a reason. Preferably,
+	 * use the reason code string constants in ProofObligation.
 	 */
-	public void markUnchecked(String message)
+	public ProofObligationList markUnchecked(String message)
 	{
 		for (ProofObligation obligation: this)
 		{
 			obligation.markUnchecked(message);
 		}
+		
+		return this;	// Convenient for getProofObligations(ctxt, env).markUnchecked("Some reason")
 	}
 }

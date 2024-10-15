@@ -110,7 +110,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	@Override
 	public TCNameSet caseLetDefStatement(POLetDefStatement node, Boolean updates)
 	{
-		TCNameSet all = newCollection();
+		TCNameSet all = super.caseLetDefStatement(node, updates);
 		
 		for (PODefinition def: node.localDefs)
 		{
@@ -128,7 +128,6 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 			}
 		}
 		
-		all.addAll(super.caseLetDefStatement(node, updates));
 		return all;
 	}
 	

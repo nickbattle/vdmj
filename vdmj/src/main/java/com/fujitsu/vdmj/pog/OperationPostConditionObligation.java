@@ -38,6 +38,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, null));
+		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
 	public OperationPostConditionObligation(
@@ -45,6 +46,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, op.errors));
+		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
 	private String getExp(POExpression preexp, POExpression postexp, List<POErrorCase> errs)

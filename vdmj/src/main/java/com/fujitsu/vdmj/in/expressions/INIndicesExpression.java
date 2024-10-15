@@ -61,10 +61,10 @@ public class INIndicesExpression extends INUnaryExpression
 
     		for (int i=1; i<= seq.size(); i++)
     		{
-    			result.addNoCheck(new NaturalOneValue(i));
+    			result.addSorted(new NaturalOneValue(i));
     		}
 
-    		return new SetValue(result);
+    		return new SetValue(result, false);
         }
         catch (ValueException e)
         {

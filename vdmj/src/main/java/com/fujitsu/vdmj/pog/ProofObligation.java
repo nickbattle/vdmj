@@ -46,6 +46,17 @@ import com.fujitsu.vdmj.values.ParameterValue;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
+	// Arguments for the markUnchecked method.
+	public static final String NOT_YET_SUPPORTED	= "Not yet supported for operations";
+	public static final String MISSING_MEASURE		= "Obligation for missing measure function";
+	public static final String UNCHECKED_VDMPP		= "Unchecked in VDM++";
+	public static final String HIDDEN_VARIABLES		= "Obligation patterns contain hidden variables";
+	public static final String REQUIRES_VDM10		= "Obigation requires VDM10";
+	public static final String BODY_UPDATES_STATE	= "Operation body updates state";
+	public static final String LOOP_STATEMENT		= "Loop statement encountered";
+	public static final String DCL_STATEMENT		= "Block contains dcl assignments";
+	public static final String HAS_UPDATED_STATE	= "Previous statements updated state";
+	
 	public final LexLocation location;
 	public final POType kind;
 	public final String name;
@@ -76,18 +87,13 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.status = POStatus.UNPROVED;
 		this.definition = ctxt.getDefinition();
 		this.number = 0;
-		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
+		this.isCheckable = true;	// Set false for some operation POs
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
 		this.counterexample = null;
 		this.witness = null;
 		this.message = null;
 		this.provedBy = null;
-		
-		if (!isCheckable)
-		{
-			this.status = POStatus.UNCHECKED;	// Implies unproved
-		}
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
@@ -151,13 +157,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	}
 	
 	/**
-	 * This is used to mark obligations as unchecked, with a reason.
+	 * This is used to mark obligations as unchecked, with a reason code.
 	 */
-	public void markUnchecked(String message)
+	public ProofObligation markUnchecked(String message)
 	{
 		this.isCheckable = false;
 		this.setStatus(POStatus.UNCHECKED);
 		this.setMessage(message);
+		
+		return this;	// Convenient for new XYZObligation().markUnchecked(REASON)
 	}
 
 	public boolean isExistential()
