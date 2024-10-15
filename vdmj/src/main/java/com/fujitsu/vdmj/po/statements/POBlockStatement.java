@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POScopeContext;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -52,6 +53,11 @@ public class POBlockStatement extends POSimpleBlockStatement
 		ctxt.push(new POScopeContext());
 		obligations.addAll(super.getProofObligations(ctxt, globals, env));
 		ctxt.pop();
+		
+		if (!assignmentDefs.isEmpty())
+		{
+			obligations.markUnchecked(ProofObligation.DCL_STATEMENT);
+		}
 
 		return obligations;
 	}

@@ -24,8 +24,11 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 
 public class POLetDefContext extends POContext
 {
@@ -40,6 +43,13 @@ public class POLetDefContext extends POContext
 	{
 		this.localDefs = new PODefinitionList();
 		this.localDefs.add(localDef);
+	}
+
+	public POLetDefContext(POAssignmentDefinition dcl)
+	{
+		this.localDefs = new PODefinitionList();
+		this.localDefs.add(new POValueDefinition(null,
+			new POIdentifierPattern(dcl.name), dcl.type, dcl.expression, dcl.expType, new PODefinitionList()));
 	}
 
 	@Override
