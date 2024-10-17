@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.statements.POErrorCaseList;
 import com.fujitsu.vdmj.po.statements.POExternalClauseList;
-import com.fujitsu.vdmj.po.statements.POSimpleBlockStatement;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.po.types.POPatternListTypePairList;
@@ -45,6 +44,7 @@ import com.fujitsu.vdmj.po.types.POPatternTypePair;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
@@ -190,38 +190,27 @@ public class POImplicitOperationDefinition extends PODefinition
 		
 		if (body != null)
 		{
-			boolean updatesState = !(body instanceof POSimpleBlockStatement) && body.updatesState();
+			POGState pstate = new POGState();
 			
 			if (stateDefinition != null)
 			{
 				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
-				ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
+				obligations.addAll(body.getProofObligations(ctxt, pstate, env));
 				ctxt.pop();
-				
-				if (updatesState)
-				{
-					oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
-				}
-				
-				obligations.addAll(oblist);
 			}
 			else if (classDefinition != null)
 			{
 				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
-				ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
+				ProofObligationList oblist = body.getProofObligations(ctxt, pstate, env);
 				ctxt.pop();
 				
 				if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
 				{
 					oblist.markUnchecked(ProofObligation.REQUIRES_VDM10);
 				}
-				else if (precondition != null)				// pre_op undefined in VDM++
+				else if (precondition != null)				// pre_op state param undefined in VDM++
 				{
 					oblist.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
-				}
-				else if (updatesState)
-				{
-					oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
 				}
 					
 				obligations.addAll(oblist);
@@ -229,15 +218,8 @@ public class POImplicitOperationDefinition extends PODefinition
 			else	// Flat spec with no state defined
 			{
 				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
-				ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
+				obligations.addAll(body.getProofObligations(ctxt, pstate, env));
 				ctxt.pop();
-				
-				if (updatesState)
-				{
-					oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
-				}
-				
-				obligations.addAll(oblist);
 			}
 
 			if (isConstructor &&

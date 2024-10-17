@@ -35,11 +35,11 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
-import com.fujitsu.vdmj.po.statements.POSimpleBlockStatement;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
@@ -163,25 +163,18 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
 		}
 		
-		boolean updatesState = !(body instanceof POSimpleBlockStatement) && body.updatesState();
+		POGState pstate = new POGState();
 		
 		if (stateDefinition != null)
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
-			ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
+			obligations.addAll(body.getProofObligations(ctxt, pstate, env));
 			ctxt.pop();
-			
-			if (updatesState)
-			{
-				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
-			}
-			
-			obligations.addAll(oblist);
 		}
 		else if (classDefinition != null)
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
-			ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
+			ProofObligationList oblist = body.getProofObligations(ctxt, pstate, env);
 			ctxt.pop();
 			
 			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
@@ -192,25 +185,14 @@ public class POExplicitOperationDefinition extends PODefinition
 			{
 				oblist.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 			}
-			else if (updatesState)
-			{
-				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
-			}
 				
 			obligations.addAll(oblist);
 		}
 		else	// Flat spec with no state defined
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
-			ProofObligationList oblist = body.getProofObligations(ctxt, null, env);
+			obligations.addAll(body.getProofObligations(ctxt, pstate, env));
 			ctxt.pop();
-			
-			if (updatesState)
-			{
-				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
-			}
-			
-			obligations.addAll(oblist);
 		}
 
 		if (isConstructor &&

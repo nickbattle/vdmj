@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2024 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -23,48 +23,41 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.pog;
 
+import java.util.Vector;
+
 /**
- * A class to hold state information for POG of statements, which involve potentially
- * changing state variables.
+ * A list of POG states for the sub-clauses in a statements. These are combined when
+ * the execution paths rejoin.
  */
-public class POGState
+public class POGStateList extends Vector<POGState>
 {
-	private boolean hasUpdatedState;
-	private boolean hasReadState;
+	private static final long serialVersionUID = 1L;
 	
-	public POGState()
+	/**
+	 * Add a clone of the parent and return it for use in subclauses.
+	 */
+	public POGState addCopy(POGState parent)
 	{
-		hasUpdatedState = false;
-	}
-	
-	private POGState(boolean hasUpdatedState, boolean hasReadState)
-	{
-		this.hasUpdatedState = hasUpdatedState;
-		this.hasReadState = hasReadState;
+		POGState newState = parent.getCopy();
+		this.add(newState);
+		return newState;
 	}
 	
-	public POGState getCopy()
+	/**
+	 * Combine all of the subclause states and update the parent.
+	 */
+	public void combineInto(POGState parent)
 	{
-		return new POGState(hasUpdatedState, hasReadState);
-	}
-	
-	public boolean hasUpdatedState()
-	{
-		return hasUpdatedState;
-	}
-	
-	public boolean hasReadState()
-	{
-		return hasReadState;
-	}
-
-	public void didUpdateState(boolean flag)
-	{
-		hasUpdatedState = hasUpdatedState || flag;
-	}
-
-	public void didReadState(boolean flag)
-	{
-		hasReadState = hasReadState || flag;
+		boolean hasUpdatedState = false;
+		boolean hasReadState = false;
+		
+		for (POGState state: this)
+		{
+			hasUpdatedState = hasUpdatedState || state.hasUpdatedState();
+			hasReadState = hasReadState || state.hasReadState();
+		}
+		
+		parent.didUpdateState(hasUpdatedState);
+		parent.didReadState(hasReadState);
 	}
 }

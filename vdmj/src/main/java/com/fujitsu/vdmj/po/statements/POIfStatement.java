@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -75,23 +76,30 @@ public class POIfStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
+		POGStateList stateList = new POGStateList();
+
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, env);
+		obligations.stateUpdate(pogState, ifExp);
 		
 		ctxt.push(new POImpliesContext(ifExp));
-		obligations.addAll(thenStmt.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		ctxt.pop();
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, pogState, env));
+			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, env);
+			oblist.stateUpdate(pogState, stmt.elseIfExp);
+			obligations.addAll(oblist);
+
+			oblist.addAll(stmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 
 		if (elseStmt != null)
 		{
-			obligations.addAll(elseStmt.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(elseStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		}
 
 		for (int i=0; i<elseList.size(); i++)
@@ -100,6 +108,8 @@ public class POIfStatement extends POStatement
 		}
 
 		ctxt.pop();
+		stateList.combineInto(pogState);	
+		
 		return obligations;
 	}
 

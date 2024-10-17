@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -70,23 +69,10 @@ abstract public class POSimpleBlockStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		boolean hasUpdatedState = false;
 
 		for (POStatement stmt: statements)
 		{
-			ProofObligationList oblist = stmt.getProofObligations(ctxt, pogState, env);
-			
-			if (stmt.updatesState())
-			{
-				hasUpdatedState = true;
-				oblist.markUnchecked(ProofObligation.BODY_UPDATES_STATE);
-			}
-			else if (stmt.readsState() && hasUpdatedState)
-			{
-				oblist.markUnchecked(ProofObligation.HAS_UPDATED_STATE);
-			}
-
-			obligations.addAll(oblist);
+			obligations.addAll(stmt.getProofObligations(ctxt, pogState, env));
 		}
 		
 		return obligations;
