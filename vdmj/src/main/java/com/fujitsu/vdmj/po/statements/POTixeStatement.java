@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -54,12 +55,14 @@ public class POTixeStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		POGStateList stateList = new POGStateList();
 
 		for (POTixeStmtAlternative alt: traps)
 		{
-			obligations.addAll(alt.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(alt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		}
 
+		stateList.combineInto(pogState);
 		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 		return obligations;
 	}

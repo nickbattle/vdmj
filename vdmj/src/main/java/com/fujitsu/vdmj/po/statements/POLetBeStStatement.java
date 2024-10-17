@@ -69,7 +69,9 @@ public class POLetBeStStatement extends POStatement
 		if (suchThat != null)
 		{
 			ctxt.push(new POForAllContext(this));
-			obligations.addAll(suchThat.getProofObligations(ctxt, env));
+			ProofObligationList oblist = suchThat.getProofObligations(ctxt, env);
+			oblist.stateUpdate(pogState, suchThat);
+			obligations.addAll(oblist);
 			ctxt.pop();
 		}
 

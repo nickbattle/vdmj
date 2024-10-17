@@ -276,11 +276,11 @@ public class ProofObligationList extends Vector<ProofObligation>
 
 	/**
 	 * Update the obligations in this list because of the current POGState, and then update
-	 * the POGState to account for the state read/updates in ifExp.
+	 * the POGState to account for the state read/updates in expression.
 	 */
-	public void stateUpdate(POGState pstate, POExpression ifExp)
+	public void stateUpdate(POGState pstate, POExpression expression)
 	{
-		boolean readsState = ifExp.readsState();
+		boolean readsState = expression.readsState();
 		
 		if (pstate.hasUpdatedState() && readsState)
 		{

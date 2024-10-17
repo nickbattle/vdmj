@@ -32,5 +32,6 @@ public class WhileLoopObligation extends ProofObligation
 	{
 		super(stmt.location, POType.WHILE_LOOP, ctxt);
 		source = ctxt.getSource("while " + stmt.exp + " do ...");
+		markUnchecked(ProofObligation.LOOP_STATEMENT);
 	}
 }

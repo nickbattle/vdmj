@@ -91,9 +91,10 @@ public class POIfStatement extends POStatement
 		{
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, env);
 			oblist.stateUpdate(pogState, stmt.elseIfExp);
-			obligations.addAll(oblist);
 
-			oblist.addAll(stmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+
+			obligations.addAll(oblist);
 			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 

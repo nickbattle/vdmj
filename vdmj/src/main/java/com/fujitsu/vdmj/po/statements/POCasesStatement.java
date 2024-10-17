@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -75,6 +76,7 @@ public class POCasesStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		POGStateList stateList = new POGStateList();
 		boolean hasIgnore = false;
 
 		for (POCaseStmtAlternative alt: cases)
@@ -85,18 +87,20 @@ public class POCasesStatement extends POStatement
 			}
 
 			// Pushes PONotCaseContext
-			obligations.addAll(alt.getProofObligations(ctxt, pogState, getStmttype(), env));
+			obligations.addAll(alt.getProofObligations(ctxt, stateList.addCopy(pogState), getStmttype(), env));
 		}
 
 		if (others != null && !hasIgnore)
 		{
-			obligations.addAll(others.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(others.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		}
 
 		for (int i=0; i<cases.size(); i++)
 		{
 			ctxt.pop();
 		}
+		
+		stateList.combineInto(pogState);
 
 		return obligations;
 	}

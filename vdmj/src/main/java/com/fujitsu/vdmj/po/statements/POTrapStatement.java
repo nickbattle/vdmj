@@ -87,8 +87,9 @@ public class POTrapStatement extends POStatement
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 
-		list.addAll(with.getProofObligations(ctxt, pogState, env));
+		// The "with" clause sees the "body" state updates, potentially
 		list.addAll(body.getProofObligations(ctxt, pogState, env));
+		list.addAll(with.getProofObligations(ctxt, pogState, env));
 		return list;
 	}
 
