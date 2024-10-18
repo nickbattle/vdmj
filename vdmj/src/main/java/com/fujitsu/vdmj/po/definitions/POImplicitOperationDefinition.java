@@ -24,9 +24,6 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -35,6 +32,7 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.POPatternListList;
 import com.fujitsu.vdmj.po.statements.POErrorCaseList;
 import com.fujitsu.vdmj.po.statements.POExternalClauseList;
 import com.fujitsu.vdmj.po.statements.POStatement;
@@ -251,9 +249,9 @@ public class POImplicitOperationDefinition extends PODefinition
 		return obligations;
 	}
 
-	public List<POPatternList> getListParamPatternList()
+	public POPatternListList getListParamPatternList()
 	{
-		List<POPatternList> list = new Vector<POPatternList>();
+		POPatternListList list = new POPatternListList();
 		
 		for (POPatternListTypePair p: parameterPatterns)
 		{

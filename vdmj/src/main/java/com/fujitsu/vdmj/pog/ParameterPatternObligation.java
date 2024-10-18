@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.POPatternListList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -85,7 +86,7 @@ public class ParameterPatternObligation extends ProofObligation
 			generate(def.getListParamPatternList(), def.type.parameters, def.type.result));
 	}
 
-	private String generate(List<POPatternList> plist, TCTypeList params, TCType result)
+	private String generate(POPatternListList plist, TCTypeList params, TCType result)
 	{
 		StringBuilder foralls = new StringBuilder();
 		StringBuilder argnames = new StringBuilder();
