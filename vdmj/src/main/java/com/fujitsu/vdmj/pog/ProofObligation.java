@@ -28,17 +28,22 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.POPatternListList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
+import com.fujitsu.vdmj.po.types.POPatternListTypePairList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -267,43 +272,69 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 
 	public String getLaunch(Context ctxt)
 	{
-		if (definition instanceof POExplicitFunctionDefinition)
+		try
 		{
-			POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)definition;
-			return launchExplicitFunction(efd, ctxt);
+			if (definition instanceof POExplicitFunctionDefinition)
+			{
+				POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)definition;
+				return
+					launchNameTypes(efd.name, efd.typeParams, ctxt) +
+					launchArguments(efd.paramPatternList, ctxt);
+			}
+			else if (definition instanceof POImplicitFunctionDefinition)
+			{
+				POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)definition;
+				return
+					launchNameTypes(ifd.name, ifd.typeParams, ctxt) +
+					launchArguments(ifd.parameterPatterns, ctxt);
+			}
+			else if (definition instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition eop = (POExplicitOperationDefinition)definition;
+				return
+					launchNameTypes(eop.name, null, ctxt) +
+					launchArguments(eop.getParamPatternList(), ctxt);
+			}
+			else if (definition instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition iop = (POImplicitOperationDefinition)definition;
+				return
+					launchNameTypes(iop.name, null, ctxt) +
+					launchArguments(iop.parameterPatterns, ctxt);
+			}
+			else if (kind.isStandAlone())
+			{
+				// PO is a stand alone expression, so just execute that
+				return source.trim();
+			}
 		}
-		else if (definition instanceof POImplicitFunctionDefinition)
+		catch (Exception e)
 		{
-			POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)definition;
-			return launchImplicitFunction(ifd, ctxt);
-		}
-		else if (kind.isStandAlone())
-		{
-			// PO is a stand alone expression, so just execute that
-			return source.trim();
+			// Cannot match all parameters from context
 		}
 
-		return null;	// Unexpected definition
+		return null;
 	}
 	
-	private String launchExplicitFunction(POExplicitFunctionDefinition efd, Context ctxt)
+	private String launchNameTypes(TCNameToken name, TCTypeList typeParams, Context ctxt) throws Exception
 	{
-		StringBuilder callString = new StringBuilder(efd.name.getName());
+		StringBuilder callString = new StringBuilder(name.getName());
 		PORemoveIgnoresVisitor.init();
 		
-		if (efd.typeParams != null)
+		if (typeParams != null)
 		{
-			String inst = addTypeParams(efd.typeParams, ctxt);
-			
-			if (inst == null)
-			{
-				return null;
-			}
-			
+			String inst = addTypeParams(typeParams, ctxt);
 			callString.append(inst);
 		}
-		
-		for (POPatternList pl: efd.paramPatternList)
+
+		return  callString.toString();
+	}
+
+	private String launchArguments(POPatternListList paramPatternList, Context ctxt) throws Exception
+	{
+		StringBuilder callString = new StringBuilder();
+
+		for (POPatternList pl: paramPatternList)
 		{
 			String sep = "";
 			callString.append("(");
@@ -311,12 +342,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			for (POPattern p: pl)
 			{
 				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-				
-				if (match == null)
-				{
-					return null;	// Can't match some params
-				}
-
 				callString.append(sep);
 				callString.append(match);
 				sep = ", ";
@@ -328,37 +353,17 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		return  callString.toString();
 	}
 	
-	private String launchImplicitFunction(POImplicitFunctionDefinition ifd, Context ctxt)
+	private String launchArguments(POPatternListTypePairList parameterPatterns, Context ctxt) throws Exception
 	{
-		StringBuilder callString = new StringBuilder(ifd.name.getName());
-		PORemoveIgnoresVisitor.init();
-		
-		if (ifd.typeParams != null)
-		{
-			String inst = addTypeParams(ifd.typeParams, ctxt);
-			
-			if (inst == null)
-			{
-				return null;
-			}
-			
-			callString.append(inst);
-		}
-
+		StringBuilder callString = new StringBuilder();
 		String sep = "";
 		callString.append("(");
 		
-		for (POPatternListTypePair pl: ifd.parameterPatterns)
+		for (POPatternListTypePair pl: parameterPatterns)
 		{
 			for (POPattern p: pl.patterns)
 			{
 				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-				
-				if (match == null)
-				{
-					return null;	// Can't match some params
-				}
-
 				callString.append(sep);
 				callString.append(match);
 				sep = ", ";
@@ -369,8 +374,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		return callString.toString();
 	}
-	
-	private String addTypeParams(TCTypeList params, Context ctxt)
+
+	private String addTypeParams(TCTypeList params, Context ctxt) throws Exception
 	{
 		StringBuilder callString = new StringBuilder();
 		String sep = "";
@@ -383,7 +388,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			
 			if (inst == null)
 			{
-				return null;	// Missing type parameter?
+				throw new Exception("Can't match type param " + param);
 			}
 			
 			callString.append(sep);
@@ -395,13 +400,24 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		return callString.toString();
 	}
 
-	private String paramMatch(POPattern p, Context ctxt)
+	private String paramMatch(POPattern p, Context ctxt) throws Exception
 	{
 		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
 		String result = p.apply(visitor, ctxt);
-		return visitor.hasFailed() ? null : result;
+		
+		if (visitor.hasFailed())
+		{
+			throw new Exception("Can't match param " + p);
+		}
+		else
+		{
+			return result;
+		}
 	}
 
+	/**
+	 * True if the PO itself generates proof obligations.
+	 */
 	public boolean hasObligations()
 	{
 		return hasObligations ;

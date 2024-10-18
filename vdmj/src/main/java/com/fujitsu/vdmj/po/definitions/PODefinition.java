@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.definitions.visitors.POGetVariableNamesVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -161,7 +162,9 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	abstract public TCType getType();
 
 	/**
-	 * Get a list of proof obligations for the definition.
+	 * Get a list of proof obligations for the definition. The second method is used
+	 * to track the POG state for updates to state variables, which is only used
+	 * by a few definition types (eg. POAssignmentDefinitions).
 	 *
 	 * @param ctxt The call context.
 	 * @return A list of POs.
@@ -169,6 +172,11 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
+	}
+
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
+	{
+		return getProofObligations(ctxt, env);	// Default to stateless version
 	}
 
 	/**

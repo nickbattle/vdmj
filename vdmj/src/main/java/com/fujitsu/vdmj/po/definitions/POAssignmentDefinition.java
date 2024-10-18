@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -66,10 +67,11 @@ public class POAssignmentDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.addAll(expression.getProofObligations(ctxt, env));
+		obligations.stateUpdate(pogState, expression);
 
 		if (!TypeComparator.isSubType(ctxt.checkType(expression, expType), type))
 		{

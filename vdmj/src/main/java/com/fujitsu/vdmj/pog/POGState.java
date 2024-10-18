@@ -35,12 +35,20 @@ public class POGState
 	public POGState()
 	{
 		hasUpdatedState = false;
+		hasReadState = false;
 	}
 	
 	private POGState(boolean hasUpdatedState, boolean hasReadState)
 	{
 		this.hasUpdatedState = hasUpdatedState;
 		this.hasReadState = hasReadState;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return (hasUpdatedState ? "has" : "has not") + " updated state; " +
+			   (hasReadState ?    "has" : "has not") + " read state";
 	}
 	
 	public POGState getCopy()

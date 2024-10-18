@@ -49,7 +49,7 @@ public class POBlockStatement extends POSimpleBlockStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt, env);
+		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt, pogState, env);
 
 		ctxt.push(new POScopeContext());
 		obligations.addAll(super.getProofObligations(ctxt, pogState, env));
