@@ -28,7 +28,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
@@ -276,6 +278,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)definition;
 			return launchImplicitFunction(ifd, ctxt);
+		}
+		else if (definition instanceof POExplicitOperationDefinition ||
+				 definition instanceof POImplicitOperationDefinition)
+		{
+			return null;	// Can't do these yet
 		}
 		else if (kind.isStandAlone())
 		{
