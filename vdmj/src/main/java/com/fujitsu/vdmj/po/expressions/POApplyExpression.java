@@ -88,7 +88,7 @@ public class POApplyExpression extends POExpression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (type.isMap(location))
+		if (!type.isUnknown(location) && type.isMap(location))
 		{
 			TCMapType m = type.getMap();
 			obligations.add(new MapApplyObligation(root, args.get(0), ctxt));
@@ -144,7 +144,7 @@ public class POApplyExpression extends POExpression
 			}
 		}
 
-		if (type.isSeq(location))
+		if (!type.isUnknown(location) && type.isSeq(location))
 		{
 			obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
 		}
