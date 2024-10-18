@@ -62,9 +62,14 @@ public class POForAllStatement extends POStatement
 		ProofObligationList obligations = set.getProofObligations(ctxt, env);
 		obligations.stateUpdate(pogState, set);
 
-		obligations.addAll(statement.getProofObligations(ctxt, pogState, env).
-			markUnchecked(ProofObligation.LOOP_STATEMENT));
+		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 		
+		if (statement.updatesState())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
+
+		obligations.addAll(loops);
 		return obligations;
 	}
 

@@ -62,9 +62,14 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(exp.getProofObligations(ctxt, env));
 		obligations.stateUpdate(pogState, exp);
 		
-		obligations.addAll(statement.getProofObligations(ctxt, pogState, env).
-			markUnchecked(ProofObligation.LOOP_STATEMENT));
+		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+		
+		if (statement.updatesState())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
 
+		obligations.addAll(loops);
 		return obligations;
 	}
 

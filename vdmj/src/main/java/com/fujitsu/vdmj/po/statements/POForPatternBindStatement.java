@@ -98,7 +98,14 @@ public class POForPatternBindStatement extends POStatement
 			ctxt.pop();
 		}
 
-		list.addAll(statement.getProofObligations(ctxt, pogState, env).markUnchecked(ProofObligation.LOOP_STATEMENT));
+		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+		
+		if (statement.updatesState())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
+
+		list.addAll(loops);
 		return list;
 	}
 
