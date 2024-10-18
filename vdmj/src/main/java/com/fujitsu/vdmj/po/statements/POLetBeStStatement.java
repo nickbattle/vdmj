@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.LetBeExistsObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -59,7 +60,7 @@ public class POLetBeStStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.add(new LetBeExistsObligation(this, ctxt));
@@ -68,12 +69,14 @@ public class POLetBeStStatement extends POStatement
 		if (suchThat != null)
 		{
 			ctxt.push(new POForAllContext(this));
-			obligations.addAll(suchThat.getProofObligations(ctxt, env));
+			ProofObligationList oblist = suchThat.getProofObligations(ctxt, env);
+			oblist.stateUpdate(pogState, suchThat);
+			obligations.addAll(oblist);
 			ctxt.pop();
 		}
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		return obligations;

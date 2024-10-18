@@ -27,9 +27,6 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POElseIfStatement extends POStatement
 {
@@ -49,14 +46,9 @@ public class POElseIfStatement extends POStatement
 	{
 		return "elseif " + elseIfExp + "\nthen\n" + thenStmt;
 	}
-
-	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
-	{
-		ProofObligationList obligations = elseIfExp.getProofObligations(ctxt, env);
-		obligations.addAll(thenStmt.getProofObligations(ctxt, globals, env));
-		return obligations;
-	}
+	
+	// getProofObligations is performed in the POIfExpression, to catch all of the alternative
+	// POGStates and combine them at the end.
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

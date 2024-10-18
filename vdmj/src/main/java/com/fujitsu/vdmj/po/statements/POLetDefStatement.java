@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -52,12 +53,12 @@ public class POLetDefStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = localDefs.getDefProofObligations(ctxt, env);
 
 		ctxt.push(new POLetDefContext(this.localDefs));
-		obligations.addAll(statement.getProofObligations(ctxt, globals, env));
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		return obligations;

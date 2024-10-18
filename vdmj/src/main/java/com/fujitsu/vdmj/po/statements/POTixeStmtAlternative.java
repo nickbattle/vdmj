@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -52,7 +53,7 @@ public class POTixeStmtAlternative implements Mappable
 		return patternBind + " |-> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -80,7 +81,7 @@ public class POTixeStmtAlternative implements Mappable
 		}
 
 
-		list.addAll(statement.getProofObligations(ctxt, globals, env));
+		list.addAll(statement.getProofObligations(ctxt, pogState, env));
 		return list;
 	}
 }

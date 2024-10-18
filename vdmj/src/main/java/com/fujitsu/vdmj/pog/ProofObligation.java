@@ -51,9 +51,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public static final String MISSING_MEASURE		= "Obligation for missing measure function";
 	public static final String UNCHECKED_VDMPP		= "Unchecked in VDM++";
 	public static final String HIDDEN_VARIABLES		= "Obligation patterns contain hidden variables";
-	public static final String REQUIRES_VDM10		= "Obigation requires VDM10";
+	public static final String REQUIRES_VDM10		= "Obligation requires VDM10";
 	public static final String BODY_UPDATES_STATE	= "Operation body updates state";
-	public static final String LOOP_STATEMENT		= "Loop statement encountered";
+	public static final String LOOP_STATEMENT		= "Loop modifies state";
 	public static final String DCL_STATEMENT		= "Block contains dcl assignments";
 	public static final String HAS_UPDATED_STATE	= "Previous statements updated state";
 	
