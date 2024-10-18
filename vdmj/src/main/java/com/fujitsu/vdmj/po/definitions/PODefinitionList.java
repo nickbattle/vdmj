@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -72,6 +73,9 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		return sb.toString();
 	}
 
+	/**
+	 * Get the proof obligations from every definition in the list.
+	 */
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
@@ -81,6 +85,21 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 			ctxt.push(new PONameContext(d.getVariableNames()));
 			obligations.addAll(d.getProofObligations(ctxt, env));
 			ctxt.pop();
+		}
+
+		return obligations;
+	}
+
+	/**
+	 * Get the proof obligations from every definition in the list and track POGState.
+	 */
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+
+		for (PODefinition d: this)
+		{
+			obligations.addAll(d.getProofObligations(ctxt, pogState, env));
 		}
 
 		return obligations;
