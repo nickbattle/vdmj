@@ -273,4 +273,20 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		return this;	// Convenient for getProofObligations(ctxt, env).markUnchecked("Some reason")
 	}
+
+	/**
+	 * Update the obligations in this list because of the current POGState, and then update
+	 * the POGState to account for the state read/updates in expression.
+	 */
+	public void stateUpdate(POGState pstate, POExpression expression)
+	{
+		boolean readsState = expression.readsState();
+		
+		if (pstate.hasUpdatedState() && readsState)
+		{
+			markUnchecked(ProofObligation.HAS_UPDATED_STATE);
+		}
+		
+		pstate.didReadState(readsState);
+	}
 }

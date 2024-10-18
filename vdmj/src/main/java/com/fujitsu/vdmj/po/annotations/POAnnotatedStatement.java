@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -53,7 +54,7 @@ public class POAnnotatedStatement extends POStatement
 	}
 	
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		annotation.poBefore(this, ctxt);
 		ProofObligationList obligations = statement.getProofObligations(ctxt, null, env);

@@ -33,6 +33,8 @@ import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -64,9 +66,10 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = exp.getProofObligations(ctxt, env);
+		list.stateUpdate(pogState, exp);
 
 		if (patternBind.pattern != null)
 		{
@@ -95,7 +98,14 @@ public class POForPatternBindStatement extends POStatement
 			ctxt.pop();
 		}
 
-		list.addAll(statement.getProofObligations(ctxt, globals, env));
+		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+		
+		if (statement.updatesState())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
+
+		list.addAll(loops);
 		return list;
 	}
 

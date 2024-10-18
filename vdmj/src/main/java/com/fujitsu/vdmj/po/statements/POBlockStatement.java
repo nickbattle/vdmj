@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -46,12 +47,12 @@ public class POBlockStatement extends POSimpleBlockStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt, env);
 
 		ctxt.push(new POScopeContext());
-		obligations.addAll(super.getProofObligations(ctxt, globals, env));
+		obligations.addAll(super.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 		
 		if (!assignmentDefs.isEmpty())

@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -70,7 +71,7 @@ public class POAssignmentStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -83,6 +84,8 @@ public class POAssignmentStatement extends POStatement
 
 		obligations.addAll(target.getProofObligations(ctxt));
 		obligations.addAll(exp.getProofObligations(ctxt, env));
+		obligations.stateUpdate(pogState, exp);
+		pogState.didUpdateState(true);
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{

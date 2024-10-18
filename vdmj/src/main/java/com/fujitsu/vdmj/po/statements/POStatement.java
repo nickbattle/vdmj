@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -62,11 +63,11 @@ public abstract class POStatement extends PONode implements Serializable
 	 * Get a list of proof obligations from the statement.
 	 *
 	 * @param ctxt The call context.
-	 * @param globals The global context created by this statement, if any.
+	 * @param pogState The global context created by this statement, if any.
 	 * @param env The Environment to lookup symbols.
 	 * @return The list of proof obligations.
 	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt, POContextStack globals, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();
 	}
