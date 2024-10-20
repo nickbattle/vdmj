@@ -200,7 +200,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (!end.is(Token.EOF))
 		{
-			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
+			throw new ParserException(2330, "POG: Tokens found after obligation at " + end, LexLocation.ANY, 0);
 		}
 		
 		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
@@ -210,7 +210,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (!potype.isType(TCBooleanType.class, obligation.location))
 		{
-			throw new ParserException(2330, "PO is not boolean?", obligation.location, 0);
+			throw new ParserException(2336, "POG: Obligation is not boolean?", obligation.location, 0);
 		}
 		
 		// Weed out errors that we can cope with
@@ -245,7 +245,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
-			throw new ParserException(2330, "PO has type errors?", obligation.location, 0);
+			throw new ParserException(2337, "POG Obligation has type errors?", obligation.location, 0);
 		}
 
 		obligation.setCheckedExpression(tcexp);

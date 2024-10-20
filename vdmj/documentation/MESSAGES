@@ -400,12 +400,14 @@ as the expected and actual values.
 2327, "Type set1 is not available in classic"
 2328, "Sequence binds are not available in classic"
 2329, "Duplicate <keyword> keyword"
-2330, "Tokens found after expression at <token>"
+2330, "POG: Tokens found after obligation at <token>"
 2331, "Expecting inv, eq or ord clause"
 2332, "Duplicate inv clause"
 2333, "Type eq/ord clauses not available in classic"
 2334, "Failed to instantiate AST<name>Annotation"
 2335, "Maximal '!' not allowed here"
+2336, "POG: Obligation is not boolean?"
+2337, "POG Obligation has type errors?"
 
 
 3000, "Expression does not match declared type"
