@@ -274,18 +274,6 @@ public class POImplicitOperationDefinition extends PODefinition
 	}
 
 	@Override
-	public boolean updatesState()
-	{
-		return body == null ? false : body.updatesState();
-	}
-	
-	@Override
-	public boolean readsState()
-	{
-		return body == null ? false : body.readsState();
-	}
-
-	@Override
 	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseImplicitOperationDefinition(this, arg);
