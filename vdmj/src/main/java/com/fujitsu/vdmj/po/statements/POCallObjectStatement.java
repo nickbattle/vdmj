@@ -76,8 +76,7 @@ public class POCallObjectStatement extends POStatement
 		}
 
 		// We have to assume the operation call accesses state
-		pogState.didReadState(true);
-		pogState.didUpdateState(true);
+		pogState.didUpdateState();
 		
 		return obligations;
 	}

@@ -275,8 +275,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 	}
 
 	/**
-	 * Update the obligations in this list because of the current POGState, and then update
-	 * the POGState to account for the state read/updates in expression.
+	 * Update the obligations in this list because of the current POGState and the state read
+	 * by the expression.
 	 */
 	public void stateUpdate(POGState pstate, POExpression expression)
 	{
@@ -286,7 +286,5 @@ public class ProofObligationList extends Vector<ProofObligation>
 		{
 			markUnchecked(ProofObligation.HAS_UPDATED_STATE);
 		}
-		
-		pstate.didReadState(readsState);
 	}
 }

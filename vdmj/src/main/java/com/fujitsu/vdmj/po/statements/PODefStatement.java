@@ -56,7 +56,7 @@ public class PODefStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = equalsDefs.getDefProofObligations(ctxt, env);
+		ProofObligationList obligations = equalsDefs.getDefProofObligations(ctxt, pogState, env);
 
 		ctxt.push(new POLetDefContext(equalsDefs));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));

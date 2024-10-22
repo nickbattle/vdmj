@@ -110,7 +110,7 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	 * one. This is used in let/def expressions, where definitions can depend on
 	 * earlier definitions in the same expression.
 	 */
-	public ProofObligationList getDefProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getDefProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		int count = 0;
@@ -121,7 +121,7 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 			count++;
 
 			ctxt.push(new PONameContext(d.getVariableNames()));
-			obligations.addAll(d.getProofObligations(ctxt, env));
+			obligations.addAll(d.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 		

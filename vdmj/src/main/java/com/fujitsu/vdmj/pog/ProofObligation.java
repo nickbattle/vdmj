@@ -59,7 +59,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public static final String REQUIRES_VDM10		= "Obligation requires VDM10";
 	public static final String BODY_UPDATES_STATE	= "Operation body updates state";
 	public static final String LOOP_STATEMENT		= "Loop modifies state";
-	public static final String DCL_STATEMENT		= "Block contains dcl assignments";
 	public static final String HAS_UPDATED_STATE	= "Previous statements updated state";
 	
 	public final LexLocation location;

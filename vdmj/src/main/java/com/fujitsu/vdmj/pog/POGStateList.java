@@ -49,15 +49,12 @@ public class POGStateList extends Vector<POGState>
 	public void combineInto(POGState parent)
 	{
 		boolean hasUpdatedState = false;
-		boolean hasReadState = false;
 		
 		for (POGState state: this)
 		{
 			hasUpdatedState = hasUpdatedState || state.hasUpdatedState();
-			hasReadState = hasReadState || state.hasReadState();
 		}
 		
-		parent.didUpdateState(hasUpdatedState);
-		parent.didReadState(hasReadState);
+		parent.setUpdateState(hasUpdatedState);
 	}
 }

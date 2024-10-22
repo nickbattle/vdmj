@@ -28,12 +28,15 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -85,7 +88,13 @@ public class POAssignmentStatement extends POStatement
 		obligations.addAll(target.getProofObligations(ctxt));
 		obligations.addAll(exp.getProofObligations(ctxt, env));
 		obligations.stateUpdate(pogState, exp);
-		pogState.didUpdateState(true);
+		
+		TCNameSet updates = this.apply(new POStatementStateFinder(), true);
+		
+		for (TCNameToken update: updates)
+		{
+			pogState.didUpdateState(update);
+		}
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{

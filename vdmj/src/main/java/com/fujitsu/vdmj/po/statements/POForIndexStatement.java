@@ -77,12 +77,7 @@ public class POForIndexStatement extends POStatement
 
 		ctxt.push(new POScopeContext());
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		
-		if (statement.updatesState())
-		{
-			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
-		}
-
+		loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
 		obligations.addAll(loops);
 		ctxt.pop();
 
