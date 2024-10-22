@@ -65,13 +65,13 @@ public class POForIndexStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = from.getProofObligations(ctxt, env);
-		obligations.addAll(to.getProofObligations(ctxt, env));
+		ProofObligationList obligations = from.getProofObligations(ctxt, pogState, env);
+		obligations.addAll(to.getProofObligations(ctxt, pogState, env));
 		obligations.stateUpdate(pogState, from);
 
 		if (by != null)
 		{
-			obligations.addAll(by.getProofObligations(ctxt, env));
+			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
 			obligations.stateUpdate(pogState, by);
 		}
 

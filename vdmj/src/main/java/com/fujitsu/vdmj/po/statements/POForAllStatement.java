@@ -59,7 +59,7 @@ public class POForAllStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = set.getProofObligations(ctxt, env);
+		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
 		obligations.stateUpdate(pogState, set);
 
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);

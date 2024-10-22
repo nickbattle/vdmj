@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -107,7 +108,7 @@ public class POEqualsDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -151,16 +152,16 @@ public class POEqualsDefinition extends PODefinition
 		}
 		else if (bind instanceof POSetBind)
 		{
-			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt, env));
+			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt, pogState, env));
 			list.add(new SetMemberObligation(test, ((POSetBind)bind).set, ctxt));
 		}
 		else if (bind instanceof POSeqBind)
 		{
-			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt, env));
+			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt, pogState, env));
 			list.add(new SeqMemberObligation(test, ((POSeqBind)bind).sequence, ctxt));
 		}
 
-		list.addAll(test.getProofObligations(ctxt, env));
+		list.addAll(test.getProofObligations(ctxt, pogState, env));
 		return list;
 	}
 

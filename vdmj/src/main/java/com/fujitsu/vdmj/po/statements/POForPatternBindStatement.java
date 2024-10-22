@@ -68,7 +68,7 @@ public class POForPatternBindStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = exp.getProofObligations(ctxt, env);
+		ProofObligationList list = exp.getProofObligations(ctxt, pogState, env);
 		list.stateUpdate(pogState, exp);
 
 		if (patternBind.pattern != null)
@@ -82,7 +82,7 @@ public class POForPatternBindStatement extends POStatement
 		else if (patternBind.bind instanceof POSetBind)
 		{
 			POSetBind bind = (POSetBind)patternBind.bind;
-			list.addAll(bind.set.getProofObligations(ctxt, env));
+			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 			
 			ctxt.push(new POForAllSequenceContext(bind, exp));
 			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
@@ -91,7 +91,7 @@ public class POForPatternBindStatement extends POStatement
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
-			list.addAll(bind.sequence.getProofObligations(ctxt, env));
+			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 			
 			ctxt.push(new POForAllSequenceContext(bind, exp));
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));

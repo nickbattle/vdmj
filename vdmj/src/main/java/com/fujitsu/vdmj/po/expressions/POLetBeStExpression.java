@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.pog.LetBeExistsObligation;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
@@ -63,22 +64,22 @@ public class POLetBeStExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.add(new LetBeExistsObligation(this, ctxt));
-		obligations.addAll(bind.getProofObligations(ctxt, env));
+		obligations.addAll(bind.getProofObligations(ctxt, pogState, env));
 
 		if (suchThat != null)
 		{
 			ctxt.push(new POForAllContext(this));
-			obligations.addAll(suchThat.getProofObligations(ctxt, env));
+			obligations.addAll(suchThat.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(checkUnionQualifiers(suchThat, TCTypeQualifier.getBoolQualifier(), ctxt));
 			ctxt.pop();
 		}
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(value.getProofObligations(ctxt, env));
+		obligations.addAll(value.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		return obligations;

@@ -256,7 +256,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convertLocal(tcexp);
 		POContextStack stack = new POContextStack();
 		stack.push(new PONameContext());	// Must have one context
-		ProofObligationList popos = poexp.getProofObligations(stack, env);
+		ProofObligationList popos = poexp.getProofObligations(stack, new POGState(), env);
 		obligation.setHasObligations(!popos.isEmpty());
 	}
 
@@ -276,13 +276,14 @@ public class ProofObligationList extends Vector<ProofObligation>
 
 	/**
 	 * Update the obligations in this list because of the current POGState and the state read
-	 * by the expression.
+	 * by the expression. This is used by various statements and definitions, to suppress
+	 * obligations that cannot yet be checked.
 	 */
 	public void stateUpdate(POGState pstate, POExpression expression)
 	{
 		boolean readsState = expression.readsState();
 		
-		if (pstate.hasUpdatedState() && readsState)
+		if (readsState && pstate.hasUpdatedState())
 		{
 			markUnchecked(ProofObligation.HAS_UPDATED_STATE);
 		}

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -106,10 +107,11 @@ public abstract class POExpression extends PONode implements Serializable
 	 * Get a list of proof obligations from the expression.
 	 *
 	 * @param ctxt The call context.
+	 * @param pogState TODO
 	 * @return The list of proof obligations.
 	 */
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();
 	}

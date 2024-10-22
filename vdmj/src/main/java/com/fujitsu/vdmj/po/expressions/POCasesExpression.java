@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -63,9 +64,9 @@ public class POCasesExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = exp.getProofObligations(ctxt, env);
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
 
 		boolean hasIgnore = false;
 		TCNameList hidden = new TCNameList();
@@ -81,12 +82,12 @@ public class POCasesExpression extends POExpression
 			hidden.addAll(alt.pattern.getHiddenVariables());	// cumulative
 			
 			// PONotCaseContext pushed by the POCaseAlternative...
-			_obligations.addAll(alt.getProofObligations(ctxt, expType, env));
+			_obligations.addAll(alt.getProofObligations(ctxt, pogState, expType, env));
 		}
 		
 		if (others != null)
 		{
-			_obligations.addAll(others.getProofObligations(ctxt, env));
+			_obligations.addAll(others.getProofObligations(ctxt, pogState, env));
 		}
 
 		for (int i=0; i<cases.size(); i++)

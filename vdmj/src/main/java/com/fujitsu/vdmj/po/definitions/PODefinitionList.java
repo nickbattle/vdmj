@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
-import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -74,23 +73,6 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	}
 
 	/**
-	 * Get the proof obligations from every definition in the list.
-	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
-	{
-		ProofObligationList obligations = new ProofObligationList();
-
-		for (PODefinition d: this)
-		{
-			ctxt.push(new PONameContext(d.getVariableNames()));
-			obligations.addAll(d.getProofObligations(ctxt, env));
-			ctxt.pop();
-		}
-
-		return obligations;
-	}
-
-	/**
 	 * Get the proof obligations from every definition in the list and track POGState.
 	 */
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
@@ -120,9 +102,7 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 			ctxt.push(new POLetDefContext(d));		// In scope for recursive or total obligations
 			count++;
 
-			ctxt.push(new PONameContext(d.getVariableNames()));
 			obligations.addAll(d.getProofObligations(ctxt, pogState, env));
-			ctxt.pop();
 		}
 		
 		for (int i=0; i<count; i++)

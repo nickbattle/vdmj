@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
@@ -84,7 +85,7 @@ public class POApplyExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -108,6 +109,11 @@ public class POApplyExpression extends POExpression
 			if (type.isFunction(location) && prename != null && !prename.isEmpty())
 			{
 				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
+			}
+			
+			if (type.isOperation(location))
+			{
+				pogState.didUpdateState();	// Operation calls assumed to update state
 			}
 
 			TCTypeList paramTypes = type.isFunction(location) ?
@@ -149,11 +155,11 @@ public class POApplyExpression extends POExpression
 			obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
 		}
 
-		obligations.addAll(root.getProofObligations(ctxt, env));
+		obligations.addAll(root.getProofObligations(ctxt, pogState, env));
 
 		for (POExpression arg: args)
 		{
-			obligations.addAll(arg.getProofObligations(ctxt, env));
+			obligations.addAll(arg.getProofObligations(ctxt, pogState, env));
 		}
 
 		return obligations;

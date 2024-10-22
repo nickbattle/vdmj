@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.ValueBindingObligation;
@@ -103,12 +104,13 @@ public class POValueDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		list.addAll(exp.getProofObligations(ctxt, env));
+		list.addAll(exp.getProofObligations(ctxt, pogState, env));
+		list.stateUpdate(pogState, exp);
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&
