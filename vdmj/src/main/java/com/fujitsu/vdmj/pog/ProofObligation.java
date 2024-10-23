@@ -60,6 +60,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public static final String BODY_UPDATES_STATE	= "Operation body updates state";
 	public static final String LOOP_STATEMENT		= "Loop modifies state";
 	public static final String HAS_UPDATED_STATE	= "Previous statements updated state";
+	public static final String COMPLEX_ASSIGNMENT	= "Assignment too complex";
 	
 	public final LexLocation location;
 	public final POType kind;
