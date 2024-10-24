@@ -56,8 +56,9 @@ public class POReturnStatement extends POStatement
 
 		if (expression != null)
 		{
-			obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
-			obligations.stateUpdate(pogState, expression);
+			// Don't process POG state here, because we're returning, so the expression can
+			// have no further effect in the operation.
+			obligations.addAll(expression.getProofObligations(ctxt, new POGState(), env));
 		}
 
 		return obligations;
