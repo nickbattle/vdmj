@@ -93,7 +93,7 @@ public class POApplyExpression extends POExpression
 		{
 			if (type.isOperation(location))
 			{
-				pogState.didUpdateState();	// Operation calls assumed to update state
+				pogState.didUpdateState(location);	// Operation calls assumed to update state
 			}
 
 			if (type.isMap(location))

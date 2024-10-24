@@ -285,7 +285,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (readsState && pstate.hasUpdatedState())
 		{
-			markUnchecked(ProofObligation.HAS_UPDATED_STATE);
+			markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + pstate.getUpdatedFrom().toShortString());
 		}
 	}
 }

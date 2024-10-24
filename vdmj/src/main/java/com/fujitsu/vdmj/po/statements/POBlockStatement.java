@@ -57,7 +57,7 @@ public class POBlockStatement extends POSimpleBlockStatement
 		for (PODefinition dcl: assignmentDefs)
 		{
 			POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
-			dclState.addDclState(adef.name);
+			dclState.addDclLocal(adef.name);
 		}
 
 		ctxt.push(new PODclContext(assignmentDefs));
