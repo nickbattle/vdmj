@@ -71,19 +71,19 @@ public class POSpecificationStatement extends POStatement
 		{
 			for (POErrorCase err: errors)
 			{
-				obligations.addAll(err.left.getProofObligations(ctxt, env));
-				obligations.addAll(err.right.getProofObligations(ctxt, env));
+				obligations.addAll(err.left.getProofObligations(ctxt, pogState, env));
+				obligations.addAll(err.right.getProofObligations(ctxt, pogState, env));
 			}
 		}
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt, env));
+			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
 		}
 
 		if (postcondition != null)
 		{
-			obligations.addAll(postcondition.getProofObligations(ctxt, env));
+			obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 		}
 
 		return obligations;

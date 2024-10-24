@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.pog.FuncPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POFunctionResultContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -134,7 +135,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -170,7 +171,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 		if (precondition != null)
 		{
 			ctxt.push(new POFunctionDefinitionContext(this, false));
-			obligations.addAll(precondition.getProofObligations(ctxt, env));
+			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 
@@ -181,7 +182,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 				ctxt.push(new POFunctionDefinitionContext(this, false));
 				obligations.add(new FuncPostConditionObligation(this, ctxt));
 				ctxt.push(new POFunctionResultContext(this));
-				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 				ctxt.pop();
 				ctxt.pop();
 			}
@@ -190,12 +191,12 @@ public class POExplicitFunctionDefinition extends PODefinition
 		if (measureDef != null && measureName != null && measureName.isMeasureName())
 		{
 			ctxt.push(new PONameContext(new TCNameList(measureName)));
-			obligations.addAll(measureDef.getProofObligations(ctxt, env));
+			obligations.addAll(measureDef.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 
 		ctxt.push(new POFunctionDefinitionContext(this, true));
-		ProofObligationList bodyObligations = body.getProofObligations(ctxt, env);
+		ProofObligationList bodyObligations = body.getProofObligations(ctxt, pogState, env);
 		bodyObligationCount  = bodyObligations.size();
 		obligations.addAll(bodyObligations);
 

@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.NonEmptySeqObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -52,9 +53,9 @@ public class POHeadExpression extends POUnaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = super.getProofObligations(ctxt, env);
+		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
 		
 		if (!etype.isAlways(TCSeq1Type.class, location))
 		{

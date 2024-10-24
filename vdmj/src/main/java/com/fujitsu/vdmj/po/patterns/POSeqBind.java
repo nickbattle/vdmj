@@ -30,6 +30,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -61,9 +62,9 @@ public class POSeqBind extends POBind
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return sequence.getProofObligations(ctxt, env);
+		return sequence.getProofObligations(ctxt, pogState, env);
 	}
 
 	@Override

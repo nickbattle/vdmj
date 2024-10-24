@@ -25,10 +25,12 @@
 package com.fujitsu.vdmj.po.expressions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
@@ -49,6 +51,23 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 		if (!updates && node.vardef.nameScope == NameScope.STATE)
 		{
 			all.add(node.name);
+		}
+		
+		return all;
+	}
+	
+	@Override
+	public TCNameSet caseApplyExpression(POApplyExpression node, Boolean updates)
+	{
+		TCNameSet all = super.caseApplyExpression(node, updates);
+		
+		if (node.type instanceof TCOperationType)
+		{
+			if (node.root instanceof POVariableExpression)
+			{
+				POVariableExpression name = (POVariableExpression)node.root;
+				all.add(name.name);
+			}
 		}
 		
 		return all;

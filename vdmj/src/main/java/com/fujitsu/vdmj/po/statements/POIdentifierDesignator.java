@@ -42,4 +42,10 @@ public class POIdentifierDesignator extends POStateDesignator
 	{
 		return name.getName();
 	}
+
+	@Override
+	public String toPattern() throws IllegalArgumentException
+	{
+		return name.getName();
+	}
 }

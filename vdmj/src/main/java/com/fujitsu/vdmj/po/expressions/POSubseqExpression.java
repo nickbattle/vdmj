@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
@@ -58,11 +59,11 @@ public class POSubseqExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = seq.getProofObligations(ctxt, env);
-		list.addAll(from.getProofObligations(ctxt, env));
-		list.addAll(to.getProofObligations(ctxt, env));
+		ProofObligationList list = seq.getProofObligations(ctxt, pogState, env);
+		list.addAll(from.getProofObligations(ctxt, pogState, env));
+		list.addAll(to.getProofObligations(ctxt, pogState, env));
 		list.addAll(checkUnionQualifiers(from, TCTypeQualifier.getNumericQualifier(), ctxt));
 		list.addAll(checkUnionQualifiers(to, TCTypeQualifier.getNumericQualifier(), ctxt));
 		return list;

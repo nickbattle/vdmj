@@ -70,7 +70,7 @@ public class POAssignmentDefinition extends PODefinition
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.addAll(expression.getProofObligations(ctxt, env));
+		obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 		obligations.stateUpdate(pogState, expression);
 
 		if (!TypeComparator.isSubType(ctxt.checkType(expression, expType), type))

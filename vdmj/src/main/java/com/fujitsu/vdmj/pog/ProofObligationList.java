@@ -200,7 +200,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (!end.is(Token.EOF))
 		{
-			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
+			throw new ParserException(2330, "POG: Tokens found after obligation at " + end, LexLocation.ANY, 0);
 		}
 		
 		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
@@ -210,7 +210,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (!potype.isType(TCBooleanType.class, obligation.location))
 		{
-			throw new ParserException(2330, "PO is not boolean?", obligation.location, 0);
+			throw new ParserException(2336, "POG: Obligation is not boolean?", obligation.location, 0);
 		}
 		
 		// Weed out errors that we can cope with
@@ -245,7 +245,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
-			throw new ParserException(2330, "PO has type errors?", obligation.location, 0);
+			throw new ParserException(2337, "POG Obligation has type errors?", obligation.location, 0);
 		}
 
 		obligation.setCheckedExpression(tcexp);
@@ -256,7 +256,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convertLocal(tcexp);
 		POContextStack stack = new POContextStack();
 		stack.push(new PONameContext());	// Must have one context
-		ProofObligationList popos = poexp.getProofObligations(stack, env);
+		ProofObligationList popos = poexp.getProofObligations(stack, new POGState(), env);
 		obligation.setHasObligations(!popos.isEmpty());
 	}
 
@@ -275,18 +275,17 @@ public class ProofObligationList extends Vector<ProofObligation>
 	}
 
 	/**
-	 * Update the obligations in this list because of the current POGState, and then update
-	 * the POGState to account for the state read/updates in expression.
+	 * Update the obligations in this list because of the current POGState and the state read
+	 * by the expression. This is used by various statements and definitions, to suppress
+	 * obligations that cannot yet be checked.
 	 */
 	public void stateUpdate(POGState pstate, POExpression expression)
 	{
 		boolean readsState = expression.readsState();
 		
-		if (pstate.hasUpdatedState() && readsState)
+		if (readsState && pstate.hasUpdatedState())
 		{
 			markUnchecked(ProofObligation.HAS_UPDATED_STATE);
 		}
-		
-		pstate.didReadState(readsState);
 	}
 }

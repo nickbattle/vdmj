@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBindList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -66,17 +67,17 @@ public class POLambdaExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POTypeBind tb: bindList)
 		{
-			obligations.addAll(tb.getProofObligations(ctxt, env));
+			obligations.addAll(tb.getProofObligations(ctxt, pogState, env));
 		}
 
 		ctxt.push(new POForAllContext(this));
-		obligations.addAll(expression.getProofObligations(ctxt, env));
+		obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		return obligations;

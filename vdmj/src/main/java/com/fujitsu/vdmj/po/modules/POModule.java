@@ -31,6 +31,8 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -88,7 +90,14 @@ public class POModule extends PONode implements Serializable
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 		
-		list.addAll(defs.getProofObligations(new POContextStack(), menv));
+		for (PODefinition def: defs)
+		{
+			POContextStack ctxt = new POContextStack();
+			ctxt.push(new PONameContext(def.getVariableNames()));
+			list.addAll(def.getProofObligations(ctxt, new POGState(), menv));
+			ctxt.pop();
+		}
+		
 		list.typeCheck(tcmodule, menv);
 		
 		if (annotations != null) annotations.poAfter(this, list);

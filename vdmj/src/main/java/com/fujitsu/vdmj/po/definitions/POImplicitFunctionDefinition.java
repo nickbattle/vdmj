@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.pog.FuncPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POFunctionResultContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -128,7 +129,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -155,7 +156,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(predef.getProofObligations(ctxt, env));
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
 		}
 
 		if (postcondition != null)
@@ -171,7 +172,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 			{
 				ctxt.push(new POFunctionDefinitionContext(this, false));
 				ctxt.push(new POFunctionResultContext(this));
-				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 				ctxt.pop();
 				ctxt.pop();
 			}
@@ -180,7 +181,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 		if (measureDef != null && measureName != null && measureName.isMeasureName())
 		{
 			ctxt.push(new PONameContext(new TCNameList(measureName)));
-			obligations.addAll(measureDef.getProofObligations(ctxt, env));
+			obligations.addAll(measureDef.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 
@@ -196,7 +197,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 		else
 		{
 			ctxt.push(new POFunctionDefinitionContext(this, true));
-    		obligations.addAll(body.getProofObligations(ctxt, env));
+    		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 			if (isUndefined ||
 				!TypeComparator.isSubType(actualResult, type.result))

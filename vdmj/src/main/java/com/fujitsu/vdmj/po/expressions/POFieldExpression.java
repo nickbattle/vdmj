@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -57,9 +58,9 @@ public class POFieldExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = object.getProofObligations(ctxt, env);
+		ProofObligationList obligations = object.getProofObligations(ctxt, pogState, env);
 
 		// If the object base is a union of records, we create a subtype PO to say that
 		// the object is one of the records that defines this field.

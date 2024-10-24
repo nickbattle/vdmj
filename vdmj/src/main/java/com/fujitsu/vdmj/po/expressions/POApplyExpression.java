@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
@@ -84,76 +85,83 @@ public class POApplyExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (!type.isUnknown(location) && type.isMap(location))
+		if (!type.isUnknown(location))
 		{
-			TCMapType m = type.getMap();
-			obligations.add(new MapApplyObligation(root, args.get(0), ctxt));
-			TCType atype = ctxt.checkType(args.get(0), argtypes.get(0));
-
-			if (!TypeComparator.isSubType(atype, m.from))
+			if (type.isOperation(location))
 			{
-				obligations.add(new SubTypeObligation(args.get(0), m.from, atype, ctxt));
-			}
-		}
-		
-		if (!type.isUnknown(location) &&
-			(type.isFunction(location) || type.isOperation(location)))
-		{
-			String prename = root.getPreName();
-
-			if (type.isFunction(location) && prename != null && !prename.isEmpty())
-			{
-				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
+				pogState.didUpdateState();	// Operation calls assumed to update state
 			}
 
-			TCTypeList paramTypes = type.isFunction(location) ?
-					type.getFunction().parameters : type.getOperation().parameters;
+			if (type.isMap(location))
+			{
+				TCMapType m = type.getMap();
+				obligations.add(new MapApplyObligation(root, args.get(0), ctxt));
+				TCType atype = ctxt.checkType(args.get(0), argtypes.get(0));
+	
+				if (!TypeComparator.isSubType(atype, m.from))
+				{
+					obligations.add(new SubTypeObligation(args.get(0), m.from, atype, ctxt));
+				}
+			}
+			
+			if (type.isFunction(location) || type.isOperation(location))
+			{
+				String prename = root.getPreName();
+	
+				if (type.isFunction(location) && prename != null && !prename.isEmpty())
+				{
+					obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
+				}
 				
-			int i=0;
-
-			for (TCType at: argtypes)
-			{
-				at = ctxt.checkType(args.get(i), at);
-				TCType pt = paramTypes.get(i);
-
-				if (!TypeComparator.isSubType(at, pt))
+				TCTypeList paramTypes = type.isFunction(location) ?
+						type.getFunction().parameters : type.getOperation().parameters;
+					
+				int i=0;
+	
+				for (TCType at: argtypes)
 				{
-					obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+					at = ctxt.checkType(args.get(i), at);
+					TCType pt = paramTypes.get(i);
+	
+					if (!TypeComparator.isSubType(at, pt))
+					{
+						obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+					}
+	
+					i++;
 				}
-
-				i++;
+			}
+	
+			if (type.isFunction(location))
+			{
+				if (recursiveCycles != null)	// name is a function in a recursive loop
+				{
+					/**
+					 * All of the functions in the loop will generate similar obligations,
+					 * so the "add" method eliminates any duplicates.
+					 */
+					for (PODefinitionList loop: recursiveCycles)
+					{
+						obligations.add(new RecursiveObligation(location, loop, this, ctxt));
+					}
+				}
+			}
+	
+			if (type.isSeq(location))
+			{
+				obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
 			}
 		}
 
-		if (!type.isUnknown(location) && type.isFunction(location))
-		{
-			if (recursiveCycles != null)	// name is a function in a recursive loop
-			{
-				/**
-				 * All of the functions in the loop will generate similar obligations,
-				 * so the "add" method eliminates any duplicates.
-				 */
-				for (PODefinitionList loop: recursiveCycles)
-				{
-					obligations.add(new RecursiveObligation(location, loop, this, ctxt));
-				}
-			}
-		}
-
-		if (!type.isUnknown(location) && type.isSeq(location))
-		{
-			obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
-		}
-
-		obligations.addAll(root.getProofObligations(ctxt, env));
+		obligations.addAll(root.getProofObligations(ctxt, pogState, env));
 
 		for (POExpression arg: args)
 		{
-			obligations.addAll(arg.getProofObligations(ctxt, env));
+			obligations.addAll(arg.getProofObligations(ctxt, pogState, env));
 		}
 
 		return obligations;

@@ -23,6 +23,10 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.util.Utils;
+
 /**
  * A class to hold state information for POG of statements, which involve potentially
  * changing state variables.
@@ -30,49 +34,80 @@ package com.fujitsu.vdmj.pog;
 public class POGState
 {
 	private boolean hasUpdatedState;
-	private boolean hasReadState;
+	private POGState outerState;
+	private TCNameList locals;
 	
 	public POGState()
 	{
 		hasUpdatedState = false;
-		hasReadState = false;
+		outerState = null;
+		locals = new TCNameList();
 	}
 	
-	private POGState(boolean hasUpdatedState, boolean hasReadState)
+	private POGState(boolean hasUpdatedState, POGState outerState)
 	{
 		this.hasUpdatedState = hasUpdatedState;
-		this.hasReadState = hasReadState;
+		this.outerState = outerState;
+		this.locals = new TCNameList();
 	}
 	
 	@Override
 	public String toString()
 	{
-		return (hasUpdatedState ? "has" : "has not") + " updated state; " +
-			   (hasReadState ?    "has" : "has not") + " read state";
+		return (hasUpdatedState ?  "has" : "has not") + " updated state" +
+				(locals.isEmpty() ? "" : Utils.listToString("(locals ", locals, ", ", ")"));
 	}
 	
 	public POGState getCopy()
 	{
-		return new POGState(hasUpdatedState, hasReadState);
+		return new POGState(hasUpdatedState, outerState);
+	}
+	
+	public POGState getLink()
+	{
+		return new POGState(false, this);
 	}
 	
 	public boolean hasUpdatedState()
 	{
-		return hasUpdatedState;
+		return hasUpdatedState || (outerState != null && outerState.hasUpdatedState());
+	}
+
+	public void setUpdateState(boolean updatedState)
+	{
+		hasUpdatedState = hasUpdatedState || updatedState;
 	}
 	
-	public boolean hasReadState()
+	public void didUpdateState()	// Used by call statements
 	{
-		return hasReadState;
+		if (outerState != null)
+		{
+			outerState.didUpdateState();
+		}
+		else
+		{
+			hasUpdatedState = true;				// Module level
+		}
 	}
 
-	public void didUpdateState(boolean flag)
+	public void didUpdateState(TCNameToken name)
 	{
-		hasUpdatedState = hasUpdatedState || flag;
+		if (locals.contains(name))
+		{
+			hasUpdatedState = true;				// A local dcl update
+		}
+		else if (outerState != null)
+		{
+			outerState.didUpdateState(name);	// May be an outer* local
+		}
+		else
+		{
+			hasUpdatedState = true;				// A module state update
+		}
 	}
 
-	public void didReadState(boolean flag)
+	public void addDclState(TCNameToken name)
 	{
-		hasReadState = hasReadState || flag;
+		locals.add(name);
 	}
 }

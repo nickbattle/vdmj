@@ -117,7 +117,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -140,7 +140,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		 */
 		if (precondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
-			obligations.addAll(predef.getProofObligations(ctxt, env));
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
 		}
 
 		if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
@@ -155,24 +155,22 @@ public class POExplicitOperationDefinition extends PODefinition
 			}
 			else
 			{
-				obligations.addAll(postdef.getProofObligations(ctxt, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, pogState, env));
 			}
 
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
 		}
 		
-		POGState pstate = new POGState();
-		
 		if (stateDefinition != null)
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
-			obligations.addAll(body.getProofObligations(ctxt, pstate, env));
+			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 		else if (classDefinition != null)
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
-			ProofObligationList oblist = body.getProofObligations(ctxt, pstate, env);
+			ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
 			ctxt.pop();
 			
 			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
@@ -189,7 +187,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		else	// Flat spec with no state defined
 		{
 			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
-			obligations.addAll(body.getProofObligations(ctxt, pstate, env));
+			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 
@@ -216,18 +214,6 @@ public class POExplicitOperationDefinition extends PODefinition
 		POPatternListList list = new POPatternListList();
 		list.add(parameterPatterns);
 		return list;
-	}
-	
-	@Override
-	public boolean updatesState()
-	{
-		return body.updatesState();
-	}
-	
-	@Override
-	public boolean readsState()
-	{
-		return body.readsState();
 	}
 
 	@Override

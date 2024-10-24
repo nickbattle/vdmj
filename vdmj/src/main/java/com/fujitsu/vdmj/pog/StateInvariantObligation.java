@@ -40,8 +40,15 @@ public class StateInvariantObligation extends ProofObligation
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
 		
-		// Note a StateDesignator is not a pattern, so this may not work!
-		sb.append("let " + ass.target + " = " + ass.exp + " in\n");
+		try
+		{
+			sb.append("let " + ass.target.toPattern() + " = " + ass.exp + " in\n");
+		}
+		catch (IllegalArgumentException e)
+		{
+			// Can't represent designator as a pattern, so cannot check PO
+			markUnchecked(ProofObligation.COMPLEX_ASSIGNMENT);
+		}
 
 		if (ass.classDefinition != null)
 		{
@@ -54,8 +61,8 @@ public class StateInvariantObligation extends ProofObligation
 			sb.append("let ");
 			sb.append(def.invPattern);
 			sb.append(" = ");
-			sb.append(def.name);
-			sb.append(" in ");
+			sb.append(def.toPattern());
+			sb.append(" in\n");
 			sb.append(def.invExpression);
 		}
 
