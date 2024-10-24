@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -183,7 +184,9 @@ public class POClassDefinition extends PODefinition
 
 		for (PODefinition def: definitions)
 		{
-			list.addAll(def.getProofObligations(new POContextStack(), new POGState(), local));
+			ctxt.push(new PONameContext(def.getVariableNames()));
+			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
+			ctxt.pop();
 		}
 		
 		list.typeCheck(tcdef.name, local);
