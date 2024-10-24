@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -172,14 +173,19 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment publicEnv)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment publicEnv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 		
 		Environment env = new PrivateClassEnvironment(tcdef, publicEnv);
 		Environment local = new FlatEnvironment(tcdef.getSelfDefinition(), env);
-		list.addAll(definitions.getProofObligations(ctxt, local));
+
+		for (PODefinition def: definitions)
+		{
+			list.addAll(def.getProofObligations(new POContextStack(), new POGState(), local));
+		}
+		
 		list.typeCheck(tcdef.name, local);
 		
 		if (annotations != null) annotations.poAfter(this, list);

@@ -22,44 +22,50 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.statements;
+package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 
-/**
- * The root of the state designator hierarchy.
- */
-public abstract class POStateDesignator extends PONode
+public class PODclContext extends POContext
 {
-	private static final long serialVersionUID = 1L;
+	public final PODefinitionList assignmentDefs;
 
-	public final LexLocation location;
-
-	public POStateDesignator(LexLocation location)
+	public PODclContext(PODefinitionList assignmentDefs)
 	{
-		this.location = location;
+		this.assignmentDefs = assignmentDefs;
 	}
 
 	@Override
-	abstract public String toString();
-	
-	/**
-	 * A pattern, such that "let <pattern> = <exp> in ..." can be used in POs. This
-	 * is not always possible.
-	 */
-	public String toPattern() throws IllegalArgumentException
+	public boolean isScopeBoundary()
 	{
-		throw new IllegalArgumentException("Cannot generate pattern for " + this);
+		return true;
 	}
 
-	/**
-	 * @param ctxt
-	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	@Override
+	public String getSource()
 	{
-		return new ProofObligationList();
+		StringBuilder sb = new StringBuilder();
+
+		if (!assignmentDefs.isEmpty())
+		{
+			sb.append("let ");
+			String sep = "";
+			
+			for (PODefinition def: assignmentDefs)
+			{
+				sb.append(sep);
+				POAssignmentDefinition adef = (POAssignmentDefinition)def;
+				sb.append(adef.name);
+				sb.append(" = ");
+				sb.append(adef.expression);
+				sep = ", ";
+			}
+			
+			sb.append(" in");
+		}
+
+		return sb.toString();
 	}
 }

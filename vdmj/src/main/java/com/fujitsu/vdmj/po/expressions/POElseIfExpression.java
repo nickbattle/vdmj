@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
@@ -52,13 +53,13 @@ public class POElseIfExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = elseIfExp.getProofObligations(ctxt, env);
+		ProofObligationList obligations = elseIfExp.getProofObligations(ctxt, pogState, env);
 		obligations.addAll(checkUnionQualifiers(elseIfExp, TCTypeQualifier.getBoolQualifier(), ctxt));
 				
 		ctxt.push(new POImpliesContext(elseIfExp));
-		obligations.addAll(thenExp.getProofObligations(ctxt, env));
+		obligations.addAll(thenExp.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		return obligations;

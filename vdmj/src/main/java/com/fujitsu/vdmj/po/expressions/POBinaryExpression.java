@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
@@ -54,11 +55,11 @@ abstract public class POBinaryExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.addAll(left.getProofObligations(ctxt, env));
-		obligations.addAll(right.getProofObligations(ctxt, env));
+		obligations.addAll(left.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(right.getProofObligations(ctxt, pogState, env));
 
 		obligations.addAll(checkUnionQualifiers(left, getLeftQualifier(), ctxt));
 		obligations.addAll(checkUnionQualifiers(right, getRightQualifier(), ctxt));

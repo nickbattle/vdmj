@@ -68,14 +68,14 @@ public class POTixeStmtAlternative implements Mappable
 		else if (patternBind.bind instanceof POSetBind)
 		{
 			POSetBind bind = (POSetBind)patternBind.bind;
-			list.addAll(bind.set.getProofObligations(ctxt, env));
+			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 
 			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
-			list.addAll(bind.sequence.getProofObligations(ctxt, env));
+			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}

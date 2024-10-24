@@ -60,12 +60,11 @@ public class POCallStatement extends POStatement
 
 		for (POExpression exp: args)
 		{
-			obligations.addAll(exp.getProofObligations(ctxt, env));
+			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 		}
 
 		// We have to assume the operation call accesses state
-		pogState.didReadState(true);
-		pogState.didUpdateState(true);
+		pogState.didUpdateState();
 
 		return obligations;
 	}

@@ -46,7 +46,7 @@ public class POStartStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return objects.getProofObligations(ctxt, env);
+		return objects.getProofObligations(ctxt, pogState, env);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
@@ -111,7 +112,7 @@ public class POStateDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -121,13 +122,13 @@ public class POStateDefinition extends PODefinition
 				
 		if (invExpression != null)
 		{
-			list.addAll(invdef.getProofObligations(ctxt, env));
+			list.addAll(invdef.getProofObligations(ctxt, pogState, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 		
 		if (initExpression != null)
 		{
-			list.addAll(initdef.getProofObligations(ctxt, env));
+			list.addAll(initdef.getProofObligations(ctxt, pogState, env));
 			list.add(new StateInitObligation(this, ctxt));
 		}
 

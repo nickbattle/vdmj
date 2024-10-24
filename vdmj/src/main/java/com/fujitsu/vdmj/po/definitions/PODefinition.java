@@ -130,22 +130,6 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 		list.addAll(apply(new POGetVariableNamesVisitor(), null));
 		return list;
 	}
-	
-	/**
-	 * True, if the definition contains executable statements that update state.
-	 */
-	public boolean updatesState()
-	{
-		return false;
-	}
-	
-	/**
-	 * True, if the definition contains executable statements that read state.
-	 */
-	public boolean readsState()
-	{
-		return false;
-	}
 
 	/**
 	 * Return the static type of the definition. For example, the type of a
@@ -162,21 +146,15 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	abstract public TCType getType();
 
 	/**
-	 * Get a list of proof obligations for the definition. The second method is used
-	 * to track the POG state for updates to state variables, which is only used
-	 * by a few definition types (eg. POAssignmentDefinitions).
+	 * Get a list of proof obligations for the definition.
 	 *
 	 * @param ctxt The call context.
+	 * @param pogState Tracks updates to state in operations.
 	 * @return A list of POs.
 	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
-	{
-		return new ProofObligationList();
-	}
-
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return getProofObligations(ctxt, env);	// Default to stateless version
+		return new ProofObligationList();
 	}
 
 	/**

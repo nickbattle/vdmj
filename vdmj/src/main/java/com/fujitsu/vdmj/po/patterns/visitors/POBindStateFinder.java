@@ -21,40 +21,32 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.pog;
+package com.fujitsu.vdmj.po.patterns.visitors;
 
-import java.util.Vector;
+import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.patterns.POBind;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A list of POG states for the sub-clauses in a statements. These are combined when
- * the execution paths rejoin.
+ * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class POGStateList extends Vector<POGState>
+public class POBindStateFinder extends POLeafBindVisitor<TCNameToken, TCNameSet, Boolean>
 {
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * Add a clone of the parent and return it for use in subclauses.
-	 */
-	public POGState addCopy(POGState parent)
+	public POBindStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
 	{
-		POGState newState = parent.getCopy();
-		this.add(newState);
-		return newState;
+		this.visitorSet = visitors;
 	}
 	
-	/**
-	 * Combine all of the subclause states and update the parent.
-	 */
-	public void combineInto(POGState parent)
+	@Override
+	protected TCNameSet newCollection()
 	{
-		boolean hasUpdatedState = false;
-		
-		for (POGState state: this)
-		{
-			hasUpdatedState = hasUpdatedState || state.hasUpdatedState();
-		}
-		
-		parent.setUpdateState(hasUpdatedState);
+		return new TCNameSet();
+	}
+
+	@Override
+	public TCNameSet caseBind(POBind node, Boolean arg)
+	{
+		return newCollection();
 	}
 }

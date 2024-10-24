@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -75,9 +76,9 @@ public class POQualifiedDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return def.getProofObligations(ctxt, env);
+		return def.getProofObligations(ctxt, pogState, env);
 	}
 
 	@Override

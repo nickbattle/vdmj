@@ -64,12 +64,12 @@ public class POLetBeStStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.add(new LetBeExistsObligation(this, ctxt));
-		obligations.addAll(bind.getProofObligations(ctxt, env));
+		obligations.addAll(bind.getProofObligations(ctxt, pogState, env));
 
 		if (suchThat != null)
 		{
 			ctxt.push(new POForAllContext(this));
-			ProofObligationList oblist = suchThat.getProofObligations(ctxt, env);
+			ProofObligationList oblist = suchThat.getProofObligations(ctxt, pogState, env);
 			oblist.stateUpdate(pogState, suchThat);
 			obligations.addAll(oblist);
 			ctxt.pop();
