@@ -54,12 +54,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	// Arguments for the markUnchecked method.
 	public static final String NOT_YET_SUPPORTED	= "Not yet supported for operations";
 	public static final String MISSING_MEASURE		= "Obligation for missing measure function";
-	public static final String UNCHECKED_VDMPP		= "Unchecked in VDM++";
+	public static final String UNCHECKED_VDMPP		= "Unchecked in VDM++/RT";
 	public static final String HIDDEN_VARIABLES		= "Obligation patterns contain hidden variables";
 	public static final String REQUIRES_VDM10		= "Obligation requires VDM10";
-	public static final String BODY_UPDATES_STATE	= "Operation body updates state";
 	public static final String LOOP_STATEMENT		= "Loop modifies state";
-	public static final String HAS_UPDATED_STATE	= "Previous statements updated state";
+	public static final String HAS_UPDATED_STATE	= "Earlier statements updated state";
 	public static final String COMPLEX_ASSIGNMENT	= "Assignment too complex";
 	
 	public final LexLocation location;
