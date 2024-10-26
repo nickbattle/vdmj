@@ -24,6 +24,10 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
@@ -141,8 +145,43 @@ public class POGState
 		}
 	}
 
+	public void didUpdateState(TCNameList names)
+	{
+		for (TCNameToken name: names)
+		{
+			didUpdateState(name);
+		}
+	}
+	
 	public void addDclLocal(TCNameToken name)
 	{
 		locals.add(name);
+	}
+	
+	public void addExternals(LexLocation location, PODefinition called)
+	{
+		if (called instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (ext.mode.is(Token.WRITE))
+					{
+						didUpdateState(ext.identifiers);
+					}
+				}
+			}
+			else
+			{
+				didUpdateState(location);
+			}
+		}
+		else
+		{
+			didUpdateState(location);
+		}
 	}
 }

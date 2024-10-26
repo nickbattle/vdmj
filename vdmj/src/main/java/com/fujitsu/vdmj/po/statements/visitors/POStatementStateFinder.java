@@ -25,8 +25,10 @@
 package com.fujitsu.vdmj.po.statements.visitors;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateFinder;
@@ -35,6 +37,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateFinder;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POLetDefStatement;
@@ -93,7 +96,31 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	public TCNameSet caseCallStatement(POCallStatement node, Boolean updates)
 	{
 		TCNameSet all = newCollection();
-		all.add(EVERYTHING);	// Not state, but assumed to access state.
+		
+		if (node.opdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)node.opdef;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (updates && ext.mode.is(Token.WRITE))
+					{
+						all.addAll(ext.identifiers);
+					}
+					else if (!updates && ext.mode.is(Token.READ))
+					{
+						all.addAll(ext.identifiers);
+					}
+				}
+			}
+		}
+		else
+		{
+			all.add(EVERYTHING);	// Not state, but assumed to access state.
+		}
+		
 		return all;
 	}
 	
@@ -101,7 +128,31 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Boolean updates)
 	{
 		TCNameSet all = newCollection();
-		all.add(EVERYTHING);	// Not state, but assumed to access state.
+		
+		if (node.fdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)node.fdef;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (updates && ext.mode.is(Token.WRITE))
+					{
+						all.addAll(ext.identifiers);
+					}
+					else if (!updates && ext.mode.is(Token.READ))
+					{
+						all.addAll(ext.identifiers);
+					}
+				}
+			}
+		}
+		else
+		{
+			all.add(EVERYTHING);	// Not state, but assumed to access state.
+		}
+
 		return all;
 	}
 	
