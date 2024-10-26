@@ -96,7 +96,7 @@ public class POApplyExpression extends POExpression
 		{
 			if (type.isOperation(location))
 			{
-				pogState.addExternals(location, opdef);
+				pogState.addOperation(location, opdef);
 			}
 
 			if (type.isMap(location))

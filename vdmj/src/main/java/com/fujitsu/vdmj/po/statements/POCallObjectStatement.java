@@ -78,7 +78,7 @@ public class POCallObjectStatement extends POStatement
 			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 		}
 
-		pogState.addExternals(location, fdef);
+		pogState.addOperation(location, fdef);
 		
 		return obligations;
 	}

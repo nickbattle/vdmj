@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -158,9 +159,13 @@ public class POGState
 		locals.add(name);
 	}
 	
-	public void addExternals(LexLocation location, PODefinition called)
+	public void addOperation(LexLocation location, PODefinition called)
 	{
-		if (called instanceof POImplicitOperationDefinition)
+		if (called.accessSpecifier.isPure)
+		{
+			return;		// No updates, by definition
+		}
+		else if (called instanceof POImplicitOperationDefinition)
 		{
 			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 			
@@ -179,7 +184,7 @@ public class POGState
 				didUpdateState(location);
 			}
 		}
-		else
+		else if (called instanceof POExplicitOperationDefinition)
 		{
 			didUpdateState(location);
 		}

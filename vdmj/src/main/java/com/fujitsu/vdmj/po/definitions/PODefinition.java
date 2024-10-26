@@ -62,6 +62,9 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	/** A list of annotations, if any */
 	public POAnnotationList annotations = null;
 
+	/** A public/private/protected/static specifier, if any. */
+	public POAccessSpecifier accessSpecifier = null;
+
 	/**
 	 * Create a new definition of a particular name and location.
 	 */
@@ -74,6 +77,11 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	public void setNameScope(NameScope scope)
 	{
 		this.nameScope = scope;
+	}
+	
+	public void setAccessSpecifier(POAccessSpecifier specifier)
+	{
+		this.accessSpecifier = specifier;
 	}
 
 	@Override
