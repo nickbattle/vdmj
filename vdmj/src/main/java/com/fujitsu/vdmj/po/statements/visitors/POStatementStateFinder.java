@@ -25,8 +25,11 @@
 package com.fujitsu.vdmj.po.statements.visitors;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateFinder;
@@ -35,6 +38,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateFinder;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POLetDefStatement;
@@ -92,17 +96,13 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	@Override
 	public TCNameSet caseCallStatement(POCallStatement node, Boolean updates)
 	{
-		TCNameSet all = newCollection();
-		all.add(EVERYTHING);	// Not state, but assumed to access state.
-		return all;
+		return operationCall(node.opdef, updates);
 	}
 	
 	@Override
 	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Boolean updates)
 	{
-		TCNameSet all = newCollection();
-		all.add(EVERYTHING);	// Not state, but assumed to access state.
-		return all;
+		return operationCall(node.fdef, updates);
 	}
 	
 	@Override
@@ -190,5 +190,52 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 		}
 		
 		return newCollection();		
+	}
+
+	/**
+	 * Use the operation's pure and ext clauses to try to determine the variable
+	 * access.
+	 */
+	private TCNameSet operationCall(PODefinition def, boolean updates)
+	{
+		TCNameSet all = newCollection();
+		
+		if (def == null)
+		{
+			all.add(EVERYTHING);	// Don't know!
+		}
+		else if (def.accessSpecifier.isPure && updates)
+		{
+			// No updates by definition of pure
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)def;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (updates && ext.mode.is(Token.WRITE))
+					{
+						all.addAll(ext.identifiers);
+					}
+					else if (!updates && ext.mode.is(Token.READ))
+					{
+						all.addAll(ext.identifiers);
+					}
+				}
+			}
+			else
+			{
+				all.add(EVERYTHING);
+			}
+		}
+		else if (def instanceof POExplicitOperationDefinition)
+		{
+			all.add(EVERYTHING);
+		}
+
+		return all;
 	}
 }

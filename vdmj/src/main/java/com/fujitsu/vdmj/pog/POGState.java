@@ -24,6 +24,11 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
@@ -110,7 +115,7 @@ public class POGState
 		}
 	}
 	
-	public void didUpdateState(LexLocation from)	// Used by call statements
+	private void didUpdateState(LexLocation from)
 	{
 		if (outerState != null)
 		{
@@ -141,8 +146,47 @@ public class POGState
 		}
 	}
 
+	public void didUpdateState(TCNameList names)
+	{
+		for (TCNameToken name: names)
+		{
+			didUpdateState(name);
+		}
+	}
+	
 	public void addDclLocal(TCNameToken name)
 	{
 		locals.add(name);
+	}
+	
+	public void addOperation(LexLocation location, PODefinition called)
+	{
+		if (called.accessSpecifier.isPure)
+		{
+			return;		// No updates, by definition
+		}
+		else if (called instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (ext.mode.is(Token.WRITE))
+					{
+						didUpdateState(ext.identifiers);
+					}
+				}
+			}
+			else
+			{
+				didUpdateState(location);
+			}
+		}
+		else if (called instanceof POExplicitOperationDefinition)
+		{
+			didUpdateState(location);
+		}
 	}
 }

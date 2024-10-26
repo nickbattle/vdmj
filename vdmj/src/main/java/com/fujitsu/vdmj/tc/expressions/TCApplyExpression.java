@@ -61,7 +61,10 @@ public class TCApplyExpression extends TCExpression
 
 	public TCType type;
 	public TCTypeList argtypes;
-	public TCDefinitionListList recursiveCycles;	// Used by PO
+	
+	// Used by PO
+	public TCDefinitionListList recursiveCycles = null;
+	public TCDefinition opdef = null;
 
 	public TCApplyExpression(TCExpression root, TCExpressionList args)
 	{
@@ -146,7 +149,7 @@ public class TCApplyExpression extends TCExpression
 			if (root instanceof TCVariableExpression)
 			{
 				TCVariableExpression exp = (TCVariableExpression)root;
-				TCDefinition opdef = env.findName(exp.name, scope);
+				opdef = env.findName(exp.name, scope);
 				
 				if (opdef != null && TCStatement.isConstructor(opdef) && !TCStatement.inConstructor(env))
 				{

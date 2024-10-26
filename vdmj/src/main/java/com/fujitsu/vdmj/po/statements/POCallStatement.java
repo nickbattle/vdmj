@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
@@ -39,12 +40,14 @@ public class POCallStatement extends POStatement
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken name;
 	public final POExpressionList args;
+	public final PODefinition opdef;
 
-	public POCallStatement(TCNameToken name, POExpressionList args)
+	public POCallStatement(TCNameToken name, POExpressionList args, PODefinition opdef)
 	{
 		super(name.getLocation());
 		this.name = name;
 		this.args = args;
+		this.opdef = opdef;
 	}
 
 	@Override
@@ -63,8 +66,7 @@ public class POCallStatement extends POStatement
 			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 		}
 
-		// We have to assume the operation call accesses state
-		pogState.didUpdateState(location);
+		pogState.addOperation(location, opdef);
 
 		return obligations;
 	}

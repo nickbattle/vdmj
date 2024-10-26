@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
@@ -43,11 +44,12 @@ public class POCallObjectStatement extends POStatement
 	public final TCNameToken classname;
 	public final TCIdentifierToken fieldname;
 	public final POExpressionList args;
+	public final PODefinition fdef;
 
 	public LexNameToken field = null;
 
 	public POCallObjectStatement(POObjectDesignator designator,
-		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args)
+		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args, PODefinition fdef)
 	{
 		super(designator.location);
 
@@ -55,6 +57,7 @@ public class POCallObjectStatement extends POStatement
 		this.classname = classname;
 		this.fieldname = fieldname;
 		this.args = args;
+		this.fdef = fdef;
 	}
 
 	@Override
@@ -75,8 +78,7 @@ public class POCallObjectStatement extends POStatement
 			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 		}
 
-		// We have to assume the operation call accesses state
-		pogState.didUpdateState(location);
+		pogState.addOperation(location, fdef);
 		
 		return obligations;
 	}
