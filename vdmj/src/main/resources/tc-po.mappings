@@ -123,7 +123,7 @@ map TCPlusPlusExpression{left, op, right, ltype, rtype, exptype} to POPlusPlusEx
 map TCPostOpExpression{location, postexpression, exptype} to POPostOpExpression(location, postexpression) set exptype;
 map TCPowerSetExpression{location, exp, exptype} to POPowerSetExpression(location, exp) set exptype;
 map TCPreExpression{location, function, args, exptype} to POPreExpression(location, function, args) set exptype;
-map TCPreOpExpression{expression, exptype} to POPreOpExpression(expression) set exptype;
+map TCPreOpExpression{location, expression, exptype} to POPreOpExpression(location, expression) set exptype;
 map TCProperSubsetExpression{left, op, right, ltype, rtype, exptype} to POProperSubsetExpression(left, op, right, ltype, rtype) set exptype;
 map TCQuoteLiteralExpression{type, exptype} to POQuoteLiteralExpression(type) set exptype;
 map TCRangeResByExpression{left, op, right, ltype, rtype, exptype} to PORangeResByExpression(left, op, right, ltype, rtype) set exptype;
