@@ -114,7 +114,7 @@ public class POGState
 		}
 	}
 	
-	public void didUpdateState(LexLocation from)	// Used by call statements
+	private void didUpdateState(LexLocation from)
 	{
 		if (outerState != null)
 		{

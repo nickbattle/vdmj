@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
@@ -51,9 +52,10 @@ public class POApplyExpression extends POExpression
 	public final TCType type;
 	public final TCTypeList argtypes;
 	public final PODefinitionListList recursiveCycles;
+	public final PODefinition opdef;
 
 	public POApplyExpression(POExpression root, POExpressionList args,
-		TCType type, TCTypeList argtypes, PODefinitionListList recursiveCycles)
+		TCType type, TCTypeList argtypes, PODefinitionListList recursiveCycles, PODefinition opdef)
 	{
 		super(root);
 		this.root = root;
@@ -61,6 +63,7 @@ public class POApplyExpression extends POExpression
 		this.type = type;
 		this.argtypes = argtypes;
 		this.recursiveCycles = recursiveCycles;
+		this.opdef = opdef;
 	}
 
 	@Override
@@ -93,7 +96,7 @@ public class POApplyExpression extends POExpression
 		{
 			if (type.isOperation(location))
 			{
-				pogState.didUpdateState(location);	// Operation calls assumed to update state
+				pogState.addExternals(location, opdef);
 			}
 
 			if (type.isMap(location))
