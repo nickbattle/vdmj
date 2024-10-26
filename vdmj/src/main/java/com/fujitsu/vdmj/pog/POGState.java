@@ -161,7 +161,11 @@ public class POGState
 	
 	public void addOperation(LexLocation location, PODefinition called)
 	{
-		if (called.accessSpecifier.isPure)
+		if (called == null)
+		{
+			didUpdateState(location);	// Assumed
+		}
+		else if (called.accessSpecifier.isPure)
 		{
 			return;		// No updates, by definition
 		}
