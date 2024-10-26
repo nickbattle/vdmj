@@ -48,7 +48,7 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	{
 		TCNameSet all = newCollection();
 		
-		if (!updates && node.vardef.nameScope == NameScope.STATE)
+		if (!updates && node.vardef.nameScope.matches(NameScope.STATE))
 		{
 			all.add(node.name);
 		}
