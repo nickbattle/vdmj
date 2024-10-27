@@ -157,6 +157,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 				Console.err.println(po.toString());
 				TypeChecker.printErrors(Console.err);
 				Console.err.println(e.toString());
+				po.markUnchecked(ProofObligation.PO_HAS_ERRORS);
 			}
 		}
 	}
@@ -177,6 +178,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 				Console.err.println(po.toString());
 				TypeChecker.printErrors(Console.err);
 				Console.err.println(e.toString());
+				po.markUnchecked(ProofObligation.PO_HAS_ERRORS);
 			}
 		}
 	}
