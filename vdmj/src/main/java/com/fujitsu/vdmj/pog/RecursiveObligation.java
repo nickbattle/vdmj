@@ -30,12 +30,12 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.util.Utils;
 
 public class RecursiveObligation extends ProofObligation
 {
@@ -81,9 +81,17 @@ public class RecursiveObligation extends ProofObligation
 			
 			for (POPatternList plist: edef.paramPatternList)
 			{
-				 sb.append("(");
-				 sb.append(Utils.listToString(plist));
-				 sb.append(")");
+				String sep = "";
+				sb.append("(");
+
+				for (POPattern p: plist)
+				{
+					sb.append(sep);
+					sb.append(p.removeIgnorePatterns());
+					sep = ", ";
+				}
+
+				sb.append(")");
 			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
