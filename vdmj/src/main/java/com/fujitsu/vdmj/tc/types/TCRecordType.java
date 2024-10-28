@@ -83,7 +83,7 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public boolean isRecord(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return true;
 	}
 
@@ -150,7 +150,7 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return name.toString() + (maximal ? "!" : "") + (opaque ? " /* opaque */" : "");
+		return name.toString() + (maximal ? "!" : "") + (isOpaque() ? " /* opaque */" : "");
 	}
 
 	@Override

@@ -98,7 +98,7 @@ public class TCRecordPattern extends TCPattern
 			{
 				TCRecordType recordType = (TCRecordType)type;
 				
-				if (recordType.opaque && !location.module.equals(recordType.location.module))
+				if (recordType.isOpaque(location))
 				{
 					report(3127, "Type '" + typename + "' has no struct export");
 				}

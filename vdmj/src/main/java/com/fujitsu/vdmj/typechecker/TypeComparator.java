@@ -309,8 +309,7 @@ public class TypeComparator
     		{
     			TCInvariantType ito =(TCInvariantType)to;
     			
-	    		if (to instanceof TCNamedType &&
-	    			(!ito.opaque || ito.location.module.equals(currentModule)))
+	    		if (to instanceof TCNamedType && !ito.isOpaque(currentModule))
 	    		{
 	    			to = ((TCNamedType)to).type;
 	    			continue;
@@ -321,8 +320,7 @@ public class TypeComparator
     		{
     			TCInvariantType ifrom =(TCInvariantType)from;
     			
-	    		if (from instanceof TCNamedType &&
-	    			(!ifrom.opaque || ifrom.location.module.equals(currentModule)))
+	    		if (from instanceof TCNamedType && !ifrom.isOpaque(currentModule))
 	    		{
 	    			from = ((TCNamedType)from).type;
 	    			continue;

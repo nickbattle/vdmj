@@ -222,7 +222,7 @@ public class TCFieldExpression extends TCExpression
 		{
     		if (!recOrClass)
     		{
-    			if (root instanceof TCRecordType && ((TCRecordType)root).opaque)
+    			if (root instanceof TCRecordType && ((TCRecordType)root).isOpaque(location))
     			{
     				object.report(3093, "Field '" + field.getName() + "' applied to non-struct export");
     			}

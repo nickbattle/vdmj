@@ -211,6 +211,8 @@ public class SubTypeObligation extends ProofObligation
 	
 	private String oneType(boolean rec, POExpression exp, TCType etype, TCType atype)
 	{
+		TypeComparator.setCurrentModule(exp.location.module);
+
 		if (atype != null && rec)
 		{
 			if (TypeComparator.isSubType(atype, etype))
