@@ -206,6 +206,9 @@ public class SubTypeObligation extends ProofObligation
 		source = ctxt.getSource(oneType(false, result, def.type.result, actualResult));
 	}
 
+	// NOTE! The atype parameter used to allow null to mean "any type", but this
+	// also caused problems sometimes with POs. Currently atype is not null...
+	
 	private String oneType(boolean rec, POExpression exp, TCType etype, TCType atype)
 	{
 		if (atype != null && rec)
@@ -215,7 +218,7 @@ public class SubTypeObligation extends ProofObligation
 				return "";		// A sub comparison is OK without checks
 			}
 		}
-
+		
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
 		etype = etype.deBracket();
@@ -237,7 +240,7 @@ public class SubTypeObligation extends ProofObligation
 
 			for (TCType poss: possibles)
 			{
-				String s = oneType(true, exp, poss, null);
+				String s = oneType(true, exp, poss, atype);
 
 				sb.append(prefix);
 				sb.append("(");
@@ -287,7 +290,7 @@ public class SubTypeObligation extends ProofObligation
 				}
 				else
 				{
-					atype = null;
+					// atype = null;
 				}
 
 				String s = oneType(true, exp, nt.type, atype);

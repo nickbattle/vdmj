@@ -61,6 +61,14 @@ public abstract class TCInvariantType extends TCType
 	{
 		this.opaque = opaque;
 	}
+	
+	/**
+	 * Is this opaque from here?
+	 */
+	public boolean isOpaque(LexLocation from)
+	{
+		return opaque && !from.module.equals(location.module);
+	}
 
 	public void setInvariant(TCExplicitFunctionDefinition invdef)
 	{
