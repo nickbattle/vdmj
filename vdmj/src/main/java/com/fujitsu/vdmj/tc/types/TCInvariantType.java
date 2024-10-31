@@ -38,7 +38,7 @@ public abstract class TCInvariantType extends TCType
 	public TCExplicitFunctionDefinition eqdef = null;
 	public TCExplicitFunctionDefinition orddef = null;
 
-	public boolean opaque = false;
+	private boolean opaque = false;
 	protected boolean inNarrower = false;
 	protected boolean maximal = false;
 
@@ -60,6 +60,30 @@ public abstract class TCInvariantType extends TCType
 	public void setOpaque(boolean opaque)
 	{
 		this.opaque = opaque;
+	}
+	
+	/**
+	 * Is this opaque from here?
+	 */
+	public boolean isOpaque(LexLocation from)
+	{
+		return opaque && !from.module.equals(location.module);
+	}
+	
+	/**
+	 * Is this opaque from here?
+	 */
+	public boolean isOpaque(String from)
+	{
+		return opaque && !from.equals(location.module);
+	}
+
+	/**
+	 * Is opaque from anywhere?
+	 */
+	public boolean isOpaque()
+	{
+		return opaque;
 	}
 
 	public void setInvariant(TCExplicitFunctionDefinition invdef)

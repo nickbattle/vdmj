@@ -227,7 +227,7 @@ public class TCValueDefinition extends TCDefinition
 			if (!nt.typename.getLex().module.equals(location.module))
 			{
 				TCNamedType fixed = new TCNamedType(nt.typename.getExplicit(true), nt.type);
-				fixed.setOpaque(nt.opaque);
+				fixed.setOpaque(nt.isOpaque());
 				return fixed;
 			}
 		}
@@ -238,7 +238,7 @@ public class TCValueDefinition extends TCDefinition
 			if (!rt.name.getLex().module.equals(location.module))
 			{
 				TCRecordType fixed = new TCRecordType(rt.name.getExplicit(true), rt.fields, rt.composed);
-				fixed.setOpaque(rt.opaque);
+				fixed.setOpaque(rt.isOpaque());
 				return fixed;
 			}
 		}

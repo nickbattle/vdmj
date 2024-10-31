@@ -102,7 +102,14 @@ public class RecursiveObligation extends ProofObligation
 
 			for (POPatternListTypePair pltp: idef.parameterPatterns)
 			{
-				sb.append(pltp.patterns);
+				String sep = "";
+				
+				for (POPattern p: pltp.patterns)
+				{
+					sb.append(sep);
+					sb.append(p.removeIgnorePatterns());
+					sep = ", ";
+				}
 			}
 
 			sb.append(")");
