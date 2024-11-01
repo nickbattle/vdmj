@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 
@@ -61,7 +62,21 @@ public class POLetDefContext extends POContext
 			for (PODefinition def: localDefs)
 			{
 				sb.append(sep);
-				sb.append(def.toExplicitString(def.location));
+
+				if (def instanceof POAssignmentDefinition)
+				{
+					POAssignmentDefinition ass = (POAssignmentDefinition)def;
+					sb.append(ass.name);
+					sb.append(":");
+					sb.append(ass.expType);
+					sb.append(" = ");
+					sb.append(ass.expression);
+				}
+				else	// POValueDefinition
+				{
+					sb.append(def.toExplicitString(def.location));
+				}
+				
 				sep = ", ";
 			}
 			
