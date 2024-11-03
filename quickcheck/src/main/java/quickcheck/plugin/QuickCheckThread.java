@@ -80,6 +80,8 @@ public class QuickCheckThread extends CancellableThread
 			
 			LSPServer server = LSPServer.getInstance();
 			MessageHub.getInstance().clearPluginMessages(pog);
+			pog.clearLenses();
+			
 			List<VDMMessage> messages = new Vector<VDMMessage>();
 			JSONArray list = new JSONArray();
 			long percentDone = -1;
@@ -141,6 +143,7 @@ public class QuickCheckThread extends CancellableThread
 			{
 				MessageHub.getInstance().addPluginMessages(pog, messages);
 				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
+				responses.add(RPCRequest.create("workspace/codeLens/refresh", null));
 			}
 			
 			for (JSONObject message: responses)
@@ -189,6 +192,7 @@ public class QuickCheckThread extends CancellableThread
 			if (launch != null)
 			{
 				cexample.put("launch", launch);
+				pog.addCodeLens(po);
 			}
 			
 			json.put("counterexample", cexample);
