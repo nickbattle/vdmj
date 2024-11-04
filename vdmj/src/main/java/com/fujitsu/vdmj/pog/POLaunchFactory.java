@@ -51,14 +51,14 @@ import com.fujitsu.vdmj.values.ParameterValue;
  */
 public class POLaunchFactory
 {
-	private static class ApplyCall
+	public static class ApplyCall
 	{
 		public String applyName = null;
 		public List<String> applyTypes = new Vector<String>();
 		public List<ApplyArg> applyArgs = new Vector<ApplyArg>();
 	}
 	
-	private static class ApplyArg
+	public static class ApplyArg
 	{
 		public String name;
 		public String type;
