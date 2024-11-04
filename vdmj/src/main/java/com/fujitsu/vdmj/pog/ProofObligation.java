@@ -27,27 +27,12 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
-import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.po.patterns.POPatternList;
-import com.fujitsu.vdmj.po.patterns.POPatternListList;
-import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
-import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
-import com.fujitsu.vdmj.po.types.POPatternListTypePair;
-import com.fujitsu.vdmj.po.types.POPatternListTypePairList;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.values.ParameterValue;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -248,171 +233,24 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	}
 	
 	/**
-	 * Generate a string invocation for the context passed.
+	 * Generate a string invocation for the PO context.
 	 */
 	public String getCexLaunch()
 	{
-		if (counterexample == null)
-		{
-			return getLaunch(Interpreter.getInstance().getInitialContext());
-		}
-		
-		return getLaunch(counterexample);
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getCexLaunch();
 	}
 	
 	public String getWitnessLaunch()
 	{
-		if (witness == null)
-		{
-			return getLaunch(Interpreter.getInstance().getInitialContext());
-		}
-		
-		return getLaunch(witness);
-	}
-
-	public String getLaunch(Context ctxt)
-	{
-		try
-		{
-			if (definition instanceof POExplicitFunctionDefinition)
-			{
-				POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)definition;
-				return
-					launchNameTypes(efd.name, efd.typeParams, ctxt) +
-					launchArguments(efd.paramPatternList, ctxt);
-			}
-			else if (definition instanceof POImplicitFunctionDefinition)
-			{
-				POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)definition;
-				return
-					launchNameTypes(ifd.name, ifd.typeParams, ctxt) +
-					launchArguments(ifd.parameterPatterns, ctxt);
-			}
-			else if (definition instanceof POExplicitOperationDefinition)
-			{
-				POExplicitOperationDefinition eop = (POExplicitOperationDefinition)definition;
-				return
-					launchNameTypes(eop.name, null, ctxt) +
-					launchArguments(eop.getParamPatternList(), ctxt);
-			}
-			else if (definition instanceof POImplicitOperationDefinition)
-			{
-				POImplicitOperationDefinition iop = (POImplicitOperationDefinition)definition;
-				return
-					launchNameTypes(iop.name, null, ctxt) +
-					launchArguments(iop.parameterPatterns, ctxt);
-			}
-			else if (kind.isStandAlone())
-			{
-				// PO is a stand alone expression, so just execute that
-				return source.trim();
-			}
-		}
-		catch (Exception e)
-		{
-			// Cannot match all parameters from context
-		}
-
-		return null;
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getWitnessLaunch();
 	}
 	
-	private String launchNameTypes(TCNameToken name, TCTypeList typeParams, Context ctxt) throws Exception
+	public String getLaunch()
 	{
-		StringBuilder callString = new StringBuilder(name.getName());
-		PORemoveIgnoresVisitor.init();
-		
-		if (typeParams != null)
-		{
-			String inst = addTypeParams(typeParams, ctxt);
-			callString.append(inst);
-		}
-
-		return  callString.toString();
-	}
-
-	private String launchArguments(POPatternListList paramPatternList, Context ctxt) throws Exception
-	{
-		StringBuilder callString = new StringBuilder();
-
-		for (POPatternList pl: paramPatternList)
-		{
-			String sep = "";
-			callString.append("(");
-			
-			for (POPattern p: pl)
-			{
-				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-				callString.append(sep);
-				callString.append(match);
-				sep = ", ";
-			}
-				
-			callString.append(")");
-		}
-		
-		return  callString.toString();
-	}
-	
-	private String launchArguments(POPatternListTypePairList parameterPatterns, Context ctxt) throws Exception
-	{
-		StringBuilder callString = new StringBuilder();
-		String sep = "";
-		callString.append("(");
-		
-		for (POPatternListTypePair pl: parameterPatterns)
-		{
-			for (POPattern p: pl.patterns)
-			{
-				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-				callString.append(sep);
-				callString.append(match);
-				sep = ", ";
-			}
-		}
-		
-		callString.append(")");
-		
-		return callString.toString();
-	}
-
-	private String addTypeParams(TCTypeList params, Context ctxt) throws Exception
-	{
-		StringBuilder callString = new StringBuilder();
-		String sep = "";
-		callString.append("[");
-		
-		for (TCType p: params)
-		{
-			TCParameterType param = (TCParameterType)p;
-			ParameterValue inst = (ParameterValue) ctxt.get(param.name);
-			
-			if (inst == null)
-			{
-				throw new Exception("Can't match type param " + param);
-			}
-			
-			callString.append(sep);
-			callString.append(inst.type);
-			sep = ", ";
-		}
-		
-		callString.append("]");
-		return callString.toString();
-	}
-
-	private String paramMatch(POPattern p, Context ctxt) throws Exception
-	{
-		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
-		String result = p.apply(visitor, ctxt);
-		
-		if (visitor.hasFailed())
-		{
-			throw new Exception("Can't match param " + p);
-		}
-		else
-		{
-			return result;
-		}
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getLaunch(null);
 	}
 
 	/**
