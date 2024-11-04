@@ -120,7 +120,7 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens
 			{
 				JSONArray constructors = null;
 				
-				results.add(makeLens(po.location, "Counterexample", CODE_LENS_COMMAND,
+				results.add(makeLens(po.location, "PO #" + po.number, CODE_LENS_COMMAND,
 						launchArgs(launchName, defaultName, true, constructors, applyName, applyTypes, applyArgs)));
 			}
 		}

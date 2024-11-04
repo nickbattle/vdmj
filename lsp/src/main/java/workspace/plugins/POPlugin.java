@@ -143,7 +143,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	protected void preCheck(CheckPrepareEvent event)
 	{
-		// Nothing
+		messagehub.clearPluginMessages(this);
+		clearLenses();
 	}
 
 	/**
@@ -268,7 +269,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		{
 			for (POLaunchDebugLens lens: codeLenses.get(file))
 			{
-				results.add(lens.getLaunchLens());
+				results.addAll(lens.getLaunchLens());
 			}
 		}
 		
