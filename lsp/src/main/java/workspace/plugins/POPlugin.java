@@ -25,6 +25,10 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
@@ -43,7 +47,9 @@ import workspace.EventListener;
 import workspace.MessageHub;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.CodeLensEvent;
 import workspace.events.LSPEvent;
+import workspace.lenses.POLaunchDebugLens;
 
 abstract public class POPlugin extends AnalysisPlugin implements EventListener
 {
@@ -64,9 +70,13 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
+	private final Map<File, List<POLaunchDebugLens>> codeLenses;
+
 	protected POPlugin()
 	{
 		super();
+		
+		codeLenses = new HashMap<File, List<POLaunchDebugLens>>();
 	}
 	
 	@Override
@@ -88,6 +98,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(CodeLensEvent.class, this);
 	}
 	
 	@Override
@@ -118,6 +129,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					new JSONObject("successful", !messagehub.hasErrors())));
 			return results;
 		}
+		else if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(le.request, getCodeLenses(le.file));
+		}
 		else
 		{
 			Diag.error("Unhandled %s event %s", getName(), event);
@@ -127,7 +143,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	protected void preCheck(CheckPrepareEvent event)
 	{
-		// Nothing
+		messagehub.clearPluginMessages(this);
+		clearLenses();
 	}
 
 	/**
@@ -224,5 +241,38 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		response.addAll(MessageHub.getInstance().getDiagnosticResponses());
 		
 		return response;
+	}
+
+	public void clearLenses()
+	{
+		codeLenses.clear();
+	}
+	
+	public void addCodeLens(ProofObligation po)
+	{
+		List<POLaunchDebugLens> array = codeLenses.get(po.location.file);
+		
+		if (array == null)
+		{
+			array = new Vector<POLaunchDebugLens>();
+			codeLenses.put(po.location.file, array);
+		}
+		
+		array.add(new POLaunchDebugLens(po));
+	}
+
+	private JSONArray getCodeLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (codeLenses.containsKey(file))
+		{
+			for (POLaunchDebugLens lens: codeLenses.get(file))
+			{
+				results.addAll(lens.getLaunchLens());
+			}
+		}
+		
+		return results;
 	}
 }

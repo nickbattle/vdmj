@@ -116,7 +116,7 @@ public class QCRunCommand extends AnalysisCommand
 					}
 					else if (obligation.kind.isStandAlone())
 					{
-						launch = obligation.getLaunch(null);
+						launch = obligation.getLaunch();
 					}
 					else
 					{
