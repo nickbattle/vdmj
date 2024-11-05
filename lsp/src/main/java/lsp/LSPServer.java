@@ -124,16 +124,22 @@ public class LSPServer extends JSONServer implements VDMJMain
 					for (JSONObject response: responses)
 					{
 						writeMessage(response);
-						
-						if (response.get("method") != null && response.get("id") != null)	// A request
-						{
-							RPCRequest req = RPCRequest.create(response);
-							responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
-						}
 					}
 				}
 			}
 		}
+	}
+	
+	@Override
+	public synchronized void writeMessage(JSONObject response) throws IOException
+	{
+		if (response.get("method") != null && response.get("id") != null)	// A request
+		{
+			RPCRequest req = RPCRequest.create(response);
+			responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
+		}
+
+		super.writeMessage(response);
 	}
 
 	public boolean isInitialized()

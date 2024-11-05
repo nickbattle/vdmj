@@ -98,6 +98,7 @@ import lsp.textdocument.DocumentSymbolHandler;
 import lsp.textdocument.ReferencesHandler;
 import lsp.textdocument.TypeHierarchyHandler;
 import lsp.textdocument.WatchKind;
+import lsp.workspace.CodeLensRefreshHandler;
 import lsp.workspace.DidChangeWSHandler;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -226,6 +227,7 @@ public class LSPPlugin extends AnalysisPlugin
 		lspDispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
 
 		lspDispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
+		lspDispatcher.register(new CodeLensRefreshHandler(), "workspace/codeLens/refresh");
 
 		lspDispatcher.register(new UnknownHandler());	// Called for unknown methods
 	}
