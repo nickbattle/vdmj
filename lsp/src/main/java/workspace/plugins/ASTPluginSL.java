@@ -160,11 +160,10 @@ public class ASTPluginSL extends ASTPlugin
 	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
-		ASTPlugin ast = registry.getPlugin("AST");
 		
 		if (dirtyModuleList != null && !dirtyModuleList.isEmpty())
 		{
-			List<ASTCodeLens> lenses = getASTCodeLenses(ast.isDirty());
+			List<ASTCodeLens> lenses = getASTCodeLenses();
 			
 			for (ASTModule module: dirtyModuleList)
 			{
