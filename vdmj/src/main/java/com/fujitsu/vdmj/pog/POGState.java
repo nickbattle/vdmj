@@ -36,7 +36,6 @@ import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold state information for POG of statements, which involve potentially
@@ -44,50 +43,52 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class POGState
 {
-	private Map<TCNameToken, LexLocation> updatedVariables;
-	private boolean updatedSomething;
-	private LexLocation updatedFrom;
+	private static final TCNameToken SOMETHING = new TCNameToken(LexLocation.ANY, "?", "?");
+	
+	private Map<TCNameToken, LexLocation> updatedState;
+	private Map<TCNameToken, LexLocation> updatedLocals;
 	private POGState outerState;
-	private TCNameList locals;
+	private TCNameList localNames;
 	
 	public POGState()
 	{
-		updatedVariables = new HashMap<TCNameToken, LexLocation>();
-		updatedSomething = false;
-		updatedFrom = LexLocation.ANY;
+		updatedState = new HashMap<TCNameToken, LexLocation>();
+		updatedLocals = new HashMap<TCNameToken, LexLocation>();
 		outerState = null;
-		locals = new TCNameList();
+		localNames = new TCNameList();
 	}
 	
 	/**
 	 * Used by getCopy and getLink.
 	 */
-	private POGState(Map<TCNameToken, LexLocation> updatedVariables, boolean updatedSomething,
-			LexLocation updatedFrom, POGState outerState, TCNameList locals)
+	private POGState(Map<TCNameToken, LexLocation> updatedState, Map<TCNameToken, LexLocation> updatedLocals,
+			POGState outerState, TCNameList localNames)
 	{
-		this.updatedVariables = updatedVariables;
-		this.updatedSomething = updatedSomething;
-		this.updatedFrom = updatedFrom;
+		this.updatedState = updatedState;
+		this.updatedLocals = updatedLocals;
 		this.outerState = outerState;
-		this.locals = new TCNameList();
-		
-		this.locals.addAll(locals);
+		this.localNames = localNames;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return (updatedSomething ? "changed " + updatedVariables : "no changes") +
-				(locals.isEmpty() ? "" : Utils.listToString(" (locals ", locals, ", ", ")"));
+		return "state: " + updatedState.toString() +
+				", locals: " + updatedLocals.toString() +
+				(outerState != null ? " / " + outerState.toString() : "");
 	}
 	
 	/**
-	 * Create a copy of the current state, to go into (say) the then/elseif/else branches
-	 * of a statement, before combining the results. Note this copies the locals.
+	 * Copy a state for use in if/else branches etc, where changes in each are not visible
+	 * in the other branches, but all changes are combined afterwards. Note that it has
+	 * the same local names and outer state.
 	 */
 	public POGState getCopy()
 	{
-		return new POGState(updatedVariables, updatedSomething, updatedFrom, outerState, locals);
+		HashMap<TCNameToken, LexLocation> copyState = new HashMap<TCNameToken, LexLocation>();
+		HashMap<TCNameToken, LexLocation> copyLocals = new HashMap<TCNameToken, LexLocation>();
+		
+		return new POGState(copyState, copyLocals, outerState, localNames);
 	}
 	
 	/**
@@ -97,24 +98,29 @@ public class POGState
 	 */
 	public POGState getLink()
 	{
-		return new POGState(new HashMap<TCNameToken, LexLocation>(), false, LexLocation.ANY, this, new TCNameList());
+		return new POGState(
+			new HashMap<TCNameToken, LexLocation>(),
+			new HashMap<TCNameToken, LexLocation>(), this, new TCNameList());
 	}
 	
 	/**
 	 * True if state has been updated, either here or in outer levels.
 	 */
-	public boolean hasUpdatedState()
-	{
-		return updatedSomething || (outerState != null && outerState.hasUpdatedState());
-	}
-
 	public boolean hasUpdatedState(TCNameSet names)
 	{
 		for (TCNameToken name: names)
 		{
-			if (updatedVariables.containsKey(name))
+			if (localNames.contains(name))
 			{
-				return true;
+				return updatedLocals.containsKey(name);
+			}
+			else
+			{
+				if (updatedState.containsKey(name) ||
+					updatedState.containsKey(SOMETHING))
+				{
+					return true;
+				}
 			}
 		}
 		
@@ -124,30 +130,34 @@ public class POGState
 	/**
 	 * Return the location of the last state update.
 	 */
-	public LexLocation getUpdatedFrom()
-	{
-		if (updatedSomething)
-		{
-			return updatedFrom;
-		}
-		else if (outerState != null)
-		{
-			return outerState.getUpdatedFrom();
-		}
-		else
-		{
-			return LexLocation.ANY;
-		}
-	}
-
-	public LexLocation getUpdatedFrom(TCNameSet names)
+	public LexLocation getUpdatedLocation(TCNameSet names)
 	{
 		for (TCNameToken name: names)
 		{
-			if (updatedVariables.containsKey(name))
+			if (localNames.contains(name))
 			{
-				return updatedVariables.get(name);
+				if (updatedLocals.containsKey(name))
+				{
+					return updatedLocals.get(name);
+				}
 			}
+			else
+			{
+				if (updatedState.containsKey(name))
+				{
+					return updatedState.get(name);
+				}
+				
+				if (updatedState.containsKey(SOMETHING))
+				{
+					return updatedState.get(SOMETHING);
+				}
+			}
+		}
+
+		if (outerState != null)
+		{
+			return outerState.getUpdatedLocation(names);
 		}
 		
 		return LexLocation.ANY;
@@ -161,27 +171,23 @@ public class POGState
 		}
 		else
 		{
-			updatedSomething = true;				// Module level
-			updatedFrom = from;
+			updatedState.put(SOMETHING, from);
 		}
 	}
 
 	public void didUpdateState(TCNameToken name, LexLocation from)
 	{
-		if (locals.contains(name))
+		if (localNames.contains(name))
 		{
-			updatedSomething = true;				// A local dcl update
-			updatedFrom = name.getLocation();
+			updatedLocals.put(name, from);			// A local dcl update
 		}
 		else if (outerState != null)
 		{
-			outerState.didUpdateState(name, from);	// May be an outer* local
+			outerState.didUpdateState(name, from);	// May be an outer* local, or state
 		}
 		else
 		{
-			updatedVariables.put(name, from);
-			updatedSomething = true;				// A module state update
-			updatedFrom = name.getLocation();
+			updatedState.put(name, from);			// A module state update
 		}
 	}
 
@@ -195,7 +201,7 @@ public class POGState
 	
 	public void addDclLocal(TCNameToken name)
 	{
-		locals.add(name);
+		localNames.add(name);
 	}
 	
 	public void addOperationCall(LexLocation from, PODefinition called)
@@ -233,14 +239,12 @@ public class POGState
 		}
 	}
 
-	public void combineWith(POGState state)
+	/**
+	 * Combine copies for if/else branches, created by getCopy().
+	 */
+	public void combineWith(POGState copy)
 	{
-		while (state.outerState != null)
-		{
-			state = state.outerState;	// Find module level
-		}
-		
-		updatedVariables.putAll(state.updatedVariables);
-		updatedSomething = updatedSomething || state.updatedSomething;
+		updatedState.putAll(copy.updatedState);
+		updatedLocals.putAll(copy.updatedLocals);
 	}
 }

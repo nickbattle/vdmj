@@ -288,7 +288,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (!reads.isEmpty() && pstate.hasUpdatedState(reads))
 		{
-			LexLocation at = pstate.getUpdatedFrom(reads);
+			LexLocation at = pstate.getUpdatedLocation(reads);
 			
 			if (at == LexLocation.ANY)
 			{
