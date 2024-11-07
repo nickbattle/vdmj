@@ -118,7 +118,7 @@ public class POGState
 			}
 		}
 		
-		return (outerState != null && outerState.hasUpdatedState());
+		return (outerState != null && outerState.hasUpdatedState(names));
 	}
 
 	/**
