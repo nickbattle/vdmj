@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2024 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,7 +21,11 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+
 package com.fujitsu.vdmj.pog;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -30,6 +34,7 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -39,22 +44,29 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class POGState
 {
-	private boolean hasUpdatedState;
+	private Map<TCNameToken, LexLocation> updatedVariables;
+	private boolean updatedSomething;
 	private LexLocation updatedFrom;
 	private POGState outerState;
 	private TCNameList locals;
 	
 	public POGState()
 	{
-		hasUpdatedState = false;
+		updatedVariables = new HashMap<TCNameToken, LexLocation>();
+		updatedSomething = false;
 		updatedFrom = LexLocation.ANY;
 		outerState = null;
 		locals = new TCNameList();
 	}
 	
-	private POGState(boolean hasUpdatedState, LexLocation updatedFrom, POGState outerState, TCNameList locals)
+	/**
+	 * Used by getCopy and getLink.
+	 */
+	private POGState(Map<TCNameToken, LexLocation> updatedVariables, boolean updatedSomething,
+			LexLocation updatedFrom, POGState outerState, TCNameList locals)
 	{
-		this.hasUpdatedState = hasUpdatedState;
+		this.updatedVariables = updatedVariables;
+		this.updatedSomething = updatedSomething;
 		this.updatedFrom = updatedFrom;
 		this.outerState = outerState;
 		this.locals = new TCNameList();
@@ -65,7 +77,7 @@ public class POGState
 	@Override
 	public String toString()
 	{
-		return (hasUpdatedState ?  "has" : "has not") + " updated state" +
+		return (updatedSomething ? "changed " + updatedVariables : "no changes") +
 				(locals.isEmpty() ? "" : Utils.listToString(" (locals ", locals, ", ", ")"));
 	}
 	
@@ -75,7 +87,7 @@ public class POGState
 	 */
 	public POGState getCopy()
 	{
-		return new POGState(hasUpdatedState, updatedFrom, outerState, locals);
+		return new POGState(updatedVariables, updatedSomething, updatedFrom, outerState, locals);
 	}
 	
 	/**
@@ -85,23 +97,36 @@ public class POGState
 	 */
 	public POGState getLink()
 	{
-		return new POGState(false, LexLocation.ANY, this, new TCNameList());
+		return new POGState(new HashMap<TCNameToken, LexLocation>(), false, LexLocation.ANY, this, new TCNameList());
 	}
 	
+	/**
+	 * True if state has been updated, either here or in outer levels.
+	 */
 	public boolean hasUpdatedState()
 	{
-		return hasUpdatedState || (outerState != null && outerState.hasUpdatedState());
+		return updatedSomething || (outerState != null && outerState.hasUpdatedState());
 	}
 
-	public void setUpdateState(boolean updatedState, LexLocation from)
+	public boolean hasUpdatedState(TCNameSet names)
 	{
-		hasUpdatedState = hasUpdatedState || updatedState;
-		updatedFrom = from;
+		for (TCNameToken name: names)
+		{
+			if (updatedVariables.containsKey(name))
+			{
+				return true;
+			}
+		}
+		
+		return (outerState != null && outerState.hasUpdatedState());
 	}
-	
+
+	/**
+	 * Return the location of the last state update.
+	 */
 	public LexLocation getUpdatedFrom()
 	{
-		if (hasUpdatedState)
+		if (updatedSomething)
 		{
 			return updatedFrom;
 		}
@@ -114,6 +139,19 @@ public class POGState
 			return LexLocation.ANY;
 		}
 	}
+
+	public LexLocation getUpdatedFrom(TCNameSet names)
+	{
+		for (TCNameToken name: names)
+		{
+			if (updatedVariables.containsKey(name))
+			{
+				return updatedVariables.get(name);
+			}
+		}
+		
+		return LexLocation.ANY;
+	}
 	
 	private void didUpdateState(LexLocation from)
 	{
@@ -123,34 +161,35 @@ public class POGState
 		}
 		else
 		{
-			hasUpdatedState = true;				// Module level
+			updatedSomething = true;				// Module level
 			updatedFrom = from;
 		}
 	}
 
-	public void didUpdateState(TCNameToken name)
+	public void didUpdateState(TCNameToken name, LexLocation from)
 	{
 		if (locals.contains(name))
 		{
-			hasUpdatedState = true;				// A local dcl update
+			updatedSomething = true;				// A local dcl update
 			updatedFrom = name.getLocation();
 		}
 		else if (outerState != null)
 		{
-			outerState.didUpdateState(name);	// May be an outer* local
+			outerState.didUpdateState(name, from);	// May be an outer* local
 		}
 		else
 		{
-			hasUpdatedState = true;				// A module state update
+			updatedVariables.put(name, from);
+			updatedSomething = true;				// A module state update
 			updatedFrom = name.getLocation();
 		}
 	}
 
-	public void didUpdateState(TCNameList names)
+	public void didUpdateState(TCNameList names, LexLocation from)
 	{
 		for (TCNameToken name: names)
 		{
-			didUpdateState(name);
+			didUpdateState(name, from);
 		}
 	}
 	
@@ -159,11 +198,11 @@ public class POGState
 		locals.add(name);
 	}
 	
-	public void addOperation(LexLocation location, PODefinition called)
+	public void addOperationCall(LexLocation from, PODefinition called)
 	{
 		if (called == null)
 		{
-			didUpdateState(location);	// Assumed
+			didUpdateState(from);	// Assumed
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -179,18 +218,29 @@ public class POGState
 				{
 					if (ext.mode.is(Token.WRITE))
 					{
-						didUpdateState(ext.identifiers);
+						didUpdateState(ext.identifiers, from);
 					}
 				}
 			}
 			else
 			{
-				didUpdateState(location);
+				didUpdateState(from);
 			}
 		}
 		else if (called instanceof POExplicitOperationDefinition)
 		{
-			didUpdateState(location);
+			didUpdateState(from);
 		}
+	}
+
+	public void combineWith(POGState state)
+	{
+		while (state.outerState != null)
+		{
+			state = state.outerState;	// Find module level
+		}
+		
+		updatedVariables.putAll(state.updatedVariables);
+		updatedSomething = updatedSomething || state.updatedSomething;
 	}
 }

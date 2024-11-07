@@ -99,7 +99,7 @@ public class POApplyExpression extends POExpression
 				// We have to say that the POGState is as if the operation updates state, because
 				// it may read state even if pure, and an apply uses the return value. So QC can't
 				// evaluate them. This makes subsequent POs Unchecked.
-				pogState.setUpdateState(true, location);
+				pogState.addOperationCall(location, null);
 			}
 
 			if (type.isMap(location))

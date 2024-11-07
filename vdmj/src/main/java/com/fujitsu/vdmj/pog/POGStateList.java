@@ -25,8 +25,6 @@ package com.fujitsu.vdmj.pog;
 
 import java.util.Vector;
 
-import com.fujitsu.vdmj.lex.LexLocation;
-
 /**
  * A list of POG states for the sub-clauses in a statements. These are combined when
  * the execution paths rejoin.
@@ -50,18 +48,9 @@ public class POGStateList extends Vector<POGState>
 	 */
 	public void combineInto(POGState parent)
 	{
-		boolean hasUpdatedState = false;
-		LexLocation updatedFrom = LexLocation.ANY;
-		
 		for (POGState state: this)
 		{
-			if (state.hasUpdatedState())
-			{
-				hasUpdatedState = true;
-				updatedFrom = state.getUpdatedFrom();
-			}
+			parent.combineWith(state);
 		}
-		
-		parent.setUpdateState(hasUpdatedState, updatedFrom);
 	}
 }

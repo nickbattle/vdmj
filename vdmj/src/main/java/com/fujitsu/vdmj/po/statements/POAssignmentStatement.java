@@ -93,7 +93,7 @@ public class POAssignmentStatement extends POStatement
 		
 		for (TCNameToken update: updates)
 		{
-			pogState.didUpdateState(update);
+			pogState.didUpdateState(update, location);
 		}
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
