@@ -203,7 +203,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
 	 */
-	protected List<ASTCodeLens> getASTCodeLenses(boolean dirty)
+	protected List<ASTCodeLens> getASTCodeLenses()
 	{
 		List<ASTCodeLens> lenses = new Vector<ASTCodeLens>();
 		

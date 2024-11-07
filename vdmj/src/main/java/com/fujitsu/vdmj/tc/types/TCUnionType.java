@@ -827,19 +827,10 @@ public class TCUnionType extends TCType
 		if (other instanceof TCUnionType)
 		{
 			TCUnionType uother = (TCUnionType)other;
-
-			for (TCType t: uother.types)
-			{
-				if (!types.contains(t))
-				{
-					return false;
-				}
-			}
-
-			return true;
+			return uother.types.equals(types);
 		}
 
-		return types.contains(other);
+		return false;
 	}
 
 	@Override
