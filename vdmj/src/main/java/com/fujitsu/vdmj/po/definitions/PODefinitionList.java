@@ -99,8 +99,19 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 
 		for (PODefinition d: this)
 		{
-			obligations.addAll(d.getProofObligations(ctxt, pogState, env));
-			ctxt.push(new POLetDefContext(d));
+			if (d instanceof POExplicitFunctionDefinition || d instanceof POImplicitFunctionDefinition)
+			{
+				// local functions push their context first, to be callable in the POs that they generate.
+				ctxt.push(new POLetDefContext(d));
+				obligations.addAll(d.getProofObligations(ctxt, pogState, env));
+			}
+			else
+			{
+				// Regular definitions are only defined after themselves
+				obligations.addAll(d.getProofObligations(ctxt, pogState, env));
+				ctxt.push(new POLetDefContext(d));
+			}
+			
 			count++;
 		}
 		

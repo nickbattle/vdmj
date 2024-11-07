@@ -388,6 +388,7 @@ public class SubTypeObligation extends ProofObligation
 
 				if (s.length() > 0)
 				{
+					sb.append(prefix);
 					sb.append("(");
 					sb.append(s);
 					sb.append(")");
