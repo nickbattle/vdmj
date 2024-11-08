@@ -25,14 +25,22 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POCallStatement extends POStatement
@@ -60,15 +68,62 @@ public class POCallStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		TCTypeList paramTypes = getParamTypes();
+		int i = 0;
 
 		for (POExpression exp: args)
 		{
 			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+
+			TCType pt = paramTypes.get(i);
+			TCType at = exp.getExptype();
+			
+			if (!TypeComparator.isSubType(at, pt))
+			{
+				obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+			}
+
+			i++;
 		}
 
-		pogState.addOperation(location, opdef);
+		pogState.addOperationCall(location, opdef);
 
 		return obligations;
+	}
+
+	private TCTypeList getParamTypes()
+	{
+		if (opdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+			return exop.type.parameters;
+		}
+		else if (opdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+			return imop.type.parameters;
+		}
+		else if (opdef instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)opdef;
+			return exfn.type.parameters;
+		}
+		else if (opdef instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)opdef;
+			return imfn.type.parameters;
+		}
+		else	// Should never happen, but don't fail
+		{
+			TCTypeList list = new TCTypeList();
+			
+			for (POExpression arg: args)
+			{
+				list.add(arg.getExptype());
+			}
+			
+			return list;
+		}
 	}
 
 	@Override

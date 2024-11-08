@@ -92,7 +92,7 @@ public class PogTest extends TestCase
 		/* 26 */ "(forall mk_(i, $any1):(int) * (int) &\n  (forall x in set {m(1), 2, 3} & (m(x) < i) =>\n    x in set dom m))\n",
 		/* 27 */ "1 in set dom m\n",
 		/* 28 */ "(let x:int = m(1) in\n  x in set dom m)\n",
-		/* 29 */ "(forall x:int &\n  x in set dom m)\n",
+		/* 29 */ "(let local: int -> int local(x) == m(x) in\n  (forall x:int &\n    x in set dom m))\n",
 		/* 30 */ "1 in set dom m\n",
 		/* 31 */ "(let x = m(1) in\n  2 in set dom m)\n",
 		/* 32 */ "(let x = m(1), y = m(2) in\n  x in set dom m)\n",

@@ -94,14 +94,6 @@ public class POApplyExpression extends POExpression
 
 		if (!type.isUnknown(location))
 		{
-			if (type.isOperation(location))
-			{
-				// We have to say that the POGState is as if the operation updates state, because
-				// it may read state even if pure, and an apply uses the return value. So QC can't
-				// evaluate them. This makes subsequent POs Unchecked.
-				pogState.setUpdateState(true, location);
-			}
-
 			if (type.isMap(location))
 			{
 				TCMapType m = type.getMap();
@@ -160,6 +152,14 @@ public class POApplyExpression extends POExpression
 			if (type.isSeq(location))
 			{
 				obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
+			}
+			
+			if (type.isOperation(location))
+			{
+				// We have to say that the POGState is as if the operation updates state, because
+				// it may read state even if pure, and an apply uses the return value. So QC can't
+				// evaluate them. This makes subsequent POs Unchecked.
+				pogState.addOperationCall(location, null);
 			}
 		}
 

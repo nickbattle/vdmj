@@ -165,20 +165,18 @@ public abstract class POExpression extends PONode implements Serializable
 		return obligations;
 	}
 
-	public boolean updatesState()
+	public TCNameSet updatesState()
 	{
 		POStatementStateFinder finder = new POStatementStateFinder();
 		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
-		TCNameSet names = vset.applyExpressionVisitor(this, true);
-		return !names.isEmpty();
+		return vset.applyExpressionVisitor(this, true);
 	}
 
-	public boolean readsState()
+	public TCNameSet readsState()
 	{
 		POStatementStateFinder finder = new POStatementStateFinder();
 		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
-		TCNameSet names = vset.applyExpressionVisitor(this, false);
-		return !names.isEmpty();
+		return vset.applyExpressionVisitor(this, false);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2024 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,7 +21,11 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+
 package com.fujitsu.vdmj.pog;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -30,8 +34,8 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold state information for POG of statements, which involve potentially
@@ -39,43 +43,52 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class POGState
 {
-	private boolean hasUpdatedState;
-	private LexLocation updatedFrom;
+	private static final TCNameToken SOMETHING = new TCNameToken(LexLocation.ANY, "?", "?");
+	
+	private Map<TCNameToken, LexLocation> updatedState;
+	private Map<TCNameToken, LexLocation> updatedLocals;
 	private POGState outerState;
-	private TCNameList locals;
+	private TCNameList localNames;
 	
 	public POGState()
 	{
-		hasUpdatedState = false;
-		updatedFrom = LexLocation.ANY;
+		updatedState = new HashMap<TCNameToken, LexLocation>();
+		updatedLocals = new HashMap<TCNameToken, LexLocation>();
 		outerState = null;
-		locals = new TCNameList();
+		localNames = new TCNameList();
 	}
 	
-	private POGState(boolean hasUpdatedState, LexLocation updatedFrom, POGState outerState, TCNameList locals)
+	/**
+	 * Used by getCopy and getLink.
+	 */
+	private POGState(Map<TCNameToken, LexLocation> updatedState, Map<TCNameToken, LexLocation> updatedLocals,
+			POGState outerState, TCNameList localNames)
 	{
-		this.hasUpdatedState = hasUpdatedState;
-		this.updatedFrom = updatedFrom;
+		this.updatedState = updatedState;
+		this.updatedLocals = updatedLocals;
 		this.outerState = outerState;
-		this.locals = new TCNameList();
-		
-		this.locals.addAll(locals);
+		this.localNames = localNames;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return (hasUpdatedState ?  "has" : "has not") + " updated state" +
-				(locals.isEmpty() ? "" : Utils.listToString(" (locals ", locals, ", ", ")"));
+		return "state: " + updatedState.toString() +
+				", locals: " + updatedLocals.toString() +
+				(outerState != null ? " / " + outerState.toString() : "");
 	}
 	
 	/**
-	 * Create a copy of the current state, to go into (say) the then/elseif/else branches
-	 * of a statement, before combining the results. Note this copies the locals.
+	 * Copy a state for use in if/else branches etc, where changes in each are not visible
+	 * in the other branches, but all changes are combined afterwards. Note that it has
+	 * the same local names and outer state.
 	 */
 	public POGState getCopy()
 	{
-		return new POGState(hasUpdatedState, updatedFrom, outerState, locals);
+		HashMap<TCNameToken, LexLocation> copyState = new HashMap<TCNameToken, LexLocation>();
+		HashMap<TCNameToken, LexLocation> copyLocals = new HashMap<TCNameToken, LexLocation>();
+		
+		return new POGState(copyState, copyLocals, outerState, localNames);
 	}
 	
 	/**
@@ -85,34 +98,69 @@ public class POGState
 	 */
 	public POGState getLink()
 	{
-		return new POGState(false, LexLocation.ANY, this, new TCNameList());
+		return new POGState(
+			new HashMap<TCNameToken, LexLocation>(),
+			new HashMap<TCNameToken, LexLocation>(), this, new TCNameList());
 	}
 	
-	public boolean hasUpdatedState()
+	/**
+	 * True if state has been updated, either here or in outer levels.
+	 */
+	public boolean hasUpdatedState(TCNameSet names)
 	{
-		return hasUpdatedState || (outerState != null && outerState.hasUpdatedState());
+		for (TCNameToken name: names)
+		{
+			if (localNames.contains(name))
+			{
+				return updatedLocals.containsKey(name);
+			}
+			else
+			{
+				if (updatedState.containsKey(name) ||
+					updatedState.containsKey(SOMETHING))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return (outerState != null && outerState.hasUpdatedState(names));
 	}
 
-	public void setUpdateState(boolean updatedState, LexLocation from)
+	/**
+	 * Return the location of the last state update.
+	 */
+	public LexLocation getUpdatedLocation(TCNameSet names)
 	{
-		hasUpdatedState = hasUpdatedState || updatedState;
-		updatedFrom = from;
-	}
-	
-	public LexLocation getUpdatedFrom()
-	{
-		if (hasUpdatedState)
+		for (TCNameToken name: names)
 		{
-			return updatedFrom;
+			if (localNames.contains(name))
+			{
+				if (updatedLocals.containsKey(name))
+				{
+					return updatedLocals.get(name);
+				}
+			}
+			else
+			{
+				if (updatedState.containsKey(name))
+				{
+					return updatedState.get(name);
+				}
+				
+				if (updatedState.containsKey(SOMETHING))
+				{
+					return updatedState.get(SOMETHING);
+				}
+			}
 		}
-		else if (outerState != null)
+
+		if (outerState != null)
 		{
-			return outerState.getUpdatedFrom();
+			return outerState.getUpdatedLocation(names);
 		}
-		else
-		{
-			return LexLocation.ANY;
-		}
+		
+		return LexLocation.ANY;
 	}
 	
 	private void didUpdateState(LexLocation from)
@@ -123,47 +171,44 @@ public class POGState
 		}
 		else
 		{
-			hasUpdatedState = true;				// Module level
-			updatedFrom = from;
+			updatedState.put(SOMETHING, from);
 		}
 	}
 
-	public void didUpdateState(TCNameToken name)
+	public void didUpdateState(TCNameToken name, LexLocation from)
 	{
-		if (locals.contains(name))
+		if (localNames.contains(name))
 		{
-			hasUpdatedState = true;				// A local dcl update
-			updatedFrom = name.getLocation();
+			updatedLocals.put(name, from);			// A local dcl update
 		}
 		else if (outerState != null)
 		{
-			outerState.didUpdateState(name);	// May be an outer* local
+			outerState.didUpdateState(name, from);	// May be an outer* local, or state
 		}
 		else
 		{
-			hasUpdatedState = true;				// A module state update
-			updatedFrom = name.getLocation();
+			updatedState.put(name, from);			// A module state update
 		}
 	}
 
-	public void didUpdateState(TCNameList names)
+	public void didUpdateState(TCNameList names, LexLocation from)
 	{
 		for (TCNameToken name: names)
 		{
-			didUpdateState(name);
+			didUpdateState(name, from);
 		}
 	}
 	
 	public void addDclLocal(TCNameToken name)
 	{
-		locals.add(name);
+		localNames.add(name);
 	}
 	
-	public void addOperation(LexLocation location, PODefinition called)
+	public void addOperationCall(LexLocation from, PODefinition called)
 	{
 		if (called == null)
 		{
-			didUpdateState(location);	// Assumed
+			didUpdateState(from);	// Assumed
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -179,18 +224,27 @@ public class POGState
 				{
 					if (ext.mode.is(Token.WRITE))
 					{
-						didUpdateState(ext.identifiers);
+						didUpdateState(ext.identifiers, from);
 					}
 				}
 			}
 			else
 			{
-				didUpdateState(location);
+				didUpdateState(from);
 			}
 		}
 		else if (called instanceof POExplicitOperationDefinition)
 		{
-			didUpdateState(location);
+			didUpdateState(from);
 		}
+	}
+
+	/**
+	 * Combine copies for if/else branches, created by getCopy().
+	 */
+	public void combineWith(POGState copy)
+	{
+		updatedState.putAll(copy.updatedState);
+		updatedLocals.putAll(copy.updatedLocals);
 	}
 }

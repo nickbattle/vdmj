@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -143,6 +144,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 	
 	public void typeCheck(TCModule tcmodule, MultiModuleEnvironment menv)
 	{
+		String tc = TypeComparator.getCurrentModule();
+		
 		for (ProofObligation po: this)
 		{
 			try
@@ -160,10 +163,14 @@ public class ProofObligationList extends Vector<ProofObligation>
 				po.markUnchecked(ProofObligation.PO_HAS_ERRORS);
 			}
 		}
+		
+		TypeComparator.setCurrentModule(tc);
 	}
 
 	public void typeCheck(TCNameToken name, Environment env)
 	{
+		String tc = TypeComparator.getCurrentModule();
+		
 		for (ProofObligation po: this)
 		{
 			try
@@ -181,6 +188,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 				po.markUnchecked(ProofObligation.PO_HAS_ERRORS);
 			}
 		}
+		
+		TypeComparator.setCurrentModule(tc);
 	}
 
 	private void typeCheck(ProofObligation obligation, String mname, Environment env) throws Exception
@@ -283,11 +292,20 @@ public class ProofObligationList extends Vector<ProofObligation>
 	 */
 	public void stateUpdate(POGState pstate, POExpression expression)
 	{
-		boolean readsState = expression.readsState();
+		TCNameSet reads = expression.readsState();
 		
-		if (readsState && pstate.hasUpdatedState())
+		if (!reads.isEmpty() && pstate.hasUpdatedState(reads))
 		{
-			markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + pstate.getUpdatedFrom().toShortString());
+			LexLocation at = pstate.getUpdatedLocation(reads);
+			
+			if (at == LexLocation.ANY)
+			{
+				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + reads);
+			}
+			else
+			{
+				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + at.toShortString());
+			}
 		}
 	}
 }

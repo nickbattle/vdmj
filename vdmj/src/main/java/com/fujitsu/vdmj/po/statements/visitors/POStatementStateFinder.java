@@ -116,7 +116,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 			{
 				POValueDefinition vdef = (POValueDefinition)def;
 				
-				if (vdef.exp.readsState())
+				if (!vdef.exp.readsState().isEmpty())
 				{
 					for (PODefinition ldef: vdef.defs)
 					{

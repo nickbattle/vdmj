@@ -133,6 +133,11 @@ public class TypeComparator
 		currentModule = module;
 	}
 	
+	public static String getCurrentModule()
+	{
+		return currentModule;
+	}
+	
 	/**
 	 * Test whether the two types are compatible. This means that, at runtime,
 	 * it is possible that the two types are the same, or sufficiently similar
@@ -142,11 +147,26 @@ public class TypeComparator
 	 * @param from
 	 * @return True if types "a" and "b" are compatible.
 	 */
-
 	public synchronized static boolean compatible(TCType to, TCType from)
 	{
 		done.clear();
 		return searchCompatible(to, from, false) == Result.Yes;
+	}
+
+	public synchronized static boolean compatible(String module, TCType to, TCType from)
+	{
+		String old = currentModule;
+		
+		try
+		{
+			setCurrentModule(module);
+			done.clear();
+			return searchCompatible(to, from, false) == Result.Yes;
+		}
+		finally
+		{
+			setCurrentModule(old);
+		}
 	}
 
 	public synchronized static boolean compatible(TCType to, TCType from, boolean paramOnly)

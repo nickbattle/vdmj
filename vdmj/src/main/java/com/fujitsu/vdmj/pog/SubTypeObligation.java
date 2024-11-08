@@ -83,7 +83,7 @@ public class SubTypeObligation extends ProofObligation
 		POExpression exp, TCType etype, TCType atype, POContextStack ctxt)
 	{
 		super(exp.location, POType.SUB_TYPE, ctxt);
-		source = ctxt.getSource(oneType(false, exp, etype, atype));
+		source = ctxt.getSource(oneTypeSafe(false, exp, etype, atype));
 		return;
 	}
 
@@ -127,7 +127,7 @@ public class SubTypeObligation extends ProofObligation
 			body = func.body;
 		}
 
-		source = ctxt.getSource(oneType(false, body, etype, atype));
+		source = ctxt.getSource(oneTypeSafe(false, body, etype, atype));
 		definition = func;
 	}
 
@@ -162,7 +162,7 @@ public class SubTypeObligation extends ProofObligation
 			body = func.body;
 		}
 
-		source = ctxt.getSource(oneType(false, body, etype, atype));
+		source = ctxt.getSource(oneTypeSafe(false, body, etype, atype));
 		definition = func;
 	}
 
@@ -174,7 +174,7 @@ public class SubTypeObligation extends ProofObligation
 		POVariableExpression result = new POVariableExpression(
 			new TCNameToken(def.location, def.name.getModule(), "RESULT"), null);
 
-		source = ctxt.getSource(oneType(false, result, def.type.result, actualResult));
+		source = ctxt.getSource(oneTypeSafe(false, result, def.type.result, actualResult));
 		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
@@ -203,16 +203,23 @@ public class SubTypeObligation extends ProofObligation
 			result = new POTupleExpression(def.location, args, null);
 		}
 
-		source = ctxt.getSource(oneType(false, result, def.type.result, actualResult));
+		source = ctxt.getSource(oneTypeSafe(false, result, def.type.result, actualResult));
 	}
 
 	// NOTE! The atype parameter used to allow null to mean "any type", but this
 	// also caused problems sometimes with POs. Currently atype is not null...
 	
+	private String oneTypeSafe(boolean rec, POExpression exp, TCType etype, TCType atype)
+	{
+		String tc = TypeComparator.getCurrentModule();
+		TypeComparator.setCurrentModule(exp.location.module);
+		String result = oneType(rec, exp, etype, atype);
+		TypeComparator.setCurrentModule(tc);
+		return result;
+	}
+	
 	private String oneType(boolean rec, POExpression exp, TCType etype, TCType atype)
 	{
-		TypeComparator.setCurrentModule(exp.location.module);
-
 		if (atype != null && rec)
 		{
 			if (TypeComparator.isSubType(atype, etype))
@@ -388,6 +395,7 @@ public class SubTypeObligation extends ProofObligation
 
 				if (s.length() > 0)
 				{
+					sb.append(prefix);
 					sb.append("(");
 					sb.append(s);
 					sb.append(")");
