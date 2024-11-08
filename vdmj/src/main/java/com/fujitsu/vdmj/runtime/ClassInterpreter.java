@@ -71,6 +71,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.BUSValue;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -122,6 +123,7 @@ public class ClassInterpreter extends Interpreter
 		{
 			defaultClass = new INClassDefinition();
 			executableClasses.add(defaultClass);
+			TypeComparator.setCurrentModule(getDefaultName());
 		}
 		else
 		{
@@ -130,6 +132,7 @@ public class ClassInterpreter extends Interpreter
     			if (c.name.getName().equals(cname))
     			{
     				defaultClass = c;
+					TypeComparator.setCurrentModule(getDefaultName());
     				return;
     			}
     		}

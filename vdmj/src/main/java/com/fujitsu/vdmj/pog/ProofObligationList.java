@@ -144,6 +144,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 	
 	public void typeCheck(TCModule tcmodule, MultiModuleEnvironment menv)
 	{
+		String tc = TypeComparator.getCurrentModule();
+		
 		for (ProofObligation po: this)
 		{
 			try
@@ -161,10 +163,14 @@ public class ProofObligationList extends Vector<ProofObligation>
 				po.markUnchecked(ProofObligation.PO_HAS_ERRORS);
 			}
 		}
+		
+		TypeComparator.setCurrentModule(tc);
 	}
 
 	public void typeCheck(TCNameToken name, Environment env)
 	{
+		String tc = TypeComparator.getCurrentModule();
+		
 		for (ProofObligation po: this)
 		{
 			try
@@ -182,6 +188,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 				po.markUnchecked(ProofObligation.PO_HAS_ERRORS);
 			}
 		}
+		
+		TypeComparator.setCurrentModule(tc);
 	}
 
 	private void typeCheck(ProofObligation obligation, String mname, Environment env) throws Exception

@@ -65,6 +65,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.traces.CallSequence;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -126,6 +127,7 @@ public class ModuleInterpreter extends Interpreter
 			executableModules.add(defaultModule);
 			checkedModules.add(new TCModule());
 			defaultEnvironment = new ModuleEnvironment(checkedModules.get(0));
+			TypeComparator.setCurrentModule(getDefaultName());
 		}
 		else
 		{
@@ -134,6 +136,7 @@ public class ModuleInterpreter extends Interpreter
 				if (m.name.getName().equals(mname))
 				{
 					defaultModule = m;
+					TypeComparator.setCurrentModule(getDefaultName());
 					break;
 				}
 			}
