@@ -31,22 +31,22 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
  */
 public class ConsoleExecTimer extends Thread
 {
-	private final long timer_MS;
+	private final long timer;
 
-	public ConsoleExecTimer(long timer_MS)
+	public ConsoleExecTimer(long timer)
 	{
-		this.timer_MS = timer_MS;
+		this.timer = timer;
 		setName("ExecTimer");
 	}
 	
 	@Override
 	public void run()
 	{
-		while (true)
+		if (timer > 0)
 		{
 			try
 			{
-				Thread.sleep(timer_MS);
+				Thread.sleep(timer);
 				Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
 			}
 			catch (InterruptedException e)
