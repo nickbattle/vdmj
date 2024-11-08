@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -85,7 +86,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 			return;
 		}
 		
-		if (qc.initStrategies(timeout))
+		if (qc.initStrategies())
 		{
 			for (ProofObligation po: chosen)
 			{
@@ -93,7 +94,22 @@ public class QuickCheckExecutor extends AsyncExecutor
 				
 				if (!qc.hasErrors())
 				{
-					qc.checkObligation(po, results);
+					ConsoleExecTimer execTimer = null;
+					
+					try
+					{
+						execTimer = new ConsoleExecTimer(timeout);
+						execTimer.start();
+
+						qc.checkObligation(po, results);
+					}
+					finally
+					{
+						if (execTimer != null)
+						{
+							execTimer.interrupt();
+						}
+					}
 				}
 				
 				if (cancelled)

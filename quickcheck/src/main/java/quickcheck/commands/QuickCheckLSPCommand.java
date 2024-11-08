@@ -172,6 +172,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		}
 		
 		QCConsole.setIncludes(includes);
+		timeout = (timeout < 0) ? QuickCheck.DEFAULT_TIMEOUT : timeout;
 
 		return null;
 	}

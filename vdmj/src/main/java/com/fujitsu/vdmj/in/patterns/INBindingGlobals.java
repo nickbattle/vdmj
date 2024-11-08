@@ -43,8 +43,6 @@ public class INBindingGlobals
 	private Context bindCounterexample = null;
 	private Context bindWitness = null;
 	private boolean bindAllValues = false;
-	private long bindTimeout = 0;
-	private boolean didTimeout = false;
 	private boolean maybe = false;
 
 	private INBindingGlobals()
@@ -57,19 +55,7 @@ public class INBindingGlobals
 		bindCounterexample = null;
 		bindWitness = null;
 		bindAllValues = false;
-		bindTimeout = 0;
-		didTimeout = false;
 		maybe = false;
-	}
-
-	public void setTimeout(long timeout)
-	{
-		bindTimeout = timeout;
-	}
-
-	public long getTimeout()
-	{
-		return bindTimeout;
 	}
 
 	public void setAllValues(boolean hasAllValues)
@@ -80,16 +66,6 @@ public class INBindingGlobals
 	public boolean hasAllValues()
 	{
 		return this.bindAllValues;
-	}
-	
-	public void setDidTimeout(boolean did)
-	{
-		this.didTimeout = did;
-	}
-	
-	public boolean didTimeout()
-	{
-		return this.didTimeout;
 	}
 	
 	public void setCounterexample(Context ctxt)
