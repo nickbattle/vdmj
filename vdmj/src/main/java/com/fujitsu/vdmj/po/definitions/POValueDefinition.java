@@ -110,7 +110,6 @@ public class POValueDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		list.addAll(exp.getProofObligations(ctxt, pogState, env));
-		list.stateUpdate(pogState, exp);
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&
