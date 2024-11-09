@@ -1000,3 +1000,4 @@ as the expected and actual values.
 5041, "Add explicit type <pattern : type> here");
 5042, "Missing type import for <name>";
 5043, "Strict: Should not use 'DEFAULT' as a module name"
+5044, "Annotations: <syntax error>"

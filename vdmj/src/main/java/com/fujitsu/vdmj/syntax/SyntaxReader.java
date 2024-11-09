@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.LocatedException;
 import com.fujitsu.vdmj.messages.VDMError;
@@ -382,7 +381,7 @@ public abstract class SyntaxReader
 				{
 					if (Properties.annotations_debug)
 					{
-						Console.err.println("Annotations: " + e.getMessage() + " at " + comments.location(i));
+						warning(5044, "Annotations: " + e.getMessage(), comments.location(i));
 					}
 				}
 			}
