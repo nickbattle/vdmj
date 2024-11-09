@@ -593,7 +593,6 @@ public class LexTokenReader extends BacktrackInputReader
 				if (rdCh() == '-')
 				{
 					StringBuilder sb = new StringBuilder();
-					LexLocation here = location(linecount, charpos + 1);
 					
 					while (ch != '\n' && ch != EOF)
 					{
@@ -601,6 +600,7 @@ public class LexTokenReader extends BacktrackInputReader
 						rdCh();
 					}
 
+					LexLocation here = new LexLocation(file, currentModule, tokline, tokpos + 2, tokline, lasteol);
 					comments.add(here, sb.toString().substring(1), false);
 					return nextToken();
 				}
