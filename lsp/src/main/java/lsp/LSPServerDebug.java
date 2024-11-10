@@ -129,6 +129,7 @@ public class LSPServerDebug implements Runnable, VDMJMain
 				catch (IOException e)
 				{
 					Diag.severe("LSP Server stopped: %s", e.getMessage());
+					Diag.error(e);
 				}
 				
 				Diag.info("LSP %s Server closing port %d", dialect, socket.getLocalPort());
