@@ -331,7 +331,25 @@ public class QuickCheck
 			for (QCStrategy strategy: strategies)
 			{
 				verbose("------------------------ Invoking %s strategy on PO #%d\n", strategy.getName(), po.number);
-				StrategyResults sresults = strategy.getValues(po, binds, ictxt);
+				StrategyResults sresults = null;
+				
+				try
+				{
+					// Suspend annotation execution by the interpreter, because the
+					// expansion of invariant types can invoke them.
+					INAnnotation.suspend(true);
+
+					sresults = strategy.getValues(po, binds, ictxt);
+				}
+				catch (Throwable t)
+				{
+					errorln("Strategy " + strategy.getName() + " failed to generate values: " + t);
+					continue;
+				}
+				finally
+				{
+					INAnnotation.suspend(false);
+				}
 				
 				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
