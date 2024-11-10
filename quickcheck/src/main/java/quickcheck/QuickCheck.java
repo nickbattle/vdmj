@@ -542,6 +542,8 @@ public class QuickCheck
 						String desc = "";
 						po.setWitness(null);
 						po.setProvedBy(null);
+						po.setCounterexample(null);
+						po.setMessage(null);
 						
 						if (timedOut)
 						{
@@ -566,8 +568,17 @@ public class QuickCheck
 						else if (sresults.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
-							desc = " by finite types";
-							po.setProvedBy("finite");
+							
+							if (bindings.isEmpty())
+							{
+								desc = " in all cases";
+								po.setProvedBy("fixed");
+							}
+							else
+							{
+								desc = " by finite types";
+								po.setProvedBy("finite");
+							}
 						}
 						else
 						{
@@ -576,8 +587,6 @@ public class QuickCheck
 						
 						infof(outcome, "PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
 						po.setStatus(outcome);
-						po.setCounterexample(null);
-						po.setMessage(null);
 					}
 					else
 					{
@@ -622,7 +631,16 @@ public class QuickCheck
 							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
-							po.setCounterexample(globals.getCounterexample());
+							
+							if (bindings.isEmpty())		// Failed with no binds - eg. Test() with no params
+							{
+								po.setCounterexample(new Context(po.location, "Empty", null));
+							}
+							else
+							{
+								po.setCounterexample(globals.getCounterexample());
+							}
+							
 							po.setWitness(null);
 							
 							if (execException != null)
