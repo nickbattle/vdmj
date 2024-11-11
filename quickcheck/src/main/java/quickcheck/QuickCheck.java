@@ -84,12 +84,12 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
-	private static final long DEFAULT_TIMEOUT = 5 * 1000;	// 5s timeout
+	public static final long DEFAULT_TIMEOUT = 5000;	// 5s timeout
+	
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
-	private long timeout = 0;
 	
 	public QuickCheck()
 	{
@@ -183,9 +183,8 @@ public class QuickCheck
 		}
 	}
 	
-	public boolean initStrategies(long timeoutSecs)
+	public boolean initStrategies()
 	{
-		this.timeout = (timeoutSecs < 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
 		boolean doChecks = true;
 		
 		for (QCStrategy strategy: strategies)
@@ -324,8 +323,6 @@ public class QuickCheck
 		IterableContext ictxt = addTypeParams(po, ctxt);
 		boolean hasAllValues = false;
 		long before = System.currentTimeMillis();
-		INBindingGlobals globals = INBindingGlobals.getInstance();
-		globals.setTimeout(timeout);	// Strategies can use this
 		
 		while (ictxt.hasNext())
 		{
@@ -334,7 +331,25 @@ public class QuickCheck
 			for (QCStrategy strategy: strategies)
 			{
 				verbose("------------------------ Invoking %s strategy on PO #%d\n", strategy.getName(), po.number);
-				StrategyResults sresults = strategy.getValues(po, binds, ictxt);
+				StrategyResults sresults = null;
+				
+				try
+				{
+					// Suspend annotation execution by the interpreter, because the
+					// expansion of invariant types can invoke them.
+					INAnnotation.suspend(true);
+
+					sresults = strategy.getValues(po, binds, ictxt);
+				}
+				catch (Throwable t)
+				{
+					errorln("Strategy " + strategy.getName() + " failed to generate values: " + t);
+					continue;
+				}
+				finally
+				{
+					INAnnotation.suspend(false);
+				}
 				
 				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
@@ -465,9 +480,7 @@ public class QuickCheck
 					}
 				}
 				
-				globals.setTimeout(timeout);
 				globals.setAllValues(sresults.hasAllValues);
-				
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				Interpreter.getInstance().setDefaultName(po.location.module);
 				
@@ -476,6 +489,7 @@ public class QuickCheck
 				Value execResult = new BooleanValue(false);
 				ContextException execException = null;
 				boolean execCompleted = false;
+				boolean timedOut = false;
 				long before = System.currentTimeMillis();
 
 				try
@@ -499,7 +513,8 @@ public class QuickCheck
 				{
 					if (e.rawMessage.equals("Execution cancelled"))
 					{
-						execResult = null;
+						execResult = new BooleanValue(false);
+						timedOut = true;
 					}
 					else if (e.number == 4024)	// 'not yet specified' expression reached
 					{
@@ -519,14 +534,7 @@ public class QuickCheck
 				
 				long after = System.currentTimeMillis() + sresults.duration;
 				
-				if (execResult == null)		// cancelled
-				{
-					infoln("----");
-					printBindings(bindings);
-					infoln("----");
-					infoln(po);
-				}
-				else if (execResult instanceof BooleanValue)
+				if (execResult instanceof BooleanValue)
 				{
 					if (execResult.boolValue(ctxt))
 					{
@@ -534,8 +542,10 @@ public class QuickCheck
 						String desc = "";
 						po.setWitness(null);
 						po.setProvedBy(null);
+						po.setCounterexample(null);
+						po.setMessage(null);
 						
-						if (globals.didTimeout())
+						if (timedOut)
 						{
 							outcome = POStatus.TIMEOUT;
 						}
@@ -558,8 +568,17 @@ public class QuickCheck
 						else if (sresults.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
-							desc = " by finite types";
-							po.setProvedBy("finite");
+							
+							if (bindings.isEmpty())
+							{
+								desc = " in all cases";
+								po.setProvedBy("fixed");
+							}
+							else
+							{
+								desc = " by finite types";
+								po.setProvedBy("finite");
+							}
 						}
 						else
 						{
@@ -568,12 +587,10 @@ public class QuickCheck
 						
 						infof(outcome, "PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
 						po.setStatus(outcome);
-						po.setCounterexample(null);
-						po.setMessage(null);
 					}
 					else
 					{
-						if (globals.didTimeout())		// Result would have been true (above), but...
+						if (timedOut)		// Result would have been true (above), but...
 						{
 							infof(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
@@ -614,7 +631,16 @@ public class QuickCheck
 							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
-							po.setCounterexample(globals.getCounterexample());
+							
+							if (bindings.isEmpty())		// Failed with no binds - eg. Test() with no params
+							{
+								po.setCounterexample(new Context(po.location, "Empty", null));
+							}
+							else
+							{
+								po.setCounterexample(globals.getCounterexample());
+							}
+							
 							po.setWitness(null);
 							
 							if (execException != null)
@@ -929,8 +955,8 @@ public class QuickCheck
 		println(USAGE);
 		println("");
 		println("  -?|-help           - show command help");
-		println("  -q|-v              - run with minimal or verbose output");
-		println("  -t <secs>          - timeout in secs");
+		println("  -q|-v|-n           - run with minimal, verbose, basic output");
+		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");
 		println("  -<strategy:option> - pass option to strategy");

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.POStatus;
@@ -57,14 +58,16 @@ public class QuickCheckThread extends CancellableThread
 	private final ProofObligationList chosen;
 	private final POPlugin pog;
 	private final Object workDoneToken;
+	private final long timeout;
 
-	public QuickCheckThread(RPCRequest request, QuickCheck qc, ProofObligationList chosen)
+	public QuickCheckThread(RPCRequest request, QuickCheck qc, ProofObligationList chosen, long timeout)
 	{
 		super(request.get("id"));
 		this.request = request;
 		this.qc = qc;
 		this.chosen = chosen;
 		this.pog = PluginRegistry.getInstance().getPlugin("PO");
+		this.timeout = timeout;
 		
 		JSONObject params = request.get("params");
 		this.workDoneToken = params.get("workDoneToken");
@@ -93,7 +96,22 @@ public class QuickCheckThread extends CancellableThread
 				
 				if (!qc.hasErrors())
 				{
-					qc.checkObligation(po, results);
+					ConsoleExecTimer execTimer = null;
+					
+					try
+					{
+						execTimer = new ConsoleExecTimer(timeout);
+						execTimer.start();
+
+						qc.checkObligation(po, results);
+					}
+					finally
+					{
+						if (execTimer != null)
+						{
+							execTimer.interrupt();
+						}
+					}
 				}
 				
 				list.add(getQCResponse(po, messages));

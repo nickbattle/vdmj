@@ -106,6 +106,7 @@ public class LSPServerStdio implements Runnable, VDMJMain
 		catch (IOException e)
 		{
 			Diag.error("LSP Server stopped: %s", e.getMessage());
+			Diag.error(e);
 		}
 	}
 }

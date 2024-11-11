@@ -68,8 +68,6 @@ public class INForAllExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		long start = System.currentTimeMillis();
-		long timeout = globals == null ? 0 : globals.getTimeout();
 
 		try
 		{
@@ -90,21 +88,6 @@ public class INForAllExpression extends INExpression
 
 			while (quantifiers.hasNext())
 			{
-				if (timeout > 0)
-				{
-					if (System.currentTimeMillis() - start > timeout)
-					{
-						if (globals != null)
-						{
-							globals.setCounterexample(null);
-							globals.setDidTimeout(true);
-							globals.setMaybe(true);
-						}
-						
-						return new BooleanValue(true);
-					}
-				}
-				
 				Context evalContext = new Context(location, "forall", ctxt);
 				NameValuePairList nvpl = quantifiers.next();
 				boolean matches = true;
@@ -134,7 +117,6 @@ public class INForAllExpression extends INExpression
 						if (globals != null)
 						{
 							globals.setCounterexample(evalContext);
-							globals.setDidTimeout(false);
 							globals.setMaybe(false);
 						}
 						
@@ -146,7 +128,6 @@ public class INForAllExpression extends INExpression
 					if (globals != null)
 					{
 						globals.setCounterexample(evalContext);
-						globals.setDidTimeout(false);
 						globals.setMaybe(false);
 					}
 					

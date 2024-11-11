@@ -59,9 +59,19 @@ public class QCConsole extends PluginConsole
 		QCConsole.includes = includes;
 	}
 	
+	public static List<POStatus> getIncludes()
+	{
+		return includes;
+	}
+	
 	public static void setVerbose(boolean verbose)
 	{
 		QCConsole.verbose = verbose;
+	}
+	
+	public boolean getVerbose()
+	{
+		return verbose;
 	}
 
 	public static void info(POStatus status, String m)

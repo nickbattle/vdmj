@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.in.expressions.INCaseAlternative;
 import com.fujitsu.vdmj.in.expressions.INCasesExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
@@ -161,8 +160,6 @@ public class DirectQCStrategy extends QCStrategy
 			if (cases != null)		// Should always be found, but...
 			{
 				ValueList values = po.exp.expType.apply(new INGetAllValuesVisitor(), ctxt);
-				long timeout = INBindingGlobals.getInstance().getTimeout();
-				
 				verbose("Checking %d values of type %s\n", values.size(), po.exp.expType);
 				
 				for (Value value: values)
@@ -191,11 +188,6 @@ public class DirectQCStrategy extends QCStrategy
 						Context cex = new Context(po.location, "Counterexample", Interpreter.getInstance().getInitialContext());
 						cex.put(name, value);
 						return new StrategyResults(getName(), cex, "(case unmatched)", System.currentTimeMillis() - before);
-					}
-					
-					if (System.currentTimeMillis() - before > timeout)
-					{
-						return new StrategyResults();	// Maybe, for very large types
 					}
 				}
 

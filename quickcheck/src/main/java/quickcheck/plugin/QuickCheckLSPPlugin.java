@@ -119,7 +119,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 
 		Vector<Integer> poList = new Vector<Integer>();
 		Vector<String> poNames = new Vector<String>();
-		long timeout = 1L;
+		long timeout = 0;
 		
 		if (request.get("params") != null)
 		{
@@ -129,7 +129,9 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			{
 				JSONObject config = params.get("config");
 				JSONArray obligations = config.get("obligations");
-				timeout = config.get("timeout", 1L);
+				
+				timeout = config.get("timeout", 1000L);	// faster for GUI?
+				if (timeout == 5) timeout = 5000;		// HACK until GUI fixed
 				
 				if (obligations != null && !obligations.isEmpty())
 				{
@@ -160,9 +162,9 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			Diag.error("No POs in scope");
 			return new RPCMessageList(request, RPCErrors.InternalError, "No POs in scope");
 		}
-		else if (qc.initStrategies(timeout))
+		else if (qc.initStrategies())
 		{
-			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen);
+			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen, timeout);
 			executor.start();
 		}
 		else

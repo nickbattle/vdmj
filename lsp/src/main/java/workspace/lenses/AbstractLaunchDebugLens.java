@@ -87,7 +87,13 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 		
 		if (!apply.applyTypes.isEmpty())
 		{
-			JSONArray applyTypes = new JSONArray(apply.applyTypes);
+			JSONArray applyTypes = new JSONArray();
+			
+			for (String atype: apply.applyTypes)
+			{
+				applyTypes.add(atype);
+			}
+			
 			launchArgs.put("applyTypes", applyTypes);
 		}
 		
