@@ -92,12 +92,24 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 					}
 					
 					ASTFunctionType ftype = (ASTFunctionType) exdef.type;
-					ASTTypeList ptypes = ftype.parameters;
 					int i = 0;
 					
-					for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
+					for (ASTPatternList pl: exdef.paramPatternList)
 					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+						JSONArray params = new JSONArray();
+						ASTTypeList ptypes = ftype.parameters;
+						
+						for (ASTPattern p: pl)
+						{
+							params.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+						}
+						
+						applyArgs.add(params);
+						
+						if (ftype.result instanceof ASTFunctionType)
+						{
+							ftype = (ASTFunctionType)ftype.result;
+						}
 					}
 				}
 			}

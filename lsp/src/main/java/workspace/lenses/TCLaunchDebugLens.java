@@ -89,7 +89,18 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					}
 					
 					TCFunctionType ftype = (TCFunctionType) exdef.type;
-					applyArgs = getParams(exdef.paramPatternList.get(0), ftype.parameters);
+					
+					applyArgs = new JSONArray();
+					
+					for (TCPatternList pl: exdef.paramPatternList)
+					{
+						applyArgs.add(getParams(pl, ftype.parameters));
+						
+						if (ftype.result instanceof TCFunctionType)
+						{
+							ftype = (TCFunctionType)ftype.result;
+						}
+					}
 				}
 			}
 			else if (def instanceof TCImplicitFunctionDefinition)
