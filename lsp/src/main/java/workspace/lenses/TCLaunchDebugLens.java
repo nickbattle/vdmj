@@ -112,7 +112,8 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					applyName = imdef.name.getName();
 					launchName = applyName;
 					defaultName = imdef.name.getModule();
-					applyArgs = getParams(imdef.parameterPatterns);
+					applyArgs = new JSONArray();
+					applyArgs.add(getParams(imdef.parameterPatterns));
 				}
 			}
 			else if (def instanceof TCExplicitOperationDefinition)
@@ -125,7 +126,8 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					launchName = applyName;
 					defaultName = exop.name.getModule();
 					TCOperationType ftype = (TCOperationType) exop.type;
-					applyArgs = getParams(exop.parameterPatterns, ftype.parameters);
+					applyArgs = new JSONArray();
+					applyArgs.add(getParams(exop.parameterPatterns, ftype.parameters));
 				}
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
@@ -137,7 +139,8 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					applyName = imop.name.getName();
 					launchName = applyName;
 					defaultName = imop.name.getModule();
-					applyArgs = getParams(imop.parameterPatterns);
+					applyArgs = new JSONArray();
+					applyArgs.add(getParams(imop.parameterPatterns));
 				}
 			}
 			
