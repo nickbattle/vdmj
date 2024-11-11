@@ -955,7 +955,7 @@ public class QuickCheck
 		println(USAGE);
 		println("");
 		println("  -?|-help           - show command help");
-		println("  -q|-v              - run with minimal or verbose output");
+		println("  -q|-v|-n           - run with minimal, verbose, basic output");
 		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");

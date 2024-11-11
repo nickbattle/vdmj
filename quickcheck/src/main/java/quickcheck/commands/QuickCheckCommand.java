@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
@@ -48,7 +49,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-q|-v][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - lightweight PO verification";
@@ -70,6 +71,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		List<String> poNames = new Vector<String>();
 		List<POStatus> includes = new Vector<POStatus>();
 		long timeout = -1;
+		boolean numbersOnly = false;
 		
 		QuickCheck qc = new QuickCheck();
 
@@ -121,6 +123,11 @@ public class QuickCheckCommand extends AnalysisCommand
 							println("Not a valid PO status: " + arglist.get(i));
 							return USAGE;
 						}
+						break;
+						
+					case "-n":
+						numbersOnly = true;
+						QCConsole.setQuiet(true);
 						break;
 
 					case "-":
@@ -208,6 +215,14 @@ public class QuickCheckCommand extends AnalysisCommand
 						execTimer.start();
 						
 						qc.checkObligation(po, results);
+						
+						if (numbersOnly)
+						{
+							if (includes.isEmpty() || includes.contains(po.status))
+							{
+								Console.out.printf("PO #%d: %s\n", po.number, po.status.toString().toUpperCase());
+							}
+						}
 					}
 					catch (Exception e)
 					{
