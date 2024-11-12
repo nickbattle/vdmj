@@ -41,16 +41,7 @@ public class JSONArray extends Vector<Object>
 	@Override
 	public boolean add(Object value)
 	{
-		if (value instanceof Integer)
-		{
-			value = ((Integer)value).longValue();
-		}
-		else if (value instanceof Short)
-		{
-			value = ((Short)value).longValue();
-		}
-		
-		return super.add(value);
+		return super.add(JSONValue.validate(value));
 	}
 	
 	@SuppressWarnings("unchecked")
