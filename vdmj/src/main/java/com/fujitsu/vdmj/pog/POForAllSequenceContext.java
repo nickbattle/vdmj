@@ -28,33 +28,38 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
+import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POForAllSequenceContext extends POContext
 {
 	public final String pattern;
 	public final String exp;
-	public final String seqset;
+	
+	private String seqset = " in seq ";
 
 	public POForAllSequenceContext(POSetBind bind, POExpression exp)
 	{
 		this.pattern = bind.pattern.toString();
 		this.exp = exp.toString();
-		this.seqset = " in set ";
 	}
 
 	public POForAllSequenceContext(POSeqBind bind, POExpression exp)
 	{
 		this.pattern = bind.pattern.toString();
 		this.exp = exp.toString();
-		this.seqset = " in seq ";
+	}
+
+	public POForAllSequenceContext(POTypeBind bind, POExpression exp)
+	{
+		this.pattern = bind.pattern.toString();
+		this.exp = exp.toString();
 	}
 
 	public POForAllSequenceContext(POPattern pattern, POExpression exp)
 	{
 		this.pattern = pattern.toString();
 		this.exp = exp.toString();
-		this.seqset = " in set ";
 	}
 
 	public POForAllSequenceContext(TCNameToken var, POExpression from, POExpression to, POExpression by)
@@ -69,8 +74,13 @@ public class POForAllSequenceContext extends POContext
 		{
 			this.exp = String.format("[ $var | $var in set {%1$s, ..., %2$s} ]", from, to);
 		}
-		
-		this.seqset = " in seq ";
+	}
+
+	public POForAllSequenceContext(POPattern pattern, POExpression set, String seqset)
+	{
+		this.pattern = pattern.toString();
+		this.exp = set.toString();
+		this.seqset = seqset;
 	}
 
 	@Override

@@ -63,7 +63,7 @@ public class POForAllStatement extends POStatement
 		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
 		obligations.markIfUpdated(pogState, set);
 
-		ctxt.push(new POForAllSequenceContext(pattern, set));
+		ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 		ctxt.pop();
 

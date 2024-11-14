@@ -45,7 +45,7 @@ public class POForPatternBindStatement extends POStatement
 	private static final long serialVersionUID = 1L;
 	public final POPatternBind patternBind;
 	public final boolean reverse;
-	public final POExpression exp;
+	public final POExpression sequence;
 	public final POStatement statement;
 
 	public POForPatternBindStatement(LexLocation location,
@@ -54,7 +54,7 @@ public class POForPatternBindStatement extends POStatement
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
-		this.exp = exp;
+		this.sequence = exp;
 		this.statement = body;
 	}
 
@@ -62,43 +62,44 @@ public class POForPatternBindStatement extends POStatement
 	public String toString()
 	{
 		return "for " + patternBind + " in " +
-			(reverse ? " reverse " : "") + exp + " do\n" + statement;
+			(reverse ? " reverse " : "") + sequence + " do\n" + statement;
 	}
 
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = exp.getProofObligations(ctxt, pogState, env);
-		list.markIfUpdated(pogState, exp);
-
+		ProofObligationList list = sequence.getProofObligations(ctxt, pogState, env);
+		list.markIfUpdated(pogState, sequence);
+		
 		if (patternBind.pattern != null)
 		{
-			// Nothing to do
+			ctxt.push(new POForAllSequenceContext(patternBind.pattern, sequence));
 		}
 		else if (patternBind.bind instanceof POTypeBind)
 		{
-			// Nothing to do
+			POTypeBind bind = (POTypeBind)patternBind.bind;
+			ctxt.push(new POForAllSequenceContext(bind, sequence));
 		}
 		else if (patternBind.bind instanceof POSetBind)
 		{
 			POSetBind bind = (POSetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 			
-			ctxt.push(new POForAllSequenceContext(bind, exp));
+			ctxt.push(new POForAllSequenceContext(bind, sequence));
 			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
-			ctxt.pop();
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
 			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 			
-			ctxt.push(new POForAllSequenceContext(bind, exp));
+			ctxt.push(new POForAllSequenceContext(bind, sequence));
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
-			ctxt.pop();
 		}
 
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+		ctxt.pop();
+		
 		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
 		list.addAll(loops);
 		
