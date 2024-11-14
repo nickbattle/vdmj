@@ -241,7 +241,7 @@ map TCAtomicStatement{location, assignments, stmttype} to POAtomicStatement(loca
 map TCBlockStatement{location, assignmentDefs, statements, stmttype} to POBlockStatement(location, assignmentDefs, statements) set stmttype;
 map TCCallObjectStatement{designator, classname, fieldname, args, fdef, stmttype} to POCallObjectStatement(designator, classname, fieldname, args, fdef) set stmttype;
 map TCCallStatement{name, args, opdef, stmttype} to POCallStatement(name, args, opdef) set stmttype;
-map TCCasesStatement{location, exp, cases, others, stmttype} to POCasesStatement(location, exp, cases, others) set stmttype;
+map TCCasesStatement{location, exp, cases, others, expType, stmttype} to POCasesStatement(location, exp, cases, others, expType) set stmttype;
 map TCCaseStmtAlternative{exp, pattern, statement} to POCaseStmtAlternative(exp, pattern, statement);
 map TCCaseStmtAlternativeList{} to POCaseStmtAlternativeList(this);
 map TCClassInvariantStatement{name, invdefs, stmttype} to POClassInvariantStatement(name, invdefs) set stmttype;

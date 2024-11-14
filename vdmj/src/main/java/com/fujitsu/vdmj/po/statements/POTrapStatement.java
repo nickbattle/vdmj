@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -89,7 +90,8 @@ public class POTrapStatement extends POStatement
 
 		// The "with" clause sees the "body" state updates, potentially
 		list.addAll(body.getProofObligations(ctxt, pogState, env));
-		list.addAll(with.getProofObligations(ctxt, pogState, env));
+		// We don't know the exception type to match against the trap pattern/bind, so unchecked
+		list.addAll(with.getProofObligations(ctxt, pogState, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 		return list;
 	}
 

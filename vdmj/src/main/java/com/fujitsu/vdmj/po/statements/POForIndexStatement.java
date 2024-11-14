@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -75,9 +76,11 @@ public class POForIndexStatement extends POStatement
 		}
 
 		ctxt.push(new POScopeContext());
+		ctxt.push(new POForAllSequenceContext(var, from, to, by));
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
 		obligations.addAll(loops);
+		ctxt.pop();
 		ctxt.pop();
 
 		return obligations;
