@@ -75,7 +75,9 @@ public class POCasesStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
+		obligations.markIfUpdated(pogState, exp);		
+		
 		POGStateList stateList = new POGStateList();
 		boolean hasIgnore = false;
 

@@ -54,7 +54,10 @@ public class POCyclesStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return statement.getProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = cycles.getProofObligations(ctxt, pogState, env);
+		obligations.markIfUpdated(pogState, cycles);
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		return obligations;
 	}
 
 	@Override

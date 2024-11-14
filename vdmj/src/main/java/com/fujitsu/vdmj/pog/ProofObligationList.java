@@ -290,7 +290,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 	 * This is used by various statements and definitions to suppress obligations that cannot
 	 * yet be checked.
 	 */
-	public void markIfUpdated(POGState pstate, POExpression expression)
+	public ProofObligationList markIfUpdated(POGState pstate, POExpression expression)
 	{
 		TCNameSet varreads = expression.readsState();
 		
@@ -307,5 +307,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + at.toShortString());
 			}
 		}
+		
+		return this;
 	}
 }
