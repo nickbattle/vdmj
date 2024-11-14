@@ -38,7 +38,11 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
+import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class POForPatternBindStatement extends POStatement
 {
@@ -46,15 +50,17 @@ public class POForPatternBindStatement extends POStatement
 	public final POPatternBind patternBind;
 	public final boolean reverse;
 	public final POExpression sequence;
+	public final TCType expType;
 	public final POStatement statement;
 
 	public POForPatternBindStatement(LexLocation location,
-		POPatternBind patternBind, boolean reverse, POExpression exp, POStatement body)
+		POPatternBind patternBind, boolean reverse, POExpression exp, TCType expType, POStatement body)
 	{
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
 		this.sequence = exp;
+		this.expType = expType;
 		this.statement = body;
 	}
 
@@ -79,6 +85,13 @@ public class POForPatternBindStatement extends POStatement
 		{
 			POTypeBind bind = (POTypeBind)patternBind.bind;
 			ctxt.push(new POForAllSequenceContext(bind, sequence));
+			
+			TCSeqType s = expType.isSeq(location) ? expType.getSeq() : null;
+			
+			if (s != null && !TypeComparator.isSubType(s.seqof, bind.type))
+			{
+				list.add(new SubTypeObligation(bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
+			}
 		}
 		else if (patternBind.bind instanceof POSetBind)
 		{
