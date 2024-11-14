@@ -60,10 +60,10 @@ public class POForAllStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
-		obligations.stateUpdate(pogState, set);
+		obligations.markIfUpdated(pogState, set);
 
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
 		obligations.addAll(loops);
 
 		return obligations;

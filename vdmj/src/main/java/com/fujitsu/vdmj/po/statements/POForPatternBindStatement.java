@@ -69,7 +69,7 @@ public class POForPatternBindStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = exp.getProofObligations(ctxt, pogState, env);
-		list.stateUpdate(pogState, exp);
+		list.markIfUpdated(pogState, exp);
 
 		if (patternBind.pattern != null)
 		{
@@ -99,7 +99,7 @@ public class POForPatternBindStatement extends POStatement
 		}
 
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
 		list.addAll(loops);
 		
 		return list;

@@ -70,7 +70,7 @@ public class POLetBeStStatement extends POStatement
 		{
 			ctxt.push(new POForAllContext(this));
 			ProofObligationList oblist = suchThat.getProofObligations(ctxt, pogState, env);
-			oblist.stateUpdate(pogState, suchThat);
+			oblist.markIfUpdated(pogState, suchThat);
 			obligations.addAll(oblist);
 			ctxt.pop();
 		}
