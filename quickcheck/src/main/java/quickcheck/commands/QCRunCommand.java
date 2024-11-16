@@ -26,14 +26,18 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
+import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * Launch a "print" command for a PO counterexample or witness.
@@ -130,16 +134,30 @@ public class QCRunCommand extends AnalysisCommand
 						
 						// Temporarily allow maximal parsing, for invariant POs
 						boolean saved = Properties.parser_maximal_types;
+						Interpreter interpreter = Interpreter.getInstance();
+						Environment saved2 = interpreter.getGlobalEnvironment();
 						
 						try
 						{
 							Properties.parser_maximal_types = true;
+							
+							// Set the default Environment to allow complex launches to run which
+							// use symbols outside the current module in VDM-SL. The default is
+							// put back afterwards!
+							if (Settings.dialect == Dialect.VDM_SL)
+							{
+								POPlugin tc = registry.getPlugin("PO");
+								MultiModuleEnvironment menv = new MultiModuleEnvironment(tc.getPO());
+								interpreter.setGlobalEnvironment(menv);
+							}
+							
 							PrintCommand cmd = new PrintCommand(pline);
 							return cmd.run(pline);
 						}
 						finally
 						{
 							Properties.parser_maximal_types = saved;
+							interpreter.setGlobalEnvironment(saved2);
 						}
 					}
 					else

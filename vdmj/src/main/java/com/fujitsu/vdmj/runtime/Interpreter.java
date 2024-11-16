@@ -133,6 +133,12 @@ abstract public class Interpreter
 	 * in VDM++ it is the global class environment.
 	 */
 	abstract public Environment getGlobalEnvironment();
+	
+	/**
+	 * Set the global environment. This is used rarely, in cases where the usual
+	 * default is not appropriate.
+	 */
+	abstract public void setGlobalEnvironment(Environment env);
 
 	/**
 	 * @return The Interpreter instance.

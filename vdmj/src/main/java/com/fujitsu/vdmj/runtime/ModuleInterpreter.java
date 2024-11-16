@@ -162,6 +162,12 @@ public class ModuleInterpreter extends Interpreter
 	{
 		return defaultEnvironment;
 	}
+	
+	@Override
+	public void setGlobalEnvironment(Environment env)
+	{
+		defaultEnvironment = env;
+	}
 
 	/**
 	 * @return The current default module name.

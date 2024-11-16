@@ -153,6 +153,12 @@ public class ClassInterpreter extends Interpreter
 		
 		return env; 
 	}
+	
+	@Override
+	public void setGlobalEnvironment(Environment env)
+	{
+		// Ignored - global env created each time above
+	}
 
 	@Override
 	public String getDefaultName()
