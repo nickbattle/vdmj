@@ -68,7 +68,7 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens
 		
 		ApplyCall apply = factory.getCexApply();
 		
-		launchArgs.put("name", (debug ? "Debug " : "Launch ") + apply.applyName);
+		launchArgs.put("name", "PO #" + po.number);
 		launchArgs.put("defaultName", defaultName);
 		launchArgs.put("type", "vdm");
 		launchArgs.put("request", "launch");
