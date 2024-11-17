@@ -162,12 +162,6 @@ public class ModuleInterpreter extends Interpreter
 	{
 		return defaultEnvironment;
 	}
-	
-	@Override
-	public void setGlobalEnvironment(Environment env)
-	{
-		defaultEnvironment = env;
-	}
 
 	/**
 	 * @return The current default module name.
@@ -285,8 +279,14 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public Value execute(String line) throws Exception
 	{
+		return execute(line, getGlobalEnvironment());
+	}
+	
+	@Override
+	public Value execute(String line, Environment env) throws Exception
+	{
 		TCExpression expr = parseExpression(line, getDefaultName());
-		typeCheck(expr);
+		typeCheck(expr, env);
 
 		Context mainContext = new StateContext(defaultModule.name.getLocation(),
 				"module scope",	null, defaultModule.getStateContext());

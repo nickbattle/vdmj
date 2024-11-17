@@ -135,7 +135,6 @@ public class QCRunCommand extends AnalysisCommand
 						// Temporarily allow maximal parsing, for invariant POs
 						boolean saved = Properties.parser_maximal_types;
 						Interpreter interpreter = Interpreter.getInstance();
-						Environment saved2 = interpreter.getGlobalEnvironment();
 						
 						try
 						{
@@ -144,20 +143,20 @@ public class QCRunCommand extends AnalysisCommand
 							// Set the default Environment to allow complex launches to run which
 							// use symbols outside the current module in VDM-SL. The default is
 							// put back afterwards!
+							Environment menv = interpreter.getGlobalEnvironment();
+							
 							if (Settings.dialect == Dialect.VDM_SL)
 							{
 								POPlugin tc = registry.getPlugin("PO");
-								MultiModuleEnvironment menv = new MultiModuleEnvironment(tc.getPO());
-								interpreter.setGlobalEnvironment(menv);
+								menv = new MultiModuleEnvironment(tc.getPO());
 							}
 							
-							PrintCommand cmd = new PrintCommand(pline);
+							PrintCommand cmd = new PrintCommand(pline, menv);
 							return cmd.run(pline);
 						}
 						finally
 						{
 							Properties.parser_maximal_types = saved;
-							interpreter.setGlobalEnvironment(saved2);
 						}
 					}
 					else

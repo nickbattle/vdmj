@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.runtime.DebuggerException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.values.Value;
 
 public class PrintCommand extends AnalysisCommand
@@ -43,8 +44,15 @@ public class PrintCommand extends AnalysisCommand
 	private final static String CMD = "print <expression>";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = CMD + " - evaluate an expression";
+	
+	private final Environment env;
 
 	public PrintCommand(String line)
+	{
+		this(line, Interpreter.getInstance().getGlobalEnvironment());
+	}
+
+	public PrintCommand(String line, Environment env)
 	{
 		super(line);
 		
@@ -52,6 +60,8 @@ public class PrintCommand extends AnalysisCommand
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
+		
+		this.env = env;
 	}
 
 	@Override
@@ -74,7 +84,7 @@ public class PrintCommand extends AnalysisCommand
 			watch.start();
 			
    			long before = System.currentTimeMillis();
-   			Value v = Interpreter.getInstance().execute(expression);
+   			Value v = Interpreter.getInstance().execute(expression, env);
    			long after = System.currentTimeMillis();
    			
    			println("= " + v);

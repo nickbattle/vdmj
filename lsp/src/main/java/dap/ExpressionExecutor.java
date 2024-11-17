@@ -36,8 +36,8 @@ public class ExpressionExecutor extends AsyncExecutor
 {
 	private final String expression;
 	private final boolean maximal;
-	private final Environment env;
-	
+
+	private Environment env = null;
 	private String answer;
 
 	public ExpressionExecutor(String id, DAPRequest request, String expression, boolean maximal, Environment env)
@@ -64,18 +64,17 @@ public class ExpressionExecutor extends AsyncExecutor
 	{
 		boolean saved = Properties.parser_maximal_types;	// Used by qcrun
 		Interpreter interpreter = manager.getInterpreter();
-		Environment saved2 = interpreter.getGlobalEnvironment();
+		
+		if (env == null) env = interpreter.getGlobalEnvironment();
 		
 		try
 		{
 			Properties.parser_maximal_types = maximal;
-			if (env != null) interpreter.setGlobalEnvironment(env);
-			answer = interpreter.execute(expression).toString();
+			answer = interpreter.execute(expression, env).toString();
 		}
 		finally
 		{
 			Properties.parser_maximal_types = saved;
-			interpreter.setGlobalEnvironment(saved2);
 		}
 	}
 

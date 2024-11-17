@@ -153,12 +153,6 @@ public class ClassInterpreter extends Interpreter
 		
 		return env; 
 	}
-	
-	@Override
-	public void setGlobalEnvironment(Environment env)
-	{
-		// Ignored - global env created each time above
-	}
 
 	@Override
 	public String getDefaultName()
@@ -305,6 +299,12 @@ public class ClassInterpreter extends Interpreter
 	 */
 	@Override
 	public Value execute(String line) throws Exception
+	{
+		return execute(line, getGlobalEnvironment());
+	}
+	
+	@Override
+	public Value execute(String line, Environment env) throws Exception
 	{
 		TCExpression expr = parseExpression(line, getDefaultName());
 		typeCheck(expr);
