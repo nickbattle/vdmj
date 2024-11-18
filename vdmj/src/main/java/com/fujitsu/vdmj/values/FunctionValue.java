@@ -317,6 +317,20 @@ public class FunctionValue extends Value
 			ValueList args = new ValueList(arg);
 			return eval(from, args, ctxt, null);
 		}
+		catch (ContextException e)
+		{
+			if (e.isUserCancel())
+			{
+				if (Settings.measureChecks && measure != null)
+				{
+					this.measureValues.clear();
+					measure.measuringThreads.clear();
+					measure.callingThreads.clear();
+				}
+			}
+			
+			throw e;
+		}
 		catch (StackOverflowError e)
 		{
 			throw new ContextException(4174, "Stack overflow", location, ctxt);
@@ -329,6 +343,20 @@ public class FunctionValue extends Value
 		try
 		{
 			return eval(from, argValues, ctxt, null);
+		}
+		catch (ContextException e)
+		{
+			if (e.isUserCancel())
+			{
+				if (Settings.measureChecks && measure != null)
+				{
+					this.measureValues.clear();
+					measure.measuringThreads.clear();
+					measure.callingThreads.clear();
+				}
+			}
+			
+			throw e;
 		}
 		catch (StackOverflowError e)
 		{

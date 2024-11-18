@@ -61,6 +61,6 @@ public class ContextException extends RuntimeException
 	
 	public boolean isUserCancel()
 	{
-		return number == 4175;
+		return number == Breakpoint.USER_CANCEL;
 	}
 }

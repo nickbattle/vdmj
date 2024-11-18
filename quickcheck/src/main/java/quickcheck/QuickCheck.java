@@ -511,7 +511,7 @@ public class QuickCheck
 				}
 				catch (ContextException e)
 				{
-					if (e.rawMessage.equals("Execution cancelled"))
+					if (e.isUserCancel())
 					{
 						execResult = new BooleanValue(false);
 						timedOut = true;
