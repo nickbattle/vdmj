@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 @SuppressWarnings("serial")
 public class ContextException extends RuntimeException
 {
+	public static final int STACK_OVERFLOW = 4998;
+	
 	public final LexLocation location;
 	public final Context ctxt;
 	public final int number;
@@ -56,7 +58,7 @@ public class ContextException extends RuntimeException
 	
 	public boolean isStackOverflow()
 	{
-		return number == 4174;
+		return number == STACK_OVERFLOW;
 	}
 	
 	public boolean isUserCancel()

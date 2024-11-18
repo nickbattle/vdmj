@@ -239,7 +239,7 @@ public class OperationValue extends Value
 		}
 		catch (StackOverflowError e)
 		{
-			throw new ContextException(4174, "Stack overflow", from, ctxt);
+			throw new ContextException(ContextException.STACK_OVERFLOW, "Stack overflow", from, ctxt);
 		}
 	}
 
