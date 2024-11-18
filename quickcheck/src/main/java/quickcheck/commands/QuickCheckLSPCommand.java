@@ -89,6 +89,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		QCConsole.setQuiet(false);
 		QCConsole.setVerbose(false);
+		QCConsole.clearIncludes();
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{

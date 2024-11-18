@@ -64,6 +64,11 @@ public class QCConsole extends PluginConsole
 		return includes;
 	}
 	
+	public static void clearIncludes()
+	{
+		includes.clear();
+	}
+	
 	public static void setVerbose(boolean verbose)
 	{
 		QCConsole.verbose = verbose;
