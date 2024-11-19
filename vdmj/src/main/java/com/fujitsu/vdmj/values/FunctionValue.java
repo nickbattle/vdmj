@@ -308,6 +308,20 @@ public class FunctionValue extends Value
 			}
 		}
 	}
+	
+	/**
+	 * This is used during catastrohpic exception handling to clear any data held
+	 * from run to run that may need to be reset.
+	 */
+	private void clearData()
+	{
+		if (Settings.measureChecks && measure != null)
+		{
+			this.measureValues.clear();
+			measure.measuringThreads.clear();
+			measure.callingThreads.clear();
+		}
+	}
 
 	public Value eval(
 		LexLocation from, Value arg, Context ctxt) throws ValueException
@@ -317,9 +331,20 @@ public class FunctionValue extends Value
 			ValueList args = new ValueList(arg);
 			return eval(from, args, ctxt, null);
 		}
+		catch (ContextException e)
+		{
+			if (e.isUserCancel())
+			{
+				clearData();
+			}
+			
+			throw e;
+		}
 		catch (StackOverflowError e)
 		{
-			throw new ContextException(4174, "Stack overflow", location, ctxt);
+			clearData();
+			ContextException.throwStackOverflow(location, ctxt);
+			return null;	// No reached
 		}
 	}
 
@@ -330,9 +355,20 @@ public class FunctionValue extends Value
 		{
 			return eval(from, argValues, ctxt, null);
 		}
+		catch (ContextException e)
+		{
+			if (e.isUserCancel())
+			{
+				clearData();
+			}
+			
+			throw e;
+		}
 		catch (StackOverflowError e)
 		{
-			throw new ContextException(4174, "Stack overflow", location, ctxt);
+			clearData();
+			ContextException.throwStackOverflow(location, ctxt);
+			return null;	// No reached
 		}
 	}
 

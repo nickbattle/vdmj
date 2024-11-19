@@ -192,6 +192,7 @@ abstract public class Interpreter
 	 * @throws Exception Parser, type checking or runtime errors.
 	 */
 	abstract public Value execute(String line) throws Exception;
+	abstract public Value execute(String line, Environment env) throws Exception;
 
 	/**
 	 * Parse the line passed, and evaluate it as an expression in the context
@@ -414,7 +415,7 @@ abstract public class Interpreter
 	 * Set an exception catchpoint. This stops execution at the point that a matching
 	 * exception is thrown.
 	 *
-	 * @param exp The exception value(s) at which to stop, or null for any exception.
+	 * @param sequence The exception value(s) at which to stop, or null for any exception.
 	 * @return The Breakpoint object created.
 	 * @throws Exception 
 	 */
@@ -492,9 +493,14 @@ abstract public class Interpreter
 	abstract protected TCExpression parseExpression(String line, String module) throws Exception;
 
 	/**
-	 * Type check a TC expression tree passed.
+	 * Type check a TC expression tree passed, optionally in a given environment.
 	 */
 	public TCType typeCheck(TCNode tree) throws Exception
+	{
+		return typeCheck(tree, getGlobalEnvironment());
+	}
+	
+	public TCType typeCheck(TCNode tree, Environment env) throws Exception
 	{
 		TypeChecker.clearErrors();
 		TCType type = null;
@@ -502,12 +508,12 @@ abstract public class Interpreter
 		if (tree instanceof TCExpression)
 		{
 			TCExpression exp = (TCExpression)tree;
-			type = exp.typeCheck(getGlobalEnvironment(), null, NameScope.NAMESANDSTATE, null);
+			type = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
 		}
 		else if (tree instanceof TCStatement)
 		{
 			TCStatement stmt = (TCStatement)tree;
-			type = stmt.typeCheck(getGlobalEnvironment(), NameScope.NAMESANDSTATE, null, false);
+			type = stmt.typeCheck(env, NameScope.NAMESANDSTATE, null, false);
 		}
 		else
 		{

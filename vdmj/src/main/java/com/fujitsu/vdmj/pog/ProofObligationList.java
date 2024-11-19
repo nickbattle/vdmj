@@ -286,26 +286,28 @@ public class ProofObligationList extends Vector<ProofObligation>
 	}
 
 	/**
-	 * Update the obligations in this list because of the current POGState and the state read
-	 * by the expression. This is used by various statements and definitions, to suppress
-	 * obligations that cannot yet be checked.
+	 * Update the obligations in this list because of updates to the state read by the expression.
+	 * This is used by various statements and definitions to suppress obligations that cannot
+	 * yet be checked.
 	 */
-	public void stateUpdate(POGState pstate, POExpression expression)
+	public ProofObligationList markIfUpdated(POGState pstate, POExpression expression)
 	{
-		TCNameSet reads = expression.readsState();
+		TCNameSet varreads = expression.readsState();
 		
-		if (!reads.isEmpty() && pstate.hasUpdatedState(reads))
+		if (!varreads.isEmpty() && pstate.hasUpdatedState(varreads))
 		{
-			LexLocation at = pstate.getUpdatedLocation(reads);
+			LexLocation at = pstate.getUpdatedLocation(varreads);
 			
 			if (at == LexLocation.ANY)
 			{
-				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + reads);
+				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + varreads);
 			}
 			else
 			{
 				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + at.toShortString());
 			}
 		}
+		
+		return this;
 	}
 }

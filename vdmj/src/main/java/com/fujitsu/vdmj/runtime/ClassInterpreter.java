@@ -300,6 +300,12 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public Value execute(String line) throws Exception
 	{
+		return execute(line, getGlobalEnvironment());
+	}
+	
+	@Override
+	public Value execute(String line, Environment env) throws Exception
+	{
 		TCExpression expr = parseExpression(line, getDefaultName());
 		typeCheck(expr);
 		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);

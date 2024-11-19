@@ -55,7 +55,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class Breakpoint implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
+	
 	/** The location of the breakpoint. */
 	public final LexLocation location;
 	/** The number of the breakpoint. */
@@ -81,7 +81,7 @@ public class Breakpoint implements Serializable
 	public int bpType = SOURCE;
 	public static final int SOURCE = 0;		// A file:line source breakpoint
 	public static final int FUNCTION = 1;	// A function or operation name breakpoint
-	
+
 	public Breakpoint(LexLocation location)
 	{
 		this.location = location;
@@ -229,7 +229,7 @@ public class Breakpoint implements Serializable
 
 			case TERMINATE:
 				setExecInterrupt(Breakpoint.NONE);
-				throw new ContextException(4175, "Execution cancelled", location, ctxt);
+				ContextException.throwUserCancel(location, ctxt);
 		}
 		
 		ThreadState state = ctxt.threadState;

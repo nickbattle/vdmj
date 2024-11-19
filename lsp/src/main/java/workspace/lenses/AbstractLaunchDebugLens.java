@@ -24,11 +24,6 @@
 
 package workspace.lenses;
 
-import com.fujitsu.vdmj.pog.POLaunchFactory;
-import com.fujitsu.vdmj.pog.POLaunchFactory.ApplyArg;
-import com.fujitsu.vdmj.pog.POLaunchFactory.ApplyCall;
-import com.fujitsu.vdmj.pog.ProofObligation;
-
 import json.JSONArray;
 import json.JSONObject;
 
@@ -68,45 +63,4 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 
     	return new JSONArray(launchArgs);	// Array with one object
 	}
-	
-	protected JSONArray launchArgs(ProofObligation po, String defaultName, boolean debug)
-	{
-		JSONObject launchArgs = new JSONObject();
-		POLaunchFactory factory = new POLaunchFactory(po);
-		
-		ApplyCall apply = factory.getCexApply();
-		
-		launchArgs.put("name", (debug ? "Debug " : "Launch ") + apply.applyName);
-		launchArgs.put("defaultName", defaultName);
-		launchArgs.put("type", "vdm");
-		launchArgs.put("request", "launch");
-		launchArgs.put("noDebug", !debug);		// Note: inverted :)
-		launchArgs.put("remoteControl", null);
-		
-		launchArgs.put("applyName", apply.applyName);
-		
-		if (!apply.applyTypes.isEmpty())
-		{
-			JSONArray applyTypes = new JSONArray();
-			
-			for (String atype: apply.applyTypes)
-			{
-				applyTypes.add(atype);
-			}
-			
-			launchArgs.put("applyTypes", applyTypes);
-		}
-		
-		JSONArray applyArgs = new JSONArray();
-		
-		for (ApplyArg arg: apply.applyArgs)
-		{
-			applyArgs.add(new JSONObject("name", arg.name, "type", arg.type, "value", arg.value));
-		}
-		
-		launchArgs.put("applyArgs", applyArgs);
-
-    	return new JSONArray(launchArgs);
-	}
-	
 }

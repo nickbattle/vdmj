@@ -950,10 +950,13 @@ as the expected and actual values.
 4171, "Cannot convert <function> to <function>"
 4172, "Values cannot be compared: <first>, <second>"
 4173, "Unknown annotation @<name>"
-4174, "Stack overflow"
-4175, "Execution cancelled"
+4174, -
+4175, -
 4176, "Cannot evaluate power set of size <n>"
 4177, "Not permitted during initialization"
+...
+4998, "Stack overflow"
+4999, "Execution cancelled"
 
 
 5000, "Definition <name> not used"

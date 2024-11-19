@@ -92,12 +92,24 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 					}
 					
 					ASTFunctionType ftype = (ASTFunctionType) exdef.type;
-					ASTTypeList ptypes = ftype.parameters;
-					int i = 0;
 					
-					for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
+					for (ASTPatternList pl: exdef.paramPatternList)
 					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+						JSONArray params = new JSONArray();
+						ASTTypeList ptypes = ftype.parameters;
+						int i = 0;
+						
+						for (ASTPattern p: pl)
+						{
+							params.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+						}
+						
+						applyArgs.add(params);
+						
+						if (ftype.result instanceof ASTFunctionType)
+						{
+							ftype = (ASTFunctionType)ftype.result;
+						}
 					}
 				}
 			}
@@ -110,12 +122,14 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 					applyName = imdef.name.getName();
 					launchName = applyName;
 					defaultName = imdef.name.module;
+					JSONArray params = new JSONArray();
+					applyArgs.add(params);
 					
 					for (ASTPatternListTypePair param: imdef.parameterPatterns)
 					{
 						for (ASTPattern p: param.patterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
+							params.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 						}
 					}
 				}
@@ -136,10 +150,12 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 						ASTOperationType ftype = (ASTOperationType) exop.type;
 						ASTTypeList ptypes = ftype.parameters;
 						int i = 0;
+						JSONArray params = new JSONArray();
+						applyArgs.add(params);
 						
 						for (ASTPattern p: exop.parameterPatterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+							params.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
 						}
 					}
 				}
@@ -156,12 +172,14 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 					if (!applyName.equals(defaultName))	// Not a constructor
 					{
 						launchName = applyName;
+						JSONArray params = new JSONArray();
+						applyArgs.add(params);
 						
 						for (ASTPatternListTypePair param: imop.parameterPatterns)
 						{
 							for (ASTPattern p: param.patterns)
 							{
-								applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
+								params.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 							}
 						}
 					}

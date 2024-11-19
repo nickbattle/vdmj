@@ -54,7 +54,10 @@ public class PODurationStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return statement.getProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = duration.getProofObligations(ctxt, pogState, env);
+		obligations.markIfUpdated(pogState, duration);
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		return obligations;
 	}
 
 	@Override

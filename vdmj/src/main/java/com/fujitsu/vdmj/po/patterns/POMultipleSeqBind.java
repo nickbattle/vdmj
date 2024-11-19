@@ -51,7 +51,9 @@ public class POMultipleSeqBind extends POMultipleBind
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return sequence.getProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
+		obligations.markIfUpdated(pogState, sequence);
+		return obligations;
 	}
 
 	@Override

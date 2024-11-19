@@ -55,7 +55,7 @@ public class POLaunchFactory
 	{
 		public String applyName = null;
 		public List<String> applyTypes = new Vector<String>();
-		public List<ApplyArg> applyArgs = new Vector<ApplyArg>();
+		public List<List<ApplyArg>> applyArgs = new Vector<List<ApplyArg>>();
 	}
 	
 	public static class ApplyArg
@@ -207,6 +207,8 @@ public class POLaunchFactory
 		String sep = "";
 		int i = 0;
 		
+		applyCall.applyArgs.add(new Vector<ApplyArg>());
+		
 		for (POPattern p: paramPatternList)
 		{
 			String match = paramMatch(p.removeIgnorePatterns(), types.get(i++), ctxt);
@@ -224,6 +226,8 @@ public class POLaunchFactory
 		StringBuilder callString = new StringBuilder();
 		String sep = "";
 		callString.append("(");
+		
+		applyCall.applyArgs.add(new Vector<ApplyArg>());
 		
 		for (POPatternListTypePair pl: parameterPatterns)
 		{
@@ -278,7 +282,9 @@ public class POLaunchFactory
 		}
 		else
 		{
-			applyCall.applyArgs.add(new ApplyArg(p.toString(), type.toString(), result));
+			List<ApplyArg> lastArgs = applyCall.applyArgs.get(applyCall.applyArgs.size() - 1);
+			String stype = type.toString().replace(" /* opaque */", "");	// HACK!
+			lastArgs.add(new ApplyArg(p.toString(), stype, result));
 			return result;
 		}
 	}

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POCasesStatement extends POStatement
@@ -40,14 +41,16 @@ public class POCasesStatement extends POStatement
 	public final POExpression exp;
 	public final POCaseStmtAlternativeList cases;
 	public final POStatement others;
+	public final TCType expType;
 
 	public POCasesStatement(LexLocation location,
-		POExpression exp, POCaseStmtAlternativeList cases, POStatement others)
+		POExpression exp, POCaseStmtAlternativeList cases, POStatement others, TCType expType)
 	{
 		super(location);
 		this.exp = exp;
 		this.cases = cases;
 		this.others = others;
+		this.expType = expType;
 	}
 
 	@Override
@@ -75,7 +78,9 @@ public class POCasesStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
+		obligations.markIfUpdated(pogState, exp);		
+		
 		POGStateList stateList = new POGStateList();
 		boolean hasIgnore = false;
 
@@ -87,7 +92,7 @@ public class POCasesStatement extends POStatement
 			}
 
 			// Pushes PONotCaseContext
-			obligations.addAll(alt.getProofObligations(ctxt, stateList.addCopy(pogState), getStmttype(), env));
+			obligations.addAll(alt.getProofObligations(ctxt, stateList.addCopy(pogState), expType, env));
 		}
 
 		if (others != null && !hasIgnore)

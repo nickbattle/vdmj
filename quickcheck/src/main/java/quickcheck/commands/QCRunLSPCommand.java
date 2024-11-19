@@ -25,10 +25,14 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -130,8 +134,13 @@ public class QCRunLSPCommand extends AnalysisCommand
 				if (launch != null)
 				{
 					println("=> print " + launch);
-					// This allows maximal types to parse, for invariant POs
-					ExpressionExecutor executor = new ExpressionExecutor("print", request, launch, true);
+					
+					// This allows maximal types to parse, for invariant POs, and allows POs to
+					// reference types outside their module in VDM-SL.
+					Environment env = (Settings.dialect == Dialect.VDM_SL) ?
+						new MultiModuleEnvironment(po.getPO()) : null;
+					
+					ExpressionExecutor executor = new ExpressionExecutor("print", request, launch, true, env);
 					executor.start();
 					return null;
 				}

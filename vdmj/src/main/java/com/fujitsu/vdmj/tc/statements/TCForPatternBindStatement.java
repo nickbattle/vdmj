@@ -46,6 +46,8 @@ public class TCForPatternBindStatement extends TCStatement
 	public final boolean reverse;
 	public final TCExpression exp;
 	public final TCStatement statement;
+	
+	private TCType expType;
 
 	public TCForPatternBindStatement(LexLocation location,
 		TCPatternBind patternBind, boolean reverse, TCExpression exp, TCStatement body)
@@ -67,12 +69,12 @@ public class TCForPatternBindStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		TCType stype = exp.typeCheck(base, null, scope, null);
+		expType = exp.typeCheck(base, null, scope, null);
 		Environment local = base;
 
-		if (stype.isSeq(location))
+		if (expType.isSeq(location))
 		{
-			TCSeqType st = stype.getSeq();
+			TCSeqType st = expType.getSeq();
 			patternBind.typeCheck(base, scope, st.seqof);
 			TCDefinitionList defs = patternBind.getDefinitions();
 			defs.typeCheck(base, scope);

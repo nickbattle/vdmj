@@ -66,8 +66,7 @@ abstract public class CodeLens
 	}
 	
 	/**
-	 * These helper methods generate the lens response body. The JSONArray returned
-	 * by getDefinitionLenses (above) is an array of these structures, one per lens. 
+	 * These helper methods generate the lens response body.
 	 */
 	protected JSONObject makeLens(LexLocation location, String title, String command)
 	{

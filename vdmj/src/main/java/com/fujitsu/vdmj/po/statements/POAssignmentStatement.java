@@ -87,7 +87,7 @@ public class POAssignmentStatement extends POStatement
 
 		obligations.addAll(target.getProofObligations(ctxt));
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
-		obligations.stateUpdate(pogState, exp);
+		obligations.markIfUpdated(pogState, exp);
 		
 		TCNameSet updates = this.apply(new POStatementStateFinder(), true);
 		

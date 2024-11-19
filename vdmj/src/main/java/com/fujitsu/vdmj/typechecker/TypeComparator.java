@@ -305,6 +305,30 @@ public class TypeComparator
 		{
 			return Result.Yes;	// Not defined "yet"...?
 		}
+		
+		// Check (possibly opaque) invariant types early. These are always compatible,
+		// even allowing for opacity.
+		
+		if (from instanceof TCNamedType && to instanceof TCNamedType)
+		{
+			TCNamedType nfrom = (TCNamedType)from;
+			TCNamedType nto = (TCNamedType)to;
+			
+			if (nfrom.typename.equals(nto.typename))
+			{
+				return Result.Yes;
+			}
+		}
+		else if (from instanceof TCRecordType && to instanceof TCRecordType)
+		{
+			TCRecordType rfrom = (TCRecordType)from;
+			TCRecordType rto = (TCRecordType)to;
+			
+			if (rfrom.name.equals(rto.name))
+			{
+				return Result.Yes;
+			}
+		}
 
 		// Obtain the fundamental type of BracketTypes, NamedTypes and
 		// OptionalTypes.
