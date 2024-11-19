@@ -283,7 +283,8 @@ public class POLaunchFactory
 		else
 		{
 			List<ApplyArg> lastArgs = applyCall.applyArgs.get(applyCall.applyArgs.size() - 1);
-			lastArgs.add(new ApplyArg(p.toString(), type.toString(), result));
+			String stype = type.toString().replace(" /* opaque */", "");	// HACK!
+			lastArgs.add(new ApplyArg(p.toString(), stype, result));
 			return result;
 		}
 	}
