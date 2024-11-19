@@ -343,7 +343,8 @@ public class FunctionValue extends Value
 		catch (StackOverflowError e)
 		{
 			clearData();
-			throw new ContextException(ContextException.STACK_OVERFLOW, "Stack overflow", location, ctxt);
+			ContextException.throwStackOverflow(location, ctxt);
+			return null;	// No reached
 		}
 	}
 
@@ -366,7 +367,8 @@ public class FunctionValue extends Value
 		catch (StackOverflowError e)
 		{
 			clearData();
-			throw new ContextException(ContextException.STACK_OVERFLOW, "Stack overflow", location, ctxt);
+			ContextException.throwStackOverflow(location, ctxt);
+			return null;	// No reached
 		}
 	}
 

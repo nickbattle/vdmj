@@ -82,8 +82,6 @@ public class Breakpoint implements Serializable
 	public static final int SOURCE = 0;		// A file:line source breakpoint
 	public static final int FUNCTION = 1;	// A function or operation name breakpoint
 
-	public static final int USER_CANCEL = 4999;	// Special message for timeouts
-	
 	public Breakpoint(LexLocation location)
 	{
 		this.location = location;
@@ -231,7 +229,7 @@ public class Breakpoint implements Serializable
 
 			case TERMINATE:
 				setExecInterrupt(Breakpoint.NONE);
-				throw new ContextException(USER_CANCEL, "Execution cancelled", location, ctxt);
+				ContextException.throwUserCancel(location, ctxt);
 		}
 		
 		ThreadState state = ctxt.threadState;

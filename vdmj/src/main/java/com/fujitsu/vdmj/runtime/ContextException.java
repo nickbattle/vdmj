@@ -29,7 +29,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 @SuppressWarnings("serial")
 public class ContextException extends RuntimeException
 {
-	public static final int STACK_OVERFLOW = 4998;
+	private static final int STACK_OVERFLOW	= 4998;
+	private static final int USER_CANCEL	= 4999;
 	
 	public final LexLocation location;
 	public final Context ctxt;
@@ -56,13 +57,23 @@ public class ContextException extends RuntimeException
 		return getMessage();
 	}
 	
+	public static void throwStackOverflow(LexLocation from, Context ctxt) throws ContextException
+	{
+		throw new ContextException(STACK_OVERFLOW, "Stack overflow", from, ctxt);
+	}
+	
 	public boolean isStackOverflow()
 	{
 		return number == STACK_OVERFLOW;
 	}
 	
+	public static void throwUserCancel(LexLocation from, Context ctxt) throws ContextException
+	{
+		throw new ContextException(USER_CANCEL, "Execution cancelled", from, ctxt);
+	}
+	
 	public boolean isUserCancel()
 	{
-		return number == Breakpoint.USER_CANCEL;
+		return number == USER_CANCEL;
 	}
 }
