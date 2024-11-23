@@ -49,9 +49,10 @@ public class LaunchHandler extends DAPHandler
 			String command = arguments.get("command");
 			String remoteControl = arguments.get("remoteControl");
 			String logging = arguments.get("logging");
+			JSONObject params = arguments.get("params");
 			
 			return DAPPlugin.getInstance().dapLaunch(
-					request, noDebug, defaultName, command, remoteControl, logging);
+					request, noDebug, defaultName, command, remoteControl, logging, params);
 		}
 		catch (Exception e)
 		{

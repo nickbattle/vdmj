@@ -26,10 +26,17 @@ package vdmj.commands;
 
 import java.io.IOException;
 
+import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
+import com.fujitsu.vdmj.typechecker.Environment;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
+import json.JSONObject;
+import workspace.Diag;
+import workspace.PluginRegistry;
 import workspace.plugins.DAPPlugin;
+import workspace.plugins.POPlugin;
 
 public class PrintCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
@@ -67,7 +74,20 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 		try
 		{
 			DAPPlugin manager = DAPPlugin.getInstance();
-			return manager.getInterpreter().execute(expression).toString();
+			JSONObject params = manager.getLaunchParams();
+			Environment env = manager.getInterpreter().getGlobalEnvironment();
+			
+			if (params != null)
+			{
+				if (params.get("type").equals("PO_LENS"))
+				{
+					Diag.info("Processing PO code lens...");
+					POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
+					env = new MultiModuleEnvironment(po.getPO());
+				}
+			}
+			
+			return manager.getInterpreter().execute(expression, env).toString();
 		}
 		catch (Exception e)
 		{
