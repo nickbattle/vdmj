@@ -79,11 +79,15 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 			
 			if (params != null)
 			{
-				if (params.get("type").equals("PO_LENS"))
+				if ("PO_LENS".equals(params.get("type")))
 				{
 					Diag.info("Processing PO code lens...");
 					POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
-					env = new MultiModuleEnvironment(po.getPO());
+					
+					if (po != null)
+					{
+						env = new MultiModuleEnvironment(po.getPO());
+					}
 				}
 			}
 			
