@@ -97,6 +97,7 @@ public class POPluginSL extends POPlugin
 				"request",		"launch",
 				"noDebug",		false,
 				"defaultName",	po.location.module,
+				"params",		new JSONObject("type", "POG"),
 				"command",		"print " + launch
 			);
 	}
@@ -117,6 +118,7 @@ public class POPluginSL extends POPlugin
 				"request",		"launch",
 				"noDebug",		false,
 				"defaultName",	po.location.module,
+				"params",		new JSONObject("type", "POG"),
 				"command",		"print " + launch
 			);
 	}

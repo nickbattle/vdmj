@@ -24,9 +24,6 @@
 
 package workspace.plugins;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
@@ -37,14 +34,12 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import rpc.RPCMessageList;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.DefaultCommand;
-import vdmj.commands.ErrorCommand;
 import vdmj.commands.HelpCommand;
 import vdmj.commands.InitCommand;
 import vdmj.commands.PluginsCommand;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.QuitCommand;
 import vdmj.commands.RestartCommand;
-import vdmj.commands.RuntraceCommand;
 import vdmj.commands.ScriptCommand;
 import vdmj.commands.SetCommand;
 import vdmj.commands.VersionCommand;
@@ -137,42 +132,11 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "?":			return new HelpCommand(line);
 			case "version":		return new VersionCommand(line);
 			case "restart":		return new RestartCommand(line);
-			case "runtrace":	return new RuntraceCommand(line);
 			case "quit":
 			case "q":			return new QuitCommand(line);
 
 			default:
-				try
-				{
-					// This can be removed when no one needs this...
-					String name = parts[0].substring(0, 1).toUpperCase() + parts[0].substring(1).toLowerCase();
-					Diag.info("Trying to load command vdmj.commands.%sCommand", name);
-					Class<?> clazz = Class.forName("vdmj.commands." + name + "Command");
-					Constructor<?> ctor = clazz.getConstructor(String.class); 
-					return (AnalysisCommand)ctor.newInstance(line);
-				}
-				catch (ClassNotFoundException e)
-				{
-					return null;
-				}
-				catch (InvocationTargetException e)
-				{
-					Diag.error(e.getTargetException());
-					
-					if (e.getTargetException() instanceof IllegalArgumentException)	// USAGE
-					{
-						return new ErrorCommand(e.getTargetException().getMessage());
-					}
-					else
-					{
-						return null;	// Unknown command
-					}
-				}
-				catch (Throwable e)
-				{
-					Diag.error(e);
-					return null;
-				}
+				return null;
 		}
 	}
 	
@@ -190,6 +154,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			QuitCommand.HELP,
 			HelpCommand.HELP,
 			VersionCommand.HELP
+			// Restart hidden
 		);
 	}
 	

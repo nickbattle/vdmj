@@ -57,7 +57,9 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.GenerateCommand;
+import vdmj.commands.RuntraceCommand;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckCompleteEvent;
@@ -187,11 +189,27 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
+	public AnalysisCommand getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "generate":	return new GenerateCommand(line);
+			case "runtrace":	return new RuntraceCommand(line);
+					
+			default:
+				return null;
+		}
+	}
+	
+	@Override
 	public HelpList getCommandHelp()
 	{
 		return new HelpList
 		(
 			GenerateCommand.HELP
+			// RuntraceCommand.HELP		// Hidden from usual help menu
 		);
 	}
 

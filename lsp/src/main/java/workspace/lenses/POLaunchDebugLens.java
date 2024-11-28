@@ -74,6 +74,7 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens
 		launchArgs.put("request", "launch");
 		launchArgs.put("noDebug", !debug);		// Note: inverted :)
 		launchArgs.put("remoteControl", null);
+		launchArgs.put("params", new JSONObject("type", "PO_LENS"));
 		
 		launchArgs.put("applyName", apply.applyName);
 		

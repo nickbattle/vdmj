@@ -109,6 +109,7 @@ public class DAPPlugin extends AnalysisPlugin
 	private Boolean noDebug;
 	private Interpreter interpreter;
 	private String launchCommand;
+	private JSONObject launchParams;
 	private String defaultName;
 	private DAPDebugReader debugReader;
 	private String remoteControl;
@@ -208,7 +209,7 @@ public class DAPPlugin extends AnalysisPlugin
 	}
 
 	public DAPMessageList dapLaunch(DAPRequest request,
-			boolean noDebug, String defaultName, String command, String remoteControl, String logging) throws Exception
+			boolean noDebug, String defaultName, String command, String remoteControl, String logging, JSONObject params) throws Exception
 	{
 		LSPPlugin manager = LSPPlugin.getInstance();
 
@@ -229,6 +230,7 @@ public class DAPPlugin extends AnalysisPlugin
 			// These values are used in configurationDone
 			this.noDebug = noDebug;
 			this.launchCommand = command;
+			this.launchParams = params;
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
 			this.logging = logging;
@@ -1020,6 +1022,11 @@ public class DAPPlugin extends AnalysisPlugin
 	public void setNoDebug(boolean noDebug)
 	{
 		this.noDebug = noDebug;
+	}
+	
+	public JSONObject getLaunchParams()
+	{
+		return launchParams;
 	}
 	
 	public void stopDebugReader()
