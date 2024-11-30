@@ -65,7 +65,7 @@ public class POSeqBind extends POBind
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, sequence);
+		obligations.markIfAmbiguous(pogState, sequence);
 		return obligations;
 	}
 

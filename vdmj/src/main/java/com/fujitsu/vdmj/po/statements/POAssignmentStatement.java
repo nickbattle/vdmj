@@ -86,20 +86,19 @@ public class POAssignmentStatement extends POStatement
 
 		try
 		{
-			ctxt.push(new POAssignmentContext(target.toPattern(), exp, false));
-
 			TCNameSet updates = this.apply(new POStatementStateFinder(), true);
 			
 			for (TCNameToken update: updates)
 			{
 				pogState.didUpdateState(update, location);
 			}
+
+			ctxt.push(new POAssignmentContext(target.toPattern(), exp, false));
 		}
 		catch (IllegalArgumentException e)	// Can't process complex designator
 		{
 			tooComplex = true;
 			ctxt.push(new POAssignmentContext("/* " + target + " */ -", exp, true));
-			pogState.didUpdateState(location);
 		}
 
 		if (!inConstructor && !tooComplex &&

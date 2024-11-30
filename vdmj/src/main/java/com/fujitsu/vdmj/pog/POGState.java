@@ -47,15 +47,17 @@ public class POGState
 	
 	private Map<TCNameToken, LexLocation> updatedState;
 	private Map<TCNameToken, LexLocation> updatedLocals;
+	private Map<TCNameToken, LexLocation> ambiguous;
 	private POGState outerState;
 	private TCNameList localNames;
 	
 	public POGState()
 	{
-		updatedState = new HashMap<TCNameToken, LexLocation>();
-		updatedLocals = new HashMap<TCNameToken, LexLocation>();
-		outerState = null;
-		localNames = new TCNameList();
+		this.updatedState = new HashMap<TCNameToken, LexLocation>();
+		this.updatedLocals = new HashMap<TCNameToken, LexLocation>();
+		this.ambiguous = new HashMap<TCNameToken, LexLocation>();
+		this.outerState = null;
+		this.localNames = new TCNameList();
 	}
 	
 	/**
@@ -66,6 +68,7 @@ public class POGState
 	{
 		this.updatedState = updatedState;
 		this.updatedLocals = updatedLocals;
+		this.ambiguous = new HashMap<TCNameToken, LexLocation>();
 		this.outerState = outerState;
 		this.localNames = localNames;
 	}
@@ -73,22 +76,23 @@ public class POGState
 	@Override
 	public String toString()
 	{
-		return "state: " + updatedState.toString() +
-				", locals: " + updatedLocals.toString() +
+		return "state: " + updatedState.keySet() +
+				", locals: " + updatedLocals.keySet() +
+				", ambiguous: " + ambiguous.keySet() +
 				(outerState != null ? " / " + outerState.toString() : "");
 	}
 	
 	/**
 	 * Copy a state for use in if/else branches etc, where changes in each are not visible
 	 * in the other branches, but all changes are combined afterwards. Note that it has
-	 * the same local names and outer state.
+	 * the same local names and no outer state.
 	 */
 	public POGState getCopy()
 	{
 		HashMap<TCNameToken, LexLocation> copyState = new HashMap<TCNameToken, LexLocation>();
 		HashMap<TCNameToken, LexLocation> copyLocals = new HashMap<TCNameToken, LexLocation>();
 		
-		return new POGState(copyState, copyLocals, outerState, localNames);
+		return new POGState(copyState, copyLocals, null, localNames);
 	}
 	
 	/**
@@ -125,6 +129,22 @@ public class POGState
 		}
 		
 		return (outerState != null && outerState.hasUpdatedState(names));
+	}
+	
+	/**
+	 * True if state may have been updated.
+	 */
+	public boolean hasAmbiguousState(TCNameSet names)
+	{
+		for (TCNameToken name: names)
+		{
+			if (ambiguous.containsKey(name))
+			{
+				return true;
+			}
+		}
+		
+		return (outerState != null && outerState.hasAmbiguousState(names));
 	}
 
 	/**
@@ -246,5 +266,8 @@ public class POGState
 	{
 		updatedState.putAll(copy.updatedState);
 		updatedLocals.putAll(copy.updatedLocals);
+		ambiguous.putAll(copy.ambiguous);
+		ambiguous.putAll(copy.updatedState);
+		ambiguous.putAll(copy.updatedLocals);
 	}
 }

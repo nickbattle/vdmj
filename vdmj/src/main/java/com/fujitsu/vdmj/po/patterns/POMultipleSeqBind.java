@@ -52,7 +52,7 @@ public class POMultipleSeqBind extends POMultipleBind
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, sequence);
+		obligations.markIfAmbiguous(pogState, sequence);
 		return obligations;
 	}
 

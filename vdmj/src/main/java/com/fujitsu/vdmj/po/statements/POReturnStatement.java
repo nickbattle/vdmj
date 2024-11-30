@@ -59,6 +59,7 @@ public class POReturnStatement extends POStatement
 			// Don't process POG state here, because we're returning, so the expression can
 			// have no further effect in the operation.
 			obligations.addAll(expression.getProofObligations(ctxt, new POGState(), env));
+			obligations.markIfAmbiguous(pogState, expression);
 		}
 
 		return obligations;

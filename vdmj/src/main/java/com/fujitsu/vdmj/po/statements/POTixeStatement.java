@@ -56,12 +56,14 @@ public class POTixeStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		POGStateList stateList = new POGStateList();
+		int popto = ctxt.size();
 
 		for (POTixeStmtAlternative alt: traps)
 		{
 			obligations.addAll(alt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		}
 
+		ctxt.popTo(popto);
 		stateList.combineInto(pogState);
 		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 		return obligations;

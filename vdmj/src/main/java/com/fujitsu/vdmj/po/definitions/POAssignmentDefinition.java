@@ -71,7 +71,7 @@ public class POAssignmentDefinition extends PODefinition
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
-		obligations.markIfUpdated(pogState, expression);
+		obligations.markIfAmbiguous(pogState, expression);
 
 		if (!TypeComparator.isSubType(ctxt.checkType(expression, expType), type))
 		{

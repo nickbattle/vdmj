@@ -75,7 +75,7 @@ public class POForPatternBindStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = sequence.getProofObligations(ctxt, pogState, env);
-		list.markIfUpdated(pogState, sequence);
+		list.markIfAmbiguous(pogState, sequence);
 		
 		if (patternBind.pattern != null)
 		{

@@ -310,4 +310,30 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		return this;
 	}
+
+	/**
+	 * Update the obligations in this list because of updates to the state read by the expression.
+	 * This is used by various statements and definitions to suppress obligations that cannot
+	 * yet be checked.
+	 */
+	public ProofObligationList markIfAmbiguous(POGState pstate, POExpression expression)
+	{
+		TCNameSet varreads = expression.readsState();
+		
+		if (!varreads.isEmpty() && pstate.hasAmbiguousState(varreads))
+		{
+			LexLocation at = pstate.getUpdatedLocation(varreads);
+			
+			if (at == LexLocation.ANY)
+			{
+				markUnchecked(ProofObligation.HAS_AMBIGUOUS_STATE + " " + varreads);
+			}
+			else
+			{
+				markUnchecked(ProofObligation.HAS_AMBIGUOUS_STATE + " " + at.toShortString());
+			}
+		}
+		
+		return this;
+	}
 }
