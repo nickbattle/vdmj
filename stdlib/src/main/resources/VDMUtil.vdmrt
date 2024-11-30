@@ -35,7 +35,7 @@ let mk_(b, v) = seq_of_char2val_(s) in
 post let mk_(b,t) = RESULT in not b => t = nil;
  
 static seq_of_char2val_:seq1 of char -> bool * ?
-seq_of_char2val_(s) == is not yet specified
+seq_of_char2val_(s) == is not yet specified;
   
 static public classname[@T] : @T -> [seq1 of char]
 	classname(s) == is not yet specified;
