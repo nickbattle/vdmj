@@ -163,7 +163,7 @@ public class POGState
 		return LexLocation.ANY;
 	}
 	
-	private void didUpdateState(LexLocation from)
+	public void didUpdateState(LexLocation from)
 	{
 		if (outerState != null)
 		{

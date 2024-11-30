@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2024 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -27,14 +27,29 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 
-public class PODclContext extends POContext
+public class POAssignmentContext extends POContext
 {
 	public final PODefinitionList assignmentDefs;
+	public final String pattern;
+	public final POExpression expression;
+	public final String tooComplex;
 
-	public PODclContext(PODefinitionList assignmentDefs)
+	public POAssignmentContext(PODefinitionList assignmentDefs)
 	{
 		this.assignmentDefs = assignmentDefs;
+		this.pattern = null;
+		this.expression = null;
+		this.tooComplex = null;
+	}
+
+	public POAssignmentContext(String pattern, POExpression expression, boolean tooComplex)
+	{
+		this.assignmentDefs = null;
+		this.pattern = pattern;
+		this.expression = expression;
+		this.tooComplex = tooComplex ? ProofObligation.COMPLEX_ASSIGNMENT : null;
 	}
 
 	@Override
@@ -42,17 +57,32 @@ public class PODclContext extends POContext
 	{
 		return true;
 	}
+	
+	@Override
+	public String markObligation()
+	{
+		return tooComplex;
+	}
 
 	@Override
 	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 
-		if (!assignmentDefs.isEmpty())
+		String sep = "";
+		
+		if (assignmentDefs == null)
 		{
 			sb.append("let ");
-			String sep = "";
-			
+			sb.append(pattern);
+			sb.append(" = ");
+			sb.append(expression);
+			sb.append(" in");
+		}
+		else if (!assignmentDefs.isEmpty())
+		{
+			sb.append("let ");
+
 			for (PODefinition def: assignmentDefs)
 			{
 				sb.append(sep);
@@ -62,7 +92,7 @@ public class PODclContext extends POContext
 				sb.append(adef.expression);
 				sep = ", ";
 			}
-			
+
 			sb.append(" in");
 		}
 

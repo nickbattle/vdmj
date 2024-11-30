@@ -85,6 +85,13 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.message = null;
 		this.provedBy = null;
 		
+		String message = ctxt.markObligation();
+		
+		if (message != null)
+		{
+			markUnchecked(message);
+		}
+		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
 

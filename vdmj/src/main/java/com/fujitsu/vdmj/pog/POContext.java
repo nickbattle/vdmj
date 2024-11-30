@@ -68,6 +68,12 @@ abstract public class POContext
 		return null;
 	}
 
+	public String markObligation()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public boolean isScopeBoundary()
 	{
 		return false;

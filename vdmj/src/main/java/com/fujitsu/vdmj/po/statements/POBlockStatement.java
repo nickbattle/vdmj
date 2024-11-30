@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.PODclContext;
+import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -60,7 +60,7 @@ public class POBlockStatement extends POSimpleBlockStatement
 			dclState.addDclLocal(adef.name);
 		}
 
-		ctxt.push(new PODclContext(assignmentDefs));
+		ctxt.push(new POAssignmentContext(assignmentDefs));
 		obligations.addAll(super.getProofObligations(ctxt, dclState, env));
 		ctxt.pop();
 
