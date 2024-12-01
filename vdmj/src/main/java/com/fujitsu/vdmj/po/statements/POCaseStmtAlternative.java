@@ -63,11 +63,11 @@ public class POCaseStmtAlternative extends PONode
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		ctxt.push(new POCaseContext(pattern, type, cexp));
+		int popto = ctxt.pushAt(new POCaseContext(pattern, type, cexp));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-		ctxt.pop();
+		ctxt.popTo(popto);
+		
 		ctxt.push(new PONotCaseContext(pattern, type, cexp));
-
 		return obligations;
 	}
 }

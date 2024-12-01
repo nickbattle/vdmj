@@ -146,6 +146,14 @@ public class POGState
 		
 		return (outerState != null && outerState.hasAmbiguousState(names));
 	}
+	
+	public void notAmbiguous(TCNameSet names)
+	{
+		for (TCNameToken name: names)
+		{
+			ambiguous.remove(name);
+		}
+	}
 
 	/**
 	 * Return the location of the last state update.

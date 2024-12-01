@@ -91,12 +91,12 @@ public class POIfStatement extends POStatement
 
 		for (POElseIfStatement stmt: elseList)
 		{
-			popto = ctxt.size();
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
-			ctxt.popTo(popto);
-
 			oblist.markIfAmbiguous(pogState, stmt.elseIfExp);
+
+			popto = ctxt.size();
 			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			ctxt.popTo(popto);
 			obligations.addAll(oblist);
 
 			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
