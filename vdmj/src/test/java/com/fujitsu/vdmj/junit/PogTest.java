@@ -147,8 +147,8 @@ public class PogTest extends TestCase
 		/* 81 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    ((m(1) < 10) =>\n      1 in set dom m)))\n",
 		/* 82 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    (not (m(1) < 10) =>\n      2 in set dom m)))\n",
 		/* 83 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (not 1 = i =>\n    (2 = i => \n      3 in set dom m)))\n",
-		/* 84 */ "(forall obj_A(iv |-> iv):A &\n  (let x = 10 in\n    while (x > 0) do ...))\n",
-		/* 85 */ "(forall obj_A(iv |-> iv):A &\n  (let x = 10 in\n    (let iv = (iv + 1) in\n      (iv < 10))))\n",
+		/* 84 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    while (x > 0) do ...))\n",
+		/* 85 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (let iv : int = (iv + 1) in\n      (iv < 10))))\n",
 	};
 
 	public void testPOG() throws Exception

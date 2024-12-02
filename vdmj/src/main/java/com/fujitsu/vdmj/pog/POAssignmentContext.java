@@ -28,11 +28,13 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POAssignmentContext extends POContext
 {
 	public final PODefinitionList assignmentDefs;
 	public final String pattern;
+	public final TCType type;
 	public final POExpression expression;
 	public final String tooComplex;
 
@@ -40,14 +42,16 @@ public class POAssignmentContext extends POContext
 	{
 		this.assignmentDefs = assignmentDefs;
 		this.pattern = null;
+		this.type = null;
 		this.expression = null;
 		this.tooComplex = null;
 	}
 
-	public POAssignmentContext(String pattern, POExpression expression, boolean tooComplex)
+	public POAssignmentContext(String pattern, TCType type, POExpression expression, boolean tooComplex)
 	{
 		this.assignmentDefs = null;
 		this.pattern = pattern;
+		this.type = type;
 		this.expression = expression;
 		this.tooComplex = tooComplex ? ProofObligation.COMPLEX_ASSIGNMENT : null;
 	}
@@ -75,6 +79,8 @@ public class POAssignmentContext extends POContext
 		{
 			sb.append("let ");
 			sb.append(pattern);
+			sb.append(" : ");
+			sb.append(type);
 			sb.append(" = ");
 			sb.append(expression);
 			sb.append(" in");
@@ -88,6 +94,8 @@ public class POAssignmentContext extends POContext
 				sb.append(sep);
 				POAssignmentDefinition adef = (POAssignmentDefinition)def;
 				sb.append(adef.name);
+				sb.append(" : ");
+				sb.append(adef.type);
 				sb.append(" = ");
 				sb.append(adef.expression);
 				sep = ", ";

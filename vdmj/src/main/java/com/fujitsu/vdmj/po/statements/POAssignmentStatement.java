@@ -93,7 +93,7 @@ public class POAssignmentStatement extends POStatement
 				pogState.didUpdateState(update, location);
 			}
 
-			ctxt.push(new POAssignmentContext(target.toPattern(), exp, false));
+			ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
 			
 			// We can disambiguate variables in a simple assignment that assigns unambiguous values,
 			// like constants or variables that are unambiguous.
@@ -111,7 +111,7 @@ public class POAssignmentStatement extends POStatement
 		catch (IllegalArgumentException e)	// Can't process a complex designator
 		{
 			tooComplex = true;
-			ctxt.push(new POAssignmentContext("/* " + target + " */ -", exp, true));
+			ctxt.push(new POAssignmentContext("/* " + target + " */ -", targetType, exp, true));
 		}
 
 		if (!inConstructor && !tooComplex &&
