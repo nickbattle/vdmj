@@ -147,12 +147,9 @@ public class POGState
 		return (outerState != null && outerState.hasAmbiguousState(names));
 	}
 	
-	public void notAmbiguous(TCNameSet names)
+	public void notAmbiguous(TCNameToken name)
 	{
-		for (TCNameToken name: names)
-		{
-			ambiguous.remove(name);
-		}
+		ambiguous.remove(name);
 	}
 
 	/**

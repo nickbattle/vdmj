@@ -95,12 +95,17 @@ public class POAssignmentStatement extends POStatement
 
 			ctxt.push(new POAssignmentContext(target.toPattern(), exp, false));
 			
-			// We can disambiguate variables in an assignment by assigning unambiguous values, like
-			// constants. 
+			// We can disambiguate variables in a simple assignment that assigns unambiguous values,
+			// like constants or variables that are unambiguous.
 			
-			if (!pogState.hasAmbiguousState(exp.readsState()))
+			if (target instanceof POIdentifierDesignator)
 			{
-				pogState.notAmbiguous(updates);
+				POIdentifierDesignator id = (POIdentifierDesignator)target;
+				
+				if (!pogState.hasAmbiguousState(exp.readsState()))
+				{
+					pogState.notAmbiguous(id.name);
+				}
 			}
 		}
 		catch (IllegalArgumentException e)	// Can't process a complex designator
