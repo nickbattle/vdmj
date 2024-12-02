@@ -24,8 +24,12 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -39,12 +43,14 @@ import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.po.types.POPatternListTypePairList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.values.ParameterValue;
+import com.fujitsu.vdmj.values.Value;
 
 /**
  * A class to help with the construction of launch invocations for POs.
@@ -99,6 +105,16 @@ public class POLaunchFactory
 		return getLaunch(po.counterexample);
 	}
 	
+	public Context getCexState()
+	{
+		if (po.counterexample == null)
+		{
+			return getState(Interpreter.getInstance().getInitialContext());
+		}
+		
+		return getState(po.counterexample);
+	}
+	
 	public String getWitnessLaunch()
 	{
 		if (po.witness == null)
@@ -107,6 +123,16 @@ public class POLaunchFactory
 		}
 		
 		return getLaunch(po.witness);
+	}
+	
+	public Context getWitnessState()
+	{
+		if (po.witness == null)
+		{
+			return getState(Interpreter.getInstance().getInitialContext());
+		}
+		
+		return getState(po.witness);
 	}
 	
 	public ApplyCall getCexApply()
@@ -165,6 +191,32 @@ public class POLaunchFactory
 		{
 			// Cannot match all parameters from context
 			init();
+		}
+
+		return null;
+	}
+	
+	private Context getState(Context cex)
+	{
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			ModuleInterpreter interpreter = ModuleInterpreter.getInstance();
+			Context sctxt = interpreter.getStateContext();
+			
+			if (sctxt != null)
+			{
+				Context result = new Context(LexLocation.ANY, "Counterexample state", null);
+				
+				for (Entry<TCNameToken, Value> entry: cex.entrySet())
+				{
+					if (sctxt.containsKey(entry.getKey()))
+					{
+						result.put(entry.getKey(), entry.getValue());
+					}
+				}
+				
+				return result;
+			}
 		}
 
 		return null;

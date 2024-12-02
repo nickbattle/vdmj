@@ -249,10 +249,22 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		return factory.getCexLaunch();
 	}
 	
+	public Context getCexState()
+	{
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getCexState();
+	}
+	
 	public String getWitnessLaunch()
 	{
 		POLaunchFactory factory = new POLaunchFactory(this);
 		return factory.getWitnessLaunch();
+	}
+	
+	public Context getWitnessState()
+	{
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getWitnessState();
 	}
 	
 	public String getLaunch()
