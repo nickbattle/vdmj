@@ -165,12 +165,10 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			// Restart hidden
 		);
 	}
-	
-	public INExpression getExecutable(TCExpression tcexp) throws Exception
-	{
-		return ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
-	}
-	
+
+	/**
+	 * Evaluate simple expressions.
+	 */
 	public Value evaluate(String expression) throws Exception
 	{
 		Interpreter interpreter = Interpreter.getInstance();
@@ -183,8 +181,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCExpression checked = tc.checkExpression(parsed, env);
 		
-		INPlugin in = this;
-		INExpression exec = in.getExecutable(checked);
+		INExpression exec = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(checked);
 		
 		return exec.eval(interpreter.getInitialContext());
 	}
