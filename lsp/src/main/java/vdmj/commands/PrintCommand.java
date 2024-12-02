@@ -28,16 +28,12 @@ import java.io.IOException;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.values.UpdatableValue;
@@ -50,6 +46,7 @@ import json.JSONObject;
 import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.DAPPlugin;
+import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 
 public class PrintCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
@@ -115,11 +112,11 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 					
 					if (sctxt != null)
 					{
+						INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+						
 						for (Entry<String, Object> entry: stateUpdates.entrySet())
 						{
-							TCExpression tcexp = m.parseExpression(entry.getValue().toString(), m.getDefaultName());
-							INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
-							Value newValue = inex.eval(m.getInitialContext());
+							Value newValue = in.evaluate(entry.getValue().toString());
 							
 							TCNameToken name = new TCNameToken(LexLocation.ANY, m.getDefaultName(), entry.getKey());
 							UpdatableValue oldValue = (UpdatableValue) sctxt.get(name);

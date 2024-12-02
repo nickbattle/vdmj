@@ -32,13 +32,18 @@ import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ModuleReader;
+import com.fujitsu.vdmj.syntax.ParserException;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
@@ -95,6 +100,23 @@ public class ASTPluginSL extends ASTPlugin
 		return (T)astModuleList;
 	}
 	
+	@Override
+	public ASTExpression parseExpression(String line, String module) throws Exception
+	{
+		LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL);
+		ExpressionReader reader = new ExpressionReader(ltr);
+		reader.setCurrentModule(module);
+		ASTExpression ast = reader.readExpression();
+		LexToken end = ltr.getLast();
+		
+		if (!end.is(Token.EOF))
+		{
+			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
+		}
+		
+		return ast;
+	}
+
 	@Override
 	protected void parseFile(File file)
 	{

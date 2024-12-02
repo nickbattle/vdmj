@@ -24,12 +24,19 @@
 
 package workspace.plugins;
 
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
+import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.values.Value;
 
 import rpc.RPCMessageList;
 import vdmj.commands.AnalysisCommand;
@@ -45,6 +52,7 @@ import vdmj.commands.SetCommand;
 import vdmj.commands.VersionCommand;
 import workspace.Diag;
 import workspace.EventListener;
+import workspace.PluginRegistry;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.LSPEvent;
@@ -156,6 +164,29 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			VersionCommand.HELP
 			// Restart hidden
 		);
+	}
+	
+	public INExpression getExecutable(TCExpression tcexp) throws Exception
+	{
+		return ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
+	}
+	
+	public Value evaluate(String expression) throws Exception
+	{
+		Interpreter interpreter = Interpreter.getInstance();
+		String module = interpreter.getDefaultName();
+		Environment env = interpreter.getGlobalEnvironment();
+		
+		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+		ASTExpression parsed = ast.parseExpression(expression, module);
+		
+		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+		TCExpression checked = tc.checkExpression(parsed, env);
+		
+		INPlugin in = this;
+		INExpression exec = in.getExecutable(checked);
+		
+		return exec.eval(interpreter.getInitialContext());
 	}
 	
 	/**
