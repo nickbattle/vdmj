@@ -252,7 +252,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected TCExpression parseExpression(String line, String module) throws Exception
+	public TCExpression parseExpression(String line, String module) throws Exception
 	{
 		LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL);
 		ExpressionReader reader = new ExpressionReader(ltr);

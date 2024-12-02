@@ -24,6 +24,8 @@
 
 package workspace.plugins;
 
+import java.util.Map.Entry;
+
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
@@ -31,6 +33,9 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.Value;
 
 import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
@@ -85,10 +90,26 @@ public class POPluginSL extends POPlugin
 	public JSONObject getCexLaunch(ProofObligation po)
 	{
 		String launch = po.getCexLaunch();
+		Context sctxt = po.getCexState();
 		
 		if (launch == null)
 		{
 			return null;	// No counterexample or definition or mismatched params
+		}
+
+		JSONObject params = new JSONObject();
+		params.put("type", "POG");
+		
+		if (sctxt != null && !sctxt.isEmpty())
+		{
+			JSONObject state = new JSONObject();
+			
+			for (Entry<TCNameToken, Value> entry: sctxt.entrySet())
+			{
+				state.put(entry.getKey().toString(), entry.getValue().toString());
+			}
+			
+			params.put("state", state);
 		}
 		
 		return new JSONObject(
@@ -97,7 +118,7 @@ public class POPluginSL extends POPlugin
 				"request",		"launch",
 				"noDebug",		false,
 				"defaultName",	po.location.module,
-				"params",		new JSONObject("type", "POG"),
+				"params",		params,
 				"command",		"print " + launch
 			);
 	}
@@ -106,19 +127,35 @@ public class POPluginSL extends POPlugin
 	public JSONObject getWitnessLaunch(ProofObligation po)
 	{
 		String launch = po.getWitnessLaunch();
+		Context sctxt = po.getWitnessState();
 		
 		if (launch == null)
 		{
 			return null;	// No witness or definition or mismatched params
 		}
+
+		JSONObject params = new JSONObject();
+		params.put("type", "POG");
 		
+		if (sctxt != null && !sctxt.isEmpty())
+		{
+			JSONObject state = new JSONObject();
+			
+			for (Entry<TCNameToken, Value> entry: sctxt.entrySet())
+			{
+				state.put(entry.getKey().toString(), entry.getValue().toString());
+			}
+			
+			params.put("state", state);
+		}
+
 		return new JSONObject(
 				"name",			"PO #" + po.number + " witness",
 				"type",			"vdm",
 				"request",		"launch",
 				"noDebug",		false,
 				"defaultName",	po.location.module,
-				"params",		new JSONObject("type", "POG"),
+				"params",		params,
 				"command",		"print " + launch
 			);
 	}

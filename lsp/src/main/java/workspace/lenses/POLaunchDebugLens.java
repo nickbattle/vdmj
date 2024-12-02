@@ -24,10 +24,14 @@
 package workspace.lenses;
 
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.pog.POLaunchFactory;
 import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.pog.POLaunchFactory.ApplyArg;
 import com.fujitsu.vdmj.pog.POLaunchFactory.ApplyCall;
 
@@ -67,6 +71,7 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens
 		POLaunchFactory factory = new POLaunchFactory(po);
 		
 		ApplyCall apply = factory.getCexApply();
+		Context sctxt = factory.getCexState();
 		
 		launchArgs.put("name", "PO #" + po.number);
 		launchArgs.put("defaultName", defaultName);
@@ -74,7 +79,23 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens
 		launchArgs.put("request", "launch");
 		launchArgs.put("noDebug", !debug);		// Note: inverted :)
 		launchArgs.put("remoteControl", null);
-		launchArgs.put("params", new JSONObject("type", "PO_LENS"));
+		
+		JSONObject params = new JSONObject();
+		params.put("type", "PO_LENS");
+		
+		if (sctxt != null && !sctxt.isEmpty())
+		{
+			JSONObject state = new JSONObject();
+			
+			for (Entry<TCNameToken, Value> entry: sctxt.entrySet())
+			{
+				state.put(entry.getKey().toString(), entry.getValue().toString());
+			}
+			
+			params.put("state", state);
+		}
+		
+		launchArgs.put("params", params);
 		
 		launchArgs.put("applyName", apply.applyName);
 		
