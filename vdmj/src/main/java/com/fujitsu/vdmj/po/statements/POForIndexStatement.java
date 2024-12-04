@@ -76,13 +76,17 @@ public class POForIndexStatement extends POStatement
 		}
 
 		ctxt.push(new POScopeContext());
-		ctxt.push(new POForAllSequenceContext(var, from, to, by));
+		int popto = ctxt.pushAt(new POForAllSequenceContext(var, from, to, by));
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
-		obligations.addAll(loops);
-		ctxt.pop();
-		ctxt.pop();
+		ctxt.popTo(popto);
 
+		if (statement.updatesState())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+			pogState.didUpdateState(location);
+		}
+		
+		obligations.addAll(loops);
 		return obligations;
 	}
 

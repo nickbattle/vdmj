@@ -63,13 +63,17 @@ public class POForAllStatement extends POStatement
 		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
 		obligations.markIfAmbiguous(pogState, set);
 
-		ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));
+		int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		ctxt.pop();
+		ctxt.popTo(popto);
 
-		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		if (statement.updatesState())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+			pogState.didUpdateState(location);
+		}
+		
 		obligations.addAll(loops);
-
 		return obligations;
 	}
 

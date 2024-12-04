@@ -111,19 +111,20 @@ public class POGState
 	 */
 	public boolean hasUpdatedState(TCNameSet names)
 	{
+		if (updatedState.containsKey(SOMETHING))
+		{
+			return true;
+		}
+
 		for (TCNameToken name: names)
 		{
 			if (localNames.contains(name))
 			{
 				return updatedLocals.containsKey(name);
 			}
-			else
+			else if (updatedState.containsKey(name))
 			{
-				if (updatedState.containsKey(name) ||
-					updatedState.containsKey(SOMETHING))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 		
@@ -135,6 +136,11 @@ public class POGState
 	 */
 	public boolean hasAmbiguousState(TCNameSet names)
 	{
+		if (updatedState.containsKey(SOMETHING))
+		{
+			return true;
+		}
+
 		for (TCNameToken name: names)
 		{
 			if (ambiguous.containsKey(name))
