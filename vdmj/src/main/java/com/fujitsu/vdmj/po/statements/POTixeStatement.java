@@ -57,6 +57,9 @@ public class POTixeStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 		POGStateList stateList = new POGStateList();
 
+		// The trap clauses see the "body" state updates, so this comes first
+		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
+
 		for (POTixeStmtAlternative alt: traps)
 		{
 			int popto = ctxt.size();
@@ -65,7 +68,6 @@ public class POTixeStatement extends POStatement
 		}
 
 		stateList.combineInto(pogState);
-		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 		return obligations;
 	}
 

@@ -89,22 +89,21 @@ public class POGState
 	 */
 	public POGState getCopy()
 	{
-		HashMap<TCNameToken, LexLocation> copyState = new HashMap<TCNameToken, LexLocation>();
-		HashMap<TCNameToken, LexLocation> copyLocals = new HashMap<TCNameToken, LexLocation>();
-		
-		return new POGState(copyState, copyLocals, null, localNames);
+		return new POGState(
+				new HashMap<TCNameToken, LexLocation>(),
+				new HashMap<TCNameToken, LexLocation>(), null, localNames);
 	}
 	
 	/**
 	 * Create a new chained POGState, linked to the current one. This is used to process
-	 * block statements that may contain "dcl" statements (ie. local state). The new local
-	 * state initially has no updates.
+	 * block statements that may contain "dcl" statements (ie. local state).Locals can be
+	 * added with addDclLocal.
 	 */
 	public POGState getLink()
 	{
 		return new POGState(
-			new HashMap<TCNameToken, LexLocation>(),
-			new HashMap<TCNameToken, LexLocation>(), this, new TCNameList());
+				new HashMap<TCNameToken, LexLocation>(),
+				new HashMap<TCNameToken, LexLocation>(), this, new TCNameList());
 	}
 	
 	/**
