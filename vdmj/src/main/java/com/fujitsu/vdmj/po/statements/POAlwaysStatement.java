@@ -54,8 +54,8 @@ public class POAlwaysStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = always.getProofObligations(ctxt, pogState, env);
-		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
+		ProofObligationList obligations = body.getProofObligations(ctxt, pogState, env);
+		obligations.addAll(always.getProofObligations(ctxt, pogState, env));
 		return obligations;
 	}
 
