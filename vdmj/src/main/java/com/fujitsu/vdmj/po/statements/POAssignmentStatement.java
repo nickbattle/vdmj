@@ -81,6 +81,12 @@ public class POAssignmentStatement extends POStatement
 
 		obligations.addAll(target.getProofObligations(ctxt));
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+
+		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
+		{
+			obligations.add(
+				new SubTypeObligation(exp, targetType, expType, ctxt));
+		}
 		
 		boolean tooComplex = false;
 
@@ -119,12 +125,6 @@ public class POAssignmentStatement extends POStatement
 			(stateDefinition != null && stateDefinition.invExpression != null))
 		{
 			obligations.add(new StateInvariantObligation(this, ctxt));
-		}
-
-		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
-		{
-			obligations.add(
-				new SubTypeObligation(exp, targetType, expType, ctxt));
 		}
 
 		return obligations;
