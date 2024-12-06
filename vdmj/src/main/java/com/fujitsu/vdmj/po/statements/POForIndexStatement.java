@@ -75,8 +75,8 @@ public class POForIndexStatement extends POStatement
 			obligations.addAll(by.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, by));
 		}
 
-		ctxt.push(new POScopeContext());
-		int popto = ctxt.pushAt(new POForAllSequenceContext(var, from, to, by));
+		int popto = ctxt.pushAt(new POScopeContext());
+		ctxt.push(new POForAllSequenceContext(var, from, to, by));
 		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 		ctxt.popTo(popto);
 
