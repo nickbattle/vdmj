@@ -80,7 +80,7 @@ public class POAssignmentContext extends POContext
 			sb.append("let ");
 			sb.append(pattern);
 			sb.append(" : ");
-			sb.append(type);
+			sb.append(type.toExplicitString(expression.location));
 			sb.append(" = ");
 			sb.append(expression);
 			sb.append(" in");
@@ -95,7 +95,7 @@ public class POAssignmentContext extends POContext
 				POAssignmentDefinition adef = (POAssignmentDefinition)def;
 				sb.append(adef.name);
 				sb.append(" : ");
-				sb.append(adef.type);
+				sb.append(adef.type.toExplicitString(adef.location));
 				sb.append(" = ");
 				sb.append(adef.expression);
 				sep = ", ";

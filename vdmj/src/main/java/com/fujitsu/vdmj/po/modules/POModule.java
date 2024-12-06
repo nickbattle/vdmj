@@ -93,9 +93,9 @@ public class POModule extends PONode implements Serializable
 		for (PODefinition def: defs)
 		{
 			POContextStack ctxt = new POContextStack();
-			ctxt.push(new PONameContext(def.getVariableNames()));
+			int popto = ctxt.pushAt(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), menv));
-			ctxt.pop();
+			ctxt.popTo(popto);
 		}
 		
 		list.typeCheck(tcmodule, menv);

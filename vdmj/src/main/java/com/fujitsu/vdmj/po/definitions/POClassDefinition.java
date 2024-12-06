@@ -184,9 +184,9 @@ public class POClassDefinition extends PODefinition
 
 		for (PODefinition def: definitions)
 		{
-			ctxt.push(new PONameContext(def.getVariableNames()));
+			int popto = ctxt.pushAt(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
-			ctxt.pop();
+			ctxt.popTo(popto);
 		}
 		
 		list.typeCheck(tcdef.name, local);
