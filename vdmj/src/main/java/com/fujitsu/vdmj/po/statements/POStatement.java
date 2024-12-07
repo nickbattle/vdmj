@@ -87,18 +87,19 @@ public abstract class POStatement extends PONode implements Serializable
 		return stmttype;
 	}
 
-	public boolean updatesState()
+	/**
+	 * State variables updated or read by this statement.
+	 */
+	public TCNameSet updatesState()
 	{
 		POStatementStateFinder visitor = new POStatementStateFinder();
-		TCNameSet names = this.apply(visitor, true);
-		return !names.isEmpty();
+		return this.apply(visitor, true);
 	}
 
-	public boolean readsState()
+	public TCNameSet readsState()
 	{
 		POStatementStateFinder visitor = new POStatementStateFinder();
-		TCNameSet names = this.apply(visitor, false);
-		return !names.isEmpty();
+		return this.apply(visitor, false);
 	}
 
 	/**

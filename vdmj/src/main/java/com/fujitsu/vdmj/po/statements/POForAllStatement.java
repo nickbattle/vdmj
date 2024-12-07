@@ -64,13 +64,14 @@ public class POForAllStatement extends POStatement
 		obligations.markIfAmbiguous(pogState, set);
 
 		int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
-		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+		POGState copy = pogState.getCopy();
+		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
+		pogState.combineWith(copy);
 		ctxt.popTo(popto);
 
-		if (statement.updatesState())
+		if (!statement.updatesState().isEmpty())
 		{
 			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
-			pogState.didUpdateState(location);
 		}
 		
 		obligations.addAll(loops);

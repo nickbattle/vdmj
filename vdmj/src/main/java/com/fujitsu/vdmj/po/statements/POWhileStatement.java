@@ -62,12 +62,13 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 		obligations.markIfAmbiguous(pogState, exp);
 		
-		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+		POGState copy = pogState.getCopy();
+		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
+		pogState.combineWith(copy);
 
-		if (statement.updatesState())
+		if (!statement.updatesState().isEmpty())
 		{
 			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
-			pogState.didUpdateState(location);
 		}
 
 		obligations.addAll(loops);

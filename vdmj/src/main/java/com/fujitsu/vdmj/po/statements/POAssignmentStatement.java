@@ -131,12 +131,6 @@ public class POAssignmentStatement extends POStatement
 	}
 	
 	@Override
-	public boolean updatesState()
-	{
-		return true;
-	}
-
-	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseAssignmentStatement(this, arg);

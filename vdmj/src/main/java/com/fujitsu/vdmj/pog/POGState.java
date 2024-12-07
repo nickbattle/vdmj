@@ -229,6 +229,14 @@ public class POGState
 		}
 	}
 	
+	public void didUpdateState(TCNameSet names, LexLocation from)
+	{
+		for (TCNameToken name: names)
+		{
+			didUpdateState(name, from);
+		}
+	}
+	
 	public void addDclLocal(TCNameToken name)
 	{
 		localNames.add(name);
