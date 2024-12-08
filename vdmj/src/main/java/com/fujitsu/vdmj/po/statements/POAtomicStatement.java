@@ -56,6 +56,7 @@ public class POAtomicStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		POGStateList stateList = new POGStateList();
+		int popto = ctxt.size();
 
 		for (POAssignmentStatement stmt: assignments)
 		{
@@ -63,6 +64,7 @@ public class POAtomicStatement extends POStatement
 		}
 
 		stateList.combineInto(pogState);	// Delayed effect of every atomic assignment
+		ctxt.popTo(popto);
 		return obligations;
 	}
 	
