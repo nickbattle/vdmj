@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -48,6 +49,14 @@ public class PONonDeterministicStatement extends POSimpleBlockStatement
 		ProofObligationList obligations = super.getProofObligations(ctxt, copy, env);
 		pogState.combineWith(copy);
 		ctxt.popTo(popto);
+		
+		for (POStatement statement: statements)
+		{
+			if (!statement.updatesState().isEmpty())
+			{
+				obligations.markUnchecked(ProofObligation.NON_DETERMINISTIC);
+			}
+		}
 		
 		return obligations;
 	}
