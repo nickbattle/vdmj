@@ -57,7 +57,7 @@ public class PONotCaseContext extends POContext
 		else
 		{
 			PORemoveIgnoresVisitor.init();
-    		sb.append("not exists ");
+    		sb.append("not (exists ");
     		sb.append(pattern.removeIgnorePatterns());
     		sb.append(":");
     		sb.append(type.toExplicitString(pattern.location));
@@ -66,6 +66,7 @@ public class PONotCaseContext extends POContext
     		sb.append(pattern.removeIgnorePatterns());
     		sb.append(" = ");
     		sb.append(exp);
+    		sb.append(")");
 		}
 
 		sb.append(" =>");
