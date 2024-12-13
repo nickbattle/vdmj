@@ -31,8 +31,10 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -47,7 +49,8 @@ public class POOperationDefinitionContext extends POContext
 	public final PODefinition definition;
 	public final PODefinition stateDefinition;
 	public final boolean expandState;
-
+	public final POExpression preExp;
+	
 	public POOperationDefinitionContext(POExplicitOperationDefinition definition,
 		boolean precond, PODefinition stateDefinition, boolean expandState)
 	{
@@ -59,6 +62,7 @@ public class POOperationDefinitionContext extends POContext
 		this.stateDefinition = stateDefinition;
 		this.definition = definition;
 		this.expandState = expandState;
+		this.preExp = definition.precondition;
 	}
 
 	public POOperationDefinitionContext(POImplicitOperationDefinition definition,
@@ -72,12 +76,24 @@ public class POOperationDefinitionContext extends POContext
 		this.stateDefinition = stateDefinition;
 		this.definition = definition;
 		this.expandState = expandState;
+		this.preExp = definition.precondition;
 	}
 	
 	@Override
 	public PODefinition getDefinition()
 	{
 		return definition;
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		if (addPrecond && preExp != null)
+		{
+			return preExp.getVariableNames();
+		}
+		
+		return super.reasonsAbout();
 	}
 
 	@Override
