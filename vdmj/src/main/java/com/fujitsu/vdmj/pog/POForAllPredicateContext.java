@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POForAllPredicateContext extends POForAllContext
 {
@@ -86,5 +87,18 @@ public class POForAllPredicateContext extends POForAllContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet names = super.reasonsAbout();
+		
+		if (predicate != null)
+		{
+			names.addAll(predicate.getVariableNames());
+		}
+		
+		return names;
 	}
 }

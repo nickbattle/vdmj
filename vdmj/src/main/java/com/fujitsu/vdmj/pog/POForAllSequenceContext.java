@@ -29,12 +29,14 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POForAllSequenceContext extends POContext
 {
 	public final String pattern;
 	public final String exp;
+	private final TCNameSet reasonsAbout;
 	
 	private String seqset = " in seq ";
 
@@ -42,24 +44,32 @@ public class POForAllSequenceContext extends POContext
 	{
 		this.pattern = bind.pattern.toString();
 		this.exp = exp.toString();
+		this.reasonsAbout = bind.getVariableNames();
+		this.reasonsAbout.addAll(exp.getVariableNames());
 	}
 
 	public POForAllSequenceContext(POSeqBind bind, POExpression exp)
 	{
 		this.pattern = bind.pattern.toString();
 		this.exp = exp.toString();
+		this.reasonsAbout = bind.getVariableNames();
+		this.reasonsAbout.addAll(exp.getVariableNames());
 	}
 
 	public POForAllSequenceContext(POTypeBind bind, POExpression exp)
 	{
 		this.pattern = bind.pattern.toString();
 		this.exp = exp.toString();
+		this.reasonsAbout = bind.getVariableNames();
+		this.reasonsAbout.addAll(exp.getVariableNames());
 	}
 
 	public POForAllSequenceContext(POPattern pattern, POExpression exp)
 	{
 		this.pattern = pattern.toString();
 		this.exp = exp.toString();
+		this.reasonsAbout = exp.getVariableNames();
+		this.reasonsAbout.addAll(pattern.getVariableNames());
 	}
 
 	public POForAllSequenceContext(TCNameToken var, POExpression from, POExpression to, POExpression by)
@@ -74,6 +84,12 @@ public class POForAllSequenceContext extends POContext
 		{
 			this.exp = String.format("[ $var | $var in set {%1$s, ..., %2$s} ]", from, to);
 		}
+		
+		this.reasonsAbout = from.getVariableNames();
+		this.reasonsAbout.addAll(to.getVariableNames());
+		if (by != null) this.reasonsAbout.addAll(by.getVariableNames());
+		this.reasonsAbout.add(var);
+
 	}
 
 	public POForAllSequenceContext(POPattern pattern, POExpression set, String seqset)
@@ -81,6 +97,8 @@ public class POForAllSequenceContext extends POContext
 		this.pattern = pattern.toString();
 		this.exp = set.toString();
 		this.seqset = seqset;
+		this.reasonsAbout = set.getVariableNames();
+		this.reasonsAbout.addAll(pattern.getVariableNames());
 	}
 
 	@Override
@@ -95,5 +113,11 @@ public class POForAllSequenceContext extends POContext
 		sb.append(" & ");
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		return reasonsAbout;
 	}
 }

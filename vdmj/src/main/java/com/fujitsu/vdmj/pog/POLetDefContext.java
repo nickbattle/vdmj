@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POLetDefContext extends POContext
 {
@@ -84,5 +86,29 @@ public class POLetDefContext extends POContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (PODefinition def: localDefs)
+		{
+			if (def instanceof POAssignmentDefinition)
+			{
+				POAssignmentDefinition ass = (POAssignmentDefinition)def;
+				names.add(ass.name);
+				names.addAll(ass.expression.getVariableNames());
+			}
+			else if (def instanceof POValueDefinition)
+			{
+				POValueDefinition vdef = (POValueDefinition)def;
+				names.addAll(vdef.pattern.getVariableNames());
+				names.addAll(vdef.exp.getVariableNames());
+			}
+		}
+		
+		return names;
 	}
 }

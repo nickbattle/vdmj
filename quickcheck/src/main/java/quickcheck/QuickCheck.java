@@ -734,7 +734,7 @@ public class QuickCheck
 			
 			if (!missing.isEmpty())
 			{
-				StringBuilder sb = new StringBuilder("Note: spec does not reason about ");
+				StringBuilder sb = new StringBuilder("Note: does not reason about ");
 				String sep = "";
 				
 				for (TCNameToken var: missing)
