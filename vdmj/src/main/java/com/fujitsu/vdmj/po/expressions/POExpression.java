@@ -29,6 +29,7 @@ import java.io.Serializable;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -144,6 +145,14 @@ public abstract class POExpression extends PONode implements Serializable
 		return exptype;
 	}
 	
+	public TCNameSet getVariableNames()
+	{
+		POExpressionVariableFinder visitor = new POExpressionVariableFinder();
+		TCNameSet set = new TCNameSet();
+		set.addAll(this.apply(visitor, null));
+		return set;
+	}
+
 	/**
 	 * Get any obligations for unions that are qualified.
 	 */

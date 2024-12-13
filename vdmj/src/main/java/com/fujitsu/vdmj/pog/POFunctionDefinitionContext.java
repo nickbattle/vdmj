@@ -31,10 +31,12 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -50,6 +52,7 @@ public class POFunctionDefinitionContext extends POContext
 	public final boolean addPrecond;
 	public final String precondition;
 	public final TCTypeList typeParams;
+	public final POExpression preExp;
 
 	public POFunctionDefinitionContext(
 		POExplicitFunctionDefinition definition, boolean precond)
@@ -63,6 +66,7 @@ public class POFunctionDefinitionContext extends POContext
 		PORemoveIgnoresVisitor.init();
 		this.precondition = preconditionCall(name, definition.typeParams, paramPatternList, definition.precondition);
 		this.typeParams = definition.typeParams;
+		this.preExp = definition.precondition;
 	}
 
 	public POFunctionDefinitionContext(
@@ -77,6 +81,7 @@ public class POFunctionDefinitionContext extends POContext
 		PORemoveIgnoresVisitor.init();
 		this.precondition = preconditionCall(name, definition.typeParams, paramPatternList, definition.precondition);
 		this.typeParams = definition.typeParams;
+		this.preExp = definition.precondition;
 	}
 
 	@Override
@@ -146,5 +151,16 @@ public class POFunctionDefinitionContext extends POContext
 	public PODefinition getDefinition()
 	{
 		return definition;
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		if (addPrecond && preExp != null)
+		{
+			return preExp.getVariableNames();
+		}
+		
+		return super.reasonsAbout();
 	}
 }

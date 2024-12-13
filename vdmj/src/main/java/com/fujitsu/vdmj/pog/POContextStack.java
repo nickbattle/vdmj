@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -152,6 +153,23 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return null;
+	}
+	
+	public TCNameSet getReasonsAbout()
+	{
+		TCNameSet set = new TCNameSet();
+		
+		for (POContext ctxt: this)
+		{
+			TCNameSet r = ctxt.reasonsAbout();
+			
+			if (r != null)
+			{
+				set.addAll(r);
+			}
+		}
+		
+		return set;
 	}
 	
 	public String markObligation()

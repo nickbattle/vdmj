@@ -27,10 +27,13 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -65,6 +68,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public Context witness;
 	public String message;
 	public String provedBy;
+	public TCNameSet obligationVars;
+	public TCNameSet reasonsAbout;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -86,6 +91,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.witness = null;
 		this.message = null;
 		this.provedBy = null;
+		this.obligationVars = null;
 		
 		String message = ctxt.markObligation();
 		
@@ -153,6 +159,37 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setMessage(String message)
 	{
 		this.message = message;
+	}
+	
+	public void setObligationVars(POExpression... expressions)
+	{
+		if (obligationVars == null)
+		{
+			obligationVars = new TCNameSet();
+		}
+		
+		for (POExpression exp: expressions)
+		{
+			obligationVars.addAll(exp.getVariableNames());
+		}
+	}
+	
+	public void setObligationVars(POPattern... patterns)
+	{
+		if (obligationVars == null)
+		{
+			obligationVars = new TCNameSet();
+		}
+		
+		for (POPattern pattern: patterns)
+		{
+			obligationVars.addAll(pattern.getVariableNames());
+		}
+	}
+	
+	public void setReasonsAbout(TCNameSet reasonsAbout)
+	{
+		this.reasonsAbout = reasonsAbout;
 	}
 	
 	/**

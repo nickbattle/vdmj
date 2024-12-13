@@ -63,6 +63,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
@@ -539,7 +540,7 @@ public class QuickCheck
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
-						String desc = "";
+						String desc = null;
 						po.setWitness(null);
 						po.setProvedBy(null);
 						po.setCounterexample(null);
@@ -552,6 +553,8 @@ public class QuickCheck
 						else if (globals.hasMaybe())
 						{
 							outcome = POStatus.MAYBE;
+							po.setMessage(reasonsAbout(po));
+							desc = po.message != null ? "(" + po.message + ")" : null;
 						}
 						else if (po.isExistential())
 						{
@@ -561,7 +564,7 @@ public class QuickCheck
 							
 							if (witness != null)
 							{
-								desc = " by witness " + witness.toStringLine();
+								desc = "by witness " + witness.toStringLine();
 								po.setProvedBy("witness");
 							}
 						}
@@ -571,28 +574,31 @@ public class QuickCheck
 							
 							if (bindings.isEmpty())
 							{
-								desc = " in all cases";
+								desc = "in all cases";
 								po.setProvedBy("fixed");
 							}
 							else
 							{
-								desc = " by finite types";
+								desc = "by finite types";
 								po.setProvedBy("finite");
 							}
 						}
 						else
 						{
 							outcome = POStatus.MAYBE;
+							po.setMessage(reasonsAbout(po));
+							desc = po.message != null ? "(" + po.message + ")" : null;
 						}
 						
-						infof(outcome, "PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
 						po.setStatus(outcome);
+						infoLine(po, desc, before, after);
 					}
 					else
 					{
+						String desc = null;
+						
 						if (timedOut)		// Result would have been true (above), but...
 						{
-							infof(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
 							po.setCounterexample(null);
 							po.setMessage(null);
@@ -602,17 +608,15 @@ public class QuickCheck
 						{
 							if (sresults.hasAllValues)
 							{
-								infof(POStatus.FAILED, "PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
+								desc = "(unsatisfiable)";
 								po.setStatus(POStatus.FAILED);
 								po.setMessage("Unsatisfiable");
-								infoln(POStatus.FAILED, "----");
-								infoln(POStatus.FAILED, po.toString());
 							}
 							else
 							{
-								infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.MAYBE);
-								po.setMessage(null);
+								po.setMessage(reasonsAbout(po));
+								desc = po.message != null ? "(" + po.message + ")" : null;
 							}
 							
 							po.setCounterexample(null);
@@ -620,17 +624,15 @@ public class QuickCheck
 						}
 						else if (globals.hasMaybe() && execCompleted)
 						{
-							infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
-							po.setMessage(null);
+							po.setMessage(reasonsAbout(po));
 							po.setCounterexample(null);
 							po.setWitness(null);
+							desc = po.message != null ? "(" + po.message + ")" : null;
 						}
 						else
 						{
-							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
-							printCounterexample(bindings);
 							
 							if (bindings.isEmpty())		// Failed with no binds - eg. Test() with no params
 							{
@@ -642,18 +644,22 @@ public class QuickCheck
 							}
 							
 							po.setWitness(null);
+							po.setMessage(null);
+						}
+						
+						infoLine(po, desc, before, after);
+
+						if (po.status == POStatus.FAILED)
+						{
+							printCounterexample(bindings);
 							
 							if (execException != null)
 							{
-								String msg = "Causes " + execException.getMessage(); 
-								infoln(POStatus.FAILED, msg);
-								po.setMessage(msg);
+								desc = "Causes " + execException.getMessage(); 
+								po.setMessage(desc);
+								infoln(desc);
 							}
-							else
-							{
-								po.setMessage(null);
-							}
-							
+
 							infoln(POStatus.FAILED, "----");
 							infoln(POStatus.FAILED, po.toString());
 						}
@@ -701,6 +707,49 @@ public class QuickCheck
 			errorCount++;
 			errorln(e);
 		}
+	}
+	
+	private void infoLine(ProofObligation po, String desc, long before, long after)
+	{
+		POStatus outcome = po.status;
+		String upper = outcome.toString().toUpperCase();
+		
+		if (desc != null)
+		{
+			infof(outcome, "PO #%d, %s %s %s\n", po.number, upper, desc, duration(before, after));
+		}
+		else
+		{
+			infof(outcome, "PO #%d, %s %s\n", po.number, upper, duration(before, after));
+		}
+	}
+
+	private String reasonsAbout(ProofObligation po)
+	{
+		if (po.obligationVars != null && po.reasonsAbout != null)
+		{
+			TCNameSet missing = new TCNameSet();
+			missing.addAll(po.obligationVars);
+			missing.removeAll(po.reasonsAbout);
+			
+			if (!missing.isEmpty())
+			{
+				StringBuilder sb = new StringBuilder("Note: spec does not reason about ");
+				String sep = "";
+				
+				for (TCNameToken var: missing)
+				{
+					sb.append(sep);
+					sb.append(var);
+					sep = ", ";
+				}
+				
+				sb.append("?");
+				return sb.toString();
+			}
+		}
+		
+		return null;
 	}
 
 	private List<String> strategyNames(List<?> arglist)

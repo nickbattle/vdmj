@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.statements.POStateDesignator;
-import com.fujitsu.vdmj.pog.ProofObligation;
 
 public class MapApplyObligation extends ProofObligation
 {
@@ -34,11 +32,7 @@ public class MapApplyObligation extends ProofObligation
 	{
 		super(root.location, POType.MAP_APPLY, ctxt);
 		source = ctxt.getSource(poExpression + " in set dom " + root);
-	}
-
-	public MapApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
-	{
-		super(root.location, POType.MAP_APPLY, ctxt);
-		source = ctxt.getSource(arg + " in set dom " + root);
+		setObligationVars(poExpression, root);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }
