@@ -223,7 +223,7 @@ public class QuickCheckThread extends CancellableThread
 			messages.add(new VDMWarning(9000, sb.toString(), po.location));
 		}
 
-		if (po.status == POStatus.FAILED)
+		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
 		{
 			if (po.message != null)		// Add failed messages as a warning too
 			{
