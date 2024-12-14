@@ -112,11 +112,16 @@ public class POFunctionResultContext extends POContext
 	@Override
 	public TCNameSet reasonsAbout()
 	{
+		TCNameSet names = new TCNameSet();
+		
 		if (preExp != null)
 		{
-			return preExp.getVariableNames();
+			 names.addAll(preExp.getVariableNames());
 		}
 		
-		return super.reasonsAbout();
+		names.addAll(result.pattern.getVariableNames());
+		names.addAll(body.getVariableNames());
+		
+		return names;
 	}
 }
