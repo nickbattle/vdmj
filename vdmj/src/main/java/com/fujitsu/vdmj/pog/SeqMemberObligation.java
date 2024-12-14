@@ -32,5 +32,7 @@ public class SeqMemberObligation extends ProofObligation
 	{
 		super(test.location, POType.SEQ_MEMBER, ctxt);
 		source = ctxt.getSource(test + " in set elems " + sequence);
+		setObligationVars(test, sequence);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }

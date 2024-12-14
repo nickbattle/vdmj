@@ -32,5 +32,7 @@ public class NonEmptySetObligation extends ProofObligation
 	{
 		super(exp.location, POType.NON_EMPTY_SET, ctxt);
 		source = ctxt.getSource(exp + " <> {}");
+		setObligationVars(exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }
