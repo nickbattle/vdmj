@@ -658,11 +658,11 @@ public class QuickCheck
 							{
 								desc = "Causes " + execException.getMessage(); 
 								po.setMessage(desc);
-								infoln(desc);
+								infof(po.status, "%s\n", desc);
 							}
 
-							infoln(POStatus.FAILED, "----");
-							infoln(POStatus.FAILED, po.toString());
+							infof(POStatus.FAILED, "----\n");
+							infof(POStatus.FAILED, "%s\n", po.toString());
 						}
 					}
 				}
