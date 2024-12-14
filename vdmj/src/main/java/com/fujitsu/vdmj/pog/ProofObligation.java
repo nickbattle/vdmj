@@ -187,9 +187,17 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 	}
 	
-	public void setReasonsAbout(TCNameSet reasonsAbout)
+	public void setReasonsAbout(TCNameSet... reasons)
 	{
-		this.reasonsAbout = reasonsAbout;
+		if (reasonsAbout == null)
+		{
+			reasonsAbout = new TCNameSet();
+		}
+		
+		for (TCNameSet set: reasons)
+		{
+			this.reasonsAbout.addAll(set);
+		}
 	}
 	
 	/**
