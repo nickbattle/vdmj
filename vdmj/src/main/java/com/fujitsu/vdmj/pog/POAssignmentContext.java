@@ -28,6 +28,8 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POAssignmentContext extends POContext
@@ -40,11 +42,24 @@ public class POAssignmentContext extends POContext
 
 	public POAssignmentContext(PODefinitionList assignmentDefs)
 	{
-		this.assignmentDefs = assignmentDefs;
+		this.assignmentDefs = new PODefinitionList();
 		this.pattern = null;
 		this.type = null;
 		this.expression = null;
 		this.tooComplex = null;
+		
+		/**
+		 * Filter out things like "dcl x:nat;", which become lets with undefined values.
+		 */
+		for (PODefinition def: assignmentDefs)
+		{
+			POAssignmentDefinition adef = (POAssignmentDefinition) def;
+
+			if (!(adef.expression instanceof POUndefinedExpression))
+			{
+				this.assignmentDefs.add(adef);
+			}
+		}
 	}
 
 	public POAssignmentContext(String pattern, TCType type, POExpression expression, boolean tooComplex)
@@ -105,5 +120,26 @@ public class POAssignmentContext extends POContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		if (assignmentDefs == null)
+		{
+			names.addAll(expression.getVariableNames());
+		}
+		else
+		{
+			for (PODefinition def: assignmentDefs)
+			{
+				POAssignmentDefinition adef = (POAssignmentDefinition) def;
+				names.addAll(adef.expression.getVariableNames());
+			}
+		}
+		
+		return names;
 	}
 }
