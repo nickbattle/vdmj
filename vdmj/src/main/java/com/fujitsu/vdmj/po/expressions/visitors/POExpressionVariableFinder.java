@@ -24,7 +24,11 @@
 
 package com.fujitsu.vdmj.po.expressions.visitors;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindVariableFinder;
@@ -38,6 +42,8 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
  */
 public class POExpressionVariableFinder extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
+	public static TCNameToken SOMETHING = new TCNameToken(LexLocation.ANY, "?", "?");
+	
 	public POExpressionVariableFinder()
 	{
 		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Object>()
@@ -57,6 +63,20 @@ public class POExpressionVariableFinder extends POLeafExpressionVisitor<TCNameTo
 				return POExpressionVariableFinder.this.newCollection();
 			}
 		};
+	}
+	
+	@Override
+	public TCNameSet caseApplyExpression(POApplyExpression node, Object arg)
+	{
+		TCNameSet names = super.caseApplyExpression(node, arg);
+		
+		if (node.opdef instanceof POExplicitOperationDefinition ||
+			node.opdef instanceof POImplicitOperationDefinition)
+		{
+			names.add(SOMETHING);
+		}
+		
+		return names;
 	}
 	
 	@Override

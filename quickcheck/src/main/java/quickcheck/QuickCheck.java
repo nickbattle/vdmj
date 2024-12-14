@@ -53,6 +53,7 @@ import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -728,6 +729,11 @@ public class QuickCheck
 	{
 		if (po.obligationVars != null && po.reasonsAbout != null)
 		{
+			if (po.reasonsAbout.contains(POExpressionVariableFinder.SOMETHING))
+			{
+				return null;	// Something => nothing missing
+			}
+			
 			TCNameSet missing = new TCNameSet();
 			missing.addAll(po.obligationVars);
 			missing.removeAll(po.reasonsAbout);
