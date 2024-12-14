@@ -120,7 +120,11 @@ public class POFunctionResultContext extends POContext
 		}
 		
 		names.addAll(result.pattern.getVariableNames());
-		names.addAll(body.getVariableNames());
+		
+		if (body != null)
+		{
+			names.addAll(body.getVariableNames());
+		}
 		
 		return names;
 	}
