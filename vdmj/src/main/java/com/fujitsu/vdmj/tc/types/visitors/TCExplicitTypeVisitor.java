@@ -117,7 +117,7 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	@Override
 	public String caseNamedType(TCNamedType node, String from)
 	{
-		if (done.contains(node))
+		if (done.has(node))
 		{
 			return "";
 		}
@@ -191,7 +191,7 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	@Override
 	public String caseRecordType(TCRecordType node, String from)
 	{
-		if (done.contains(node))
+		if (done.has(node))
 		{
 			return "";
 		}

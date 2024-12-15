@@ -126,7 +126,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseNamedType(TCNamedType type, Context ctxt)
 	{
-		if (done.contains(type))
+		if (done.has(type))
 		{
 			return 1L;	// Not zero
 		}
@@ -175,7 +175,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseRecordType(TCRecordType type, Context ctxt)
 	{
-		if (done.contains(type))
+		if (done.has(type))
 		{
 			return 1L;	// Not zero
 		}

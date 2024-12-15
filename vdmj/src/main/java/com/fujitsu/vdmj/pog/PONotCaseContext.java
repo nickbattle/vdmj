@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class PONotCaseContext extends POContext
@@ -40,6 +41,15 @@ public class PONotCaseContext extends POContext
 		this.pattern = pattern;
 		this.type = type;
 		this.exp = exp;
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet result = new TCNameSet();
+		result.addAll(pattern.getVariableNames());
+		result.addAll(exp.getVariableNames());
+		return result;
 	}
 
 	@Override

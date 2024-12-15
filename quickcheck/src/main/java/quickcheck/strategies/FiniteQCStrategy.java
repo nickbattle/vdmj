@@ -168,7 +168,15 @@ public class FiniteQCStrategy extends QCStrategy
 			// Game on... all binds can be expanded
 			for (INBindingOverride bind: binds)
 			{
-				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
+				try
+				{
+					result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
+				}
+				catch (InternalException e)
+				{
+		   			verbose("Infinite type encountered in expansion of %s\n", bind);
+					return new StrategyResults();
+				}
 			}
 		}
 		
