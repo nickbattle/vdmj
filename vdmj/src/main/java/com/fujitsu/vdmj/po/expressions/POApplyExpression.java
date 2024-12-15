@@ -37,6 +37,8 @@ import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -151,7 +153,22 @@ public class POApplyExpression extends POExpression
 	
 			if (type.isSeq(location))
 			{
-				obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
+				TCSeqType st = type.getSeq();
+				POExpression arg = args.get(0);
+				
+				if (st instanceof TCSeq1Type && arg instanceof POIntegerLiteralExpression)
+				{
+					POIntegerLiteralExpression e = (POIntegerLiteralExpression)arg;
+					
+					if (e.value.value != 1)		// s(1) is always okay for seq1
+					{
+						obligations.add(new SeqApplyObligation(root, arg, ctxt));
+					}
+				}
+				else
+				{
+					obligations.add(new SeqApplyObligation(root, arg, ctxt));
+				}
 			}
 			
 			if (type.isOperation(location))
