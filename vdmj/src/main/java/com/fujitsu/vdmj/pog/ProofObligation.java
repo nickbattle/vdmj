@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -170,6 +171,18 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		for (POExpression exp: expressions)
 		{
+			TCType etype = exp.getExptype();
+			
+			if (etype instanceof TCInvariantType)
+			{
+				TCInvariantType itype = (TCInvariantType)etype;
+				
+				if (itype.invdef != null)
+				{
+					continue;	// Invariant "reasons about" this exp
+				}
+			}
+			
 			obligationVars.addAll(exp.getVariableNames());
 		}
 	}
