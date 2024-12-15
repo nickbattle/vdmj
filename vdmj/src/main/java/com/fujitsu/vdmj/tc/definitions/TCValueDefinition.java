@@ -300,6 +300,11 @@ public class TCValueDefinition extends TCDefinition
 		return type != null ? type :
 				(expType != null ? expType : new TCUnknownType(location));
 	}
+	
+	public TCType getExpType()
+	{
+		return expType;		// NB. Not the declared type, necessarily
+	}
 
 	@Override
 	public void unusedCheck()

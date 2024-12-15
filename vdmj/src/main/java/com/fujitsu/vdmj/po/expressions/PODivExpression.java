@@ -30,9 +30,12 @@ import com.fujitsu.vdmj.pog.NonZeroObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class PODivExpression extends PONumericBinaryExpression
 {
@@ -49,7 +52,29 @@ public class PODivExpression extends PONumericBinaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
 		
-		if (!right.getExptype().isAlways(TCNaturalOneType.class, location))
+		TCType rtype = right.getExptype();
+
+		// A simple problem here is that constant values, like "X:nat = 123" are defined as nat
+		// even though they are nat1. We don't want POs for these, so we try to discover the
+		// actual type, via the Environment.
+
+		if (right instanceof POVariableExpression)
+		{
+			POVariableExpression vexp = (POVariableExpression)right;
+			TCDefinition def = env.findName(vexp.name, NameScope.NAMESANDSTATE);
+			
+			if (def instanceof TCLocalDefinition)
+			{
+				TCLocalDefinition ldef = (TCLocalDefinition)def;
+				
+				if (ldef.valueDefinition != null)
+				{
+					rtype = ldef.valueDefinition.getExpType();
+				}
+			}
+		}
+
+		if (!rtype.isAlways(TCNaturalOneType.class, location))
 		{
 			obligations.add(new NonZeroObligation(location, right, ctxt));
 		}
