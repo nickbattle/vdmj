@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POAssignmentContext extends POContext
@@ -130,6 +131,8 @@ public class POAssignmentContext extends POContext
 		if (assignmentDefs == null)
 		{
 			names.addAll(expression.getVariableNames());
+			TCNameToken pname = new TCNameToken(expression.location, expression.location.module, pattern);
+			names.add(pname);
 		}
 		else
 		{

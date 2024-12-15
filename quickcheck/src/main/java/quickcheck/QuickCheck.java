@@ -740,7 +740,7 @@ public class QuickCheck
 			
 			if (!missing.isEmpty())
 			{
-				StringBuilder sb = new StringBuilder("Note: does not reason about ");
+				StringBuilder sb = new StringBuilder("Note: does not check ");
 				String sep = "";
 				
 				for (TCNameToken var: missing)
