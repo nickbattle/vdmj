@@ -38,7 +38,8 @@
 				<include>vdmj/documentation/*.pdf</include>
 				<include>annotations/documentation/*.pdf</include>
 				<include>lsp/documentation/*.pdf</include>
-			</includes>
+				<include>quickcheck/documentation/*.pdf</include>
+		</includes>
 		</fileSet>
 	</fileSets>
 
