@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
 import com.fujitsu.vdmj.tc.expressions.TCDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCElseIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
@@ -85,6 +86,23 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 		{
 			truths.pop();
 		}
+	}
+	
+	private int pushTruthsOf(TCExpression exp, Stack<TCExpression> truths)
+	{
+		int count = 0;
+		truths.push(exp);
+		count++;
+		
+		if (exp instanceof TCAndExpression)
+		{
+			TCAndExpression and = (TCAndExpression)exp;
+			
+			count += pushTruthsOf(and.left, truths);
+			count += pushTruthsOf(and.right, truths);
+		}
+		
+		return count;
 	}
 
 	@Override
@@ -183,20 +201,19 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	@Override
 	public Boolean caseIfExpression(TCIfExpression node, Stack<TCExpression> truths)
 	{
-		int pushes = 0;
-		
-		truths.push(node.ifExp);
+		int p = pushTruthsOf(node.ifExp, truths);
 		boolean result = node.thenExp.apply(this, truths);
-		truths.pop();
+		pops(truths, p);
 		
+		int pushes = 0;
 		truths.push(new TCNotExpression(node.location, node.ifExp));
 		pushes++;
 		
 		for (TCElseIfExpression elif: node.elseList)
 		{
-			truths.push(elif.elseIfExp);
+			p = pushTruthsOf(elif.elseIfExp, truths);
 			result = result && elif.thenExp.apply(this, truths);
-			truths.pop();
+			pops(truths, p);
 			
 			truths.push(new TCNotExpression(node.location, elif.thenExp));
 			pushes++;
@@ -210,8 +227,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	@Override
 	public Boolean caseImpliesExpression(TCImpliesExpression node, Stack<TCExpression> truths)
 	{
-		truths.push(node.left);
-		int pushes = 1;
+		int pushes = pushTruthsOf(node.left, truths);
 
 		if (node.left instanceof TCEqualsExpression)
 		{

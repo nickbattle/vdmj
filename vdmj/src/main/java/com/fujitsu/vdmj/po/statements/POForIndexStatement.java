@@ -67,22 +67,27 @@ public class POForIndexStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = from.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, from);
-		obligations.addAll(to.getProofObligations(ctxt, pogState, env).markIfUpdated(pogState, to));
+		obligations.markIfAmbiguous(pogState, from);
+		obligations.addAll(to.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, to));
 
 		if (by != null)
 		{
-			obligations.addAll(by.getProofObligations(ctxt, pogState, env).markIfUpdated(pogState, by));
+			obligations.addAll(by.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, by));
 		}
 
-		ctxt.push(new POScopeContext());
+		int popto = ctxt.pushAt(new POScopeContext());
 		ctxt.push(new POForAllSequenceContext(var, from, to, by));
-		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
-		obligations.addAll(loops);
-		ctxt.pop();
-		ctxt.pop();
+		POGState copy = pogState.getCopy();
+		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
+		pogState.combineWith(copy);
+		ctxt.popTo(popto);
 
+		if (!statement.updatesState().isEmpty())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
+		
+		obligations.addAll(loops);
 		return obligations;
 	}
 

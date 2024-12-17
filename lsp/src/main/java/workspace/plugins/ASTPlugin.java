@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTPerSyncDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.patterns.ASTIdentifierPattern;
 import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.ast.types.ASTNamedType;
@@ -179,6 +180,8 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		
 		return registrations;
 	}
+	
+	abstract public ASTExpression parseExpression(String line, String module) throws Exception;
 	
 	abstract protected void parseFile(File file);
 

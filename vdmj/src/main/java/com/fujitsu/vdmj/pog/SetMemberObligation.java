@@ -32,5 +32,7 @@ public class SetMemberObligation extends ProofObligation
 	{
 		super(test.location, POType.SET_MEMBER, ctxt);
 		source = ctxt.getSource(test + " in set " + set);
+		setObligationVars(test, set);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }

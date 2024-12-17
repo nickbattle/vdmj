@@ -87,11 +87,17 @@ public class POTrapStatement extends POStatement
 
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
-
-		// The "with" clause sees the "body" state updates, potentially
+		
+		// The "with" clause sees the "body" state updates, so this comes first
 		list.addAll(body.getProofObligations(ctxt, pogState, env));
+		
 		// We don't know the exception type to match against the trap pattern/bind, so unchecked
-		list.addAll(with.getProofObligations(ctxt, pogState, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+		int popto = ctxt.size();
+		POGState copy = pogState.getCopy();
+		list.addAll(with.getProofObligations(ctxt, copy, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+		ctxt.popTo(popto);
+		
+		pogState.combineWith(copy);
 		return list;
 	}
 

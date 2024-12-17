@@ -31,8 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -41,10 +44,13 @@ import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -149,6 +155,13 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		return lenses;
 	}
 	
+	public TCExpression checkExpression(ASTExpression ast, Environment env) throws Exception
+	{
+		TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
+		tc.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
+		return tc;
+	}
+
 	abstract protected JSONArray getCodeLenses(File file);
 
 	abstract public <T extends Mappable> T getTC();

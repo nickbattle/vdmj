@@ -70,14 +70,19 @@ public class POLetBeStStatement extends POStatement
 		{
 			ctxt.push(new POForAllContext(this));
 			ProofObligationList oblist = suchThat.getProofObligations(ctxt, pogState, env);
-			oblist.markIfUpdated(pogState, suchThat);
+			oblist.markIfAmbiguous(pogState, suchThat);
 			obligations.addAll(oblist);
 			ctxt.pop();
 		}
 
-		ctxt.push(new POForAllPredicateContext(this));
+		int popto = ctxt.pushAt(new POForAllPredicateContext(this));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-		ctxt.pop();
+		
+		if (ctxt.size() == popto + 1)
+		{
+			// Nothing left on the stack by the body, so remove this context
+			ctxt.popTo(popto);
+		}
 
 		return obligations;
 	}

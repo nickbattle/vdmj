@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSetBind extends POBind
@@ -65,8 +66,16 @@ public class POSetBind extends POBind
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, set);
+		obligations.markIfAmbiguous(pogState, set);
 		return obligations;
+	}
+	
+	@Override
+	public TCNameSet getVariableNames()
+	{
+		TCNameSet names = set.getVariableNames();
+		names.addAll(pattern.getVariableNames());
+		return names;
 	}
 
 	@Override

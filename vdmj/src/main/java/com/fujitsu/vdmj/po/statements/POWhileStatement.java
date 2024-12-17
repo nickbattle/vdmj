@@ -60,12 +60,20 @@ public class POWhileStatement extends POStatement
 		obligations.add(new WhileLoopObligation(this, ctxt));
 		
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
-		obligations.markIfUpdated(pogState, exp);
+		obligations.markIfAmbiguous(pogState, exp);
 		
-		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
-		obligations.addAll(loops);
+		int popto = ctxt.size();
+		POGState copy = pogState.getCopy();
+		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
+		pogState.combineWith(copy);
+		ctxt.popTo(popto);
 
+		if (!statement.updatesState().isEmpty())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
+
+		obligations.addAll(loops);
 		return obligations;
 	}
 

@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POForAllContext extends POContext
 {
@@ -128,5 +129,18 @@ public class POForAllContext extends POContext
 		sb.append(" &");
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet result = new TCNameSet();
+		
+		for (POMultipleBind mbind: bindings)
+		{
+			result.addAll(mbind.getVariableNames());
+		}
+		
+		return result;
 	}
 }

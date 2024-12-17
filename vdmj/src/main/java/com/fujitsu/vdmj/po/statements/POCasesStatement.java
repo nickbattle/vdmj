@@ -79,10 +79,11 @@ public class POCasesStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, exp);		
+		obligations.markIfAmbiguous(pogState, exp);		
 		
 		POGStateList stateList = new POGStateList();
 		boolean hasIgnore = false;
+		int popto = ctxt.size();
 
 		for (POCaseStmtAlternative alt: cases)
 		{
@@ -100,11 +101,7 @@ public class POCasesStatement extends POStatement
 			obligations.addAll(others.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		}
 
-		for (int i=0; i<cases.size(); i++)
-		{
-			ctxt.pop();
-		}
-		
+		ctxt.popTo(popto);
 		stateList.combineInto(pogState);
 
 		return obligations;

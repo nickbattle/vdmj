@@ -114,7 +114,7 @@ public class TCInfiniteTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean
 	@Override
 	public Set<Boolean> caseNamedType(TCNamedType node, TCType arg)
 	{
-		if (done.contains(node) && node.equals(arg))
+		if (done.has(node) && node.equals(arg))
 		{
 			return trueSet();
 		}
@@ -127,7 +127,7 @@ public class TCInfiniteTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean
 	@Override
 	public Set<Boolean> caseRecordType(TCRecordType node, TCType arg)
 	{
-		if (done.contains(node) && node.equals(arg))
+		if (done.has(node) && node.equals(arg))
 		{
 			return trueSet();
 		}

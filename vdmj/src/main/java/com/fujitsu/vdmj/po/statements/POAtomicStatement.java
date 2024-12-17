@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
@@ -56,6 +57,7 @@ public class POAtomicStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		POGStateList stateList = new POGStateList();
+		int popto = ctxt.size();
 
 		for (POAssignmentStatement stmt: assignments)
 		{
@@ -63,6 +65,9 @@ public class POAtomicStatement extends POStatement
 		}
 
 		stateList.combineInto(pogState);	// Delayed effect of every atomic assignment
+		ctxt.popTo(popto);
+		obligations.markUnchecked(ProofObligation.NON_DETERMINISTIC);
+		
 		return obligations;
 	}
 	

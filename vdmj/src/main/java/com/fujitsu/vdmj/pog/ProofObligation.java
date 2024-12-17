@@ -27,10 +27,14 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -43,7 +47,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public static final String HIDDEN_VARIABLES		= "Obligation patterns contain hidden variables";
 	public static final String REQUIRES_VDM10		= "Obligation requires VDM10";
 	public static final String LOOP_STATEMENT		= "Loop modifies state";
+	public static final String NON_DETERMINISTIC	= "Non-deterministic update";
 	public static final String HAS_UPDATED_STATE	= "Earlier statements updated state";
+	public static final String HAS_AMBIGUOUS_STATE	= "Earlier statements may have updated state";
 	public static final String COMPLEX_ASSIGNMENT	= "Assignment too complex";
 	public static final String PO_HAS_ERRORS		= "PO has errors";
 	
@@ -63,6 +69,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public Context witness;
 	public String message;
 	public String provedBy;
+	public TCNameSet obligationVars;
+	public TCNameSet reasonsAbout;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -84,6 +92,14 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.witness = null;
 		this.message = null;
 		this.provedBy = null;
+		this.obligationVars = null;
+		
+		String message = ctxt.markObligation();
+		
+		if (message != null)
+		{
+			markUnchecked(message);
+		}
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
@@ -144,6 +160,57 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setMessage(String message)
 	{
 		this.message = message;
+	}
+	
+	public void setObligationVars(POExpression... expressions)
+	{
+		if (obligationVars == null)
+		{
+			obligationVars = new TCNameSet();
+		}
+		
+		for (POExpression exp: expressions)
+		{
+			TCType etype = exp.getExptype();
+			
+			if (etype instanceof TCInvariantType)
+			{
+				TCInvariantType itype = (TCInvariantType)etype;
+				
+				if (itype.invdef != null)
+				{
+					continue;	// Invariant "reasons about" this exp
+				}
+			}
+			
+			obligationVars.addAll(exp.getVariableNames());
+		}
+	}
+	
+	public void setObligationVars(POPattern... patterns)
+	{
+		if (obligationVars == null)
+		{
+			obligationVars = new TCNameSet();
+		}
+		
+		for (POPattern pattern: patterns)
+		{
+			obligationVars.addAll(pattern.getVariableNames());
+		}
+	}
+	
+	public void setReasonsAbout(TCNameSet... reasons)
+	{
+		if (reasonsAbout == null)
+		{
+			reasonsAbout = new TCNameSet();
+		}
+		
+		for (TCNameSet set: reasons)
+		{
+			this.reasonsAbout.addAll(set);
+		}
 	}
 	
 	/**
@@ -241,10 +308,22 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		return factory.getCexLaunch();
 	}
 	
+	public Context getCexState()
+	{
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getCexState();
+	}
+	
 	public String getWitnessLaunch()
 	{
 		POLaunchFactory factory = new POLaunchFactory(this);
 		return factory.getWitnessLaunch();
+	}
+	
+	public Context getWitnessState()
+	{
+		POLaunchFactory factory = new POLaunchFactory(this);
+		return factory.getWitnessState();
 	}
 	
 	public String getLaunch()

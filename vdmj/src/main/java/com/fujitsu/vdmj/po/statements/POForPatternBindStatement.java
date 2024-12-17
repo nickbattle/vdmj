@@ -75,8 +75,10 @@ public class POForPatternBindStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = sequence.getProofObligations(ctxt, pogState, env);
-		list.markIfUpdated(pogState, sequence);
-		
+		list.markIfAmbiguous(pogState, sequence);
+
+		int popto = ctxt.size();
+
 		if (patternBind.pattern != null)
 		{
 			ctxt.push(new POForAllSequenceContext(patternBind.pattern, sequence));
@@ -110,12 +112,17 @@ public class POForPatternBindStatement extends POStatement
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 
-		ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-		ctxt.pop();
-		
-		if (statement.updatesState()) loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		POGState copy = pogState.getCopy();
+		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
+		pogState.combineWith(copy);
+		ctxt.popTo(popto);
+
+		if (!statement.updatesState().isEmpty())
+		{
+			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+		}
+
 		list.addAll(loops);
-		
 		return list;
 	}
 

@@ -33,6 +33,9 @@ public class SeqApplyObligation extends ProofObligation
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
 		source = ctxt.getSource(poExpression + " in set inds " + root);
+		setObligationVars(root, poExpression);
+		// Note, the LHS included, eg. "len s in set inds s"
+		setReasonsAbout(ctxt.getReasonsAbout(), poExpression.getVariableNames());
 	}
 
 	public SeqApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)

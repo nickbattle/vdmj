@@ -25,14 +25,22 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Map.Entry;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ModuleInterpreter;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.values.UpdatableValue;
+import com.fujitsu.vdmj.values.Value;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -92,6 +100,7 @@ public class QCRunLSPCommand extends AnalysisCommand
 				}
 				
 				String launch = null;
+				Context postate = null;
 
 				if (obligation.definition != null)
 				{
@@ -110,10 +119,12 @@ public class QCRunLSPCommand extends AnalysisCommand
 						}
 						
 						launch = obligation.getCexLaunch();
+						postate = obligation.getCexState();
 					}
 					else if (obligation.witness != null)
 					{
 						launch = obligation.getWitnessLaunch();
+						postate = obligation.getWitnessState();
 					}
 					else
 					{
@@ -124,6 +135,7 @@ public class QCRunLSPCommand extends AnalysisCommand
 				else if (obligation.kind.isStandAlone())
 				{
 					launch = obligation.getLaunch();
+					postate = null;
 				}
 				else
 				{
@@ -134,7 +146,27 @@ public class QCRunLSPCommand extends AnalysisCommand
 				if (launch != null)
 				{
 					println("=> print " + launch);
-					
+
+					if (Settings.dialect == Dialect.VDM_SL && postate != null)
+					{
+						ModuleInterpreter m = ModuleInterpreter.getInstance();
+						Context state = m.getStateContext();
+						
+						for (Entry<TCNameToken, Value> entry: postate.entrySet())
+						{
+							try
+							{
+								UpdatableValue value = (UpdatableValue) state.get(entry.getKey());
+								value.set(LexLocation.ANY, entry.getValue(), m.getInitialContext());
+							}
+							catch (Exception e)
+							{
+								return new DAPMessageList(request, false,
+										"Problem setting state values for launch?", null);
+							}
+						}
+					}
+
 					// This allows maximal types to parse, for invariant POs, and allows POs to
 					// reference types outside their module in VDM-SL.
 					Environment env = (Settings.dialect == Dialect.VDM_SL) ?

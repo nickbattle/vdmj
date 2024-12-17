@@ -131,7 +131,6 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 				JSONArray obligations = config.get("obligations");
 				
 				timeout = config.get("timeout", 1000L);	// faster for GUI?
-				if (timeout == 5) timeout = 5000;		// HACK until GUI fixed
 				
 				if (obligations != null && !obligations.isEmpty())
 				{

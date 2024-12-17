@@ -57,9 +57,14 @@ public class POLetDefStatement extends POStatement
 	{
 		ProofObligationList obligations = localDefs.getDefProofObligations(ctxt, pogState, env);
 
-		ctxt.push(new POLetDefContext(this.localDefs));
+		int popto = ctxt.pushAt(new POLetDefContext(this.localDefs));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-		ctxt.pop();
+		
+		if (ctxt.size() == popto + 1)
+		{
+			// Nothing left on the stack by the body, so remove this context
+			ctxt.popTo(popto);
+		}
 
 		return obligations;
 	}

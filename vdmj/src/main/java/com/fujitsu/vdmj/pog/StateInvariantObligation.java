@@ -40,16 +40,6 @@ public class StateInvariantObligation extends ProofObligation
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
 		
-		try
-		{
-			sb.append("let " + ass.target.toPattern() + " = " + ass.exp + " in\n");
-		}
-		catch (IllegalArgumentException e)
-		{
-			// Can't represent designator as a pattern, so cannot check PO
-			markUnchecked(ProofObligation.COMPLEX_ASSIGNMENT);
-		}
-
 		if (ass.classDefinition != null)
 		{
 			sb.append(invDefs(ass.classDefinition));

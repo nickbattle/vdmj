@@ -31,12 +31,33 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 @SuppressWarnings("serial")
 public class POContextStack extends Stack<POContext>
 {
+	/**
+	 * The pushAt/popTo methods allow a push to record the current stack size and then
+	 * pop items back to that size easily. It is used in operation PO handling, where
+	 * persistent contexts (like a state update) are not popped symmetrically.
+	 */
+	public int pushAt(POContext ctxt)
+	{
+		int size = this.size();
+		push(ctxt);
+		return size;
+	}
+	
+	public void popTo(int size)
+	{
+		while (size() > size)
+		{
+			pop();
+		}
+	}
+	
 	public String getName()
 	{
 		StringBuilder result = new StringBuilder();
@@ -128,6 +149,38 @@ public class POContextStack extends Stack<POContext>
 			if (params != null && !params.isEmpty())
 			{
 				return params;
+			}
+		}
+		
+		return null;
+	}
+	
+	public TCNameSet getReasonsAbout()
+	{
+		TCNameSet set = new TCNameSet();
+		
+		for (POContext ctxt: this)
+		{
+			TCNameSet r = ctxt.reasonsAbout();
+			
+			if (r != null)
+			{
+				set.addAll(r);
+			}
+		}
+		
+		return set;
+	}
+	
+	public String markObligation()
+	{
+		for (POContext ctxt: this)
+		{
+			String message = ctxt.markObligation();
+			
+			if (message != null)
+			{
+				return message;
 			}
 		}
 		

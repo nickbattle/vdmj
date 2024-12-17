@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.PODclContext;
+import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -52,17 +52,24 @@ public class POBlockStatement extends POSimpleBlockStatement
 	{
 		ProofObligationList obligations = assignmentDefs.getDefProofObligations(ctxt, pogState, env);
 		
-		POGState dclState = pogState.getLink();
-		
-		for (PODefinition dcl: assignmentDefs)
+		if (!assignmentDefs.isEmpty())
 		{
-			POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
-			dclState.addDclLocal(adef.name);
+			POGState dclState = pogState.getLink();
+			
+			for (PODefinition dcl: assignmentDefs)
+			{
+				POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
+				dclState.addDclLocal(adef.name);
+			}
+	
+			ctxt.push(new POAssignmentContext(assignmentDefs));
+			obligations.addAll(super.getProofObligations(ctxt, dclState, env));
+			ctxt.pop();
 		}
-
-		ctxt.push(new PODclContext(assignmentDefs));
-		obligations.addAll(super.getProofObligations(ctxt, dclState, env));
-		ctxt.pop();
+		else
+		{
+			obligations.addAll(super.getProofObligations(ctxt, pogState, env));
+		}
 
 		return obligations;
 	}

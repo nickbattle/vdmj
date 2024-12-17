@@ -31,7 +31,8 @@ public class SeqModificationObligation extends ProofObligation
 	public SeqModificationObligation(POPlusPlusExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.SEQ_MODIFICATION, ctxt);
-		source = ctxt.getSource(
-			"dom " + exp.right + " subset inds " + exp.left);
+		source = ctxt.getSource("dom " + exp.right + " subset inds " + exp.left);
+		setObligationVars(exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }

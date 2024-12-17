@@ -55,7 +55,7 @@ public class PODurationStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = duration.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, duration);
+		obligations.markIfAmbiguous(pogState, duration);
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		return obligations;
 	}

@@ -65,6 +65,22 @@ public class TCTypeSet extends TreeSet<TCType> implements Cloneable, Mappable
 		add(t2);
 	}
 
+	public boolean has(Object other)
+	{
+		if (other instanceof TCType)
+		{
+			for (TCType t: this)
+			{
+				if (t.getClass().equals(other.getClass()) && t.equals(other))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	@Override
 	public boolean add(TCType t)
 	{

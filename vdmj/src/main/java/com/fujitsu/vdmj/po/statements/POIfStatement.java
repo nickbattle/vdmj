@@ -79,36 +79,37 @@ public class POIfStatement extends POStatement
 		POGStateList stateList = new POGStateList();
 
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, pogState, env);
-		obligations.markIfUpdated(pogState, ifExp);
+		obligations.markIfAmbiguous(pogState, ifExp);
 		
-		ctxt.push(new POImpliesContext(ifExp));
+		int base = ctxt.pushAt(new POImpliesContext(ifExp));
+		
+		int popto = base;
 		obligations.addAll(thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
-		ctxt.pop();
+		ctxt.popTo(popto);
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
-			oblist.markIfUpdated(pogState, stmt.elseIfExp);
+			oblist.markIfAmbiguous(pogState, stmt.elseIfExp);
 
+			popto = ctxt.size();
 			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
-
+			ctxt.popTo(popto);
 			obligations.addAll(oblist);
+
 			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 
 		if (elseStmt != null)
 		{
+			popto = ctxt.size();
 			obligations.addAll(elseStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			ctxt.popTo(popto);
 		}
 
-		for (int i=0; i<elseList.size(); i++)
-		{
-			ctxt.pop();
-		}
-
-		ctxt.pop();
+		ctxt.popTo(base);
 		stateList.combineInto(pogState);	
 		
 		return obligations;

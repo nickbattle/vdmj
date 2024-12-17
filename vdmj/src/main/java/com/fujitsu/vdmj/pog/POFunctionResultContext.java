@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.types.POPatternTypePair;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 
@@ -40,6 +41,7 @@ public class POFunctionResultContext extends POContext
 	public final POExpression body;
 	public final POPatternTypePair result;
 	public final boolean implicit;
+	public final POExpression preExp;
 
 	public POFunctionResultContext(POExplicitFunctionDefinition definition)
 	{
@@ -48,6 +50,7 @@ public class POFunctionResultContext extends POContext
 		this.precondition = preconditionCall(name, definition.typeParams, definition.paramPatternList, definition.precondition);
 		this.body = definition.body;
 		this.implicit = false;
+		this.preExp = definition.precondition;
 		
 		TCFunctionType lastFunc = definition.type;
 		
@@ -74,6 +77,7 @@ public class POFunctionResultContext extends POContext
 		this.body = definition.body;
 		this.implicit = true;
 		this.result = definition.result;
+		this.preExp = definition.precondition;
 	}
 
 	@Override
@@ -103,5 +107,25 @@ public class POFunctionResultContext extends POContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		if (preExp != null)
+		{
+			 names.addAll(preExp.getVariableNames());
+		}
+		
+		names.addAll(result.pattern.getVariableNames());
+		
+		if (body != null)
+		{
+			names.addAll(body.getVariableNames());
+		}
+		
+		return names;
 	}
 }

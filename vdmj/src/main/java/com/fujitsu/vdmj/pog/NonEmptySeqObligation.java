@@ -32,5 +32,7 @@ public class NonEmptySeqObligation extends ProofObligation
 	{
 		super(exp.location, POType.NON_EMPTY_SEQ, ctxt);
 		source = ctxt.getSource(exp + " <> []");
+		setObligationVars(exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }

@@ -190,9 +190,9 @@ public class POExplicitFunctionDefinition extends PODefinition
 		
 		if (measureDef != null && measureName != null && measureName.isMeasureName())
 		{
-			ctxt.push(new PONameContext(new TCNameList(measureName)));
+			int popto = ctxt.pushAt(new PONameContext(new TCNameList(measureName)));
 			obligations.addAll(measureDef.getProofObligations(ctxt, pogState, env));
-			ctxt.pop();
+			ctxt.popTo(popto);
 		}
 
 		ctxt.push(new POFunctionDefinitionContext(this, true));

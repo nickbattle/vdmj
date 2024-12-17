@@ -297,7 +297,7 @@ public class RandomRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseNamedType(TCNamedType type, Integer limit)
 	{
-		if (done.contains(type))
+		if (done.has(type))
 		{
 			return new ValueSet();		// recursing
 		}
@@ -354,7 +354,7 @@ public class RandomRangeCreator extends RangeCreator
 			}
 		}
 		
-		if (done.contains(node))
+		if (done.has(node))
 		{
 			return new ValueSet();		// recursing
 		}

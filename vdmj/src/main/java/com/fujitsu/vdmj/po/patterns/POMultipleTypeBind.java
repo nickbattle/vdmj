@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -52,6 +53,19 @@ public class POMultipleTypeBind extends POMultipleBind
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();
+	}
+	
+	@Override
+	public TCNameSet getVariableNames()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (POPattern p: plist)
+		{
+			names.addAll(p.getAllVariableNames());
+		}
+		
+		return names;
 	}
 
 	@Override

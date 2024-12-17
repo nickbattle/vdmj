@@ -135,7 +135,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	@Override
 	public BigInteger caseNamedType(TCNamedType type, Context ctxt)
 	{
-		if (done.contains(type))
+		if (done.has(type))
 		{
 			return BigInteger.ONE;	// Not zero
 		}
@@ -184,7 +184,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	@Override
 	public BigInteger caseRecordType(TCRecordType type, Context ctxt)
 	{
-		if (done.contains(type))
+		if (done.has(type))
 		{
 			return BigInteger.ONE;	// Not zero
 		}

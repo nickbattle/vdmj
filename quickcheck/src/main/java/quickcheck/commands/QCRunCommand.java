@@ -26,9 +26,12 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Map.Entry;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
@@ -36,8 +39,13 @@ import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ModuleInterpreter;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.values.UpdatableValue;
+import com.fujitsu.vdmj.values.Value;
 
 /**
  * Launch a "print" command for a PO counterexample or witness.
@@ -91,6 +99,7 @@ public class QCRunCommand extends AnalysisCommand
 					}
 					
 					String launch = null;
+					Context postate = null;
 					
 					if (obligation.definition != null)
 					{
@@ -108,10 +117,12 @@ public class QCRunCommand extends AnalysisCommand
 							}
 							
 							launch = obligation.getCexLaunch();
+							postate = obligation.getCexState();
 						}
 						else if (obligation.witness != null)
 						{
 							launch = obligation.getWitnessLaunch();
+							postate = obligation.getWitnessState();
 						}
 						else
 						{
@@ -121,6 +132,7 @@ public class QCRunCommand extends AnalysisCommand
 					else if (obligation.kind.isStandAlone())
 					{
 						launch = obligation.getLaunch();
+						postate = null;
 					}
 					else
 					{
@@ -132,10 +144,28 @@ public class QCRunCommand extends AnalysisCommand
 						String pline = "print " + launch;
 						println("=> " + pline);
 						
+						if (Settings.dialect == Dialect.VDM_SL && postate != null)
+						{
+							ModuleInterpreter m = ModuleInterpreter.getInstance();
+							Context state = m.getStateContext();
+							
+							for (Entry<TCNameToken, Value> entry: postate.entrySet())
+							{
+								try
+								{
+									UpdatableValue value = (UpdatableValue) state.get(entry.getKey());
+									value.set(LexLocation.ANY, entry.getValue(), m.getInitialContext());
+								}
+								catch (Exception e)
+								{
+									return "Problem setting state values for launch?";
+								}
+							}
+						}
+						
 						// Temporarily allow maximal parsing, for invariant POs
 						boolean saved = Properties.parser_maximal_types;
-						Interpreter interpreter = Interpreter.getInstance();
-						
+
 						try
 						{
 							Properties.parser_maximal_types = true;
@@ -143,6 +173,8 @@ public class QCRunCommand extends AnalysisCommand
 							// Set the default Environment to allow complex launches to run which
 							// use symbols outside the current module in VDM-SL. The default is
 							// put back afterwards!
+							
+							Interpreter interpreter = Interpreter.getInstance();
 							Environment menv = interpreter.getGlobalEnvironment();
 							
 							if (Settings.dialect == Dialect.VDM_SL)
