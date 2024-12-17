@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
@@ -160,7 +162,7 @@ public class POApplyExpression extends POExpression
 				{
 					POIntegerLiteralExpression e = (POIntegerLiteralExpression)arg;
 					
-					if (e.value.value != 1)		// s(1) is always okay for seq1
+					if (!e.value.value.equals(BigInteger.ONE))	// s(1) is always okay for seq1
 					{
 						obligations.add(new SeqApplyObligation(root, arg, ctxt));
 					}
