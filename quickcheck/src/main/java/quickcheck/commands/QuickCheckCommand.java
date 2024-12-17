@@ -49,7 +49,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <msecs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - lightweight PO verification";
