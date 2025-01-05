@@ -24,13 +24,12 @@
 
 package quickcheck.strategies;
 
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
@@ -45,62 +44,51 @@ import quickcheck.QuickCheck;
 public class FiniteQCStrategy extends QCStrategy
 {
 	private int expansionLimit = 1024;	// Small and fast?
-	private int errorCount = 0;
 
-	public FiniteQCStrategy(List<?> argv)
+	public FiniteQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		Iterator<String> iter = argv.iterator();
+		
+		while (iter.hasNext())
 		{
-			@SuppressWarnings("unchecked")
-			Iterator<String> iter = (Iterator<String>) argv.iterator();
-			
-			while (iter.hasNext())
+			try
 			{
-				try
+				String arg = iter.next();
+				
+				switch (arg)
 				{
-					String arg = iter.next();
-					
-					switch (arg)
-					{
-						case "-finite:size":		// Total top level size = type size
+					case "-finite:size":	// Total top level size = type size
+						iter.remove();
+
+						if (iter.hasNext())
+						{
+							expansionLimit = Integer.parseInt(iter.next());
 							iter.remove();
-	
-							if (iter.hasNext())
-							{
-								expansionLimit = Integer.parseInt(iter.next());
-								iter.remove();
-							}
-							break;
-	
-						default:
-							if (arg.startsWith("-finite:"))
-							{
-								println("Unknown finite option: " + arg);
-								println(help());
-								errorCount++;
-								iter.remove();
-							}
-					}
-				}
-				catch (NumberFormatException e)
-				{
-					println("Argument must be numeric");
-					println(help());
-					errorCount++;
-				}
-				catch (ArrayIndexOutOfBoundsException e)
-				{
-					println("Missing argument");
-					println(help());
-					errorCount++;
+						}
+						break;
+
+					default:
+						if (arg.startsWith("-finite:"))
+						{
+							println("Unknown finite option: " + arg);
+							println(help());
+							errorCount++;
+							iter.remove();
+						}
 				}
 			}
-		}
-		else
-		{
-			@SuppressWarnings("unchecked")
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "finite");
-			expansionLimit = get(map, "size", expansionLimit);
+			catch (NumberFormatException e)
+			{
+				println("Argument must be numeric");
+				println(help());
+				errorCount++;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				println("Missing argument");
+				println(help());
+				errorCount++;
+			}
 		}
 	}
 
@@ -108,12 +96,6 @@ public class FiniteQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "finite";
-	}
-
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;
 	}
 
 	@Override

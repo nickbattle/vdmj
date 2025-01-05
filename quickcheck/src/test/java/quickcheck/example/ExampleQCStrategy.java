@@ -42,46 +42,35 @@ import quickcheck.strategies.StrategyResults;
 public class ExampleQCStrategy extends QCStrategy
 {
 	private boolean provedResult = false;
-	private int errorCount = 0;
 
-	@SuppressWarnings("unchecked")
-	public ExampleQCStrategy(List<?> argv)
+	public ExampleQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		// Remove your "qc" plugin arguments from the list here
+		// You must include the strategy name, like "-example:n"
+		
+		for (int i=0; i < argv.size(); i++)
 		{
-			List<String> args = (List<String>)argv;
-			
-			// Remove your "qc" plugin arguments from the list here
-			// It's useful to include the strategy name, like "-example:n"
-			for (int i=0; i < args.size(); i++)
+			switch (argv.get(i))
 			{
-				switch (args.get(i))
-				{
-					case "-example:proved":
-						args.remove(i);
-	
-						if (i < args.size())
-						{
-							provedResult = Boolean.parseBoolean(args.get(i));
-							args.remove(i);
-						}
-						break;
-						
-					default:
-						if (args.get(i).startsWith("-example:"))
-						{
-							errorln("Unknown exmaple option: " + args.get(i));
-							errorln(help());
-							errorCount++;
-							args.remove(i);
-						}
-				}
+				case "-example:proved":
+					argv.remove(i);
+
+					if (i < argv.size())
+					{
+						provedResult = Boolean.parseBoolean(argv.get(i));
+						argv.remove(i);
+					}
+					break;
+					
+				default:
+					if (argv.get(i).startsWith("-example:"))
+					{
+						errorln("Unknown exmaple option: " + argv.get(i));
+						errorln(help());
+						errorCount++;
+						argv.remove(i);
+					}
 			}
-		}
-		else
-		{
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "example");
-			provedResult = get(map, "proved", false);
 		}
 	}
 	
@@ -89,12 +78,6 @@ public class ExampleQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "example";	// Can be used with -s <name>
-	}
-
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;	// Called after init and getValues
 	}
 
 	@Override

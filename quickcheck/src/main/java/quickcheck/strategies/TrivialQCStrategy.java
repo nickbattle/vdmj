@@ -28,7 +28,6 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
@@ -41,29 +40,19 @@ import quickcheck.visitors.TrivialQCVisitor;
 
 public class TrivialQCStrategy extends QCStrategy
 {
-	private int errorCount = 0;
-
-	public TrivialQCStrategy(List<?> argv)
+	public TrivialQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		for (int i=0; i < argv.size(); i++)
 		{
-			for (int i=0; i < argv.size(); i++)
+			String arg = argv.get(i);
+
+			if (arg.startsWith("-trivial:"))
 			{
-				String arg = (String)argv.get(i);
-	
-				if (arg.startsWith("-trivial:"))
-				{
-					println("Unknown trivial option: " + arg);
-					println(help());
-					errorCount ++;
-					argv.remove(i);
-				}
+				println("Unknown trivial option: " + arg);
+				println(help());
+				errorCount ++;
+				argv.remove(i);
 			}
-		}
-		else
-		{
-			@SuppressWarnings({ "unchecked", "unused" })
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "trivial");
 		}
 	}
 	
@@ -71,12 +60,6 @@ public class TrivialQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "trivial";
-	}
-
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;
 	}
 
 	@Override

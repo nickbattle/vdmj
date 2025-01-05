@@ -103,98 +103,80 @@ public class FixedQCStrategy extends QCStrategy
 	public final static int DEFAULT_LIMIT = 20;
 	
 	private int expansionLimit = DEFAULT_LIMIT;		// Top level binding value expansion limit
-	
-	private int errorCount = 0;
 	private String rangesFile = "ranges.qc";
 	private boolean createFile = false;
 
 	private Map<String, ValueList> allRanges = null;
 	
-	public FixedQCStrategy(List<?> argv)
+	public FixedQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		Iterator<String> iter = argv.iterator();
+		
+		while (iter.hasNext())
 		{
-			@SuppressWarnings("unchecked")
-			Iterator<String> iter = (Iterator<String>) argv.iterator();
-			
-			while (iter.hasNext())
+			try
 			{
-				try
+				String arg = iter.next();
+				
+				switch (arg)
 				{
-					String arg = iter.next();
-					
-					switch (arg)
-					{
-						case "-fixed:file":			// Use this as ranges.qc
+					case "-fixed:file":			// Use this as ranges.qc
+						iter.remove();
+
+						if (iter.hasNext())
+						{
+							rangesFile = iter.next();
 							iter.remove();
-	
-							if (iter.hasNext())
-							{
-								rangesFile = iter.next();
-								iter.remove();
-							}
-							
-							createFile = false;
-							break;
-							
-						case "-fixed:create":		// Create ranges.qc
+						}
+						
+						createFile = false;
+						break;
+						
+					case "-fixed:create":		// Create ranges.qc
+						iter.remove();
+						
+						if (iter.hasNext())
+						{
+							rangesFile = iter.next();
 							iter.remove();
-							
-							if (iter.hasNext())
-							{
-								rangesFile = iter.next();
-								iter.remove();
-							}
-	
-							createFile = true;
-							break;
-							
-						case "-fixed:size":		// Total top level size
+						}
+
+						createFile = true;
+						break;
+						
+					case "-fixed:size":		// Total top level size
+						iter.remove();
+
+						if (iter.hasNext())
+						{
+							expansionLimit = Integer.parseInt(iter.next());
 							iter.remove();
-	
-							if (iter.hasNext())
-							{
-								expansionLimit = Integer.parseInt(iter.next());
-								iter.remove();
-							}
-							break;
-							
-						default:
-							if (arg.startsWith("-fixed:"))
-							{
-								println("Unknown fixed option: " + arg);
-								println(help());
-								errorCount++;
-								iter.remove();
-							}
-					}
-				}
-				catch (NumberFormatException e)
-				{
-					println("Argument must be numeric");
-					println(help());
-					errorCount++;
-				}
-				catch (ArrayIndexOutOfBoundsException e)
-				{
-					println("Missing argument");
-					println(help());
-					errorCount++;
+						}
+						break;
+						
+					default:
+						if (arg.startsWith("-fixed:"))
+						{
+							println("Unknown fixed option: " + arg);
+							println(help());
+							errorCount++;
+							iter.remove();
+						}
 				}
 			}
+			catch (NumberFormatException e)
+			{
+				println("Argument must be numeric");
+				println(help());
+				errorCount++;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				println("Missing argument");
+				println(help());
+				errorCount++;
+			}
 		}
-		else
-		{
-			@SuppressWarnings("unchecked")
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "fixed");
-			expansionLimit = get(map, "size", expansionLimit);
-		}
-	}
-	
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;
 	}
 	
 	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException, ParserException

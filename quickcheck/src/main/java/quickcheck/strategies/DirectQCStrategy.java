@@ -30,7 +30,6 @@ import static quickcheck.commands.QCConsole.verboseln;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.fujitsu.vdmj.in.expressions.INCaseAlternative;
@@ -64,29 +63,19 @@ import quickcheck.visitors.TotalExpressionVisitor;
  */
 public class DirectQCStrategy extends QCStrategy
 {
-	private int errorCount = 0;
-
-	public DirectQCStrategy(List<?> argv)
+	public DirectQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		for (int i=0; i < argv.size(); i++)
 		{
-			for (int i=0; i < argv.size(); i++)
+			String arg = argv.get(i);
+			
+			if (arg.startsWith("-direct:"))
 			{
-				String arg = (String)argv.get(i);
-				
-				if (arg.startsWith("-direct:"))
-				{
-					println("Unknown direct option: " + argv);
-					println(help());
-					errorCount ++;
-					argv.remove(i);
-				}
+				println("Unknown direct option: " + argv);
+				println(help());
+				errorCount ++;
+				argv.remove(i);
 			}
-		}
-		else
-		{
-			@SuppressWarnings({ "unchecked", "unused" })
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "direct");
 		}
 	}
 
@@ -94,12 +83,6 @@ public class DirectQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "direct";
-	}
-
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;
 	}
 
 	@Override

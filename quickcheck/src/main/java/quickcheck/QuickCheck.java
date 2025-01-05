@@ -108,7 +108,7 @@ public class QuickCheck
 		errorCount = 0;
 	}
 	
-	public void loadStrategies(List<?> argv)
+	public void loadStrategies(List<String> argv)
 	{
 		strategies = new Vector<QCStrategy>();
 		disabled = new Vector<QCStrategy>();
