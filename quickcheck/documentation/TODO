@@ -1,0 +1,9 @@
+Things to do with QuickCheck:
+
+. Consider an interface for the print/info/error output, passed in from the VDMJ/LSP plugins
+
+. Strategy to look for constants in a PO and use bind values around that "bias"?
+
+. Break up checkObligation into several stages/methods.
+
+. More general heuristic method injection in the MAYBE case?
