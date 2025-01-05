@@ -192,14 +192,14 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			
 			for (int i=0; i<strategies.size(); i++)
 			{
-				JSONObject sentry = (JSONObject) strategies.get(i);
+				JSONObject sentry = strategies.index(i);
 				String sname = sentry.get("name");
 				Boolean enabled = sentry.get("enabled", true);
 				
 				if (sname != null && enabled)
 				{
 					list.add("-s");
-					list.add(sname);
+					list.add(sname);	// NB. Only enable those listed
 					
 					for (String key: sentry.keySet())
 					{
