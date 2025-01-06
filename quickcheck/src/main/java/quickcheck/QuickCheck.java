@@ -415,313 +415,310 @@ public class QuickCheck
 	public void checkObligation(ProofObligation po, StrategyResults sresults)
 	{
 		verbose("------------------------ Checking PO #%d\n", po.number);
+		resetErrors();		// Only flag fatal errors
+		
+		INBindingGlobals globals = INBindingGlobals.getInstance();
+		globals.clear();	// Clear before each obligation run
 
+		if (!po.isCheckable)
+		{
+			infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED %s\n",
+				po.number, (po.message == null ? "" : "(" + po.message + ")"));
+			return;
+		}
+		else if (sresults.provedBy != null)
+		{
+			po.setStatus(POStatus.PROVABLE);
+			po.setProvedBy(sresults.provedBy);
+			po.setMessage(sresults.message);
+			po.setWitness(sresults.witness);
+			po.setCounterexample(null);
+			infof(POStatus.PROVABLE, "PO #%d, PROVABLE by %s %s %s\n",
+					po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
+			return;
+		}
+		else if (sresults.disprovedBy != null)
+		{
+			po.setStatus(POStatus.FAILED);
+			po.setProvedBy(sresults.disprovedBy);
+			po.setMessage(sresults.message);
+			po.setWitness(null);
+			po.setCounterexample(sresults.witness);		// Note: set in counterexample
+			
+			if (sresults.witness == null)
+			{
+				infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n",
+						po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
+			}
+			else
+			{
+				infof(POStatus.FAILED, "PO #%d, FAILED by %s %s: Counterexample: %s\n",
+						po.number, sresults.disprovedBy, duration(sresults.duration), sresults.witness.toStringLine());
+			}
+			return;
+		}
+		
 		try
 		{
-			resetErrors();		// Only flag fatal errors
-			
-			INBindingGlobals globals = INBindingGlobals.getInstance();
-			globals.clear();	// Clear before each obligation run
-
-			if (!po.isCheckable)
+			for (INBindingOverride mbind: sresults.binds)
 			{
-				infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED %s\n",
-					po.number, (po.message == null ? "" : "(" + po.message + ")"));
-				return;
-			}
-			else if (sresults.provedBy != null)
-			{
-				po.setStatus(POStatus.PROVABLE);
-				po.setProvedBy(sresults.provedBy);
-				po.setMessage(sresults.message);
-				po.setWitness(sresults.witness);
-				po.setCounterexample(null);
-				infof(POStatus.PROVABLE, "PO #%d, PROVABLE by %s %s %s\n",
-						po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
-				return;
-			}
-			else if (sresults.disprovedBy != null)
-			{
-				po.setStatus(POStatus.FAILED);
-				po.setProvedBy(sresults.disprovedBy);
-				po.setMessage(sresults.message);
-				po.setWitness(null);
-				po.setCounterexample(sresults.witness);		// Note: set in counterexample
+				ValueList values = sresults.counterexamples.get(mbind.toString());
 				
-				if (sresults.witness == null)
+				if (values != null)
 				{
-					infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n",
-							po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
+					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
+					mbind.setBindValues(values);
 				}
 				else
 				{
-					infof(POStatus.FAILED, "PO #%d, FAILED by %s %s: Counterexample: %s\n",
-							po.number, sresults.disprovedBy, duration(sresults.duration), sresults.witness.toStringLine());
-				}
-				return;
-			}
-			
-			INExpression poexp = sresults.inExpression;
-			List<INBindingOverride> bindings = sresults.binds;
-
-			try
-			{
-				for (INBindingOverride mbind: bindings)
-				{
-					ValueList values = sresults.counterexamples.get(mbind.toString());
-					
-					if (values != null)
-					{
-						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values);
-					}
-					else
-					{
-						errorln("PO #" + po.number + ": No bind values defined for " + mbind);
-						errorCount++;
-					}
-				}
-				
-				globals.setAllValues(sresults.hasAllValues);
-				Context ctxt = Interpreter.getInstance().getInitialContext();
-				Interpreter.getInstance().setDefaultName(po.location.module);
-				
-				ctxt = addSelf(po, ctxt);
-				IterableContext ictxt = addTypeParams(po, ctxt);
-				Value execResult = new BooleanValue(false);
-				ContextException execException = null;
-				boolean execCompleted = false;
-				boolean timedOut = false;
-				long before = System.currentTimeMillis();
-
-				try
-				{
-					verbose("PO #%d, starting evaluation...\n", po.number);
-					
-					// Suspend annotation execution by the interpreter, because the
-					// expressions and statements in the PO can invoke them.
-					INAnnotation.suspend(true);
-					
-					do
-					{
-						ictxt.next();
-						execResult = poexp.eval(ictxt);
-					}
-					while (ictxt.hasNext() && execResult.boolValue(ctxt));
-					
-					execCompleted = true;
-				}
-				catch (ContextException e)
-				{
-					if (e.isUserCancel())
-					{
-						execResult = new BooleanValue(false);
-						timedOut = true;
-					}
-					else if (e.number == 4024)	// 'not yet specified' expression reached
-					{
-						// MAYBE, in effect - execCompleted will be false
-						execResult = new BooleanValue(!po.isExistential());
-					}
-					else
-					{
-						execResult = new BooleanValue(false);
-						execException = e;
-					}
-				}
-				finally
-				{
-					INAnnotation.suspend(false);
-				}
-				
-				long after = System.currentTimeMillis() + sresults.duration;
-				
-				if (execResult instanceof BooleanValue)
-				{
-					if (execResult.boolValue(ctxt))
-					{
-						POStatus outcome = null;
-						String desc = null;
-						po.setWitness(null);
-						po.setProvedBy(null);
-						po.setCounterexample(null);
-						po.setMessage(null);
-						
-						if (timedOut)
-						{
-							outcome = POStatus.TIMEOUT;
-						}
-						else if (globals.hasMaybe())
-						{
-							outcome = POStatus.MAYBE;
-							po.setMessage(reasonsAbout(po));
-							desc = po.message != null ? "(" + po.message + ")" : null;
-						}
-						else if (po.isExistential())
-						{
-							outcome = POStatus.PROVABLE;		// An "exists" PO is PROVABLE, if true.
-							Context witness = globals.getWitness();
-							po.setWitness(witness);
-							
-							if (witness != null)
-							{
-								desc = "by witness " + witness.toStringLine();
-								po.setProvedBy("witness");
-							}
-						}
-						else if (sresults.hasAllValues && execCompleted)
-						{
-							outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
-							
-							if (bindings.isEmpty())
-							{
-								desc = "in all cases";
-								po.setProvedBy("fixed");
-							}
-							else
-							{
-								desc = "by finite types";
-								po.setProvedBy("finite");
-							}
-						}
-						else
-						{
-							outcome = POStatus.MAYBE;
-							po.setMessage(reasonsAbout(po));
-							desc = po.message != null ? "(" + po.message + ")" : null;
-						}
-						
-						po.setStatus(outcome);
-						infoLine(po, desc, before, after);
-					}
-					else
-					{
-						String desc = null;
-						
-						if (timedOut)		// Result would have been true (above), but...
-						{
-							po.setStatus(POStatus.TIMEOUT);
-							po.setCounterexample(null);
-							po.setMessage(null);
-							po.setWitness(null);
-						}
-						else if (po.isExistential())	// Principal exp is "exists..."
-						{
-							if (sresults.hasAllValues)
-							{
-								desc = "(unsatisfiable)";
-								po.setStatus(POStatus.FAILED);
-								po.setMessage("Unsatisfiable");
-							}
-							else
-							{
-								po.setStatus(POStatus.MAYBE);
-								po.setMessage(reasonsAbout(po));
-								desc = po.message != null ? "(" + po.message + ")" : null;
-							}
-							
-							po.setCounterexample(null);
-							po.setWitness(null);
-						}
-						else if (globals.hasMaybe() && execCompleted)
-						{
-							po.setStatus(POStatus.MAYBE);
-							po.setMessage(reasonsAbout(po));
-							po.setCounterexample(null);
-							po.setWitness(null);
-							desc = po.message != null ? "(" + po.message + ")" : null;
-						}
-						else
-						{
-							po.setStatus(POStatus.FAILED);
-							
-							if (bindings.isEmpty())		// Failed with no binds - eg. Test() with no params
-							{
-								po.setCounterexample(new Context(po.location, "Empty", null));
-							}
-							else
-							{
-								po.setCounterexample(globals.getCounterexample());
-							}
-							
-							po.setWitness(null);
-							po.setMessage(null);
-						}
-						
-						infoLine(po, desc, before, after);
-
-						if (po.status == POStatus.FAILED)
-						{
-							printCounterexample(bindings);
-							
-							if (execException != null)
-							{
-								desc = "Causes " + execException.getMessage(); 
-								po.setMessage(desc);
-								infof(po.status, "%s\n", desc);
-							}
-
-							infof(POStatus.FAILED, "----\n");
-							infof(POStatus.FAILED, "%s\n", po.toString());
-						}
-					}
-				}
-				else
-				{
-					String msg = String.format("Error: PO #%d evaluation returns %s?\n", po.number, execResult.kind());
-					infoln(msg);
-					po.setStatus(POStatus.FAILED);
-					po.setCounterexample(null);
-					po.setMessage(msg);
-					infoln("----");
-					printBindings(bindings);
-					infoln("----");
-					infoln(po);
+					errorln("PO #" + po.number + ": No bind values defined for " + mbind);
 					errorCount++;
 				}
 			}
-			catch (Exception e)
+			
+			globals.setAllValues(sresults.hasAllValues);
+			Context ctxt = Interpreter.getInstance().getInitialContext();
+			Interpreter.getInstance().setDefaultName(po.location.module);
+			
+			ctxt = addSelf(po, ctxt);
+			IterableContext ictxt = addTypeParams(po, ctxt);
+			Value execResult = new BooleanValue(false);
+			ContextException execException = null;
+			boolean execCompleted = false;
+			boolean timedOut = false;
+			long before = System.currentTimeMillis();
+
+			try
 			{
-				String msg = String.format("Exception: PO #%d %s", po.number, e.getMessage());
-				infoln(msg);
-				po.setStatus(POStatus.FAILED);
-				po.setCounterexample(null);
-				po.setMessage(msg);
-				infoln("----");
-				printBindings(bindings);
-				infoln("----");
-				infoln(po);
-				errorCount++;
-			}
-			finally		// Clear everything, to be safe
-			{
-				for (INBindingOverride mbind: bindings)
-				{
-					mbind.setBindValues(null);
-				}
+				verbose("PO #%d, starting evaluation...\n", po.number);
 				
-				globals.clear();
+				// Suspend annotation execution by the interpreter, because the
+				// expressions and statements in the PO can invoke them.
+				INAnnotation.suspend(true);
+				
+				do
+				{
+					ictxt.next();
+					execResult = sresults.inExpression.eval(ictxt);
+				}
+				while (ictxt.hasNext() && execResult.boolValue(ctxt));
+				
+				execCompleted = true;
 			}
+			catch (ContextException e)
+			{
+				if (e.isUserCancel())
+				{
+					execResult = new BooleanValue(false);
+					timedOut = true;
+				}
+				else if (e.number == 4024)	// 'not yet specified' expression reached
+				{
+					// MAYBE, in effect - execCompleted will be false
+					execResult = new BooleanValue(!po.isExistential());
+				}
+				else
+				{
+					execResult = new BooleanValue(false);
+					execException = e;
+				}
+			}
+			finally
+			{
+				INAnnotation.suspend(false);
+			}
+			
+			long after = System.currentTimeMillis() + sresults.duration;
+			String durstr = duration(before, after);
+			
+			analyseResult(po, sresults, globals,
+				execResult, execException, execCompleted, timedOut, durstr);
 		}
 		catch (Exception e)
 		{
+			String msg = String.format("QC Exception: PO #%d %s", po.number, e.getMessage());
+			infoln(msg);
+			po.setStatus(POStatus.FAILED);
+			po.setCounterexample(null);
+			po.setMessage(msg);
+			infoln("----");
+			printBindings(sresults.binds);
+			infoln("----");
+			infoln(po);
 			errorCount++;
-			errorln(e);
+		}
+		finally		// Clear everything, to be safe
+		{
+			for (INBindingOverride mbind: sresults.binds)
+			{
+				mbind.setBindValues(null);
+			}
+			
+			globals.clear();
+		}
+	}
+
+	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
+		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut, String durstr)
+		throws ValueException
+	{
+		if (execResult instanceof BooleanValue)
+		{
+			if (execResult.boolValue(null))
+			{
+				POStatus outcome = null;
+				String desc = null;
+				po.setWitness(null);
+				po.setProvedBy(null);
+				po.setCounterexample(null);
+				po.setMessage(null);
+				
+				if (timedOut)
+				{
+					outcome = POStatus.TIMEOUT;
+				}
+				else if (globals.hasMaybe())
+				{
+					outcome = POStatus.MAYBE;
+					po.setMessage(reasonsAbout(po));
+					desc = po.message != null ? "(" + po.message + ")" : null;
+				}
+				else if (po.isExistential())
+				{
+					outcome = POStatus.PROVABLE;		// An "exists" PO is PROVABLE, if true.
+					Context witness = globals.getWitness();
+					po.setWitness(witness);
+					
+					if (witness != null)
+					{
+						desc = "by witness " + witness.toStringLine();
+						po.setProvedBy("witness");
+					}
+				}
+				else if (sresults.hasAllValues && execCompleted)
+				{
+					outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
+					
+					if (sresults.binds.isEmpty())
+					{
+						desc = "in all cases";
+						po.setProvedBy("fixed");
+					}
+					else
+					{
+						desc = "by finite types";
+						po.setProvedBy("finite");
+					}
+				}
+				else
+				{
+					outcome = POStatus.MAYBE;
+					po.setMessage(reasonsAbout(po));
+					desc = po.message != null ? "(" + po.message + ")" : null;
+				}
+				
+				po.setStatus(outcome);
+				infoLine(po, desc, durstr);
+			}
+			else
+			{
+				String desc = null;
+				
+				if (timedOut)		// Result would have been true (above), but...
+				{
+					po.setStatus(POStatus.TIMEOUT);
+					po.setCounterexample(null);
+					po.setMessage(null);
+					po.setWitness(null);
+				}
+				else if (po.isExistential())	// Principal exp is "exists..."
+				{
+					if (sresults.hasAllValues)
+					{
+						desc = "(unsatisfiable)";
+						po.setStatus(POStatus.FAILED);
+						po.setMessage("Unsatisfiable");
+					}
+					else
+					{
+						po.setStatus(POStatus.MAYBE);
+						po.setMessage(reasonsAbout(po));
+						desc = po.message != null ? "(" + po.message + ")" : null;
+					}
+					
+					po.setCounterexample(null);
+					po.setWitness(null);
+				}
+				else if (globals.hasMaybe() && execCompleted)
+				{
+					po.setStatus(POStatus.MAYBE);
+					po.setMessage(reasonsAbout(po));
+					po.setCounterexample(null);
+					po.setWitness(null);
+					desc = po.message != null ? "(" + po.message + ")" : null;
+				}
+				else
+				{
+					po.setStatus(POStatus.FAILED);
+					
+					if (sresults.binds.isEmpty())		// Failed with no binds - eg. Test() with no params
+					{
+						po.setCounterexample(new Context(po.location, "Empty", null));
+					}
+					else
+					{
+						po.setCounterexample(globals.getCounterexample());
+					}
+					
+					po.setWitness(null);
+					po.setMessage(null);
+				}
+				
+				infoLine(po, desc, durstr);
+
+				if (po.status == POStatus.FAILED)
+				{
+					printCounterexample(sresults.binds);
+					
+					if (execException != null)
+					{
+						desc = "Causes " + execException.getMessage(); 
+						po.setMessage(desc);
+						infof(po.status, "%s\n", desc);
+					}
+
+					infof(POStatus.FAILED, "----\n");
+					infof(POStatus.FAILED, "%s\n", po.toString());
+				}
+			}
+		}
+		else
+		{
+			String msg = String.format("Error: PO #%d evaluation returns %s?\n", po.number, execResult.kind());
+			infoln(msg);
+			po.setStatus(POStatus.FAILED);
+			po.setCounterexample(null);
+			po.setMessage(msg);
+			infoln("----");
+			printBindings(sresults.binds);
+			infoln("----");
+			infoln(po);
+			errorCount++;
 		}
 	}
 	
-	private void infoLine(ProofObligation po, String desc, long before, long after)
+	private void infoLine(ProofObligation po, String desc, String durstr)
 	{
 		POStatus outcome = po.status;
 		String upper = outcome.toString().toUpperCase();
 		
 		if (desc != null)
 		{
-			infof(outcome, "PO #%d, %s %s %s\n", po.number, upper, desc, duration(before, after));
+			infof(outcome, "PO #%d, %s %s %s\n", po.number, upper, desc, durstr);
 		}
 		else
 		{
-			infof(outcome, "PO #%d, %s %s\n", po.number, upper, duration(before, after));
+			infof(outcome, "PO #%d, %s %s\n", po.number, upper, durstr);
 		}
 	}
 

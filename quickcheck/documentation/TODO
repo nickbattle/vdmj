@@ -4,6 +4,4 @@ Things to do with QuickCheck:
 
 . Strategy to look for constants in a PO and use bind values around that "bias"?
 
-. Break up checkObligation into several stages/methods.
-
 . More general heuristic method injection in the MAYBE case?
