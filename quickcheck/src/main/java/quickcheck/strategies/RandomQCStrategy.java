@@ -118,6 +118,12 @@ public class RandomQCStrategy extends QCStrategy
 	}
 
 	@Override
+	public boolean useByDefault()
+	{
+		return false;	// Rather use fixed
+	}
+	
+	@Override
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
