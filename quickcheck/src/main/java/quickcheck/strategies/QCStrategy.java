@@ -36,6 +36,8 @@ abstract public class QCStrategy
 {
 	protected int errorCount = 0;
 
+	abstract public String getName();
+
 	public boolean hasErrors()
 	{
 		return errorCount > 0;
@@ -55,9 +57,11 @@ abstract public class QCStrategy
 	{
 		return true;
 	}
-
-	abstract public String getName();
-	abstract public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt);
+	
+	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
+	{
+		return new StrategyResults();
+	}
 	
 	public void maybeHeuristic(ProofObligation po)
 	{

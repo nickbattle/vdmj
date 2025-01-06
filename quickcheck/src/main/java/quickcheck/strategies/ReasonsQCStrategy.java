@@ -28,10 +28,8 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.List;
 
-import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -60,12 +58,6 @@ public class ReasonsQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "reasons";
-	}
-
-	@Override
-	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
-	{
-		return new StrategyResults();
 	}
 	
 	@Override
