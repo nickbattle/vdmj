@@ -154,10 +154,4 @@ public class RandomQCStrategy extends QCStrategy
 	{
 		return getName() + " [-random:size <size>][-random:seed <seed>]";
 	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return false;	// Don't use if no -s given
-	}
 }

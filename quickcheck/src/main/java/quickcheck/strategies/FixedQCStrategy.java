@@ -557,10 +557,4 @@ public class FixedQCStrategy extends QCStrategy
 	{
 		return getName() + " [-fixed:file <file> | -fixed:create <file>][-fixed:size <size>]";
 	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return true;	// Use if no -s given
-	}
 }

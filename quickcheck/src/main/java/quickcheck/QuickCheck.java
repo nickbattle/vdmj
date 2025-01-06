@@ -53,7 +53,6 @@ import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -64,7 +63,6 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
@@ -529,10 +527,10 @@ public class QuickCheck
 			}
 			
 			long after = System.currentTimeMillis() + sresults.duration;
-			String durstr = duration(before, after);
 			
 			analyseResult(po, sresults, globals,
-				execResult, execException, execCompleted, timedOut, durstr);
+				execResult, execException, execCompleted, timedOut,
+				duration(before, after));
 		}
 		catch (Exception e)
 		{
@@ -580,8 +578,7 @@ public class QuickCheck
 				else if (globals.hasMaybe())
 				{
 					outcome = POStatus.MAYBE;
-					po.setMessage(reasonsAbout(po));
-					desc = po.message != null ? "(" + po.message + ")" : null;
+					po.setMessage(null);
 				}
 				else if (po.isExistential())
 				{
@@ -613,11 +610,17 @@ public class QuickCheck
 				else
 				{
 					outcome = POStatus.MAYBE;
-					po.setMessage(reasonsAbout(po));
-					desc = po.message != null ? "(" + po.message + ")" : null;
+					po.setMessage(null);
 				}
 				
 				po.setStatus(outcome);
+				
+				if (outcome == POStatus.MAYBE)
+				{
+					applyHeuristics(po);
+					desc = po.message != null ? "(" + po.message + ")" : null;
+				}
+				
 				infoLine(po, desc, durstr);
 			}
 			else
@@ -642,8 +645,7 @@ public class QuickCheck
 					else
 					{
 						po.setStatus(POStatus.MAYBE);
-						po.setMessage(reasonsAbout(po));
-						desc = po.message != null ? "(" + po.message + ")" : null;
+						po.setMessage(null);
 					}
 					
 					po.setCounterexample(null);
@@ -652,10 +654,9 @@ public class QuickCheck
 				else if (globals.hasMaybe() && execCompleted)
 				{
 					po.setStatus(POStatus.MAYBE);
-					po.setMessage(reasonsAbout(po));
+					po.setMessage(null);
 					po.setCounterexample(null);
 					po.setWitness(null);
-					desc = po.message != null ? "(" + po.message + ")" : null;
 				}
 				else
 				{
@@ -672,6 +673,12 @@ public class QuickCheck
 					
 					po.setWitness(null);
 					po.setMessage(null);
+				}
+				
+				if (po.status == POStatus.MAYBE)
+				{
+					applyHeuristics(po);
+					desc = po.message != null ? "(" + po.message + ")" : null;
 				}
 				
 				infoLine(po, desc, durstr);
@@ -707,6 +714,17 @@ public class QuickCheck
 		}
 	}
 	
+	private void applyHeuristics(ProofObligation po)
+	{
+		if (po.status == POStatus.MAYBE)
+		{
+			for (QCStrategy strategy: strategies)
+			{
+				strategy.maybeHeuristic(po);
+			}
+		}
+	}
+
 	private void infoLine(ProofObligation po, String desc, String durstr)
 	{
 		POStatus outcome = po.status;
@@ -720,39 +738,6 @@ public class QuickCheck
 		{
 			infof(outcome, "PO #%d, %s %s\n", po.number, upper, durstr);
 		}
-	}
-
-	private String reasonsAbout(ProofObligation po)
-	{
-		if (po.obligationVars != null && po.reasonsAbout != null)
-		{
-			if (po.reasonsAbout.contains(POExpressionVariableFinder.SOMETHING))
-			{
-				return null;	// Something => nothing missing
-			}
-			
-			TCNameSet missing = new TCNameSet();
-			missing.addAll(po.obligationVars);
-			missing.removeAll(po.reasonsAbout);
-			
-			if (!missing.isEmpty())
-			{
-				StringBuilder sb = new StringBuilder("Note: does not check ");
-				String sep = "";
-				
-				for (TCNameToken var: missing)
-				{
-					sb.append(sep);
-					sb.append(var);
-					sep = ", ";
-				}
-				
-				sb.append("?");
-				return sb.toString();
-			}
-		}
-		
-		return null;
 	}
 
 	private List<String> strategyNames(List<?> arglist)

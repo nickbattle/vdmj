@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -25,59 +25,80 @@
 package quickcheck.strategies;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.List;
-import java.util.Stack;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-import quickcheck.visitors.TrivialQCVisitor;
-
-public class TrivialQCStrategy extends QCStrategy
+/**
+ * A class to hold the MAYBE "reasons about" heuristic.
+ */
+public class ReasonsQCStrategy extends QCStrategy
 {
-	public TrivialQCStrategy(List<String> argv)
+	public ReasonsQCStrategy(List<String> argv)
 	{
 		for (int i=0; i < argv.size(); i++)
 		{
 			String arg = argv.get(i);
-
-			if (arg.startsWith("-trivial:"))
+			
+			if (arg.startsWith("-reasons:"))
 			{
-				println("Unknown trivial option: " + arg);
+				println("Unknown reasons option: " + argv);
 				println(help());
 				errorCount ++;
 				argv.remove(i);
 			}
 		}
 	}
-	
+
 	@Override
 	public String getName()
 	{
-		return "trivial";
+		return "reasons";
 	}
 
 	@Override
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
-		long before = System.currentTimeMillis();
-
-		if (po.isCheckable && po.getCheckedExpression() != null && !po.hasObligations())
+		return new StrategyResults();
+	}
+	
+	@Override
+	public void maybeHeuristic(ProofObligation po)
+	{
+		if (po.obligationVars != null && po.reasonsAbout != null)
 		{
-			TrivialQCVisitor visitor = new TrivialQCVisitor();
-
-			if (po.getCheckedExpression().apply(visitor, new Stack<TCExpression>()))
+			if (po.reasonsAbout.contains(POExpressionVariableFinder.SOMETHING))
 			{
-				return new StrategyResults(getName(), visitor.getMessage(), null, System.currentTimeMillis() - before);
+				po.setMessage(null);	// Something => nothing missing
 			}
-			
-			verbose("No trivial patterns found\n");
+			else
+			{
+				TCNameSet missing = new TCNameSet();
+				missing.addAll(po.obligationVars);
+				missing.removeAll(po.reasonsAbout);
+				
+				if (!missing.isEmpty())
+				{
+					StringBuilder sb = new StringBuilder("Note: does not check ");
+					String sep = "";
+					
+					for (TCNameToken var: missing)
+					{
+						sb.append(sep);
+						sb.append(var);
+						sep = ", ";
+					}
+					
+					sb.append("?");
+					po.setMessage(sb.toString());
+				}
+			}
 		}
-		
-		return new StrategyResults();	// Got nothing!
 	}
 }

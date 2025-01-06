@@ -41,9 +41,26 @@ abstract public class QCStrategy
 		return errorCount > 0;
 	}
 
+	public String help()
+	{
+		return getName() + " (no options)";
+	}
+
+	public boolean useByDefault()
+	{
+		return true;
+	}
+
+	public boolean init(QuickCheck qc)
+	{
+		return true;
+	}
+
 	abstract public String getName();
-	abstract public boolean useByDefault();
-	abstract public boolean init(QuickCheck qc);
 	abstract public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt);
-	abstract public String help();
+	
+	public void maybeHeuristic(ProofObligation po)
+	{
+		return;		// Should update po.message
+	}
 }

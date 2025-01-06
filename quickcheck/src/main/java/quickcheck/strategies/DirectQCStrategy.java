@@ -54,7 +54,6 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.QuickCheck;
 import quickcheck.visitors.TotalExpressionVisitor;
 
 /**
@@ -83,18 +82,6 @@ public class DirectQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "direct";
-	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean init(QuickCheck qc)
-	{
-		return true;
 	}
 
 	@Override
@@ -250,11 +237,4 @@ public class DirectQCStrategy extends QCStrategy
 			return new StrategyResults();
 		}
 	}
-
-	@Override
-	public String help()
-	{
-		return getName() + " (no options)";
-	}
-
 }

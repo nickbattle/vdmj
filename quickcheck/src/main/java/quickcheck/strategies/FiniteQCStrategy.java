@@ -99,12 +99,6 @@ public class FiniteQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public boolean useByDefault()
-	{
-		return true;
-	}
-
-	@Override
 	public boolean init(QuickCheck qc)
 	{
 		verbose("finite:size = %d\n", expansionLimit);

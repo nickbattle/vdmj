@@ -40,7 +40,6 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.QuickCheck;
 import quickcheck.visitors.SearchQCVisitor;
 
 public class SearchQCStrategy extends QCStrategy
@@ -65,12 +64,6 @@ public class SearchQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "search";
-	}
-
-	@Override
-	public boolean init(QuickCheck qc)
-	{
-		return true;
 	}
 
 	@Override
@@ -131,17 +124,5 @@ public class SearchQCStrategy extends QCStrategy
 		}
 		
 		return new StrategyResults(result, false, System.currentTimeMillis() - before);
-	}
-
-	@Override
-	public String help()
-	{
-		return getName() + " (no options)";
-	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return true;	// Use if no -s given
 	}
 }
