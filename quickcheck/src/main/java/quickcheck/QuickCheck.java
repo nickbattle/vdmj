@@ -854,8 +854,7 @@ public class QuickCheck
 					infoln(po.status, "Counterexample: " + cex);
 				}
 				
-				infoln(po.status, "----");
-				infof(po.status, "%s\n", po.source);
+				infof(po.status, "----\n%s\n", po.source);
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
@@ -875,20 +874,14 @@ public class QuickCheck
 		
 		StringBuilder result = new StringBuilder();
 		String sep = "";
-		Context ctxt = path;
-		
-		while (ctxt.outer != null)
+
+		for (TCNameToken name: path.keySet())
 		{
-			for (TCNameToken name: ctxt.keySet())
-			{
-				result.append(sep);
-				result.append(name);
-				result.append(" = ");
-				result.append(ctxt.get(name));
-				sep = ", ";
-			}
-			
-			ctxt = ctxt.outer;
+			result.append(sep);
+			result.append(name);
+			result.append(" = ");
+			result.append(path.get(name));
+			sep = ", ";
 		}
 		
 		return result.toString();

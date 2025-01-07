@@ -89,11 +89,14 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.isCheckable = true;	// Set false for some operation POs
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
+		
+		this.qualifier = null;
 		this.counterexample = null;
 		this.witness = null;
 		this.message = null;
 		this.provedBy = null;
 		this.obligationVars = null;
+		this.reasonsAbout = null;
 		
 		String message = ctxt.markObligation();
 		

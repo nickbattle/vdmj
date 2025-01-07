@@ -127,7 +127,6 @@ public class QuickCheckCommand extends AnalysisCommand
 						
 					case "-n":
 						nominal = true;
-						QCConsole.setQuiet(true);
 						break;
 
 					case "-":
