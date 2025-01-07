@@ -36,7 +36,6 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
@@ -71,7 +70,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		List<String> poNames = new Vector<String>();
 		List<POStatus> includes = new Vector<POStatus>();
 		long timeout = -1;
-		boolean numbersOnly = false;
+		boolean nominal = false;
 		
 		QuickCheck qc = new QuickCheck();
 
@@ -127,7 +126,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						break;
 						
 					case "-n":
-						numbersOnly = true;
+						nominal = true;
 						QCConsole.setQuiet(true);
 						break;
 
@@ -201,6 +200,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			for (ProofObligation po: chosen)
 			{
 				verbose("Processing PO #%s\n", po.number);
+				long before = System.currentTimeMillis();
 				StrategyResults results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
@@ -216,13 +216,11 @@ public class QuickCheckCommand extends AnalysisCommand
 						execTimer.start();
 						
 						qc.checkObligation(po, results);
+						double duration = (System.currentTimeMillis() - before)/1000;
 						
-						if (numbersOnly)
+						if (includes.isEmpty() || includes.contains(po.status))
 						{
-							if (includes.isEmpty() || includes.contains(po.status))
-							{
-								Console.out.printf("PO #%d: %s\n", po.number, po.status.toString().toUpperCase());
-							}
+							qc.printQuickCheckResult(po, duration, nominal);
 						}
 					}
 					catch (Exception e)

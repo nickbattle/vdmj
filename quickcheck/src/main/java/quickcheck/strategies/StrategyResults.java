@@ -45,6 +45,7 @@ public class StrategyResults
 {
 	public final String provedBy;			// If set, provable by the strategy
 	public final String disprovedBy;		// If set, disproved by the strategy
+	public final String qualifier;			// Any qualifier along with the result
 	public final String message;			// Any message along with the result
 	public final Context witness;			// Any witness found (can be a disproof witness)
 	
@@ -59,6 +60,7 @@ public class StrategyResults
 	{
 		this.provedBy = null;
 		this.disprovedBy = null;
+		this.qualifier = null;
 		this.message = null;
 		this.witness = null;
 		
@@ -67,11 +69,12 @@ public class StrategyResults
 		this.duration = 0;
 	}
 
-	public StrategyResults(String disprovedBy, Context witness, String message, long duration)
+	public StrategyResults(String disprovedBy, Context witness, String qualifier, long duration)
 	{
 		this.provedBy = null;
 		this.disprovedBy = disprovedBy;
-		this.message = message;
+		this.qualifier = qualifier;
+		this.message = null;
 		this.witness = witness;
 
 		this.counterexamples = new HashMap<String, ValueList>();;
@@ -83,6 +86,7 @@ public class StrategyResults
 	{
 		this.provedBy = null;
 		this.disprovedBy = null;
+		this.qualifier = null;
 		this.message = null;
 		this.witness = null;
 
@@ -91,11 +95,12 @@ public class StrategyResults
 		this.duration = duration;
 	}
 
-	public StrategyResults(String provedBy, String message, Context witness, long duration)
+	public StrategyResults(String provedBy, String qualifier, Context witness, long duration)
 	{
 		this.provedBy = provedBy;
 		this.disprovedBy = null;
-		this.message = message;
+		this.qualifier = qualifier;
+		this.message = null;
 		this.witness = witness;
 
 		this.counterexamples = new HashMap<String, ValueList>();

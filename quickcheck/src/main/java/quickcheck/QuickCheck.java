@@ -25,8 +25,6 @@
 package quickcheck;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
@@ -420,39 +418,27 @@ public class QuickCheck
 
 		if (!po.isCheckable)
 		{
-			infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED %s\n",
-				po.number, (po.message == null ? "" : "(" + po.message + ")"));
+			verbose("PO is UNCHECKED");
 			return;
 		}
 		else if (sresults.provedBy != null)
 		{
 			po.setStatus(POStatus.PROVABLE);
 			po.setProvedBy(sresults.provedBy);
-			po.setMessage(sresults.message);
+			po.setQualifier(sresults.qualifier);
+			po.setMessage(null);
 			po.setWitness(sresults.witness);
 			po.setCounterexample(null);
-			infof(POStatus.PROVABLE, "PO #%d, PROVABLE by %s %s %s\n",
-					po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
 			return;
 		}
 		else if (sresults.disprovedBy != null)
 		{
 			po.setStatus(POStatus.FAILED);
 			po.setProvedBy(sresults.disprovedBy);
-			po.setMessage(sresults.message);
+			po.setQualifier(sresults.qualifier);
+			po.setMessage(null);
 			po.setWitness(null);
 			po.setCounterexample(sresults.witness);		// Note: set in counterexample
-			
-			if (sresults.witness == null)
-			{
-				infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n",
-						po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
-			}
-			else
-			{
-				infof(POStatus.FAILED, "PO #%d, FAILED by %s %s: Counterexample: %s\n",
-						po.number, sresults.disprovedBy, duration(sresults.duration), sresults.witness.toStringLine());
-			}
 			return;
 		}
 		
@@ -484,7 +470,6 @@ public class QuickCheck
 			ContextException execException = null;
 			boolean execCompleted = false;
 			boolean timedOut = false;
-			long before = System.currentTimeMillis();
 
 			try
 			{
@@ -526,23 +511,14 @@ public class QuickCheck
 				INAnnotation.suspend(false);
 			}
 			
-			long after = System.currentTimeMillis() + sresults.duration;
-			
 			analyseResult(po, sresults, globals,
-				execResult, execException, execCompleted, timedOut,
-				duration(before, after));
+				execResult, execException, execCompleted, timedOut);
 		}
 		catch (Exception e)
 		{
-			String msg = String.format("QC Exception: PO #%d %s", po.number, e.getMessage());
-			infoln(msg);
 			po.setStatus(POStatus.FAILED);
 			po.setCounterexample(null);
-			po.setMessage(msg);
-			infoln("----");
-			printBindings(sresults.binds);
-			infoln("----");
-			infoln(po);
+			po.setMessage(e.getMessage());
 			errorCount++;
 		}
 		finally		// Clear everything, to be safe
@@ -557,19 +533,21 @@ public class QuickCheck
 	}
 
 	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
-		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut, String durstr)
+		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut)
 		throws ValueException
 	{
 		if (execResult instanceof BooleanValue)
 		{
+			po.setWitness(null);
+			po.setProvedBy(null);
+			po.setCounterexample(null);
+			po.setMessage(null);
+			po.setQualifier(null);
+			
 			if (execResult.boolValue(null))
 			{
 				POStatus outcome = null;
-				String desc = null;
-				po.setWitness(null);
-				po.setProvedBy(null);
-				po.setCounterexample(null);
-				po.setMessage(null);
+				String qualifier = null;
 				
 				if (timedOut)
 				{
@@ -578,7 +556,6 @@ public class QuickCheck
 				else if (globals.hasMaybe())
 				{
 					outcome = POStatus.MAYBE;
-					po.setMessage(null);
 				}
 				else if (po.isExistential())
 				{
@@ -588,7 +565,7 @@ public class QuickCheck
 					
 					if (witness != null)
 					{
-						desc = "by witness " + witness.toStringLine();
+						qualifier = "by witness " + witness.toStringLine();
 						po.setProvedBy("witness");
 					}
 				}
@@ -598,65 +575,49 @@ public class QuickCheck
 					
 					if (sresults.binds.isEmpty())
 					{
-						desc = "in all cases";
+						qualifier = "in all cases";
 						po.setProvedBy("fixed");
 					}
 					else
 					{
-						desc = "by finite types";
+						qualifier = "by finite types";
 						po.setProvedBy("finite");
 					}
 				}
 				else
 				{
 					outcome = POStatus.MAYBE;
-					po.setMessage(null);
 				}
 				
 				po.setStatus(outcome);
+				po.setQualifier(qualifier);
 				
 				if (outcome == POStatus.MAYBE)
 				{
 					applyHeuristics(po);
-					desc = po.message != null ? "(" + po.message + ")" : null;
 				}
-				
-				infoLine(po, desc, durstr);
 			}
 			else
 			{
-				String desc = null;
-				
 				if (timedOut)		// Result would have been true (above), but...
 				{
 					po.setStatus(POStatus.TIMEOUT);
-					po.setCounterexample(null);
-					po.setMessage(null);
-					po.setWitness(null);
 				}
 				else if (po.isExistential())	// Principal exp is "exists..."
 				{
 					if (sresults.hasAllValues)
 					{
-						desc = "(unsatisfiable)";
 						po.setStatus(POStatus.FAILED);
-						po.setMessage("Unsatisfiable");
+						po.setQualifier("Unsatisfiable");
 					}
 					else
 					{
 						po.setStatus(POStatus.MAYBE);
-						po.setMessage(null);
 					}
-					
-					po.setCounterexample(null);
-					po.setWitness(null);
 				}
 				else if (globals.hasMaybe() && execCompleted)
 				{
 					po.setStatus(POStatus.MAYBE);
-					po.setMessage(null);
-					po.setCounterexample(null);
-					po.setWitness(null);
 				}
 				else
 				{
@@ -670,46 +631,24 @@ public class QuickCheck
 					{
 						po.setCounterexample(globals.getCounterexample());
 					}
-					
-					po.setWitness(null);
-					po.setMessage(null);
+
+					if (execException != null)
+					{
+						po.setMessage("Causes " + execException.getMessage());
+					}
 				}
 				
 				if (po.status == POStatus.MAYBE)
 				{
 					applyHeuristics(po);
-					desc = po.message != null ? "(" + po.message + ")" : null;
-				}
-				
-				infoLine(po, desc, durstr);
-
-				if (po.status == POStatus.FAILED)
-				{
-					printCounterexample(sresults.binds);
-					
-					if (execException != null)
-					{
-						desc = "Causes " + execException.getMessage(); 
-						po.setMessage(desc);
-						infof(po.status, "%s\n", desc);
-					}
-
-					infof(POStatus.FAILED, "----\n");
-					infof(POStatus.FAILED, "%s\n", po.toString());
 				}
 			}
 		}
 		else
 		{
-			String msg = String.format("Error: PO #%d evaluation returns %s?\n", po.number, execResult.kind());
-			infoln(msg);
 			po.setStatus(POStatus.FAILED);
 			po.setCounterexample(null);
-			po.setMessage(msg);
-			infoln("----");
-			printBindings(sresults.binds);
-			infoln("----");
-			infoln(po);
+			po.setMessage("PO evaluation returns " + execResult.kind());
 			errorCount++;
 		}
 	}
@@ -722,21 +661,6 @@ public class QuickCheck
 			{
 				strategy.maybeHeuristic(po);
 			}
-		}
-	}
-
-	private void infoLine(ProofObligation po, String desc, String durstr)
-	{
-		POStatus outcome = po.status;
-		String upper = outcome.toString().toUpperCase();
-		
-		if (desc != null)
-		{
-			infof(outcome, "PO #%d, %s %s %s\n", po.number, upper, desc, durstr);
-		}
-		else
-		{
-			infof(outcome, "PO #%d, %s %s\n", po.number, upper, durstr);
 		}
 	}
 
@@ -896,53 +820,48 @@ public class QuickCheck
 		return ctxt;
 	}
 
-	private void printBindings(List<INBindingOverride> bindings)
+	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{
-		int MAXVALUES = 10;
+		infof(po.status, "PO #%d, %s", po.number, po.status.toString().toUpperCase());
 		
-		for (INBindingOverride bind: bindings)
+		if (po.qualifier != null)
 		{
-			infof("%s = [", bind);
-			
-			ValueList list = bind.getBindValues();
-			int max = (list.size() > MAXVALUES) ? MAXVALUES : list.size();
-			String sep = "";
-			
-			for (int i=0; i<max; i++)
-			{
-				infof("%s%s", sep, list.get(i).toShortString(20));
-				sep = ", ";
-			}
-			
-			if (max < list.size())
-			{
-				infof("... (%d values)]\n", list.size());
-			}
-			else
-			{
-				infof("]\n");
-			}
+			infof(po.status, " %s", po.qualifier);
 		}
-	}
-
-	private void printCounterexample(List<INBindingOverride> bindings)
-	{
-		if (bindings.isEmpty())
+		
+		if (po.status != POStatus.UNCHECKED)
 		{
-			infoln(POStatus.FAILED, "Obligation is always false");
+			infof(po.status, " in %ss\n", duration);
 		}
-		else
+		
+		if (!nominal)
 		{
-			Context path = INBindingGlobals.getInstance().getCounterexample();
-			String cex = stringOfContext(path);
-			
-			if (cex == null)
+			if (po.message != null)
 			{
-				infoln(POStatus.FAILED, "No counterexample");
+				infoln(po.status, po.message);
 			}
-			else
+			
+			if (po.status == POStatus.FAILED && po.counterexample != null)
 			{
-				infoln(POStatus.FAILED, "Counterexample: " + cex);
+				String cex = stringOfContext(po.counterexample);
+				
+				if (cex == null)
+				{
+					infoln(po.status, "No counterexample");
+				}
+				else
+				{
+					infoln(po.status, "Counterexample: " + cex);
+				}
+				
+				infoln(po.status, "----");
+				infof(po.status, "%s\n", po.source);
+			}
+			
+			if (po.status == POStatus.PROVABLE && po.witness != null)
+			{
+				String witness = stringOfContext(po.witness);
+				infoln(po.status, "Witness: " + witness);
 			}
 		}
 	}
@@ -973,18 +892,6 @@ public class QuickCheck
 		}
 		
 		return result.toString();
-	}
-
-	private String duration(long time)
-	{
-		double duration = (double)(time)/1000;
-		return "in " + duration + "s";
-	}
-
-	private String duration(long before, long after)
-	{
-		double duration = (double)(after - before)/1000;
-		return "in " + duration + "s";
 	}
 
 	public void printHelp(String USAGE)
