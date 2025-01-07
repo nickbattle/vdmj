@@ -51,7 +51,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 	private List<String> poNames = new Vector<String>();
 	private List<POStatus> includes = new Vector<POStatus>();
 	private long timeout = -1;
-	private boolean numbersOnly = false;
+	private boolean nominal = false;
 	private QuickCheck qc = new QuickCheck();
 	
 	public QuickCheckLSPCommand(String line)
@@ -129,8 +129,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						break;
 						
 					case "-n":
-						QCConsole.setQuiet(true);
-						numbersOnly = true;
+						nominal = true;
 						break;
 
 					case "-":
@@ -191,7 +190,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		if (errs == null)
 		{
-			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, numbersOnly);
+			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal);
 			executor.start();
 		}
 		
@@ -207,7 +206,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		{
 			try
 			{
-				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, numbersOnly);
+				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal);
 				executor.exec();	// Note, not start!
 				executor.clean();	// Send POG updated notification
 				return executor.getAnswer();

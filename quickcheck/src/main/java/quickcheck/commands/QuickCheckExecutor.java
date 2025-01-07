@@ -30,7 +30,6 @@ import java.util.List;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -52,18 +51,18 @@ public class QuickCheckExecutor extends AsyncExecutor
 	private final long timeout;
 	private final List<Integer> poList;
 	private final List<String> poNames;
-	private final boolean numbersOnly;
+	private final boolean nominal;
 	private String answer;
 
 	public QuickCheckExecutor(DAPRequest request, QuickCheck qc,
-			long timeout, List<Integer> poList, List<String> poNames, boolean numbersOnly)
+			long timeout, List<Integer> poList, List<String> poNames, boolean nominal)
 	{
 		super("qc", request);
 		this.qc = qc;
 		this.timeout = timeout;
 		this.poList = poList;
 		this.poNames = poNames;
-		this.numbersOnly = numbersOnly;
+		this.nominal = nominal;
 	}
 
 	@Override
@@ -96,6 +95,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 		{
 			for (ProofObligation po: chosen)
 			{
+				long before = System.currentTimeMillis();
 				StrategyResults results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
@@ -109,12 +109,10 @@ public class QuickCheckExecutor extends AsyncExecutor
 
 						qc.checkObligation(po, results);
 
-						if (numbersOnly)
+						if (includes.isEmpty() || includes.contains(po.status))
 						{
-							if (includes.isEmpty() || includes.contains(po.status))
-							{
-								Console.out.printf("PO #%d: %s\n", po.number, po.status.toString().toUpperCase());
-							}
+							double duration = (System.currentTimeMillis() - before)/1000;
+							qc.printQuickCheckResult(po, duration, nominal);
 						}
 					}
 					finally
