@@ -425,7 +425,7 @@ public class QuickCheck
 		{
 			po.setStatus(POStatus.PROVABLE);
 			po.setProvedBy(sresults.provedBy);
-			po.setQualifier(sresults.qualifier);
+			po.setQualifier("by " + sresults.provedBy);
 			po.setMessage(null);
 			po.setWitness(sresults.witness);
 			po.setCounterexample(null);
@@ -435,7 +435,7 @@ public class QuickCheck
 		{
 			po.setStatus(POStatus.FAILED);
 			po.setProvedBy(sresults.disprovedBy);
-			po.setQualifier(sresults.qualifier);
+			po.setQualifier("by " + sresults.disprovedBy);
 			po.setMessage(null);
 			po.setWitness(null);
 			po.setCounterexample(sresults.witness);		// Note: set in counterexample
