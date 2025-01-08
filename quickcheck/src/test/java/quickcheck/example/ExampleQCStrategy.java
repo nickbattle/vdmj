@@ -90,7 +90,6 @@ public class ExampleQCStrategy extends QCStrategy
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
-		long before = System.currentTimeMillis();
 		
 		for (INBindingOverride bind: binds)
 		{
@@ -100,11 +99,11 @@ public class ExampleQCStrategy extends QCStrategy
 		if (provedResult)
 		{
 			Context witness = null;		// Could have witness values set
-			return new StrategyResults(getName(), "Just an example", witness , System.currentTimeMillis() - before);
+			return new StrategyResults(getName(), "Just an example", witness);
 		}
 		else
 		{
-			return new StrategyResults(values, false, System.currentTimeMillis() - before);
+			return new StrategyResults(values, false);
 		}
 	}
 

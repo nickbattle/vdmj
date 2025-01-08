@@ -64,15 +64,13 @@ public class TrivialQCStrategy extends QCStrategy
 	@Override
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
-		long before = System.currentTimeMillis();
-
 		if (po.isCheckable && po.getCheckedExpression() != null && !po.hasObligations())
 		{
 			TrivialQCVisitor visitor = new TrivialQCVisitor();
 
 			if (po.getCheckedExpression().apply(visitor, new Stack<TCExpression>()))
 			{
-				return new StrategyResults(getName(), visitor.getMessage(), null, System.currentTimeMillis() - before);
+				return new StrategyResults(getName(), visitor.getMessage(), null);
 			}
 			
 			verbose("No trivial patterns found\n");

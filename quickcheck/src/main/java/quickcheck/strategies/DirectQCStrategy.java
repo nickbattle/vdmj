@@ -107,7 +107,6 @@ public class DirectQCStrategy extends QCStrategy
 	{
 		try
 		{
-			long before = System.currentTimeMillis();
 			Interpreter in = Interpreter.getInstance();
 			Context ctxt = in.getInitialContext();
 			LexLocation loc = po.exp.location;
@@ -156,11 +155,11 @@ public class DirectQCStrategy extends QCStrategy
 						TCNameToken name = new TCNameToken(po.location, po.location.module, po.exp.exp.toString());
 						Context cex = new Context(po.location, "Counterexample", Interpreter.getInstance().getInitialContext());
 						cex.put(name, value);
-						return new StrategyResults(getName(), cex, "(case unmatched)", System.currentTimeMillis() - before);
+						return new StrategyResults(getName(), cex, "(case unmatched)");
 					}
 				}
 				
-				return new StrategyResults(getName(), "(patterns match all type values)", null, System.currentTimeMillis() - before);
+				return new StrategyResults(getName(), "(patterns match all type values)", null);
 			}
 			else
 			{
@@ -188,7 +187,7 @@ public class DirectQCStrategy extends QCStrategy
 				
 				if (unique.size() == typeSize)
 				{
-					return new StrategyResults(getName(), "(patterns match all type values)", null, System.currentTimeMillis() - before);
+					return new StrategyResults(getName(), "(patterns match all type values)", null);
 				}
 			}
 		}
@@ -223,13 +222,12 @@ public class DirectQCStrategy extends QCStrategy
 
 		verboseln("Function body type always matches the return type");
 
-		long before = System.currentTimeMillis();
 		exdef.body.apply(visitor, null);
 		
 		if (visitor.isTotal())
 		{
 			verboseln("Function body has no partial operators");
-			return new StrategyResults(getName(), "(body is total)", null, System.currentTimeMillis() - before);
+			return new StrategyResults(getName(), "(body is total)", null);
 		}
 		else
 		{

@@ -54,7 +54,6 @@ public class StrategyResults
 	
 	public INExpression inExpression;		// The INExpression
 	public List<INBindingOverride> binds;	// The binds used	
-	public long duration;					// time to generate counterexamples, in millisecs
 
 	public StrategyResults()
 	{
@@ -66,10 +65,9 @@ public class StrategyResults
 		
 		this.counterexamples = new HashMap<String, ValueList>();
 		this.hasAllValues = false;
-		this.duration = 0;
 	}
 
-	public StrategyResults(String disprovedBy, Context witness, String qualifier, long duration)
+	public StrategyResults(String disprovedBy, Context witness, String qualifier)
 	{
 		this.provedBy = null;
 		this.disprovedBy = disprovedBy;
@@ -79,10 +77,9 @@ public class StrategyResults
 
 		this.counterexamples = new HashMap<String, ValueList>();;
 		this.hasAllValues = false;
-		this.duration = duration;
 	}
 
-	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues, long duration)
+	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues)
 	{
 		this.provedBy = null;
 		this.disprovedBy = null;
@@ -92,10 +89,9 @@ public class StrategyResults
 
 		this.counterexamples = counterexamples;
 		this.hasAllValues = hasAllValues;
-		this.duration = duration;
 	}
 
-	public StrategyResults(String provedBy, String qualifier, Context witness, long duration)
+	public StrategyResults(String provedBy, String qualifier, Context witness)
 	{
 		this.provedBy = provedBy;
 		this.disprovedBy = null;
@@ -105,12 +101,6 @@ public class StrategyResults
 
 		this.counterexamples = new HashMap<String, ValueList>();
 		this.hasAllValues = false;
-		this.duration = duration;
-	}
-	
-	public void setDuration(Long duration)
-	{
-		this.duration = duration;
 	}
 
 	public void setInExpression(INExpression inExpression)

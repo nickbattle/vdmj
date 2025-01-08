@@ -109,7 +109,6 @@ public class FiniteQCStrategy extends QCStrategy
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
-		long before = System.currentTimeMillis();
 		
 		if (po.isCheckable)
 		{
@@ -160,7 +159,7 @@ public class FiniteQCStrategy extends QCStrategy
 		// The current bind may be finite, but others may not be.
 		boolean hasAll = (po.typeParams == null);
 		
-		return new StrategyResults(result, hasAll, System.currentTimeMillis() - before);
+		return new StrategyResults(result, hasAll);
 	}
 
 	@Override

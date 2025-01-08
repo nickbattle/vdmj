@@ -320,7 +320,6 @@ public class QuickCheck
 		ctxt = addSelf(po, ctxt);
 		IterableContext ictxt = addTypeParams(po, ctxt);
 		boolean hasAllValues = false;
-		long before = System.currentTimeMillis();
 		
 		while (ictxt.hasNext())
 		{
@@ -352,7 +351,6 @@ public class QuickCheck
 				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
 					verbose("Obligation resolved by %s\n", strategy.getName());
-					sresults.setDuration(System.currentTimeMillis() - before);
 					sresults.setBinds(binds);
 					sresults.setInExpression(poexp);
 					return sresults;
@@ -402,7 +400,7 @@ public class QuickCheck
 			}
 		}
 		
-		StrategyResults results = new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
+		StrategyResults results = new StrategyResults(union, hasAllValues);
 		results.setBinds(binds);
 		results.setInExpression(poexp);
 		return results;

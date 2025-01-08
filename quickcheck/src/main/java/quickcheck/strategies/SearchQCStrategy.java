@@ -70,7 +70,6 @@ public class SearchQCStrategy extends QCStrategy
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
-		long before = System.currentTimeMillis();
 
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
@@ -123,6 +122,6 @@ public class SearchQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new StrategyResults(result, false, System.currentTimeMillis() - before);
+		return new StrategyResults(result, false);
 	}
 }
