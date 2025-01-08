@@ -787,6 +787,26 @@ public class QuickCheck
 		
 		return ctxt;
 	}
+	
+	/**
+	 * Produce output (subject to include/quiet flags) for a standard QuickCheck command line.
+	 * The format is as follows, with several fields being optional:
+	 * 
+	 * PO #<number>, <status> <qualifier> in <time>
+	 * <message>
+	 * <counterexample>|<witness>
+	 * ----
+	 * <source>
+	 * 
+	 * For example:
+	 * 
+	 * PO #1, MAYBE in 0.028s
+	 * PO #2, FAILED in 0.003s
+	 * Counterexample: i = 1, s = [1.25]
+	 * ----
+	 * (forall i:nat, s:seq of real & pre_f(i, s) =>
+	 *   is_nat(s(i)))
+	 */
 
 	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{

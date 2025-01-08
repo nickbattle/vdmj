@@ -225,13 +225,22 @@ public class QuickCheckThread extends CancellableThread
 
 		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
 		{
-			if (po.message != null)		// Add failed messages as a warning too
+			if (po.message != null)		// Add failed messages/qualifiers as a warning too
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("PO #");
 				sb.append(po.number);
 				sb.append(" ");
 				sb.append(po.message);
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+			}
+			else if (po.qualifier != null)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" ");
+				sb.append(po.qualifier);
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
 			}
 		}

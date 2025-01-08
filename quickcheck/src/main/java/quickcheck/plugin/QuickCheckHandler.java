@@ -24,8 +24,10 @@
 package quickcheck.plugin;
 
 import lsp.LSPHandler;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Diag;
 import workspace.PluginRegistry;
 
 /**
@@ -43,7 +45,8 @@ public class QuickCheckHandler extends LSPHandler
 		}
 		catch (Exception e)
 		{
-			return new RPCMessageList(request, e);
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
 }

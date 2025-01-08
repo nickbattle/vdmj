@@ -161,7 +161,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 				JSONObject config = params.get("config");
 				JSONArray obligations = config.get("obligations");
 				
-				timeout = config.get("timeout", 1000);
+				timeout = config.get("timeout", 1000L);
 				
 				if (obligations != null && !obligations.isEmpty())
 				{
