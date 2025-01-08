@@ -111,7 +111,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 
 						if (includes.isEmpty() || includes.contains(po.status))
 						{
-							double duration = (System.currentTimeMillis() - before)/1000;
+							double duration = (double)(System.currentTimeMillis() - before)/1000;
 							qc.printQuickCheckResult(po, duration, nominal);
 						}
 					}

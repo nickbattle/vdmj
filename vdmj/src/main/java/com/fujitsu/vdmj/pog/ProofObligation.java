@@ -90,11 +90,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
 		
-		this.qualifier = null;
-		this.counterexample = null;
-		this.witness = null;
-		this.message = null;
-		this.provedBy = null;
 		this.obligationVars = null;
 		this.reasonsAbout = null;
 		
@@ -106,6 +101,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
+	}
+	
+	public void clearAnalysis()
+	{
+		this.qualifier = null;
+		this.counterexample = null;
+		this.witness = null;
+		this.message = null;
+		this.provedBy = null;
 	}
 
 	public String getSource()

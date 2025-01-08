@@ -536,63 +536,53 @@ public class QuickCheck
 		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut)
 		throws ValueException
 	{
+		po.clearAnalysis();
+		
 		if (execResult instanceof BooleanValue)
 		{
-			po.setWitness(null);
-			po.setProvedBy(null);
-			po.setCounterexample(null);
-			po.setMessage(null);
-			po.setQualifier(null);
-			
 			if (execResult.boolValue(null))
 			{
-				POStatus outcome = null;
-				String qualifier = null;
-				
 				if (timedOut)
 				{
-					outcome = POStatus.TIMEOUT;
+					po.setStatus(POStatus.TIMEOUT);
 				}
 				else if (globals.hasMaybe())
 				{
-					outcome = POStatus.MAYBE;
+					po.setStatus(POStatus.MAYBE);
 				}
 				else if (po.isExistential())
 				{
-					outcome = POStatus.PROVABLE;		// An "exists" PO is PROVABLE, if true.
+					po.setStatus(POStatus.PROVABLE);		// An "exists" PO is PROVABLE, if true.
 					Context witness = globals.getWitness();
-					po.setWitness(witness);
 					
 					if (witness != null)
 					{
-						qualifier = "by witness " + witness.toStringLine();
+						po.setWitness(witness);
+						po.setQualifier("by witness");
 						po.setProvedBy("witness");
 					}
 				}
 				else if (sresults.hasAllValues && execCompleted)
 				{
-					outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
+					po.setStatus(POStatus.PROVABLE);		// All values were tested and passed, so PROVABLE
 					
 					if (sresults.binds.isEmpty())
 					{
-						qualifier = "in all cases";
+						po.setQualifier("in all cases");
 						po.setProvedBy("fixed");
 					}
 					else
 					{
-						qualifier = "by finite types";
+						po.setQualifier("by finite types");
 						po.setProvedBy("finite");
 					}
 				}
 				else
 				{
-					outcome = POStatus.MAYBE;
+					po.setStatus(POStatus.MAYBE);
 				}
 				
-				po.setStatus(outcome);
-				po.setQualifier(qualifier);
-				
-				if (outcome == POStatus.MAYBE)
+				if (po.status == POStatus.MAYBE)
 				{
 					applyHeuristics(po);
 				}
@@ -608,7 +598,7 @@ public class QuickCheck
 					if (sresults.hasAllValues)
 					{
 						po.setStatus(POStatus.FAILED);
-						po.setQualifier("Unsatisfiable");
+						po.setQualifier("unsatisfiable");
 					}
 					else
 					{
@@ -647,7 +637,6 @@ public class QuickCheck
 		else
 		{
 			po.setStatus(POStatus.FAILED);
-			po.setCounterexample(null);
 			po.setMessage("PO evaluation returns " + execResult.kind());
 			errorCount++;
 		}
@@ -664,51 +653,32 @@ public class QuickCheck
 		}
 	}
 
-	private List<String> strategyNames(List<?> arglist)
+	private List<String> strategyNames(List<String> arglist)
 	{
 		List<String> names = new Vector<String>();
 		
 		if (arglist != null && !arglist.isEmpty())
 		{
-			if (arglist.get(0) instanceof String)
+			Iterator<String> iter = arglist.iterator();
+			
+			while (iter.hasNext())
 			{
-				@SuppressWarnings("unchecked")
-				Iterator<String> iter = (Iterator<String>) arglist.iterator();
+				String arg = iter.next();
 				
-				while (iter.hasNext())
+				if (arg.equals("-s"))
 				{
-					String arg = iter.next();
+					iter.remove();
 					
-					if (arg.equals("-s"))
+					if (iter.hasNext())
 					{
+						arg = iter.next();
 						iter.remove();
-						
-						if (iter.hasNext())
-						{
-							arg = iter.next();
-							iter.remove();
-							names.add(arg);
-						}
-						else
-						{
-							errorln("-s must be followed by a strategy name");
-							names.add("unknown");
-						}
+						names.add(arg);
 					}
-				}
-			}
-			else
-			{
-				for (int i=0; i<arglist.size(); i++)
-				{
-					@SuppressWarnings("unchecked")
-					Map<String, Object> map = (Map<String, Object>) arglist.get(i);
-					
-					Boolean enabled = (Boolean) map.getOrDefault("enabled", true);
-					
-					if (enabled)
+					else
 					{
-						names.add((String) map.get("name"));
+						errorln("-s must be followed by a strategy name");
+						names.add("unknown");
 					}
 				}
 			}
@@ -831,8 +801,10 @@ public class QuickCheck
 		
 		if (po.status != POStatus.UNCHECKED)
 		{
-			infof(po.status, " in %ss\n", duration);
+			infof(po.status, " in %ss", duration);
 		}
+		
+		infof(po.status, "\n");
 		
 		if (!nominal)
 		{

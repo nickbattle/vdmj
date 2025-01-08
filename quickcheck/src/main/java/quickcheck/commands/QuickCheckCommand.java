@@ -215,7 +215,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						execTimer.start();
 						
 						qc.checkObligation(po, results);
-						double duration = (System.currentTimeMillis() - before)/1000;
+						double duration = (double)(System.currentTimeMillis() - before)/1000;
 						
 						if (includes.isEmpty() || includes.contains(po.status))
 						{
