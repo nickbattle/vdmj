@@ -87,7 +87,7 @@ public class QuickCheck
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
-	private ProofObligationList chosen = null;
+	private ProofObligationList chosenPOs = null;
 	
 	public QuickCheck()
 	{
@@ -201,30 +201,23 @@ public class QuickCheck
 			}
 		}
 
-		verbose("------------------------ Initialized\n");
+		verbose("------------------------ Initialized all strategies\n");
 		return doChecks;
 	}
 	
-	public List<QCStrategy> getEnabledStrategies()
+	private List<QCStrategy> getEnabledStrategies()
 	{
 		return strategies;
 	}
 	
-	public List<QCStrategy> getDisabledStrategies()
+	private List<QCStrategy> getDisabledStrategies()
 	{
 		return disabled;
 	}
 	
-	public List<QCStrategy> getAllStrategies()	// Enabled and disabled
+	public ProofObligationList getChosenPOs()
 	{
-		List<QCStrategy> all = new Vector<QCStrategy>(strategies);
-		all.addAll(disabled);
-		return all;
-	}
-	
-	public ProofObligationList getChosen()
-	{
-		return chosen;
+		return chosenPOs;
 	}
 	
 	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList, List<String> poNames)
@@ -233,28 +226,28 @@ public class QuickCheck
 		
 		if (poList.isEmpty() && poNames.isEmpty())
 		{
-			chosen = new ProofObligationList();
+			chosenPOs = new ProofObligationList();
 			String def = Interpreter.getInstance().getDefaultName();
 			
 			for (ProofObligation po: all)
 			{
 				if (po.location.module.equals(def))
 				{
-					chosen.add(po);
+					chosenPOs.add(po);
 				}
 			}
 			
-			return chosen;	// No PO#s specified, so use default class/module's POs
+			return chosenPOs;	// No PO#s specified, so use default class/module's POs
 		}
 		else
 		{
-			chosen = new ProofObligationList();
+			chosenPOs = new ProofObligationList();
 			
 			for (Integer n: poList)
 			{
 				if (n > 0 && n <= all.size())
 				{
-					chosen.add(all.get(n-1));
+					chosenPOs.add(all.get(n-1));
 				}
 				else
 				{
@@ -269,12 +262,12 @@ public class QuickCheck
 				{
 					if (po.location.module.matches(name) || po.name.matches(name))
 					{
-						chosen.add(po);
+						chosenPOs.add(po);
 					}
 				}
 			}
 			
-			return errorCount > 0 ? null : chosen;
+			return errorCount > 0 ? null : chosenPOs;
 		}
 	}
 	
@@ -380,10 +373,10 @@ public class QuickCheck
 					}
 				}
 				
-				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
+				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one strategy has all values
 			}
 			
-			verboseln("-------------------------");
+			verboseln("------------------------- Strategies complete.");
 		}
 		
 		for (INBindingOverride bind: binds)
@@ -488,6 +481,8 @@ public class QuickCheck
 			}
 			catch (ContextException e)
 			{
+				verbose("PO #%d, exception %s.\n", po.number, e.getMessage());
+
 				if (e.isUserCancel())
 				{
 					execResult = new BooleanValue(false);
@@ -506,6 +501,7 @@ public class QuickCheck
 			}
 			finally
 			{
+				verbose("PO #%d, stopped evaluation.\n", po.number);
 				INAnnotation.suspend(false);
 			}
 			
@@ -532,13 +528,14 @@ public class QuickCheck
 
 	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
 		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut)
-		throws ValueException
 	{
 		po.clearAnalysis();
 		
 		if (execResult instanceof BooleanValue)
 		{
-			if (execResult.boolValue(null))
+			BooleanValue result = (BooleanValue)execResult;
+			
+			if (result.value)	// ie. true
 			{
 				if (timedOut)
 				{
@@ -580,10 +577,7 @@ public class QuickCheck
 					po.setStatus(POStatus.MAYBE);
 				}
 				
-				if (po.status == POStatus.MAYBE)
-				{
-					applyHeuristics(po);
-				}
+				applyHeuristics(po);
 			}
 			else
 			{
@@ -626,10 +620,7 @@ public class QuickCheck
 					}
 				}
 				
-				if (po.status == POStatus.MAYBE)
-				{
-					applyHeuristics(po);
-				}
+				applyHeuristics(po);
 			}
 		}
 		else

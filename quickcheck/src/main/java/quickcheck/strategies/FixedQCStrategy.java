@@ -385,7 +385,7 @@ public class FixedQCStrategy extends QCStrategy
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
 
-			for (ProofObligation po: qc.getChosen())
+			for (ProofObligation po: qc.getChosenPOs())
 			{
 				for (INBindingOverride mbind: qc.getINBindList(qc.getINExpression(po)))
 				{

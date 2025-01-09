@@ -137,20 +137,19 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		{
 			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen, timeout);
 			executor.start();
+			return null;
 		}
 		else
 		{
 			Diag.error("No strategy to run");
 			return new RPCMessageList(request, RPCErrors.InternalError, "No strategy to run");
 		}
-		
-		return null;
 	}
 
 	private long getParamArgs(RPCRequest request,
 			Vector<Integer> poList, Vector<String> poNames)
 	{
-		long timeout = 1000;	// faster for GUI?
+		long timeout = 1000L;	// faster default for GUI?
 		
 		if (request.get("params") != null)
 		{

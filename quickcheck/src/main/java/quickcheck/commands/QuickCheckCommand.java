@@ -106,6 +106,10 @@ public class QuickCheckCommand extends AnalysisCommand
 						QCConsole.setVerbose(true);
 						break;
 						
+					case "-n":
+						nominal = true;
+						break;
+						
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
@@ -122,10 +126,6 @@ public class QuickCheckCommand extends AnalysisCommand
 							println("Not a valid PO status: " + arglist.get(i));
 							return USAGE;
 						}
-						break;
-						
-					case "-n":
-						nominal = true;
 						break;
 
 					case "-":

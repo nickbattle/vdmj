@@ -109,6 +109,10 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						QCConsole.setVerbose(true);
 						break;
 						
+					case "-n":
+						nominal = true;
+						break;
+						
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
@@ -125,10 +129,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 							errorln("Not a valid PO status: " + arglist.get(i));
 							return result(request, USAGE);
 						}
-						break;
-						
-					case "-n":
-						nominal = true;
 						break;
 
 					case "-":
@@ -188,7 +188,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		if (errs == null)
 		{
-			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
+			QuickCheckExecutor executor =
+				new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
 			executor.start();
 		}
 		
@@ -204,7 +205,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		{
 			try
 			{
-				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
+				QuickCheckExecutor executor =
+					new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
 				executor.exec();	// Note, not start!
 				executor.clean();	// Send POG updated notification
 				return executor.getAnswer();
