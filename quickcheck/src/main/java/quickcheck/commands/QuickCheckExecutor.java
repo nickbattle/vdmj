@@ -52,10 +52,13 @@ public class QuickCheckExecutor extends AsyncExecutor
 	private final List<Integer> poList;
 	private final List<String> poNames;
 	private final boolean nominal;
+	private final List<POStatus> includes;
+	
 	private String answer;
 
 	public QuickCheckExecutor(DAPRequest request, QuickCheck qc,
-			long timeout, List<Integer> poList, List<String> poNames, boolean nominal)
+			long timeout, List<Integer> poList, List<String> poNames, boolean nominal,
+			List<POStatus> includes)
 	{
 		super("qc", request);
 		this.qc = qc;
@@ -63,6 +66,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 		this.poList = poList;
 		this.poNames = poNames;
 		this.nominal = nominal;
+		this.includes = includes;
 	}
 
 	@Override
@@ -77,7 +81,6 @@ public class QuickCheckExecutor extends AsyncExecutor
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
 		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
-		List<POStatus> includes = QCConsole.getIncludes();
 		
 		if (qc.hasErrors())
 		{

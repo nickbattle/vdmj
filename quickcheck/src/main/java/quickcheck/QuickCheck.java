@@ -423,7 +423,7 @@ public class QuickCheck
 		{
 			po.setStatus(POStatus.PROVABLE);
 			po.setProvedBy(sresults.provedBy);
-			po.setQualifier("by " + sresults.provedBy);
+			po.setQualifier("by " + sresults.provedBy + " " + sresults.qualifier);
 			po.setMessage(null);
 			po.setWitness(sresults.witness);
 			po.setCounterexample(null);
@@ -433,7 +433,7 @@ public class QuickCheck
 		{
 			po.setStatus(POStatus.FAILED);
 			po.setProvedBy(sresults.disprovedBy);
-			po.setQualifier("by " + sresults.disprovedBy);
+			po.setQualifier("by " + sresults.disprovedBy + " " + sresults.qualifier);
 			po.setMessage(null);
 			po.setWitness(null);
 			po.setCounterexample(sresults.witness);		// Note: set in counterexample
@@ -810,25 +810,25 @@ public class QuickCheck
 
 	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{
-		infof(po.status, "PO #%d, %s", po.number, po.status.toString().toUpperCase());
+		infof("PO #%d, %s", po.number, po.status.toString().toUpperCase());
 		
 		if (po.qualifier != null)
 		{
-			infof(po.status, " %s", po.qualifier);
+			infof(" %s", po.qualifier);
 		}
 		
 		if (po.status != POStatus.UNCHECKED)
 		{
-			infof(po.status, " in %ss", duration);
+			infof(" in %ss", duration);
 		}
 		
-		infof(po.status, "\n");
+		infof("\n");
 		
 		if (!nominal)
 		{
 			if (po.message != null)
 			{
-				infoln(po.status, po.message);
+				infoln(po.message);
 			}
 			
 			if (po.status == POStatus.FAILED && po.counterexample != null)
@@ -837,20 +837,20 @@ public class QuickCheck
 				
 				if (cex == null)
 				{
-					infoln(po.status, "No counterexample");
+					infoln("No counterexample");
 				}
 				else
 				{
-					infoln(po.status, "Counterexample: " + cex);
+					infoln("Counterexample: " + cex);
 				}
 				
-				infof(po.status, "----\n%s\n", po.source);
+				infof("----\n%s\n", po.source);
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
 			{
 				String witness = stringOfContext(po.witness);
-				infoln(po.status, "Witness: " + witness);
+				infoln("Witness: " + witness);
 			}
 		}
 	}

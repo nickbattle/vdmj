@@ -89,7 +89,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		QCConsole.setQuiet(false);
 		QCConsole.setVerbose(false);
-		QCConsole.clearIncludes();
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
@@ -177,7 +176,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 			}
 		}
 		
-		QCConsole.setIncludes(includes);
 		timeout = (timeout < 0) ? QuickCheck.DEFAULT_TIMEOUT : timeout;
 
 		return null;
@@ -190,7 +188,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		if (errs == null)
 		{
-			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal);
+			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
 			executor.start();
 		}
 		
@@ -206,7 +204,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		{
 			try
 			{
-				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal);
+				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
 				executor.exec();	// Note, not start!
 				executor.clean();	// Send POG updated notification
 				return executor.getAnswer();
