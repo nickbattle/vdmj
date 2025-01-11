@@ -143,6 +143,8 @@ public class POValueDefinition extends PODefinition
 		{
 			list.add(new SubTypeObligation(exp, type, expType, ctxt));
 		}
+		
+		list.markIfAmbiguous(pogState, exp);
 
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;

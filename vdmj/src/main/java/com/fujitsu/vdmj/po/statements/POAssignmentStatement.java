@@ -80,7 +80,7 @@ public class POAssignmentStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 
 		obligations.addAll(target.getProofObligations(ctxt));
-		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(exp.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, exp));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{
