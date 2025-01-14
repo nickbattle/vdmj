@@ -25,8 +25,6 @@
 package quickcheck;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
@@ -53,7 +51,6 @@ import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -64,7 +61,6 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
@@ -91,7 +87,7 @@ public class QuickCheck
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
-	private ProofObligationList chosen = null;
+	private ProofObligationList chosenPOs = null;
 	
 	public QuickCheck()
 	{
@@ -108,7 +104,7 @@ public class QuickCheck
 		errorCount = 0;
 	}
 	
-	public void loadStrategies(List<?> argv)
+	public void loadStrategies(List<String> argv)
 	{
 		strategies = new Vector<QCStrategy>();
 		disabled = new Vector<QCStrategy>();
@@ -205,30 +201,23 @@ public class QuickCheck
 			}
 		}
 
-		verbose("------------------------ Initialized\n");
+		verbose("------------------------ Initialized all strategies\n");
 		return doChecks;
 	}
 	
-	public List<QCStrategy> getEnabledStrategies()
+	private List<QCStrategy> getEnabledStrategies()
 	{
 		return strategies;
 	}
 	
-	public List<QCStrategy> getDisabledStrategies()
+	private List<QCStrategy> getDisabledStrategies()
 	{
 		return disabled;
 	}
 	
-	public List<QCStrategy> getAllStrategies()	// Enabled and disabled
+	public ProofObligationList getChosenPOs()
 	{
-		List<QCStrategy> all = new Vector<QCStrategy>(strategies);
-		all.addAll(disabled);
-		return all;
-	}
-	
-	public ProofObligationList getChosen()
-	{
-		return chosen;
+		return chosenPOs;
 	}
 	
 	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList, List<String> poNames)
@@ -237,28 +226,28 @@ public class QuickCheck
 		
 		if (poList.isEmpty() && poNames.isEmpty())
 		{
-			chosen = new ProofObligationList();
+			chosenPOs = new ProofObligationList();
 			String def = Interpreter.getInstance().getDefaultName();
 			
 			for (ProofObligation po: all)
 			{
 				if (po.location.module.equals(def))
 				{
-					chosen.add(po);
+					chosenPOs.add(po);
 				}
 			}
 			
-			return chosen;	// No PO#s specified, so use default class/module's POs
+			return chosenPOs;	// No PO#s specified, so use default class/module's POs
 		}
 		else
 		{
-			chosen = new ProofObligationList();
+			chosenPOs = new ProofObligationList();
 			
 			for (Integer n: poList)
 			{
 				if (n > 0 && n <= all.size())
 				{
-					chosen.add(all.get(n-1));
+					chosenPOs.add(all.get(n-1));
 				}
 				else
 				{
@@ -273,12 +262,12 @@ public class QuickCheck
 				{
 					if (po.location.module.matches(name) || po.name.matches(name))
 					{
-						chosen.add(po);
+						chosenPOs.add(po);
 					}
 				}
 			}
 			
-			return errorCount > 0 ? null : chosen;
+			return errorCount > 0 ? null : chosenPOs;
 		}
 	}
 	
@@ -324,7 +313,6 @@ public class QuickCheck
 		ctxt = addSelf(po, ctxt);
 		IterableContext ictxt = addTypeParams(po, ctxt);
 		boolean hasAllValues = false;
-		long before = System.currentTimeMillis();
 		
 		while (ictxt.hasNext())
 		{
@@ -356,7 +344,6 @@ public class QuickCheck
 				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
 					verbose("Obligation resolved by %s\n", strategy.getName());
-					sresults.setDuration(System.currentTimeMillis() - before);
 					sresults.setBinds(binds);
 					sresults.setInExpression(poexp);
 					return sresults;
@@ -386,10 +373,10 @@ public class QuickCheck
 					}
 				}
 				
-				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
+				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one strategy has all values
 			}
 			
-			verboseln("-------------------------");
+			verboseln("------------------------- Strategies complete.");
 		}
 		
 		for (INBindingOverride bind: binds)
@@ -406,7 +393,7 @@ public class QuickCheck
 			}
 		}
 		
-		StrategyResults results = new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
+		StrategyResults results = new StrategyResults(union, hasAllValues);
 		results.setBinds(binds);
 		results.setInExpression(poexp);
 		return results;
@@ -415,394 +402,272 @@ public class QuickCheck
 	public void checkObligation(ProofObligation po, StrategyResults sresults)
 	{
 		verbose("------------------------ Checking PO #%d\n", po.number);
+		resetErrors();		// Only flag fatal errors
+		
+		INBindingGlobals globals = INBindingGlobals.getInstance();
+		globals.clear();	// Clear before each obligation run
 
+		if (!po.isCheckable)
+		{
+			verbose("PO is UNCHECKED");
+			return;
+		}
+		else if (sresults.provedBy != null)
+		{
+			po.setStatus(POStatus.PROVABLE);
+			po.setProvedBy(sresults.provedBy);
+			po.setQualifier("by " + sresults.provedBy + " " + sresults.qualifier);
+			po.setMessage(null);
+			po.setWitness(sresults.witness);
+			po.setCounterexample(null);
+			return;
+		}
+		else if (sresults.disprovedBy != null)
+		{
+			po.setStatus(POStatus.FAILED);
+			po.setProvedBy(sresults.disprovedBy);
+			po.setQualifier("by " + sresults.disprovedBy + " " + sresults.qualifier);
+			po.setMessage(null);
+			po.setWitness(null);
+			po.setCounterexample(sresults.witness);		// Note: set in counterexample
+			return;
+		}
+		
 		try
 		{
-			resetErrors();		// Only flag fatal errors
-			
-			INBindingGlobals globals = INBindingGlobals.getInstance();
-			globals.clear();	// Clear before each obligation run
-
-			if (!po.isCheckable)
+			for (INBindingOverride mbind: sresults.binds)
 			{
-				infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED %s\n",
-					po.number, (po.message == null ? "" : "(" + po.message + ")"));
-				return;
-			}
-			else if (sresults.provedBy != null)
-			{
-				po.setStatus(POStatus.PROVABLE);
-				po.setProvedBy(sresults.provedBy);
-				po.setMessage(sresults.message);
-				po.setWitness(sresults.witness);
-				po.setCounterexample(null);
-				infof(POStatus.PROVABLE, "PO #%d, PROVABLE by %s %s %s\n",
-						po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
-				return;
-			}
-			else if (sresults.disprovedBy != null)
-			{
-				po.setStatus(POStatus.FAILED);
-				po.setProvedBy(sresults.disprovedBy);
-				po.setMessage(sresults.message);
-				po.setWitness(null);
-				po.setCounterexample(sresults.witness);		// Note: set in counterexample
+				ValueList values = sresults.counterexamples.get(mbind.toString());
 				
-				if (sresults.witness == null)
+				if (values != null)
 				{
-					infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n",
-							po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
+					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
+					mbind.setBindValues(values);
 				}
 				else
 				{
-					infof(POStatus.FAILED, "PO #%d, FAILED by %s %s: Counterexample: %s\n",
-							po.number, sresults.disprovedBy, duration(sresults.duration), sresults.witness.toStringLine());
-				}
-				return;
-			}
-			
-			INExpression poexp = sresults.inExpression;
-			List<INBindingOverride> bindings = sresults.binds;
-
-			try
-			{
-				for (INBindingOverride mbind: bindings)
-				{
-					ValueList values = sresults.counterexamples.get(mbind.toString());
-					
-					if (values != null)
-					{
-						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values);
-					}
-					else
-					{
-						errorln("PO #" + po.number + ": No bind values defined for " + mbind);
-						errorCount++;
-					}
-				}
-				
-				globals.setAllValues(sresults.hasAllValues);
-				Context ctxt = Interpreter.getInstance().getInitialContext();
-				Interpreter.getInstance().setDefaultName(po.location.module);
-				
-				ctxt = addSelf(po, ctxt);
-				IterableContext ictxt = addTypeParams(po, ctxt);
-				Value execResult = new BooleanValue(false);
-				ContextException execException = null;
-				boolean execCompleted = false;
-				boolean timedOut = false;
-				long before = System.currentTimeMillis();
-
-				try
-				{
-					verbose("PO #%d, starting evaluation...\n", po.number);
-					
-					// Suspend annotation execution by the interpreter, because the
-					// expressions and statements in the PO can invoke them.
-					INAnnotation.suspend(true);
-					
-					do
-					{
-						ictxt.next();
-						execResult = poexp.eval(ictxt);
-					}
-					while (ictxt.hasNext() && execResult.boolValue(ctxt));
-					
-					execCompleted = true;
-				}
-				catch (ContextException e)
-				{
-					if (e.isUserCancel())
-					{
-						execResult = new BooleanValue(false);
-						timedOut = true;
-					}
-					else if (e.number == 4024)	// 'not yet specified' expression reached
-					{
-						// MAYBE, in effect - execCompleted will be false
-						execResult = new BooleanValue(!po.isExistential());
-					}
-					else
-					{
-						execResult = new BooleanValue(false);
-						execException = e;
-					}
-				}
-				finally
-				{
-					INAnnotation.suspend(false);
-				}
-				
-				long after = System.currentTimeMillis() + sresults.duration;
-				
-				if (execResult instanceof BooleanValue)
-				{
-					if (execResult.boolValue(ctxt))
-					{
-						POStatus outcome = null;
-						String desc = null;
-						po.setWitness(null);
-						po.setProvedBy(null);
-						po.setCounterexample(null);
-						po.setMessage(null);
-						
-						if (timedOut)
-						{
-							outcome = POStatus.TIMEOUT;
-						}
-						else if (globals.hasMaybe())
-						{
-							outcome = POStatus.MAYBE;
-							po.setMessage(reasonsAbout(po));
-							desc = po.message != null ? "(" + po.message + ")" : null;
-						}
-						else if (po.isExistential())
-						{
-							outcome = POStatus.PROVABLE;		// An "exists" PO is PROVABLE, if true.
-							Context witness = globals.getWitness();
-							po.setWitness(witness);
-							
-							if (witness != null)
-							{
-								desc = "by witness " + witness.toStringLine();
-								po.setProvedBy("witness");
-							}
-						}
-						else if (sresults.hasAllValues && execCompleted)
-						{
-							outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
-							
-							if (bindings.isEmpty())
-							{
-								desc = "in all cases";
-								po.setProvedBy("fixed");
-							}
-							else
-							{
-								desc = "by finite types";
-								po.setProvedBy("finite");
-							}
-						}
-						else
-						{
-							outcome = POStatus.MAYBE;
-							po.setMessage(reasonsAbout(po));
-							desc = po.message != null ? "(" + po.message + ")" : null;
-						}
-						
-						po.setStatus(outcome);
-						infoLine(po, desc, before, after);
-					}
-					else
-					{
-						String desc = null;
-						
-						if (timedOut)		// Result would have been true (above), but...
-						{
-							po.setStatus(POStatus.TIMEOUT);
-							po.setCounterexample(null);
-							po.setMessage(null);
-							po.setWitness(null);
-						}
-						else if (po.isExistential())	// Principal exp is "exists..."
-						{
-							if (sresults.hasAllValues)
-							{
-								desc = "(unsatisfiable)";
-								po.setStatus(POStatus.FAILED);
-								po.setMessage("Unsatisfiable");
-							}
-							else
-							{
-								po.setStatus(POStatus.MAYBE);
-								po.setMessage(reasonsAbout(po));
-								desc = po.message != null ? "(" + po.message + ")" : null;
-							}
-							
-							po.setCounterexample(null);
-							po.setWitness(null);
-						}
-						else if (globals.hasMaybe() && execCompleted)
-						{
-							po.setStatus(POStatus.MAYBE);
-							po.setMessage(reasonsAbout(po));
-							po.setCounterexample(null);
-							po.setWitness(null);
-							desc = po.message != null ? "(" + po.message + ")" : null;
-						}
-						else
-						{
-							po.setStatus(POStatus.FAILED);
-							
-							if (bindings.isEmpty())		// Failed with no binds - eg. Test() with no params
-							{
-								po.setCounterexample(new Context(po.location, "Empty", null));
-							}
-							else
-							{
-								po.setCounterexample(globals.getCounterexample());
-							}
-							
-							po.setWitness(null);
-							po.setMessage(null);
-						}
-						
-						infoLine(po, desc, before, after);
-
-						if (po.status == POStatus.FAILED)
-						{
-							printCounterexample(bindings);
-							
-							if (execException != null)
-							{
-								desc = "Causes " + execException.getMessage(); 
-								po.setMessage(desc);
-								infof(po.status, "%s\n", desc);
-							}
-
-							infof(POStatus.FAILED, "----\n");
-							infof(POStatus.FAILED, "%s\n", po.toString());
-						}
-					}
-				}
-				else
-				{
-					String msg = String.format("Error: PO #%d evaluation returns %s?\n", po.number, execResult.kind());
-					infoln(msg);
-					po.setStatus(POStatus.FAILED);
-					po.setCounterexample(null);
-					po.setMessage(msg);
-					infoln("----");
-					printBindings(bindings);
-					infoln("----");
-					infoln(po);
+					errorln("PO #" + po.number + ": No bind values defined for " + mbind);
 					errorCount++;
 				}
 			}
-			catch (Exception e)
+			
+			globals.setAllValues(sresults.hasAllValues);
+			Context ctxt = Interpreter.getInstance().getInitialContext();
+			Interpreter.getInstance().setDefaultName(po.location.module);
+			
+			ctxt = addSelf(po, ctxt);
+			IterableContext ictxt = addTypeParams(po, ctxt);
+			Value execResult = new BooleanValue(false);
+			ContextException execException = null;
+			boolean execCompleted = false;
+			boolean timedOut = false;
+
+			try
 			{
-				String msg = String.format("Exception: PO #%d %s", po.number, e.getMessage());
-				infoln(msg);
-				po.setStatus(POStatus.FAILED);
-				po.setCounterexample(null);
-				po.setMessage(msg);
-				infoln("----");
-				printBindings(bindings);
-				infoln("----");
-				infoln(po);
-				errorCount++;
-			}
-			finally		// Clear everything, to be safe
-			{
-				for (INBindingOverride mbind: bindings)
-				{
-					mbind.setBindValues(null);
-				}
+				verbose("PO #%d, starting evaluation...\n", po.number);
 				
-				globals.clear();
+				// Suspend annotation execution by the interpreter, because the
+				// expressions and statements in the PO can invoke them.
+				INAnnotation.suspend(true);
+				
+				do
+				{
+					ictxt.next();
+					execResult = sresults.inExpression.eval(ictxt);
+				}
+				while (ictxt.hasNext() && execResult.boolValue(ctxt));
+				
+				execCompleted = true;
 			}
+			catch (ContextException e)
+			{
+				verbose("PO #%d, exception %s.\n", po.number, e.getMessage());
+
+				if (e.isUserCancel())
+				{
+					execResult = new BooleanValue(false);
+					timedOut = true;
+				}
+				else if (e.number == 4024)	// 'not yet specified' expression reached
+				{
+					// MAYBE, in effect - execCompleted will be false
+					execResult = new BooleanValue(!po.isExistential());
+				}
+				else
+				{
+					execResult = new BooleanValue(false);
+					execException = e;
+				}
+			}
+			finally
+			{
+				verbose("PO #%d, stopped evaluation.\n", po.number);
+				INAnnotation.suspend(false);
+			}
+			
+			analyseResult(po, sresults, globals,
+				execResult, execException, execCompleted, timedOut);
 		}
 		catch (Exception e)
 		{
+			po.setStatus(POStatus.FAILED);
+			po.setCounterexample(null);
+			po.setMessage(e.getMessage());
 			errorCount++;
-			errorln(e);
+		}
+		finally		// Clear everything, to be safe
+		{
+			for (INBindingOverride mbind: sresults.binds)
+			{
+				mbind.setBindValues(null);
+			}
+			
+			globals.clear();
 		}
 	}
-	
-	private void infoLine(ProofObligation po, String desc, long before, long after)
+
+	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
+		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut)
 	{
-		POStatus outcome = po.status;
-		String upper = outcome.toString().toUpperCase();
+		po.clearAnalysis();
 		
-		if (desc != null)
+		if (execResult instanceof BooleanValue)
 		{
-			infof(outcome, "PO #%d, %s %s %s\n", po.number, upper, desc, duration(before, after));
+			BooleanValue result = (BooleanValue)execResult;
+			
+			if (result.value)	// ie. true
+			{
+				if (timedOut)
+				{
+					po.setStatus(POStatus.TIMEOUT);
+				}
+				else if (globals.hasMaybe())
+				{
+					po.setStatus(POStatus.MAYBE);
+				}
+				else if (po.isExistential())
+				{
+					po.setStatus(POStatus.PROVABLE);		// An "exists" PO is PROVABLE, if true.
+					Context witness = globals.getWitness();
+					
+					if (witness != null)
+					{
+						po.setWitness(witness);
+						po.setQualifier("by witness");
+						po.setProvedBy("witness");
+					}
+				}
+				else if (sresults.hasAllValues && execCompleted)
+				{
+					po.setStatus(POStatus.PROVABLE);		// All values were tested and passed, so PROVABLE
+					
+					if (sresults.binds.isEmpty())
+					{
+						po.setQualifier("in all cases");
+						po.setProvedBy("fixed");
+					}
+					else
+					{
+						po.setQualifier("by finite types");
+						po.setProvedBy("finite");
+					}
+				}
+				else
+				{
+					po.setStatus(POStatus.MAYBE);
+				}
+				
+				applyHeuristics(po);
+			}
+			else
+			{
+				if (timedOut)		// Result would have been true (above), but...
+				{
+					po.setStatus(POStatus.TIMEOUT);
+				}
+				else if (po.isExistential())	// Principal exp is "exists..."
+				{
+					if (sresults.hasAllValues)
+					{
+						po.setStatus(POStatus.FAILED);
+						po.setQualifier("unsatisfiable");
+					}
+					else
+					{
+						po.setStatus(POStatus.MAYBE);
+					}
+				}
+				else if (globals.hasMaybe() && execCompleted)
+				{
+					po.setStatus(POStatus.MAYBE);
+				}
+				else
+				{
+					po.setStatus(POStatus.FAILED);
+					
+					if (sresults.binds.isEmpty())		// Failed with no binds - eg. Test() with no params
+					{
+						po.setCounterexample(new Context(po.location, "Empty", null));
+					}
+					else
+					{
+						po.setCounterexample(globals.getCounterexample());
+					}
+
+					if (execException != null)
+					{
+						po.setMessage("Causes " + execException.getMessage());
+					}
+				}
+				
+				applyHeuristics(po);
+			}
 		}
 		else
 		{
-			infof(outcome, "PO #%d, %s %s\n", po.number, upper, duration(before, after));
+			po.setStatus(POStatus.FAILED);
+			po.setMessage("PO evaluation returns " + execResult.kind());
+			errorCount++;
 		}
 	}
-
-	private String reasonsAbout(ProofObligation po)
+	
+	private void applyHeuristics(ProofObligation po)
 	{
-		if (po.obligationVars != null && po.reasonsAbout != null)
+		if (po.status == POStatus.MAYBE)
 		{
-			if (po.reasonsAbout.contains(POExpressionVariableFinder.SOMETHING))
+			for (QCStrategy strategy: strategies)
 			{
-				return null;	// Something => nothing missing
-			}
-			
-			TCNameSet missing = new TCNameSet();
-			missing.addAll(po.obligationVars);
-			missing.removeAll(po.reasonsAbout);
-			
-			if (!missing.isEmpty())
-			{
-				StringBuilder sb = new StringBuilder("Note: does not check ");
-				String sep = "";
-				
-				for (TCNameToken var: missing)
-				{
-					sb.append(sep);
-					sb.append(var);
-					sep = ", ";
-				}
-				
-				sb.append("?");
-				return sb.toString();
+				strategy.maybeHeuristic(po);
 			}
 		}
-		
-		return null;
 	}
 
-	private List<String> strategyNames(List<?> arglist)
+	private List<String> strategyNames(List<String> arglist)
 	{
 		List<String> names = new Vector<String>();
 		
 		if (arglist != null && !arglist.isEmpty())
 		{
-			if (arglist.get(0) instanceof String)
+			Iterator<String> iter = arglist.iterator();
+			
+			while (iter.hasNext())
 			{
-				@SuppressWarnings("unchecked")
-				Iterator<String> iter = (Iterator<String>) arglist.iterator();
+				String arg = iter.next();
 				
-				while (iter.hasNext())
+				if (arg.equals("-s"))
 				{
-					String arg = iter.next();
+					iter.remove();
 					
-					if (arg.equals("-s"))
+					if (iter.hasNext())
 					{
+						arg = iter.next();
 						iter.remove();
-						
-						if (iter.hasNext())
-						{
-							arg = iter.next();
-							iter.remove();
-							names.add(arg);
-						}
-						else
-						{
-							errorln("-s must be followed by a strategy name");
-							names.add("unknown");
-						}
+						names.add(arg);
 					}
-				}
-			}
-			else
-			{
-				for (int i=0; i<arglist.size(); i++)
-				{
-					@SuppressWarnings("unchecked")
-					Map<String, Object> map = (Map<String, Object>) arglist.get(i);
-					
-					Boolean enabled = (Boolean) map.getOrDefault("enabled", true);
-					
-					if (enabled)
+					else
 					{
-						names.add((String) map.get("name"));
+						errorln("-s must be followed by a strategy name");
+						names.add("unknown");
 					}
 				}
 			}
@@ -913,54 +778,70 @@ public class QuickCheck
 		
 		return ctxt;
 	}
+	
+	/**
+	 * Produce output (subject to include/quiet flags) for a standard QuickCheck command line.
+	 * The format is as follows, with several fields being optional:
+	 * 
+	 * PO #<number>, <status> <qualifier> in <time>
+	 * <message>
+	 * <counterexample>|<witness>
+	 * ----
+	 * <source>
+	 * 
+	 * For example:
+	 * 
+	 * PO #1, MAYBE in 0.028s
+	 * PO #2, FAILED in 0.003s
+	 * Counterexample: i = 1, s = [1.25]
+	 * ----
+	 * (forall i:nat, s:seq of real & pre_f(i, s) =>
+	 *   is_nat(s(i)))
+	 */
 
-	private void printBindings(List<INBindingOverride> bindings)
+	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{
-		int MAXVALUES = 10;
+		infof("PO #%d, %s", po.number, po.status.toString().toUpperCase());
 		
-		for (INBindingOverride bind: bindings)
+		if (po.qualifier != null)
 		{
-			infof("%s = [", bind);
-			
-			ValueList list = bind.getBindValues();
-			int max = (list.size() > MAXVALUES) ? MAXVALUES : list.size();
-			String sep = "";
-			
-			for (int i=0; i<max; i++)
-			{
-				infof("%s%s", sep, list.get(i).toShortString(20));
-				sep = ", ";
-			}
-			
-			if (max < list.size())
-			{
-				infof("... (%d values)]\n", list.size());
-			}
-			else
-			{
-				infof("]\n");
-			}
+			infof(" %s", po.qualifier);
 		}
-	}
-
-	private void printCounterexample(List<INBindingOverride> bindings)
-	{
-		if (bindings.isEmpty())
+		
+		if (po.status != POStatus.UNCHECKED)
 		{
-			infoln(POStatus.FAILED, "Obligation is always false");
+			infof(" in %ss", duration);
 		}
-		else
+		
+		infof("\n");
+		
+		if (!nominal)
 		{
-			Context path = INBindingGlobals.getInstance().getCounterexample();
-			String cex = stringOfContext(path);
-			
-			if (cex == null)
+			if (po.message != null)
 			{
-				infoln(POStatus.FAILED, "No counterexample");
+				infoln(po.message);
 			}
-			else
+			
+			if (po.status == POStatus.FAILED && po.counterexample != null)
 			{
-				infoln(POStatus.FAILED, "Counterexample: " + cex);
+				String cex = stringOfContext(po.counterexample);
+				
+				if (cex == null)
+				{
+					infoln("No counterexample");
+				}
+				else
+				{
+					infoln("Counterexample: " + cex);
+				}
+				
+				infof("----\n%s\n", po.source);
+			}
+			
+			if (po.status == POStatus.PROVABLE && po.witness != null)
+			{
+				String witness = stringOfContext(po.witness);
+				infoln("Witness: " + witness);
 			}
 		}
 	}
@@ -974,35 +855,17 @@ public class QuickCheck
 		
 		StringBuilder result = new StringBuilder();
 		String sep = "";
-		Context ctxt = path;
-		
-		while (ctxt.outer != null)
+
+		for (TCNameToken name: path.keySet())
 		{
-			for (TCNameToken name: ctxt.keySet())
-			{
-				result.append(sep);
-				result.append(name);
-				result.append(" = ");
-				result.append(ctxt.get(name));
-				sep = ", ";
-			}
-			
-			ctxt = ctxt.outer;
+			result.append(sep);
+			result.append(name);
+			result.append(" = ");
+			result.append(path.get(name));
+			sep = ", ";
 		}
 		
 		return result.toString();
-	}
-
-	private String duration(long time)
-	{
-		double duration = (double)(time)/1000;
-		return "in " + duration + "s";
-	}
-
-	private String duration(long before, long after)
-	{
-		double duration = (double)(after - before)/1000;
-		return "in " + duration + "s";
 	}
 
 	public void printHelp(String USAGE)

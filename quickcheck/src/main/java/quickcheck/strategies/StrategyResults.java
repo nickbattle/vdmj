@@ -45,6 +45,7 @@ public class StrategyResults
 {
 	public final String provedBy;			// If set, provable by the strategy
 	public final String disprovedBy;		// If set, disproved by the strategy
+	public final String qualifier;			// Any qualifier along with the result
 	public final String message;			// Any message along with the result
 	public final Context witness;			// Any witness found (can be a disproof witness)
 	
@@ -53,59 +54,53 @@ public class StrategyResults
 	
 	public INExpression inExpression;		// The INExpression
 	public List<INBindingOverride> binds;	// The binds used	
-	public long duration;					// time to generate counterexamples, in millisecs
 
 	public StrategyResults()
 	{
 		this.provedBy = null;
 		this.disprovedBy = null;
+		this.qualifier = null;
 		this.message = null;
 		this.witness = null;
 		
 		this.counterexamples = new HashMap<String, ValueList>();
 		this.hasAllValues = false;
-		this.duration = 0;
 	}
 
-	public StrategyResults(String disprovedBy, Context witness, String message, long duration)
+	public StrategyResults(String disprovedBy, Context witness, String qualifier)
 	{
 		this.provedBy = null;
 		this.disprovedBy = disprovedBy;
-		this.message = message;
+		this.qualifier = qualifier;
+		this.message = null;
 		this.witness = witness;
 
 		this.counterexamples = new HashMap<String, ValueList>();;
 		this.hasAllValues = false;
-		this.duration = duration;
 	}
 
-	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues, long duration)
+	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues)
 	{
 		this.provedBy = null;
 		this.disprovedBy = null;
+		this.qualifier = null;
 		this.message = null;
 		this.witness = null;
 
 		this.counterexamples = counterexamples;
 		this.hasAllValues = hasAllValues;
-		this.duration = duration;
 	}
 
-	public StrategyResults(String provedBy, String message, Context witness, long duration)
+	public StrategyResults(String provedBy, String qualifier, Context witness)
 	{
 		this.provedBy = provedBy;
 		this.disprovedBy = null;
-		this.message = message;
+		this.qualifier = qualifier;
+		this.message = null;
 		this.witness = witness;
 
 		this.counterexamples = new HashMap<String, ValueList>();
 		this.hasAllValues = false;
-		this.duration = duration;
-	}
-	
-	public void setDuration(Long duration)
-	{
-		this.duration = duration;
 	}
 
 	public void setInExpression(INExpression inExpression)

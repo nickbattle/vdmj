@@ -24,9 +24,7 @@
 
 package quickcheck.strategies;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -36,48 +34,37 @@ import quickcheck.QuickCheck;
 
 abstract public class QCStrategy
 {
+	protected int errorCount = 0;
+
 	abstract public String getName();
-	abstract public boolean hasErrors();
-	abstract public boolean useByDefault();
-	abstract public boolean init(QuickCheck qc);
-	abstract public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt);
-	abstract public String help();
-	
-	/**
-	 * These methods help with access to the JSON parameters passed from VSCode.
-	 */
-	
-	protected Map<String, Object> getParams(List<Map<String, Object>> list, String name)
+
+	public boolean hasErrors()
 	{
-		if (list != null)
-		{
-			for (Map<String, Object> entry: list)
-			{
-				if (name.equals(entry.get("name")))
-				{
-					return entry;
-				}
-			}
-		}
-		
-		return new HashMap<String, Object>();
+		return errorCount > 0;
+	}
+
+	public String help()
+	{
+		return getName() + " (no options)";
+	}
+
+	public boolean useByDefault()
+	{
+		return true;
+	}
+
+	public boolean init(QuickCheck qc)
+	{
+		return true;
 	}
 	
-	protected int get(Map<String, Object> map, String key, int def)
+	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
-		Long value = (Long) map.get(key);
-		return (value != null) ? value.intValue() : def;
+		return new StrategyResults();
 	}
 	
-	protected long get(Map<String, Object> map, String key, long def)
+	public void maybeHeuristic(ProofObligation po)
 	{
-		Long value = (Long) map.get(key);
-		return (value != null) ? value.longValue() : def;
-	}
-	
-	protected boolean get(Map<String, Object> map, String key, boolean def)
-	{
-		Boolean value = (Boolean) map.get(key);
-		return (value != null) ? value.booleanValue() : def;
+		return;		// Should update po.message
 	}
 }

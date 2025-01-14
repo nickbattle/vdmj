@@ -43,7 +43,7 @@ import vdmj.commands.ScriptRunnable;
 
 public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
-	public final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <msecs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	public final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <msecs>][-i <status>]* [-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	public final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
@@ -51,7 +51,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 	private List<String> poNames = new Vector<String>();
 	private List<POStatus> includes = new Vector<POStatus>();
 	private long timeout = -1;
-	private boolean numbersOnly = false;
+	private boolean nominal = false;
 	private QuickCheck qc = new QuickCheck();
 	
 	public QuickCheckLSPCommand(String line)
@@ -89,7 +89,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		QCConsole.setQuiet(false);
 		QCConsole.setVerbose(false);
-		QCConsole.clearIncludes();
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
@@ -110,6 +109,10 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						QCConsole.setVerbose(true);
 						break;
 						
+					case "-n":
+						nominal = true;
+						break;
+						
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
@@ -126,11 +129,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 							errorln("Not a valid PO status: " + arglist.get(i));
 							return result(request, USAGE);
 						}
-						break;
-						
-					case "-n":
-						QCConsole.setQuiet(true);
-						numbersOnly = true;
 						break;
 
 					case "-":
@@ -178,7 +176,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 			}
 		}
 		
-		QCConsole.setIncludes(includes);
 		timeout = (timeout < 0) ? QuickCheck.DEFAULT_TIMEOUT : timeout;
 
 		return null;
@@ -191,7 +188,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		
 		if (errs == null)
 		{
-			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, numbersOnly);
+			QuickCheckExecutor executor =
+				new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
 			executor.start();
 		}
 		
@@ -207,7 +205,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		{
 			try
 			{
-				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames, numbersOnly);
+				QuickCheckExecutor executor =
+					new QuickCheckExecutor(request, qc, timeout, poList, poNames, nominal, includes);
 				executor.exec();	// Note, not start!
 				executor.clean();	// Send POG updated notification
 				return executor.getAnswer();

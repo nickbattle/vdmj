@@ -55,17 +55,17 @@ public class QuickCheckThread extends CancellableThread
 {
 	private final RPCRequest request;
 	private final QuickCheck qc;
-	private final ProofObligationList chosen;
+	private final ProofObligationList chosenPOs;
 	private final POPlugin pog;
 	private final Object workDoneToken;
 	private final long timeout;
 
-	public QuickCheckThread(RPCRequest request, QuickCheck qc, ProofObligationList chosen, long timeout)
+	public QuickCheckThread(RPCRequest request, QuickCheck qc, ProofObligationList chosenPOs, long timeout)
 	{
 		super(request.get("id"));
 		this.request = request;
 		this.qc = qc;
-		this.chosen = chosen;
+		this.chosenPOs = chosenPOs;
 		this.pog = PluginRegistry.getInstance().getPlugin("PO");
 		this.timeout = timeout;
 		
@@ -90,7 +90,7 @@ public class QuickCheckThread extends CancellableThread
 			long percentDone = -1;
 			int count = 0;
 			
-			for (ProofObligation po: chosen)
+			for (ProofObligation po: chosenPOs)
 			{
 				StrategyResults results = qc.getValues(po);
 				
@@ -119,7 +119,7 @@ public class QuickCheckThread extends CancellableThread
 				
 				if (workDoneToken != null)
 				{
-					long done = (100 * count)/chosen.size();
+					long done = (100 * count)/chosenPOs.size();
 					
 					if (done != percentDone)	// Only if changed %age
 					{
@@ -225,13 +225,22 @@ public class QuickCheckThread extends CancellableThread
 
 		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
 		{
-			if (po.message != null)		// Add failed messages as a warning too
+			if (po.message != null)		// Add failed messages/qualifiers as a warning too
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("PO #");
 				sb.append(po.number);
 				sb.append(" ");
 				sb.append(po.message);
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+			}
+			else if (po.qualifier != null)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" ");
+				sb.append(po.qualifier);
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
 			}
 		}

@@ -24,13 +24,12 @@
 
 package quickcheck.strategies;
 
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -46,73 +45,61 @@ public class RandomQCStrategy extends QCStrategy
 {
 	private int expansionLimit = 20;	// Overall returned value limit
 	private long seed = System.currentTimeMillis();
-	private int errorCount = 0;
 
-	public RandomQCStrategy(List<?> argv)
+	public RandomQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		Iterator<String> iter = argv.iterator();
+		
+		while (iter.hasNext())
 		{
-			@SuppressWarnings("unchecked")
-			Iterator<String> iter = (Iterator<String>) argv.iterator();
-			
-			while (iter.hasNext())
+			try
 			{
-				try
+				String arg = iter.next();
+				
+				switch (arg)
 				{
-					String arg = iter.next();
-					
-					switch (arg)
-					{
-						case "-random:size":		// Total top level size
+					case "-random:size":		// Total top level size
+						iter.remove();
+
+						if (iter.hasNext())
+						{
+							expansionLimit = Integer.parseInt(iter.next());
 							iter.remove();
-	
-							if (iter.hasNext())
-							{
-								expansionLimit = Integer.parseInt(iter.next());
-								iter.remove();
-							}
-							break;
-							
-						case "-random:seed":		// Seed
+						}
+						break;
+						
+					case "-random:seed":		// Seed
+						iter.remove();
+
+						if (iter.hasNext())
+						{
+							seed = Long.parseLong(iter.next());
 							iter.remove();
-	
-							if (iter.hasNext())
-							{
-								seed = Long.parseLong(iter.next());
-								iter.remove();
-							}
-							break;
-	
-						default:
-							if (arg.startsWith("-random:"))
-							{
-								println("Unknown random option: " + arg);
-								println(help());
-								errorCount++;
-								iter.remove();
-							}
-					}
-				}
-				catch (NumberFormatException e)
-				{
-					println("Argument must be numeric");
-					println(help());
-					errorCount++;
-				}
-				catch (ArrayIndexOutOfBoundsException e)
-				{
-					println("Missing argument");
-					println(help());
-					errorCount++;
+						}
+						break;
+
+					default:
+						if (arg.startsWith("-random:"))
+						{
+							println("Unknown random option: " + arg);
+							println(help());
+							errorCount++;
+							iter.remove();
+						}
 				}
 			}
-		}
-		else
-		{
-			@SuppressWarnings("unchecked")
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "random");
-			expansionLimit = get(map, "size", expansionLimit);
-			seed = get(map, "seed", seed);
+			catch (NumberFormatException e)
+			{
+				println("Argument must be numeric");
+				println(help());
+				errorCount++;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				println("Missing argument");
+				println(help());
+				errorCount++;
+			}
 		}
 	}
 	
@@ -120,12 +107,6 @@ public class RandomQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "random";
-	}
-
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount  > 0;
 	}
 
 	@Override
@@ -137,10 +118,15 @@ public class RandomQCStrategy extends QCStrategy
 	}
 
 	@Override
+	public boolean useByDefault()
+	{
+		return false;	// Rather use fixed
+	}
+	
+	@Override
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
-		long before = System.currentTimeMillis();
 		
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
@@ -165,18 +151,12 @@ public class RandomQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new StrategyResults(result, false, System.currentTimeMillis() - before);
+		return new StrategyResults(result, false);
 	}
 
 	@Override
 	public String help()
 	{
 		return getName() + " [-random:size <size>][-random:seed <seed>]";
-	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return false;	// Don't use if no -s given
 	}
 }

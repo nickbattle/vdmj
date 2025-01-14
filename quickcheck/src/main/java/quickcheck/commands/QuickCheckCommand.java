@@ -36,7 +36,6 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
@@ -49,7 +48,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <msecs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <msecs>][-i <status>]* [-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - lightweight PO verification";
@@ -71,7 +70,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		List<String> poNames = new Vector<String>();
 		List<POStatus> includes = new Vector<POStatus>();
 		long timeout = -1;
-		boolean numbersOnly = false;
+		boolean nominal = false;
 		
 		QuickCheck qc = new QuickCheck();
 
@@ -87,7 +86,6 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		QCConsole.setQuiet(false);
 		QCConsole.setVerbose(false);
-		QCConsole.clearIncludes();
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
@@ -108,6 +106,10 @@ public class QuickCheckCommand extends AnalysisCommand
 						QCConsole.setVerbose(true);
 						break;
 						
+					case "-n":
+						nominal = true;
+						break;
+						
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
@@ -124,11 +126,6 @@ public class QuickCheckCommand extends AnalysisCommand
 							println("Not a valid PO status: " + arglist.get(i));
 							return USAGE;
 						}
-						break;
-						
-					case "-n":
-						numbersOnly = true;
-						QCConsole.setQuiet(true);
 						break;
 
 					case "-":
@@ -176,8 +173,6 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 		}
 
-		QCConsole.setIncludes(includes);
-
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
 		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
@@ -201,6 +196,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			for (ProofObligation po: chosen)
 			{
 				verbose("Processing PO #%s\n", po.number);
+				long before = System.currentTimeMillis();
 				StrategyResults results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
@@ -216,13 +212,11 @@ public class QuickCheckCommand extends AnalysisCommand
 						execTimer.start();
 						
 						qc.checkObligation(po, results);
+						double duration = (double)(System.currentTimeMillis() - before)/1000;
 						
-						if (numbersOnly)
+						if (includes.isEmpty() || includes.contains(po.status))
 						{
-							if (includes.isEmpty() || includes.contains(po.status))
-							{
-								Console.out.printf("PO #%d: %s\n", po.number, po.status.toString().toUpperCase());
-							}
+							qc.printQuickCheckResult(po, duration, nominal);
 						}
 					}
 					catch (Exception e)

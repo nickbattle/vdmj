@@ -1,0 +1,3 @@
+Things to do with QuickCheck:
+
+. Strategy to look for constants in a PO and use bind values around that "bias"?

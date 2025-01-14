@@ -29,7 +29,6 @@ import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -41,34 +40,23 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.QuickCheck;
 import quickcheck.visitors.SearchQCVisitor;
 
 public class SearchQCStrategy extends QCStrategy
 {
-	private int errorCount = 0;
-
-	public SearchQCStrategy(List<?> argv)
+	public SearchQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		for (int i=0; i < argv.size(); i++)
 		{
-			for (int i=0; i < argv.size(); i++)
+			String arg = argv.get(i);
+		
+			if (arg.startsWith("-search:"))
 			{
-				String arg = (String)argv.get(i);
-			
-				if (arg.startsWith("-search:"))
-				{
-					println("Unknown search option: " + arg);
-					println(help());
-					errorCount ++;
-					argv.remove(i);
-				}
+				println("Unknown search option: " + arg);
+				println(help());
+				errorCount ++;
+				argv.remove(i);
 			}
-		}
-		else
-		{
-			@SuppressWarnings({ "unchecked", "unused" })
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "search");
 		}
 	}
 	
@@ -79,22 +67,9 @@ public class SearchQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;
-	}
-
-	@Override
-	public boolean init(QuickCheck qc)
-	{
-		return true;
-	}
-
-	@Override
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
-		long before = System.currentTimeMillis();
 
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
@@ -147,18 +122,6 @@ public class SearchQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new StrategyResults(result, false, System.currentTimeMillis() - before);
-	}
-
-	@Override
-	public String help()
-	{
-		return getName() + " (no options)";
-	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return true;	// Use if no -s given
+		return new StrategyResults(result, false);
 	}
 }

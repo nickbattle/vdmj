@@ -65,6 +65,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
 	
+	public String qualifier;
 	public Context counterexample;
 	public Context witness;
 	public String message;
@@ -88,11 +89,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.isCheckable = true;	// Set false for some operation POs
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
-		this.counterexample = null;
-		this.witness = null;
-		this.message = null;
-		this.provedBy = null;
+		
 		this.obligationVars = null;
+		this.reasonsAbout = null;
 		
 		String message = ctxt.markObligation();
 		
@@ -103,6 +102,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
+	
+	public void clearAnalysis()
+	{
+		this.qualifier = null;
+		this.counterexample = null;
+		this.witness = null;
+		this.message = null;
+		this.provedBy = null;
+	}
 
 	public String getSource()
 	{
@@ -112,6 +120,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setStatus(POStatus status)
 	{
 		this.status = status;
+	}
+	
+	public void setQualifier(String qualifier)
+	{
+		this.qualifier = qualifier;
 	}
 	
 	public void setProvedBy(String provedBy)
@@ -214,13 +227,13 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	}
 	
 	/**
-	 * This is used to mark obligations as unchecked, with a reason code.
+	 * This is used to mark obligations as unchecked, with a qualifier.
 	 */
-	public ProofObligation markUnchecked(String message)
+	public ProofObligation markUnchecked(String qualifier)
 	{
 		this.isCheckable = false;
 		this.setStatus(POStatus.UNCHECKED);
-		this.setMessage(message);
+		this.setQualifier(qualifier);
 		
 		return this;	// Convenient for new XYZObligation().markUnchecked(REASON)
 	}

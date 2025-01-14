@@ -24,9 +24,7 @@
 
 package quickcheck.plugin;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -109,7 +107,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		QCConsole.setQuiet(true);
 		QCConsole.setVerbose(false);
 
-		qc.loadStrategies(getParams(request));
+		qc.loadStrategies(getStrategyArgs(request));
 		
 		if (qc.hasErrors())
 		{
@@ -119,33 +117,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 
 		Vector<Integer> poList = new Vector<Integer>();
 		Vector<String> poNames = new Vector<String>();
-		long timeout = 0;
-		
-		if (request.get("params") != null)
-		{
-			JSONObject params = request.get("params");
-			
-			if (params.get("config") != null)
-			{
-				JSONObject config = params.get("config");
-				JSONArray obligations = config.get("obligations");
-				
-				timeout = config.get("timeout", 1000L);	// faster for GUI?
-				
-				if (obligations != null && !obligations.isEmpty())
-				{
-					for (int i=0; i < obligations.size(); i++)
-					{
-						long po = obligations.index(i);
-						poList.add((int) po);
-					}
-				}
-				else
-				{
-					poNames.add(".*");
-				}
-			}
-		}
+		long timeout = getParamArgs(request, poList, poNames);
 
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
@@ -165,19 +137,52 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		{
 			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen, timeout);
 			executor.start();
+			return null;
 		}
 		else
 		{
 			Diag.error("No strategy to run");
 			return new RPCMessageList(request, RPCErrors.InternalError, "No strategy to run");
 		}
-		
-		return null;
 	}
 
-	private List<Map<String, Object>> getParams(RPCRequest request)
+	private long getParamArgs(RPCRequest request,
+			Vector<Integer> poList, Vector<String> poNames)
 	{
-		List<Map<String, Object>> list = new Vector<Map<String, Object>>();
+		long timeout = 1000L;	// faster default for GUI?
+		
+		if (request.get("params") != null)
+		{
+			JSONObject params = request.get("params");
+			
+			if (params.get("config") != null)
+			{
+				JSONObject config = params.get("config");
+				JSONArray obligations = config.get("obligations");
+				
+				timeout = config.get("timeout", 1000L);
+				
+				if (obligations != null && !obligations.isEmpty())
+				{
+					for (int i=0; i < obligations.size(); i++)
+					{
+						long po = obligations.index(i);
+						poList.add((int) po);
+					}
+				}
+				else
+				{
+					poNames.add(".*");
+				}
+			}
+		}
+		
+		return timeout;
+	}
+
+	private List<String> getStrategyArgs(RPCRequest request)
+	{
+		List<String> list = new Vector<String>();
 		JSONObject params = request.get("params");
 		
 		if (params != null && params.get("strategies") != null)
@@ -186,16 +191,32 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			
 			for (int i=0; i<strategies.size(); i++)
 			{
-				Map<String, Object> map = new HashMap<String, Object>();
-				JSONObject entry = (JSONObject) strategies.get(i);
+				JSONObject sentry = strategies.index(i);
+				String sname = sentry.get("name");
+				Boolean enabled = sentry.get("enabled", true);
 				
-				for (String key: entry.keySet())
+				if (sname != null && enabled)
 				{
-					Object value = entry.get(key);
-					map.put(key, value);
+					list.add("-s");
+					list.add(sname);	// NB. Only enable those listed
+					
+					for (String key: sentry.keySet())
+					{
+						Object value = sentry.get(key);
+						
+						switch (key)
+						{
+							case "name":
+							case "enabled":
+								break;
+						
+							default:
+								// simulate "-fixed:size 100" etc.
+								list.add("-" + sname + ":" + key);
+								list.add(value.toString());
+						}
+					}
 				}
-				
-				list.add(map);
 			}
 		}
 		

@@ -133,7 +133,7 @@ public class TotalExpressionVisitor extends POLeafExpressionVisitor<Boolean, Lis
 	@Override
 	public List<Boolean> caseCasesExpression(POCasesExpression node, Object arg)
 	{
-		isTotal = false;
+		isTotal = (node.others != null);
 		return super.caseCasesExpression(node, arg);
 	}
 	

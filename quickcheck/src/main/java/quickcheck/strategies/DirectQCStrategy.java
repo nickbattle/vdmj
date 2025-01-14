@@ -31,7 +31,6 @@ import static quickcheck.commands.QCConsole.verboseln;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.fujitsu.vdmj.in.expressions.INCaseAlternative;
@@ -56,7 +55,6 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.QuickCheck;
 import quickcheck.visitors.TotalExpressionVisitor;
 
 /**
@@ -65,29 +63,19 @@ import quickcheck.visitors.TotalExpressionVisitor;
  */
 public class DirectQCStrategy extends QCStrategy
 {
-	private int errorCount = 0;
-
-	public DirectQCStrategy(List<?> argv)
+	public DirectQCStrategy(List<String> argv)
 	{
-		if (!argv.isEmpty() && argv.get(0) instanceof String)
+		for (int i=0; i < argv.size(); i++)
 		{
-			for (int i=0; i < argv.size(); i++)
+			String arg = argv.get(i);
+			
+			if (arg.startsWith("-direct:"))
 			{
-				String arg = (String)argv.get(i);
-				
-				if (arg.startsWith("-direct:"))
-				{
-					println("Unknown direct option: " + argv);
-					println(help());
-					errorCount ++;
-					argv.remove(i);
-				}
+				println("Unknown direct option: " + argv);
+				println(help());
+				errorCount ++;
+				argv.remove(i);
 			}
-		}
-		else
-		{
-			@SuppressWarnings({ "unchecked", "unused" })
-			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "direct");
 		}
 	}
 
@@ -95,24 +83,6 @@ public class DirectQCStrategy extends QCStrategy
 	public String getName()
 	{
 		return "direct";
-	}
-
-	@Override
-	public boolean hasErrors()
-	{
-		return errorCount > 0;
-	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean init(QuickCheck qc)
-	{
-		return true;
 	}
 
 	@Override
@@ -138,7 +108,6 @@ public class DirectQCStrategy extends QCStrategy
 	{
 		try
 		{
-			long before = System.currentTimeMillis();
 			Interpreter in = Interpreter.getInstance();
 			Context ctxt = in.getInitialContext();
 			LexLocation loc = po.exp.location;
@@ -187,11 +156,11 @@ public class DirectQCStrategy extends QCStrategy
 						TCNameToken name = new TCNameToken(po.location, po.location.module, po.exp.exp.toString());
 						Context cex = new Context(po.location, "Counterexample", Interpreter.getInstance().getInitialContext());
 						cex.put(name, value);
-						return new StrategyResults(getName(), cex, "(case unmatched)", System.currentTimeMillis() - before);
+						return new StrategyResults(getName(), cex, "(case unmatched)");
 					}
 				}
-
-				return new StrategyResults(getName(), "(patterns match all type values)", null, System.currentTimeMillis() - before);
+				
+				return new StrategyResults(getName(), "(patterns match all type values)", null);
 			}
 			else
 			{
@@ -219,7 +188,7 @@ public class DirectQCStrategy extends QCStrategy
 				
 				if (unique.size() == typeSize.longValue())
 				{
-					return new StrategyResults(getName(), "(patterns match all type values)", null, System.currentTimeMillis() - before);
+					return new StrategyResults(getName(), "(patterns match all type values)", null);
 				}
 			}
 		}
@@ -254,13 +223,12 @@ public class DirectQCStrategy extends QCStrategy
 
 		verboseln("Function body type always matches the return type");
 
-		long before = System.currentTimeMillis();
 		exdef.body.apply(visitor, null);
 		
 		if (visitor.isTotal())
 		{
 			verboseln("Function body has no partial operators");
-			return new StrategyResults(getName(), "(body is total)", null, System.currentTimeMillis() - before);
+			return new StrategyResults(getName(), "(body is total)", null);
 		}
 		else
 		{
@@ -268,11 +236,4 @@ public class DirectQCStrategy extends QCStrategy
 			return new StrategyResults();
 		}
 	}
-
-	@Override
-	public String help()
-	{
-		return getName() + " (no options)";
-	}
-
 }
