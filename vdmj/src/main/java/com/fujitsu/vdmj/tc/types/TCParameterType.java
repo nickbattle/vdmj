@@ -43,7 +43,7 @@ public class TCParameterType extends TCType
 	{
 		super(pname.getLocation());
 		this.name = pname;
-		this.paramPattern = new TCUnknownType(location);
+		this.paramPattern = new TCUndefinedType(location);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class TCParameterType extends TCType
 	@Override
 	public boolean isOrdered(LexLocation loc)
 	{
-		return paramPattern.isOrdered(loc);
+		return true;
 	}
 
 	@Override

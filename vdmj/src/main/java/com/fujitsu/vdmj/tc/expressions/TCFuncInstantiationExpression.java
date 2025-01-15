@@ -156,7 +156,8 @@ public class TCFuncInstantiationExpression extends TCExpression
     					
     					if (!TypeComparator.compatible(ptype.paramPattern, atype))
     					{
-    						concern(serious, 3061, "Inappropriate type for argument " + i);
+    						TCType act = actualTypes.get(i);
+    						act.concern(serious, 3061, "Inappropriate type for parameter " + (i + 1));
     						detail2(serious, "Expect", ptype.paramPattern, "Actual", atype);
     					}
 
