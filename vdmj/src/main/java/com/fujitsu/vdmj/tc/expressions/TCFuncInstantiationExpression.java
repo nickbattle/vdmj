@@ -148,13 +148,20 @@ public class TCFuncInstantiationExpression extends TCExpression
 
     				for (int i=0; i < actualTypes.size(); i++)
     				{
-    					TCType ptype = actualTypes.get(i);
-    					ptype = ptype.typeResolve(env);
-    					fixed.add(ptype);
+    					TCType atype = actualTypes.get(i);
+    					atype = atype.typeResolve(env);
+    					fixed.add(atype);
 
-    					TCParameterType param = (TCParameterType) typeParams.get(i);
-    					map.put(param.name, ptype);
-    					TypeComparator.checkComposeTypes(ptype, env, false);
+    					TCParameterType ptype = (TCParameterType) typeParams.get(i);
+    					
+    					if (!TypeComparator.compatible(ptype.paramPattern, atype))
+    					{
+    						concern(serious, 3061, "Inappropriate type for argument " + i);
+    						detail2(serious, "Expect", ptype.paramPattern, "Actual", atype);
+    					}
+
+    					map.put(ptype.name, atype);
+    					TypeComparator.checkComposeTypes(atype, env, false);
     				}
 
     				actualTypes = fixed;

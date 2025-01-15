@@ -190,6 +190,7 @@ public class TCTypeDefinition extends TCDefinition
 		try
 		{
 			type = (TCInvariantType)type.typeResolve(base);
+			if (annotations != null) annotations.tcResolve(this, base);
 
 			if (type.isInfinite())
 			{

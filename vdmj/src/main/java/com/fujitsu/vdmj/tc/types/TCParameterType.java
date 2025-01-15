@@ -58,7 +58,7 @@ public class TCParameterType extends TCType
 			report(3433, "Parameter type @" + name + " not defined");
 		}
 
-		return this;
+		return paramdef.getType();	// Pick up @TypeParam pattern
 	}
 	
 	public TCDefinition getDefinition()

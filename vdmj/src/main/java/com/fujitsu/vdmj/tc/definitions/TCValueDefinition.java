@@ -157,6 +157,7 @@ public class TCValueDefinition extends TCDefinition
 			type = type.typeResolve(env);
 			pattern.typeResolve(env);
 			updateDefs();
+			if (annotations != null) annotations.tcResolve(this, env);
 		}
 	}
 	

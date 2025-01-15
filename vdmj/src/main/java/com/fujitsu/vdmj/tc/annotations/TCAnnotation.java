@@ -127,6 +127,11 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
+	public void tcResolve(TCDefinition def, Environment env)
+	{
+		// Do nothing
+	}
+
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
 		// Do nothing

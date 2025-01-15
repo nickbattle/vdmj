@@ -58,9 +58,9 @@ public class TCTypeParamAnnotation extends TCAnnotation
 	{
 		return "@" + name + " " + qcParam + " = " + qcType;
 	}
-
+	
 	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	public void tcResolve(TCDefinition def, Environment env)
 	{
 		TCTypeList funcParams = null;
 		
@@ -98,6 +98,12 @@ public class TCTypeParamAnnotation extends TCAnnotation
 			
 			name.report(6001, "@TypeParam " +  qcParam + " is not a parameter of " + def.name);
 		}
+	}
+
+	@Override
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		// Covered by tcResolve
 	}
 	
 	@Override

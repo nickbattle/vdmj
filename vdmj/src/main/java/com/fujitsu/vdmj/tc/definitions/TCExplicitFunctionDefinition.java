@@ -199,10 +199,12 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				getTypeParamDefinitions(), base, NameScope.NAMES);
 
 			type = type.typeResolve(params);
+			if (annotations != null) annotations.tcResolve(this, params);			
 		}
 		else
 		{
 			type = type.typeResolve(base);
+			if (annotations != null) annotations.tcResolve(this, base);			
 		}
 
 		if (base.isVDMPP())
