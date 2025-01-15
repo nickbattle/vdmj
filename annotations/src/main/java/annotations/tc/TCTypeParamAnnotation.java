@@ -96,7 +96,7 @@ public class TCTypeParamAnnotation extends TCAnnotation
 				}
 			}
 			
-			name.report(6001, "@TypeParam " +  qcParam + " is not a parameter of " + def.name);
+			qcParam.report(6001, "@TypeParam " +  qcParam + " is not a parameter of " + def.name);
 		}
 	}
 
