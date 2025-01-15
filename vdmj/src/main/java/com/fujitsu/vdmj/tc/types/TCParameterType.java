@@ -127,6 +127,54 @@ public class TCParameterType extends TCType
 	}
 
 	@Override
+	public TCUnionType getUnion()
+	{
+		return paramPattern.getUnion();
+	}
+
+	@Override
+	public TCSeqType getSeq()
+	{
+		return paramPattern.getSeq();
+	}
+
+	@Override
+	public TCSetType getSet()
+	{
+		return paramPattern.getSet();
+	}
+
+	@Override
+	public TCMapType getMap()
+	{
+		return paramPattern.getMap();
+	}
+
+	@Override
+	public TCRecordType getRecord()
+	{
+		return paramPattern.getRecord();
+	}
+
+	@Override
+	public TCNumericType getNumeric()
+	{
+		return paramPattern.getNumeric();
+	}
+
+	@Override
+	public TCProductType getProduct()
+	{
+		return paramPattern.getProduct();
+	}
+
+	@Override
+	public TCProductType getProduct(int n)
+	{
+		return paramPattern.getProduct(n);
+	}
+
+	@Override
 	public int hashCode()
 	{
 		return name.hashCode();
