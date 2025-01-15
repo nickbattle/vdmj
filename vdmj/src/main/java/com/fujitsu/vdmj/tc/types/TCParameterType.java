@@ -35,12 +35,15 @@ public class TCParameterType extends TCType
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken name;
+	
 	private TCDefinition paramdef = null;
+	public TCType paramPattern = null;
 
 	public TCParameterType(TCNameToken pname)
 	{
 		super(pname.getLocation());
 		this.name = pname;
+		this.paramPattern = new TCUnknownType(location);
 	}
 
 	@Override
@@ -66,7 +69,61 @@ public class TCParameterType extends TCType
 	@Override
 	public boolean isOrdered(LexLocation loc)
 	{
-		return true;
+		return paramPattern.isOrdered(loc);
+	}
+
+	@Override
+	public boolean isUnion(LexLocation from)
+	{
+		return paramPattern.isUnion(location);
+	}
+
+	@Override
+	public boolean isSeq(LexLocation from)
+	{
+		return paramPattern.isSeq(location);
+	}
+
+	@Override
+	public boolean isSet(LexLocation from)
+	{
+		return paramPattern.isSet(location);
+	}
+
+	@Override
+	public boolean isMap(LexLocation from)
+	{
+		return paramPattern.isMap(location);
+	}
+
+	@Override
+	public boolean isRecord(LexLocation from)
+	{
+		return paramPattern.isRecord(from);
+	}
+
+	@Override
+	public boolean isTag()
+	{
+		return paramPattern.isTag();
+	}
+
+	@Override
+	public boolean isNumeric(LexLocation from)
+	{
+		return paramPattern.isNumeric(location);
+	}
+
+	@Override
+	public boolean isProduct(LexLocation from)
+	{
+		return paramPattern.isProduct(location);
+	}
+
+	@Override
+	public boolean isProduct(int n, LexLocation from)
+	{
+		return paramPattern.isProduct(n, location);
 	}
 
 	@Override

@@ -14,3 +14,4 @@ map ASTSeparateAnnotation{name, args} to TCSeparateAnnotation(name, args);
 map ASTDeadlineMetAnnotation{name, args} to TCDeadlineMetAnnotation(name, args);
 map ASTSepRequireAnnotation{name, args} to TCSepRequireAnnotation(name, args);
 map ASTDocLinkAnnotation{name, args} to TCDocLinkAnnotation(name, args);
+map ASTTypeParamAnnotation{name, qcParam, qcType} to TCTypeParamAnnotation(name, qcParam, qcType);
