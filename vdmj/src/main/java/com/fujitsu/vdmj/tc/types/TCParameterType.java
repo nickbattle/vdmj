@@ -56,6 +56,7 @@ public class TCParameterType extends TCType
 		if (paramdef == null || !(paramdef.getType() instanceof TCParameterType))
 		{
 			report(3433, "Parameter type @" + name + " not defined");
+			return this;
 		}
 
 		return paramdef.getType();	// Pick up @TypeParam pattern
