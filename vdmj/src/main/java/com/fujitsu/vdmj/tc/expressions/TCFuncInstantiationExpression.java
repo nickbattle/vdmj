@@ -158,7 +158,17 @@ public class TCFuncInstantiationExpression extends TCExpression
     					{
     						TCType act = actualTypes.get(i);
     						act.concern(serious, 3061, "Inappropriate type for parameter " + (i + 1));
-    						detail2(serious, "Expect", ptype.paramPattern, "Actual", atype);
+    						
+    						if (atype instanceof TCParameterType)
+    						{
+    							TCParameterType p = (TCParameterType)atype;
+    							detail2(serious, "Expect", ptype.paramPattern, "Actual",
+    								p.paramPattern == null ? atype : p.paramPattern);
+    						}
+    						else
+    						{
+    							detail2(serious, "Expect", ptype.paramPattern, "Actual", atype);
+    						}
     					}
 
     					map.put(ptype.name, atype);
