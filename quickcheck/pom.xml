@@ -35,6 +35,10 @@
 		</dependency>
 		<dependency>
 			<groupId>dk.au.ece.vdmj</groupId>
+			<artifactId>annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>lsp</artifactId>
 		</dependency>
 	</dependencies>

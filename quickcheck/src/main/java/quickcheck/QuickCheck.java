@@ -72,6 +72,7 @@ import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
+import annotations.po.POTypeParamAnnotation;
 import quickcheck.annotations.IterableContext;
 import quickcheck.annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.FixedQCStrategy;
@@ -700,6 +701,13 @@ public class QuickCheck
 								map.put(qca.qcParam.name, new ParameterValue(ptype));
 							}
 						}
+					}
+					else if (a instanceof POTypeParamAnnotation)
+					{
+						POTypeParamAnnotation tpa = (POTypeParamAnnotation)a;
+						
+						Map<TCNameToken, Value> map = ictxt.newMap(0);
+						map.put(tpa.qcParam.name, new ParameterValue(tpa.qcType));
 					}
 				}
 			}
