@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
 public class TCQuickCheckAnnotation extends TCAnnotation
@@ -115,10 +116,24 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 		}
 		else
 		{
-			for (TCType ptype: funcParams)
+			for (TCType fParam: funcParams)
 			{
-				if (ptype.equals(qcParam))
+				if (fParam.equals(qcParam))
 				{
+					TCParameterType tcp = (TCParameterType)fParam;
+					
+					if (tcp.paramPattern != null)	// @TypeParam available
+					{
+						for (TCType qcType: qcTypes)
+						{
+							if (!TypeComparator.compatible(tcp.paramPattern, qcType))
+							{
+								qcParam.warning(6001, "Inappropriate type for @QC parameter");
+								tcp.detail2("Expect", tcp.paramPattern, "Actual", qcType);
+							}
+						}
+					}
+					
 					return;		// Valid parameter name
 				}
 			}
