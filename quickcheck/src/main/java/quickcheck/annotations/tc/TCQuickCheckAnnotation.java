@@ -128,7 +128,7 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 						{
 							if (!TypeComparator.compatible(tcp.paramPattern, qcType))
 							{
-								qcType.warning(6001, "Inappropriate type for @QC parameter");
+								qcType.report(6001, "Inappropriate type for @QC parameter");
 								qcType.detail2("Expect", tcp.paramPattern, "Actual", qcType);
 							}
 						}

@@ -51,11 +51,6 @@
 	     </dependency>
 	     <dependency>
 	         <groupId>dk.au.ece.vdmj</groupId>
-	         <artifactId>annotations</artifactId>
-	         <version>${project.version}</version>
-	     </dependency>
-	     <dependency>
-	         <groupId>dk.au.ece.vdmj</groupId>
 	         <artifactId>lsp</artifactId>
 	         <version>${project.version}</version>
 	     </dependency>
