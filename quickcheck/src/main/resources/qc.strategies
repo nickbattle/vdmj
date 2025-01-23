@@ -5,3 +5,4 @@ quickcheck.strategies.FiniteQCStrategy
 quickcheck.strategies.TrivialQCStrategy
 quickcheck.strategies.DirectQCStrategy
 quickcheck.strategies.ReasonsQCStrategy
+quickcheck.strategies.ConstantQCStrategy
