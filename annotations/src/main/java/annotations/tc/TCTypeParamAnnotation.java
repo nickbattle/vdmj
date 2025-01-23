@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.annotations.tc;
+package annotations.tc;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCNewExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -39,58 +38,29 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
-import com.fujitsu.vdmj.typechecker.TypeComparator;
-import com.fujitsu.vdmj.util.Utils;
 
-public class TCQuickCheckAnnotation extends TCAnnotation
+public class TCTypeParamAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	
 	public final TCParameterType qcParam;
-	public final TCTypeList qcTypes;
-	public final TCNewExpression qcConstructor;
+	public final TCType qcType;
 
-	public TCQuickCheckAnnotation(TCIdentifierToken name,
-		TCParameterType qcParam, TCTypeList qcTypes, TCNewExpression qcConstructor)
+	public TCTypeParamAnnotation(TCIdentifierToken name, TCParameterType qcParam, TCType qcType)
 	{
 		super(name, null);
 		this.qcParam = qcParam;
-		this.qcTypes = qcTypes;
-		this.qcConstructor = qcConstructor;
+		this.qcType = qcType;
 	}
 	
 	@Override
 	public String toString()
 	{
-		if (qcConstructor != null)
-		{
-			return "@" + name + " " + qcConstructor + ";";
-		}
-		else
-		{
-			return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
-		}
-	}
-
-	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
-	{
-		if (qcConstructor == null)
-		{
-			checkTypeParams(def, env, scope);
-		}
-		else
-		{
-			checkConstructor(def, env, scope);
-		}
+		return "@" + name + " " + qcParam + " = " + qcType;
 	}
 	
-	private void checkConstructor(TCDefinition def, Environment env, NameScope scope)
-	{
-		qcConstructor.typeCheck(env, null, scope, null);
-	}
-
-	private void checkTypeParams(TCDefinition def, Environment env, NameScope scope)
+	@Override
+	public void tcResolve(TCDefinition def, Environment env)
 	{
 		TCTypeList funcParams = null;
 		
@@ -106,63 +76,57 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 		}
 		else
 		{
-			name.report(6001, "@QuickCheck only applies to function definitions");
+			name.report(6001, "@TypeParam only applies to function definitions");
 			return;
 		}
 		
 		if (funcParams == null)
 		{
-			name.report(6001, "@QuickCheck only applies to polymorphic definitions");
+			name.report(6001, "@TypeParam only applies to polymorphic definitions");
 		}
 		else
 		{
-			for (TCType fParam: funcParams)
+			for (TCType ptype: funcParams)
 			{
-				if (fParam.equals(qcParam))
+				if (ptype.equals(qcParam))
 				{
-					TCParameterType tcp = (TCParameterType)fParam;
-					
-					if (tcp.paramPattern != null)	// @TypeParam available
-					{
-						for (TCType qcType: qcTypes)
-						{
-							if (!TypeComparator.compatible(tcp.paramPattern, qcType))
-							{
-								qcType.report(6001, "Inappropriate type for @QC parameter");
-								qcType.detail2("Expect", tcp.paramPattern, "Actual", qcType);
-							}
-						}
-					}
-					
+					TCParameterType paramType = (TCParameterType) ptype;
+					paramType.paramPattern = qcType;
 					return;		// Valid parameter name
 				}
 			}
 			
-			name.report(6001, "@QuickCheck " +  qcParam + " is not a parameter of " + def.name);
+			qcParam.report(6001, "@TypeParam " +  qcParam + " is not a parameter of " + def.name);
 		}
+	}
+
+	@Override
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		// Covered by tcResolve
 	}
 	
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(6001, "@QuickCheck only applies to function definitions");
+		name.report(6001, "@TypeParam only applies to function definitions");
 	}
 	
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6001, "@QuickCheck only applies to function definitions");
+		name.report(6001, "@TypeParam only applies to function definitions");
 	}
 
 	@Override
 	public void tcBefore(TCModule m)
 	{
-		name.report(6001, "@QuickCheck only applies to function definitions");
+		name.report(6001, "@TypeParam only applies to function definitions");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition m)
 	{
-		name.report(6001, "@QuickCheck only applies to function definitions");
+		name.report(6001, "@TypeParam only applies to function definitions");
 	}
 }

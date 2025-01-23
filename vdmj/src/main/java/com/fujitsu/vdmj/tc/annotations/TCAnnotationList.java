@@ -64,6 +64,14 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		});
 	}
 	
+	public void tcResolve(TCDefinition def, Environment env)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcResolve(def, env);
+		}
+	}
+	
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
 		for (TCAnnotation annotation: this)

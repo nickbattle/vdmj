@@ -537,7 +537,7 @@ public class QuickCheck
 			
 			if (result.value)	// ie. true
 			{
-				if (timedOut)
+				if (timedOut)	// Result would be false (below), but...
 				{
 					po.setStatus(POStatus.TIMEOUT);
 				}
@@ -581,7 +581,7 @@ public class QuickCheck
 			}
 			else
 			{
-				if (timedOut)		// Result would have been true (above), but...
+				if (timedOut)
 				{
 					po.setStatus(POStatus.TIMEOUT);
 				}
@@ -689,6 +689,11 @@ public class QuickCheck
 					if (a instanceof POQuickCheckAnnotation)
 					{
 						POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
+						
+						// A map of @T names to lists of types is created from each @QuickCheck.
+						// The IterableContexts are then vertical "slices" through this, selecting
+						// all of the first types, then all of the second and so on. Lastly,
+						// any missing cases are filled in with "real" types.
 						
 						if (qca.qcTypes != null)	// ie. not new C(args)
 						{
@@ -798,7 +803,6 @@ public class QuickCheck
 	 * (forall i:nat, s:seq of real & pre_f(i, s) =>
 	 *   is_nat(s(i)))
 	 */
-
 	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{
 		infof("PO #%d, %s", po.number, po.status.toString().toUpperCase());

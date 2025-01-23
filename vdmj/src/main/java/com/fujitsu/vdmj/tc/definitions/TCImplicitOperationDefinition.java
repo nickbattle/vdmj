@@ -168,7 +168,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public void typeResolve(Environment base)
 	{
 		type = type.typeResolve(base);
-
+		if (annotations != null) annotations.tcResolve(this, base);
+		
 		if (result != null)
 		{
 			result.typeResolve(base);

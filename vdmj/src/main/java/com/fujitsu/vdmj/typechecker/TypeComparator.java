@@ -409,7 +409,14 @@ public class TypeComparator
 				from.warning(5031, "Type " + from + " must be a union");	// See bug #562
 			}
 			
-			return Result.Yes;	// Runtime checked...
+			TCParameterType ptype = (TCParameterType)from;
+			
+			if (ptype.paramPattern instanceof TCUndefinedType)
+			{
+				return Result.Yes;	// Runtime checked...
+			}
+
+			from = ptype.paramPattern;
 		}
 
 		// OK... so we have fully resolved the basic types...

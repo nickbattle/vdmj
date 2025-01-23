@@ -153,6 +153,8 @@ public class TCStateDefinition extends TCDefinition
 		}
 
 		recordType = (TCRecordType) recordType.typeResolve(env);
+		
+		if (annotations != null) annotations.tcResolve(this, env);
 
 		if (invPattern != null)
 		{

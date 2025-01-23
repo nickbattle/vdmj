@@ -502,6 +502,18 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		TypeChecker.warning(number, msg, location);
 	}
 
+	public void concern(boolean serious, int number, String msg)
+	{
+		if (serious)
+		{
+			TypeChecker.report(number, msg, location);
+		}
+		else
+		{
+			TypeChecker.warning(number, msg, location);
+		}
+	}
+
 	public void detail(String tag, Object obj)
 	{
 		TypeChecker.detail(tag, obj);

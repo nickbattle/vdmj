@@ -35,12 +35,15 @@ public class TCParameterType extends TCType
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken name;
+	
 	private TCDefinition paramdef = null;
+	public TCType paramPattern = null;
 
 	public TCParameterType(TCNameToken pname)
 	{
 		super(pname.getLocation());
 		this.name = pname;
+		this.paramPattern = new TCUndefinedType(location);
 	}
 
 	@Override
@@ -53,9 +56,10 @@ public class TCParameterType extends TCType
 		if (paramdef == null || !(paramdef.getType() instanceof TCParameterType))
 		{
 			report(3433, "Parameter type @" + name + " not defined");
+			return this;
 		}
 
-		return this;
+		return paramdef.getType();	// Pick up @TypeParam pattern
 	}
 	
 	public TCDefinition getDefinition()
@@ -67,6 +71,108 @@ public class TCParameterType extends TCType
 	public boolean isOrdered(LexLocation loc)
 	{
 		return true;
+	}
+
+	@Override
+	public boolean isUnion(LexLocation from)
+	{
+		return paramPattern.isUnion(location);
+	}
+
+	@Override
+	public boolean isSeq(LexLocation from)
+	{
+		return paramPattern.isSeq(location);
+	}
+
+	@Override
+	public boolean isSet(LexLocation from)
+	{
+		return paramPattern.isSet(location);
+	}
+
+	@Override
+	public boolean isMap(LexLocation from)
+	{
+		return paramPattern.isMap(location);
+	}
+
+	@Override
+	public boolean isRecord(LexLocation from)
+	{
+		return paramPattern.isRecord(from);
+	}
+
+	@Override
+	public boolean isTag()
+	{
+		return paramPattern.isTag();
+	}
+
+	@Override
+	public boolean isNumeric(LexLocation from)
+	{
+		return paramPattern.isNumeric(location);
+	}
+
+	@Override
+	public boolean isProduct(LexLocation from)
+	{
+		return paramPattern.isProduct(location);
+	}
+
+	@Override
+	public boolean isProduct(int n, LexLocation from)
+	{
+		return paramPattern.isProduct(n, location);
+	}
+
+	@Override
+	public TCUnionType getUnion()
+	{
+		return paramPattern.getUnion();
+	}
+
+	@Override
+	public TCSeqType getSeq()
+	{
+		return paramPattern.getSeq();
+	}
+
+	@Override
+	public TCSetType getSet()
+	{
+		return paramPattern.getSet();
+	}
+
+	@Override
+	public TCMapType getMap()
+	{
+		return paramPattern.getMap();
+	}
+
+	@Override
+	public TCRecordType getRecord()
+	{
+		return paramPattern.getRecord();
+	}
+
+	@Override
+	public TCNumericType getNumeric()
+	{
+		return paramPattern.getNumeric();
+	}
+
+	@Override
+	public TCProductType getProduct()
+	{
+		return paramPattern.getProduct();
+	}
+
+	@Override
+	public TCProductType getProduct(int n)
+	{
+		return paramPattern.getProduct(n);
 	}
 
 	@Override
