@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIotaExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLambdaExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetBeStExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
@@ -156,6 +157,12 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	{
 		node.predicate.apply(this, arg);
 		return false;
+	}
+	
+	@Override
+	public Boolean caseIsExpression(TCIsExpression node, List<TCExpression> arg)
+	{
+		return node.test.apply(this, arg);
 	}
 	
 	@Override

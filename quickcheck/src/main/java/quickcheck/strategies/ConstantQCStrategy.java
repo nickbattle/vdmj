@@ -42,9 +42,11 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.visitors.ConstantExpressionFinder;
+import quickcheck.visitors.ConstantNudger;
 
 /**
  * A strategy to look for constants in obligations to create bindings.
@@ -98,6 +100,7 @@ public class ConstantQCStrategy extends QCStrategy
 		}
 			
 		Map<String, ValueList> results = new HashMap<String, ValueList>();
+		ConstantNudger nudger = new ConstantNudger();
 		
 		for (INBindingOverride bind: binds)
 		{
@@ -108,15 +111,20 @@ public class ConstantQCStrategy extends QCStrategy
 			{
 				if (TypeComparator.compatible(bindType, tctypes.get(i)))
 				{
-					if (results.containsKey(key))
+					ValueList list = results.get(key);
+					
+					if (list == null)
 					{
-						ValueList values = results.get(key);
-						values.add(constants.get(i));
+						list = new ValueList();
+						results.put(key, list);
 					}
-					else
-					{
-						results.put(key, new ValueList(constants.get(i)));
-					}
+					
+					Value k = constants.get(i);
+
+					// Add the value, plus a couple of nudges up and down
+					list.add(k);
+					list.add(k.apply(nudger, -1));
+					list.add(k.apply(nudger, +1));
 				}
 			}
 		}
@@ -127,6 +135,6 @@ public class ConstantQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// For now
+		return true;	// For now
 	}
 }
