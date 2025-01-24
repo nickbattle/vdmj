@@ -96,39 +96,52 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 		}
 	}
 	
-	private void ifNotNull(TCExpression exp, List<TCExpression> clist)
+	private boolean ifNotNull(TCExpression exp, List<TCExpression> clist)
 	{
 		if (exp != null)
 		{
-			exp.apply(this,  clist);
+			return exp.apply(this,  clist);
 		}
+		
+		return true;	// effectively constant (not there)
 	}
 	
 	@Override
 	public Boolean caseCasesExpression(TCCasesExpression node, List<TCExpression> arg)
 	{
-		node.exp.apply(this, arg);
+		boolean constant = node.exp.apply(this, arg);
 		
 		for (TCCaseAlternative alt: node.cases)
 		{
-			alt.cexp.apply(this, arg);
+			constant = constant && alt.cexp.apply(this, arg);
 		}
 		
-		return false;
+		if (constant)
+		{
+			arg.add(node);
+		}
+		
+		return constant;
 	}
 	
 	@Override
 	public Boolean caseIfExpression(TCIfExpression node, List<TCExpression> arg)
 	{
-		node.ifExp.apply(this, arg);
-		node.elseExp.apply(this, arg);
+		boolean constant = node.ifExp.apply(this, arg);
+		constant = constant && node.thenExp.apply(this, arg);
+		constant = constant && ifNotNull(node.elseExp, arg);
 		
 		for (TCElseIfExpression elif: node.elseList)
 		{
-			elif.elseIfExp.apply(this, arg);
+			constant = constant && elif.elseIfExp.apply(this, arg);
 		}
 		
-		return false;
+		if (constant)
+		{
+			arg.add(node);
+		}
+		
+		return constant;
 	}
 	
 	@Override
@@ -378,13 +391,28 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 		boolean left = node.left.apply(this, clist);
 		boolean right = node.right.apply(this, clist);
 		
-		return left && right;
+		if (left && right)
+		{
+			clist.add(node);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	@Override
 	public Boolean caseUnaryExpression(TCUnaryExpression node, List<TCExpression> clist)
 	{
-		return node.exp.apply(this, clist);
+		Boolean constant = node.exp.apply(this, clist);
+		
+		if (constant)
+		{
+			clist.add(node);
+		}
+		
+		return constant;
 	}
 	
 	@Override

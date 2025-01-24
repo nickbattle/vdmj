@@ -89,7 +89,7 @@ public class ConstantQCStrategy extends QCStrategy
 			for (TCExpression tcexp: tcconstants)
 			{
 				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
-				constants.add(inexp.eval(ctxt));
+				constants.add(inexp.eval(ctxt));	// NB. evaluate whole subexpressions
 				tctypes.add(tcexp.getType());
 			}
 		}
