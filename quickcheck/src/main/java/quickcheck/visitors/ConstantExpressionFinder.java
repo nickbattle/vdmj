@@ -69,6 +69,13 @@ import com.fujitsu.vdmj.tc.expressions.TCTupleExpression;
 import com.fujitsu.vdmj.tc.expressions.TCUnaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -85,15 +92,19 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 		env = Interpreter.getInstance().getGlobalEnvironment();
 	}
 	
-	private void allOf(TCExpressionList args, List<TCExpression> clist)
+	private boolean allOf(TCExpressionList args, List<TCExpression> clist)
 	{
+		boolean constant = true;
+		
 		if (args != null)
 		{
 			for (TCExpression exp: args)
 			{
-				exp.apply(this,  clist);
+				constant = constant && exp.apply(this,  clist);
 			}
 		}
+		
+		return constant;
 	}
 	
 	private boolean ifNotNull(TCExpression exp, List<TCExpression> clist)
@@ -106,6 +117,42 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 		return true;	// effectively constant (not there)
 	}
 	
+	private void doBind(TCBind bind, List<TCExpression> arg)
+	{
+		if (bind instanceof TCSetBind)
+		{
+			TCSetBind set = (TCSetBind)bind;
+			set.set.apply(this, arg);
+		}
+		else if (bind instanceof TCSeqBind)
+		{
+			TCSeqBind seq = (TCSeqBind)bind;
+			seq.sequence.apply(this, arg);
+		}
+	}
+	
+	private void doMBinds(TCMultipleBindList bindList, List<TCExpression> arg)
+	{
+		for (TCMultipleBind mbind: bindList)
+		{
+			doMBind(mbind, arg);
+		}
+	}
+
+	private void doMBind(TCMultipleBind mbind, List<TCExpression> arg)
+	{
+		if (mbind instanceof TCMultipleSetBind)
+		{
+			TCMultipleSetBind set = (TCMultipleSetBind)mbind;
+			set.set.apply(this, arg);
+		}
+		else if (mbind instanceof TCMultipleSeqBind)
+		{
+			TCMultipleSeqBind seq = (TCMultipleSeqBind)mbind;
+			seq.sequence.apply(this, arg);
+		}
+	}
+
 	@Override
 	public Boolean caseCasesExpression(TCCasesExpression node, List<TCExpression> arg)
 	{
@@ -147,6 +194,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseExists1Expression(TCExists1Expression node, List<TCExpression> arg)
 	{
+		doBind(node.bind, arg);
 		node.predicate.apply(this, arg);
 		return false;
 	}
@@ -154,6 +202,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseExistsExpression(TCExistsExpression node, List<TCExpression> arg)
 	{
+		doMBinds(node.bindList, arg);
 		node.predicate.apply(this, arg);
 		return false;
 	}
@@ -161,6 +210,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseForAllExpression(TCForAllExpression node, List<TCExpression> arg)
 	{
+		doMBinds(node.bindList, arg);
 		node.predicate.apply(this, arg);
 		return false;
 	}
@@ -168,6 +218,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseIotaExpression(TCIotaExpression node, List<TCExpression> arg)
 	{
+		doBind(node.bind, arg);
 		node.predicate.apply(this, arg);
 		return false;
 	}
@@ -188,6 +239,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseLetBeStExpression(TCLetBeStExpression node, List<TCExpression> arg)
 	{
+		doMBind(node.bind, arg);
 		ifNotNull(node.suchThat, arg);
 		node.value.apply(this, arg);
 		return false;
@@ -196,6 +248,19 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseLetDefExpression(TCLetDefExpression node, List<TCExpression> arg)
 	{
+		for (TCDefinition def: node.localDefs)
+		{
+			if (def instanceof TCLocalDefinition)
+			{
+				TCLocalDefinition ldef = (TCLocalDefinition)def;
+				
+				if (ldef.valueDefinition != null)
+				{
+					ldef.valueDefinition.exp.apply(this, arg);
+				}
+			}
+		}
+		
 		node.expression.apply(this, arg);
 		return false;
 	}
@@ -205,6 +270,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	{
 		node.first.left.apply(this, arg);
 		node.first.right.apply(this, arg);
+		doMBinds(node.bindings, arg);
 		node.predicate.apply(this, arg);
 		return false;
 	}
@@ -238,13 +304,8 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseMkTypeExpression(TCMkTypeExpression node, List<TCExpression> arg)
 	{
-		boolean constant = true;
-		
-		for (TCExpression field: node.args)
-		{
-			constant = constant && field.apply(this, arg);
-		}
-		
+		boolean constant = allOf(node.args, arg);
+
 		if (constant)
 		{
 			arg.add(node);
@@ -269,11 +330,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseNewExpression(TCNewExpression node, List<TCExpression> arg)
 	{
-		for (TCExpression exp: node.args)
-		{
-			exp.apply(this, arg);
-		}
-		
+		allOf(node.args, arg);
 		return false;
 	}
 	
@@ -281,6 +338,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	public Boolean caseSeqCompExpression(TCSeqCompExpression node, List<TCExpression> arg)
 	{
 		node.first.apply(this, arg);
+		doBind(node.bind, arg);
 		node.predicate.apply(this, arg);
 		
 		return false;
@@ -289,13 +347,8 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseSeqEnumExpression(TCSeqEnumExpression node, List<TCExpression> arg)
 	{
-		boolean constant = true;
-		
-		for (TCExpression exp: node.members)
-		{
-			constant = constant && exp.apply(this, arg);
-		}
-		
+		boolean constant = allOf(node.members, arg);
+
 		if (constant)
 		{
 			arg.add(node);
@@ -308,6 +361,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	public Boolean caseSetCompExpression(TCSetCompExpression node, List<TCExpression> arg)
 	{
 		node.first.apply(this, arg);
+		doMBinds(node.bindings, arg);
 		node.predicate.apply(this, arg);
 		
 		return false;
@@ -316,12 +370,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseSetEnumExpression(TCSetEnumExpression node, List<TCExpression> arg)
 	{
-		boolean constant = true;
-		
-		for (TCExpression exp: node.members)
-		{
-			constant = constant && exp.apply(this, arg);
-		}
+		boolean constant = allOf(node.members, arg);
 		
 		if (constant)
 		{
@@ -344,12 +393,7 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseTupleExpression(TCTupleExpression node, List<TCExpression> arg)
 	{
-		boolean constant = true;
-		
-		for (TCExpression exp: node.args)
-		{
-			constant = constant && exp.apply(this, arg);
-		}
+		boolean constant = allOf(node.args, arg);
 		
 		if (constant)
 		{
