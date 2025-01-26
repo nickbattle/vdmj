@@ -24,7 +24,6 @@
 
 package quickcheck.visitors;
 
-import java.util.Iterator;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.runtime.Context;
@@ -77,19 +76,14 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	@Override
 	public Value caseMapValue(MapValue node, Integer arg)
 	{
-		ValueMap nudged = new ValueMap(node.values);
+		ValueMap nudged = new ValueMap();
 		
-		Iterator<Entry<Value, Value>> iter = nudged.entrySet().iterator();
-		
-		while (iter.hasNext() && arg-- >0)
+		for (Entry<Value, Value> entry: node.values.entrySet())
 		{
-			Entry<Value, Value> entry = iter.next();
-			iter.remove();
+			Value key = entry.getKey().apply(this, arg);
+			Value val = entry.getValue().apply(this, arg);
 			
-			Value key2 = entry.getKey().apply(this, arg);
-			Value val2 = entry.getValue().apply(this, arg);
-			
-			nudged.put(key2, val2);
+			nudged.put(key, val);
 		}
 		
 		return new MapValue(nudged);
