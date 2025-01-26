@@ -76,6 +76,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -462,7 +463,14 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	@Override
 	public Boolean caseApplyExpression(TCApplyExpression node, List<TCExpression> clist)
 	{
-		allOf(node.args, clist);
+		boolean constant = node.root.apply(this, clist);
+		constant = constant && allOf(node.args, clist);
+		
+		if (node.type instanceof TCSeqType)
+		{
+			return constant;	// eg. s(1)
+		}
+		
 		return false;
 	}
 	
