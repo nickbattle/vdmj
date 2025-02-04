@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
@@ -63,6 +64,7 @@ import com.fujitsu.vdmj.tc.expressions.TCSeqCompExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSetCompExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSetRangeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubseqExpression;
 import com.fujitsu.vdmj.tc.expressions.TCTupleExpression;
@@ -260,6 +262,11 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 					ldef.valueDefinition.exp.apply(this, arg);
 				}
 			}
+			else if (def instanceof TCValueDefinition)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)def;
+				vdef.exp.apply(this, arg);
+			}
 		}
 		
 		node.expression.apply(this, arg);
@@ -272,7 +279,12 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 		node.first.left.apply(this, arg);
 		node.first.right.apply(this, arg);
 		doMBinds(node.bindings, arg);
-		node.predicate.apply(this, arg);
+		
+		if (node.predicate != null)
+		{
+			node.predicate.apply(this, arg);
+		}
+		
 		return false;
 	}
 	
@@ -340,7 +352,11 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	{
 		node.first.apply(this, arg);
 		doBind(node.bind, arg);
-		node.predicate.apply(this, arg);
+		
+		if (node.predicate != null)
+		{
+			node.predicate.apply(this, arg);
+		}
 		
 		return false;
 	}
@@ -363,9 +379,21 @@ public class ConstantExpressionFinder extends TCExpressionVisitor<Boolean, List<
 	{
 		node.first.apply(this, arg);
 		doMBinds(node.bindings, arg);
-		node.predicate.apply(this, arg);
+		
+		if (node.predicate != null)
+		{
+			node.predicate.apply(this, arg);
+		}
 		
 		return false;
+	}
+	
+	@Override
+	public Boolean caseSetRangeExpression(TCSetRangeExpression node, List<TCExpression> arg)
+	{
+		boolean constant = node.first.apply(this, arg);
+		constant = constant && node.last.apply(this, arg);
+		return constant;
 	}
 	
 	@Override

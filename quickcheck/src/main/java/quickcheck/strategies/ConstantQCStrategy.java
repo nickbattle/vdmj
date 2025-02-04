@@ -109,7 +109,7 @@ public class ConstantQCStrategy extends QCStrategy
 			
 			for (int i = 0; i < constants.size(); i++)
 			{
-				if (TypeComparator.compatible(bindType, tctypes.get(i)))
+				if (TypeComparator.isSubType(bindType, tctypes.get(i)))
 				{
 					ValueList list = results.get(key);
 					

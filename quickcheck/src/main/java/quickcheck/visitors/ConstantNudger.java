@@ -168,7 +168,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	{
 		try
 		{
-			return new NaturalValue(node.nat1Value(ctxt) + arg);
+			return new NaturalOneValue(node.nat1Value(ctxt) + arg);
 		}
 		catch (Exception e)
 		{
