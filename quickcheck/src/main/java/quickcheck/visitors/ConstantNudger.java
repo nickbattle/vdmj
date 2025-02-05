@@ -24,6 +24,8 @@
 
 package quickcheck.visitors;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.runtime.Context;
@@ -168,7 +170,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	{
 		try
 		{
-			return new NaturalOneValue(node.nat1Value(ctxt) + arg);
+			return new NaturalOneValue(node.nat1Value(ctxt).add(BigInteger.valueOf(arg)));
 		}
 		catch (Exception e)
 		{
@@ -181,7 +183,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	{
 		try
 		{
-			return new NaturalValue(node.natValue(ctxt) + arg);
+			return new NaturalValue(node.natValue(ctxt).add(BigInteger.valueOf(arg)));
 		}
 		catch (Exception e)
 		{
@@ -192,7 +194,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	@Override
 	public Value caseIntegerValue(IntegerValue node, Integer arg)
 	{
-		return new IntegerValue(node.intValue(ctxt) + arg);
+		return new IntegerValue(node.intValue(ctxt).add(BigInteger.valueOf(arg)));
 	}
 	
 	@Override
@@ -200,7 +202,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	{
 		try
 		{
-			return new RealValue(node.realValue(ctxt) + arg);
+			return new RealValue(node.realValue(ctxt).add(BigDecimal.valueOf(arg)));
 		}
 		catch (Exception e)
 		{
@@ -213,7 +215,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 	{
 		try
 		{
-			return new RationalValue(node.ratValue(ctxt) + arg);
+			return new RationalValue(node.ratValue(ctxt).add(BigDecimal.valueOf(arg)));
 		}
 		catch (Exception e)
 		{
