@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -197,7 +198,7 @@ public class POGState
 	{
 		if (outerState != null)
 		{
-			outerState.didUpdateState(from);
+			outerState.didUpdateState(from);	// Find outermost level
 		}
 		else
 		{
@@ -217,19 +218,11 @@ public class POGState
 		}
 		else
 		{
-			updatedState.put(name, from);			// A module state update
+			updatedState.put(name, from);			// An outermost state update
 		}
 	}
 
-	public void didUpdateState(TCNameList names, LexLocation from)
-	{
-		for (TCNameToken name: names)
-		{
-			didUpdateState(name, from);
-		}
-	}
-	
-	public void didUpdateState(TCNameSet names, LexLocation from)
+	public void didUpdateState(Collection<? extends TCNameToken> names, LexLocation from)
 	{
 		for (TCNameToken name: names)
 		{
@@ -246,7 +239,7 @@ public class POGState
 	{
 		if (called == null)
 		{
-			didUpdateState(from);	// Assumed
+			didUpdateState(from);	// Assumed to update something
 		}
 		else if (called.accessSpecifier.isPure)
 		{
