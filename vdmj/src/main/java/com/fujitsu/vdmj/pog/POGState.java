@@ -222,7 +222,7 @@ public class POGState
 		}
 	}
 
-	public void didUpdateState(Collection<? extends TCNameToken> names, LexLocation from)
+	public void didUpdateState(Collection<TCNameToken> names, LexLocation from)
 	{
 		for (TCNameToken name: names)
 		{
