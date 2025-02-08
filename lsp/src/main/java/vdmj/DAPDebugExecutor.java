@@ -84,8 +84,8 @@ public class DAPDebugExecutor implements DebugExecutor
 			this.location = frameLoc;
 		}
 		
-		public int frameId;
-		public LexLocation location;
+		public final int frameId;
+		public final LexLocation location;
 		public String title;
 		public List<Scope> scopes = new Vector<Scope>();
 		public int outerId = 0;
@@ -644,7 +644,26 @@ public class DAPDebugExecutor implements DebugExecutor
 		
 		if (arguments != null)
 		{
-			nextLoc[0] = arguments.location;
+			if (arguments.location == LexLocation.ANY)
+			{
+				// Flat SL specs have a default location of "?" for the outer context.
+				// That causes problems in the client, so we try to replace it with
+				// the start of an arbitrary definition's file.
+				
+				if (c.isEmpty())
+				{
+					nextLoc[0] = frame.location;
+				}
+				else
+				{
+					nextLoc[0] = locationFromCtxt(c);
+				}
+			}
+			else
+			{
+				nextLoc[0] = arguments.location;
+			}
+			
 			return buildArguments(arguments, frame);
 		}
 		
@@ -757,29 +776,7 @@ public class DAPDebugExecutor implements DebugExecutor
 	private Context buildArguments(RootContext c, Frame frame)
 	{
 		String scope = (c.outer == null ? "Globals" : "Arguments");
-		LexLocation loc = c.location;
-		
-		if (frame.frameId == topFrameId)	// in base context
-		{
-			loc = breakloc;
-		}
-		else if (loc == LexLocation.ANY)
-		{
-			// Flat SL specs have a default location of "?" for the outer context.
-			// That causes problems in the client, so we try to replace it with
-			// the start of an arbitrary definition's file.
-			
-			if (c.isEmpty())
-			{
-				loc = frame.location;
-			}
-			else
-			{
-				loc = locationFromCtxt(c);
-			}
-		}
-		
-		Context arguments = new Context(loc, scope, null);
+		Context arguments = new Context(c.location, scope, null);
 		
 		for (Entry<TCNameToken, Value> nvp: c.entrySet())
 		{
@@ -850,7 +847,6 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 
 		frame.title = c.title;	// Title comes from RootContext
-		frame.location = loc;
 		return c.outer;
 	}
 	
