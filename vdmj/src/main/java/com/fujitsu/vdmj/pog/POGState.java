@@ -65,11 +65,11 @@ public class POGState
 	 * Used by getCopy and getLink.
 	 */
 	private POGState(Map<TCNameToken, LexLocation> updatedState, Map<TCNameToken, LexLocation> updatedLocals,
-			POGState outerState, TCNameList localNames)
+			Map<TCNameToken, LexLocation> ambiguous, POGState outerState, TCNameList localNames)
 	{
 		this.updatedState = updatedState;
 		this.updatedLocals = updatedLocals;
-		this.ambiguous = new HashMap<TCNameToken, LexLocation>();
+		this.ambiguous = ambiguous;
 		this.outerState = outerState;
 		this.localNames = localNames;
 	}
@@ -86,13 +86,14 @@ public class POGState
 	/**
 	 * Copy a state for use in if/else branches etc, where changes in each are not visible
 	 * in the other branches, but all changes are combined afterwards. Note that it has
-	 * the same local names and no outer state.
+	 * the same local names and ambiguous state, and no outer state.
 	 */
 	public POGState getCopy()
 	{
 		return new POGState(
 				new HashMap<TCNameToken, LexLocation>(),
-				new HashMap<TCNameToken, LexLocation>(), null, localNames);
+				new HashMap<TCNameToken, LexLocation>(),
+				ambiguous, null, localNames);
 	}
 	
 	/**
@@ -104,7 +105,8 @@ public class POGState
 	{
 		return new POGState(
 				new HashMap<TCNameToken, LexLocation>(),
-				new HashMap<TCNameToken, LexLocation>(), this, new TCNameList());
+				new HashMap<TCNameToken, LexLocation>(),
+				ambiguous, this, new TCNameList());
 	}
 	
 	/**
