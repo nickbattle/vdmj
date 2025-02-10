@@ -46,11 +46,11 @@ public class POGState
 {
 	private static final TCNameToken SOMETHING = new TCNameToken(LexLocation.ANY, "?", "?");
 	
-	private Map<TCNameToken, LexLocation> updatedState;
-	private Map<TCNameToken, LexLocation> updatedLocals;
-	private Map<TCNameToken, LexLocation> ambiguous;
-	private POGState outerState;
-	private TCNameList localNames;
+	private final Map<TCNameToken, LexLocation> updatedState;
+	private final Map<TCNameToken, LexLocation> updatedLocals;
+	private final Map<TCNameToken, LexLocation> ambiguous;
+	private final POGState outerState;
+	private final TCNameList localNames;
 	
 	public POGState()
 	{
@@ -86,7 +86,7 @@ public class POGState
 	/**
 	 * Copy a state for use in if/else branches etc, where changes in each are not visible
 	 * in the other branches, but all changes are combined afterwards. Note that it has
-	 * the same local names and ambiguous state, and no outer state.
+	 * the same local names and ambiguous state, but no outer state changes.
 	 */
 	public POGState getCopy()
 	{
@@ -98,7 +98,7 @@ public class POGState
 	
 	/**
 	 * Create a new chained POGState, linked to the current one. This is used to process
-	 * block statements that may contain "dcl" statements (ie. local state).Locals can be
+	 * block statements that may contain "dcl" statements (ie. local state). Locals are
 	 * added with addDclLocal.
 	 */
 	public POGState getLink()
@@ -135,7 +135,7 @@ public class POGState
 	}
 	
 	/**
-	 * True if state may have been updated.
+	 * True if state may have been updated on alternative paths.
 	 */
 	public boolean hasAmbiguousState(TCNameSet names)
 	{
@@ -155,6 +155,9 @@ public class POGState
 		return (outerState != null && outerState.hasAmbiguousState(names));
 	}
 	
+	/**
+	 * Used when a state value is given an unambiguous value, like "x := 0"
+	 */
 	public void notAmbiguous(TCNameToken name)
 	{
 		ambiguous.remove(name);
@@ -195,6 +198,11 @@ public class POGState
 		
 		return LexLocation.ANY;
 	}
+	
+	/**
+	 * State updates either update the updatedLocals of the nearest getLink, or they
+	 * update the updatedState in the lowest level. 
+	 */
 	
 	public void didUpdateState(LexLocation from)
 	{
