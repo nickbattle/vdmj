@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
@@ -66,24 +67,22 @@ public class POReturnStatement extends POStatement
 			obligations.addAll(expression.getProofObligations(ctxt, new POGState(), env));
 			
 			PODefinition definition = ctxt.getDefinition();
+			TCType result = null;
 			
 			if (definition instanceof POExplicitOperationDefinition)
 			{
 				POExplicitOperationDefinition opdef = (POExplicitOperationDefinition)definition;
-				
-				if (!TypeComparator.isSubType(getStmttype(), opdef.type.result))
-				{
-					obligations.add(new SubTypeObligation(expression, opdef.type.result, getStmttype(), ctxt));
-				}
+				result = opdef.type.result;
 			}
 			else if (definition instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition opdef = (POImplicitOperationDefinition)definition;
-				
-				if (!TypeComparator.isSubType(getStmttype(), opdef.type.result))
-				{
-					obligations.add(new SubTypeObligation(expression, opdef.type.result, getStmttype(), ctxt));
-				}
+				result = opdef.type.result;
+			}
+			
+			if (result != null && !TypeComparator.isSubType(getStmttype(), result))
+			{
+				obligations.add(new SubTypeObligation(expression, result, getStmttype(), ctxt));
 			}
 
 			obligations.markIfAmbiguous(pogState, expression);
