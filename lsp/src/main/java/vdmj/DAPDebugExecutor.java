@@ -607,6 +607,12 @@ public class DAPDebugExecutor implements DebugExecutor
 		return DebugCommand.QUIT;
 	}
 	
+	/**
+	 * Build the ctxtFrames and scopes for the stack. VDMJ stacks contain Contexts for
+	 * local "let" variables etc, and RootContexts that contain any arguments. The
+	 * initial Frame is located at the break/stop location. Subsequent Frames are located
+	 * where that is called from, hence the nextLoc being passed back.
+	 */
 	private void buildCache()
 	{
 		LexLocation[] nextLoc = { breakloc };
@@ -616,7 +622,6 @@ public class DAPDebugExecutor implements DebugExecutor
 		while (c != null)
 		{
 			int frameId = nextFrameId.incrementAndGet();
-			Frame frame = new Frame(frameId, nextLoc[0]);
 			
 			if (prevFrame == null)
 			{
@@ -627,12 +632,22 @@ public class DAPDebugExecutor implements DebugExecutor
 				prevFrame.outerId = frameId;
 			}
 			
+			Frame frame = new Frame(frameId, nextLoc[0]);
 			ctxtFrames.put(frameId, frame);
-			c = buildScopes(c, frame, nextLoc);
 			prevFrame = frame;
+
+			c = buildScopes(c, frame, nextLoc);
 		}
 	}
 	
+	/**
+	 * Build Scopes for any guards, any local variables and any arguments passed.
+	 * The buildLocals and buildArguments return the next Context down the stack.
+	 * The location for the next frame is set to the LexLocation of the argument
+	 * frame (the RootContext), which is where this fn/op was called from. The
+	 * locations are "out by one" because the first frame location is the breakpoint.
+	 * See above. 
+	 */
 	private Context buildScopes(Context c, Frame frame, LexLocation[] nextLoc)
 	{
 		if (c.guardOp != null)
@@ -644,27 +659,9 @@ public class DAPDebugExecutor implements DebugExecutor
 		
 		if (arguments != null)
 		{
-			if (arguments.location == LexLocation.ANY)
-			{
-				// Flat SL specs have a default location of "?" for the outer context.
-				// That causes problems in the client, so we try to replace it with
-				// the start of an arbitrary definition's file.
-				
-				if (c.isEmpty())
-				{
-					nextLoc[0] = frame.location;
-				}
-				else
-				{
-					nextLoc[0] = locationFromCtxt(c);
-				}
-			}
-			else
-			{
-				nextLoc[0] = arguments.location;
-			}
-			
-			return buildArguments(arguments, frame);
+			Context nextFrame = buildArguments(arguments, frame);
+			nextLoc[0] = arguments.location;
+			return nextFrame;
 		}
 		
 		return null;	// No further frames
@@ -747,7 +744,7 @@ public class DAPDebugExecutor implements DebugExecutor
 
 	/**
 	 * Add a "Locals" scope for "let" contexts that are not arguments in a RootContext.
-	 * Return the RootContext for (any) argument processing, or null at the outer level.
+	 * Return the RootContext for argument processing, or null at the outer level.
 	 */
 	private RootContext buildLocals(Context c, Frame frame)
 	{
@@ -850,28 +847,28 @@ public class DAPDebugExecutor implements DebugExecutor
 		return c.outer;
 	}
 	
-	private LexLocation locationFromCtxt(Context c)
-	{
-		LexLocation loc = c.location;
-		
-		for (Entry<TCNameToken, Value> entry: c.entrySet())
-		{
-			if (entry.getValue() instanceof OperationValue)
-			{
-				OperationValue op = (OperationValue)entry.getValue();
-				loc = op.name.getLocation();
-				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
-				break;
-			}
-			else if (entry.getValue() instanceof FunctionValue)
-			{
-				FunctionValue fn = (FunctionValue)entry.getValue();
-				loc = fn.location;
-				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
-				break;
-			}
-		}
-		
-		return loc;
-	}
+//	private LexLocation locationFromCtxt(Context c)
+//	{
+//		LexLocation loc = c.location;
+//		
+//		for (Entry<TCNameToken, Value> entry: c.entrySet())
+//		{
+//			if (entry.getValue() instanceof OperationValue)
+//			{
+//				OperationValue op = (OperationValue)entry.getValue();
+//				loc = op.name.getLocation();
+//				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+//				break;
+//			}
+//			else if (entry.getValue() instanceof FunctionValue)
+//			{
+//				FunctionValue fn = (FunctionValue)entry.getValue();
+//				loc = fn.location;
+//				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+//				break;
+//			}
+//		}
+//		
+//		return loc;
+//	}
 }
