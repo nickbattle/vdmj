@@ -28,6 +28,8 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.List;
 
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -63,7 +65,11 @@ public class ReasonsQCStrategy extends QCStrategy
 	@Override
 	public void maybeHeuristic(ProofObligation po)
 	{
-		if (po.obligationVars != null && po.reasonsAbout != null)
+		boolean isfunc =
+			(po.definition instanceof POExplicitFunctionDefinition ||
+			po.definition instanceof POImplicitFunctionDefinition);
+		
+		if (isfunc && po.obligationVars != null && po.reasonsAbout != null)
 		{
 			if (po.reasonsAbout.contains(POExpressionVariableFinder.SOMETHING))
 			{

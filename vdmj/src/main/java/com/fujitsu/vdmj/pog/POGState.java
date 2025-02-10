@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,11 +46,11 @@ public class POGState
 {
 	private static final TCNameToken SOMETHING = new TCNameToken(LexLocation.ANY, "?", "?");
 	
-	private Map<TCNameToken, LexLocation> updatedState;
-	private Map<TCNameToken, LexLocation> updatedLocals;
-	private Map<TCNameToken, LexLocation> ambiguous;
-	private POGState outerState;
-	private TCNameList localNames;
+	private final Map<TCNameToken, LexLocation> updatedState;
+	private final Map<TCNameToken, LexLocation> updatedLocals;
+	private final Map<TCNameToken, LexLocation> ambiguous;
+	private final POGState outerState;
+	private final TCNameList localNames;
 	
 	public POGState()
 	{
@@ -64,11 +65,11 @@ public class POGState
 	 * Used by getCopy and getLink.
 	 */
 	private POGState(Map<TCNameToken, LexLocation> updatedState, Map<TCNameToken, LexLocation> updatedLocals,
-			POGState outerState, TCNameList localNames)
+			Map<TCNameToken, LexLocation> ambiguous, POGState outerState, TCNameList localNames)
 	{
 		this.updatedState = updatedState;
 		this.updatedLocals = updatedLocals;
-		this.ambiguous = new HashMap<TCNameToken, LexLocation>();
+		this.ambiguous = ambiguous;
 		this.outerState = outerState;
 		this.localNames = localNames;
 	}
@@ -85,25 +86,27 @@ public class POGState
 	/**
 	 * Copy a state for use in if/else branches etc, where changes in each are not visible
 	 * in the other branches, but all changes are combined afterwards. Note that it has
-	 * the same local names and no outer state.
+	 * the same local names and ambiguous state, but no outer state changes.
 	 */
 	public POGState getCopy()
 	{
 		return new POGState(
 				new HashMap<TCNameToken, LexLocation>(),
-				new HashMap<TCNameToken, LexLocation>(), null, localNames);
+				new HashMap<TCNameToken, LexLocation>(),
+				ambiguous, null, localNames);
 	}
 	
 	/**
 	 * Create a new chained POGState, linked to the current one. This is used to process
-	 * block statements that may contain "dcl" statements (ie. local state).Locals can be
+	 * block statements that may contain "dcl" statements (ie. local state). Locals are
 	 * added with addDclLocal.
 	 */
 	public POGState getLink()
 	{
 		return new POGState(
 				new HashMap<TCNameToken, LexLocation>(),
-				new HashMap<TCNameToken, LexLocation>(), this, new TCNameList());
+				new HashMap<TCNameToken, LexLocation>(),
+				ambiguous, this, new TCNameList());
 	}
 	
 	/**
@@ -132,7 +135,7 @@ public class POGState
 	}
 	
 	/**
-	 * True if state may have been updated.
+	 * True if state may have been updated on alternative paths.
 	 */
 	public boolean hasAmbiguousState(TCNameSet names)
 	{
@@ -152,6 +155,9 @@ public class POGState
 		return (outerState != null && outerState.hasAmbiguousState(names));
 	}
 	
+	/**
+	 * Used when a state value is given an unambiguous value, like "x := 0"
+	 */
 	public void notAmbiguous(TCNameToken name)
 	{
 		ambiguous.remove(name);
@@ -193,11 +199,16 @@ public class POGState
 		return LexLocation.ANY;
 	}
 	
+	/**
+	 * State updates either update the updatedLocals of the nearest getLink, or they
+	 * update the updatedState in the lowest level. 
+	 */
+	
 	public void didUpdateState(LexLocation from)
 	{
 		if (outerState != null)
 		{
-			outerState.didUpdateState(from);
+			outerState.didUpdateState(from);	// Find outermost level
 		}
 		else
 		{
@@ -217,19 +228,11 @@ public class POGState
 		}
 		else
 		{
-			updatedState.put(name, from);			// A module state update
+			updatedState.put(name, from);			// An outermost state update
 		}
 	}
 
-	public void didUpdateState(TCNameList names, LexLocation from)
-	{
-		for (TCNameToken name: names)
-		{
-			didUpdateState(name, from);
-		}
-	}
-	
-	public void didUpdateState(TCNameSet names, LexLocation from)
+	public void didUpdateState(Collection<TCNameToken> names, LexLocation from)
 	{
 		for (TCNameToken name: names)
 		{
@@ -246,7 +249,7 @@ public class POGState
 	{
 		if (called == null)
 		{
-			didUpdateState(from);	// Assumed
+			didUpdateState(from);	// Assumed to update something
 		}
 		else if (called.accessSpecifier.isPure)
 		{

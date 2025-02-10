@@ -25,12 +25,18 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class POReturnStatement extends POStatement
 {
@@ -59,6 +65,26 @@ public class POReturnStatement extends POStatement
 			// Don't process POG state here, because we're returning, so the expression can
 			// have no further effect in the operation.
 			obligations.addAll(expression.getProofObligations(ctxt, new POGState(), env));
+			
+			PODefinition definition = ctxt.getDefinition();
+			TCType result = null;
+			
+			if (definition instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition opdef = (POExplicitOperationDefinition)definition;
+				result = opdef.type.result;
+			}
+			else if (definition instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition opdef = (POImplicitOperationDefinition)definition;
+				result = opdef.type.result;
+			}
+			
+			if (result != null && !TypeComparator.isSubType(getStmttype(), result))
+			{
+				obligations.add(new SubTypeObligation(expression, result, getStmttype(), ctxt));
+			}
+
 			obligations.markIfAmbiguous(pogState, expression);
 		}
 
