@@ -29,10 +29,12 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
+import com.fujitsu.vdmj.pog.POContext;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POBlockStatement extends POSimpleBlockStatement
@@ -62,9 +64,44 @@ public class POBlockStatement extends POSimpleBlockStatement
 				dclState.addDclLocal(adef.name);
 			}
 	
-			ctxt.push(new POAssignmentContext(assignmentDefs));
+			int dcls = ctxt.pushAt(new POAssignmentContext(assignmentDefs));
 			obligations.addAll(super.getProofObligations(ctxt, dclState, env));
-			ctxt.pop();
+			
+			// Remove the POAssignmentContext for the dcls, unless they are used in
+			// "x := ..." assignments within the block, since the dcls are then needed
+			// in any POs.
+			
+			boolean found = false;
+			
+			for (int sp = dcls + 1; sp < ctxt.size() && !found; sp++)
+			{
+				POContext item = ctxt.get(sp);
+				
+				if (item instanceof POAssignmentContext)
+				{
+					POAssignmentContext actxt = (POAssignmentContext)item;
+					
+					if (actxt.expression != null)	// <name> := <exp>
+					{
+						for (TCNameToken name: actxt.expression.readsState())
+						{
+							if (dclState.hasLocalName(name))
+							{
+								found = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+			
+			if (!found)		// dcl variables not used in assignments
+			{
+				ctxt.remove(dcls);
+			}
+			
+			// The dclState goes out of scope here and its localUpdates have no further
+			// effect. But updates made to locals in outer scopes will still be available.
 		}
 		else
 		{

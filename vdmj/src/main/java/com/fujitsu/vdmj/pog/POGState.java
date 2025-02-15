@@ -156,6 +156,14 @@ public class POGState
 	}
 	
 	/**
+	 * True if POGState has a local variable of this name.
+	 */
+	public boolean hasLocalName(TCNameToken name)
+	{
+		return localNames.contains(name);
+	}
+	
+	/**
 	 * Used when a state value is given an unambiguous value, like "x := 0"
 	 */
 	public void notAmbiguous(TCNameToken name)
