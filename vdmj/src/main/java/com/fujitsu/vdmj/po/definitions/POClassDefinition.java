@@ -186,6 +186,7 @@ public class POClassDefinition extends PODefinition
 		{
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
+			ctxt.clear();
 		}
 		
 		list.typeCheck(tcdef.name, local);
