@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -68,12 +71,14 @@ public class POBlockStatement extends POSimpleBlockStatement
 			obligations.addAll(super.getProofObligations(ctxt, dclState, env));
 			
 			// Remove the POAssignmentContext for the dcls, unless they are used in
-			// "x := ..." assignments within the block, since the dcls are then needed
-			// in any POs.
+			// assignments to outer state within the block, since the dcls are needed
+			// in any POs relating to those updated state values.
 			
-			boolean found = false;
+			boolean updatesState = false;
+			List<Integer> localUpdates = new LinkedList<Integer>();
+			localUpdates.add(dcls);
 			
-			for (int sp = dcls + 1; sp < ctxt.size() && !found; sp++)
+			for (int sp = dcls + 1; sp < ctxt.size(); sp++)
 			{
 				POContext item = ctxt.get(sp);
 				
@@ -84,25 +89,26 @@ public class POBlockStatement extends POSimpleBlockStatement
 					if (actxt.expression != null)	// <name> := <exp>
 					{
 						boolean local = false;
+						
+						for (PODefinition dcl: assignmentDefs)
+						{
+							POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
+							
+							if (adef.name.getName().equals(actxt.pattern))
+							{
+								localUpdates.add(0, sp);	// Caused by x := to local x.
+								local = true;
+								break;
+							}
+						}
 
-//						for (PODefinition dcl: assignmentDefs)
-//						{
-//							POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
-//							
-//							if (adef.name.getName().equals(actxt.pattern))
-//							{
-//								local = true;
-//								break;	// assignment to local dcl, so fine
-//							}
-//						}
-
-						if (!local)
+						if (!local)		// So assigning to outer state
 						{
 							for (TCNameToken name: actxt.expression.readsState())
 							{
 								if (dclState.hasLocalName(name))
 								{
-									found = true;	// state assigned by dcl
+									updatesState = true;	// state assigned using locals
 									break;
 								}
 							}
@@ -111,9 +117,12 @@ public class POBlockStatement extends POSimpleBlockStatement
 				}
 			}
 			
-			if (!found)		// dcl variables not used in assignments
+			if (!updatesState)			// dcl variables not used in state assignments
 			{
-				ctxt.remove(dcls);
+				for (int sp: localUpdates)	// Added in reverse order
+				{
+					ctxt.remove(sp);
+				}
 			}
 			
 			// The dclState goes out of scope here and its localUpdates have no further
