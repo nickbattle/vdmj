@@ -83,12 +83,28 @@ public class POBlockStatement extends POSimpleBlockStatement
 					
 					if (actxt.expression != null)	// <name> := <exp>
 					{
-						for (TCNameToken name: actxt.expression.readsState())
+						boolean local = false;
+
+//						for (PODefinition dcl: assignmentDefs)
+//						{
+//							POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
+//							
+//							if (adef.name.getName().equals(actxt.pattern))
+//							{
+//								local = true;
+//								break;	// assignment to local dcl, so fine
+//							}
+//						}
+
+						if (!local)
 						{
-							if (dclState.hasLocalName(name))
+							for (TCNameToken name: actxt.expression.readsState())
 							{
-								found = true;
-								break;
+								if (dclState.hasLocalName(name))
+								{
+									found = true;	// state assigned by dcl
+									break;
+								}
 							}
 						}
 					}
