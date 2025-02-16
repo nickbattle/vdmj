@@ -47,7 +47,7 @@ public class POCompExpression extends POBinaryExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
 
 		if (ltype.isFunction(location))
 		{

@@ -24,15 +24,20 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
+import com.fujitsu.vdmj.pog.POContext;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POBlockStatement extends POSimpleBlockStatement
@@ -62,9 +67,66 @@ public class POBlockStatement extends POSimpleBlockStatement
 				dclState.addDclLocal(adef.name);
 			}
 	
-			ctxt.push(new POAssignmentContext(assignmentDefs));
+			int dcls = ctxt.pushAt(new POAssignmentContext(assignmentDefs));
 			obligations.addAll(super.getProofObligations(ctxt, dclState, env));
-			ctxt.pop();
+			
+			// Remove the POAssignmentContext for the dcls, unless they are used in
+			// assignments to outer state within the block, since the dcls are needed
+			// in any POs relating to those updated state values.
+			
+			boolean updatesState = false;
+			List<Integer> localUpdates = new LinkedList<Integer>();
+			localUpdates.add(dcls);
+			
+			for (int sp = dcls + 1; sp < ctxt.size(); sp++)
+			{
+				POContext item = ctxt.get(sp);
+				
+				if (item instanceof POAssignmentContext)
+				{
+					POAssignmentContext actxt = (POAssignmentContext)item;
+					
+					if (actxt.expression != null)	// <name> := <exp>
+					{
+						boolean local = false;
+						
+						for (PODefinition dcl: assignmentDefs)
+						{
+							POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
+							
+							if (adef.name.getName().equals(actxt.pattern))
+							{
+								localUpdates.add(0, sp);	// Caused by x := to local x.
+								local = true;
+								break;
+							}
+						}
+
+						if (!local)		// So assigning to outer state
+						{
+							for (TCNameToken name: actxt.expression.readsState())
+							{
+								if (dclState.hasLocalName(name))
+								{
+									updatesState = true;	// state assigned using locals
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if (!updatesState)			// dcl variables not used in state assignments
+			{
+				for (int sp: localUpdates)	// Added in reverse order
+				{
+					ctxt.remove(sp);
+				}
+			}
+			
+			// The dclState goes out of scope here and its localUpdates have no further
+			// effect. But updates made to locals in outer scopes will still be available.
 		}
 		else
 		{
