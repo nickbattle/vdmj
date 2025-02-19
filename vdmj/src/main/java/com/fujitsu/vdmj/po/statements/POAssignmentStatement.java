@@ -98,18 +98,17 @@ public class POAssignmentStatement extends POStatement
 			{
 				pogState.didUpdateState(update, location);
 			}
-
-			ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
 			
-			// We can disambiguate variables in a simple assignment that assigns unambiguous values,
-			// like constants or variables that are unambiguous.
-			
-			if (target instanceof POIdentifierDesignator)
+			if (!pogState.hasAmbiguousState(exp.readsState()))
 			{
-				POIdentifierDesignator id = (POIdentifierDesignator)target;
+				ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
 				
-				if (!pogState.hasAmbiguousState(exp.readsState()))
+				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
+				// like constants or variables that are unambiguous.
+				
+				if (target instanceof POIdentifierDesignator)
 				{
+					POIdentifierDesignator id = (POIdentifierDesignator)target;
 					pogState.notAmbiguous(id.name);
 				}
 			}
