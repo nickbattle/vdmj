@@ -94,6 +94,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		POExplicitFunctionDefinition postdef,
 		TCType actualResult,
 		POStateDefinition stateDefinition,
+		POClassDefinition classDefinition,
 		boolean isConstructor)
 	{
 		super(name.getLocation(), name);
@@ -111,6 +112,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		this.postdef = postdef;
 		this.actualResult = actualResult;
 		this.stateDefinition = stateDefinition;
+		this.classDefinition = classDefinition;
 		this.isConstructor = isConstructor;
 	}
 
