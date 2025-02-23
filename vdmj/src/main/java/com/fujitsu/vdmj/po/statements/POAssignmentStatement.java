@@ -93,24 +93,22 @@ public class POAssignmentStatement extends POStatement
 		try
 		{
 			TCNameSet updates = this.apply(new POStatementStateFinder(), true);
-			
-			for (TCNameToken update: updates)
-			{
-				pogState.didUpdateState(update, location);
-			}
+			TCNameToken update = updates.iterator().next();	// Always one
+			pogState.didUpdateState(update, location);
 			
 			if (!pogState.hasAmbiguousState(exp.readsState()))
 			{
+				// toPattern throws IllegalArgumentException for complex target patterns
 				ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
 				
 				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
 				// like constants or variables that are unambiguous.
-				
-				if (target instanceof POIdentifierDesignator)
-				{
-					POIdentifierDesignator id = (POIdentifierDesignator)target;
-					pogState.notAmbiguous(id.name);
-				}
+				pogState.notAmbiguous(update);
+			}
+			else
+			{
+				// Updated a variable with an ambiguous value, so it becomes ambiguous
+				pogState.isAmbiguous(update, location);
 			}
 		}
 		catch (IllegalArgumentException e)	// Can't process a complex designator

@@ -171,6 +171,11 @@ public class POGState
 		ambiguous.remove(name);
 	}
 
+	public void isAmbiguous(TCNameToken name, LexLocation location)
+	{
+		ambiguous.put(name, location);
+	}
+
 	/**
 	 * Return the location of the last state update.
 	 */
