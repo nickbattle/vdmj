@@ -165,13 +165,13 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			{			
 				case "-i":
 					iter.remove();
-					startInterpreter = true;
+					setStartInterpreter();
 					interactive = true;
 					break;
 					
 				case "-e":
 					iter.remove();
-					startInterpreter = true;
+					setStartInterpreter();
 					interactive = false;
 					
 					if (iter.hasNext())
@@ -187,7 +187,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 
 				case "-cmd":
 					iter.remove();
-					startInterpreter = true;
+					setStartInterpreter();
 					interactive = false;
 					
 					if (iter.hasNext())
@@ -263,7 +263,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	    			
 	    		case "-remote":
 	    			iter.remove();
-	    			startInterpreter = true;
+					setStartInterpreter();
 	    			interactive = false;
 	    			
 	    			if (iter.hasNext())
@@ -279,7 +279,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	    			
 	    		case "-simulation":
 	    			iter.remove();
-	    			startInterpreter = true;
+					setStartInterpreter();
 	    			interactive = true;
 	    			
 	    			if (iter.hasNext())
@@ -314,8 +314,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		{
 			remoteClass = getRemoteClass(remoteControlName);
 		}
-
-		if (remoteSimulationName != null)
+		else if (remoteSimulationName != null)
 		{
 			remoteSimulation = getRemoteClass(remoteSimulationName);
 			
@@ -328,6 +327,16 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 				fail("Cannot instantiate simulation: " + e.getMessage());
 			}
 		}
+	}
+	
+	private void setStartInterpreter()
+	{
+		if (startInterpreter)	// Already set?
+		{
+			fail("Only one of: -i, -e, -cmd, -remote, -simulation");
+		}
+
+		startInterpreter = true;
 	}
 	
 	@Override
