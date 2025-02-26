@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import java.util.NoSuchElementException;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -108,10 +110,10 @@ public class POAssignmentStatement extends POStatement
 			else
 			{
 				// Updated a variable with an ambiguous value, so it becomes ambiguous
-				pogState.isAmbiguous(update, location);
+				pogState.isAmbiguous(update, exp.location);
 			}
 		}
-		catch (IllegalArgumentException e)	// Can't process a complex designator
+		catch (IllegalArgumentException | NoSuchElementException e)	// Can't process a complex designator
 		{
 			tooComplex = true;
 			ctxt.push(new POAssignmentContext("/* " + target + " */ -", targetType, exp, true));
