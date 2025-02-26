@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
@@ -112,7 +111,7 @@ public class POGState
 	/**
 	 * True if state has been updated, either here or in outer levels.
 	 */
-	public boolean hasUpdatedState(TCNameSet names)
+	public boolean hasUpdatedState(Collection<TCNameToken> names)
 	{
 		if (updatedState.containsKey(SOMETHING))
 		{
@@ -137,7 +136,7 @@ public class POGState
 	/**
 	 * True if state may have been updated on alternative paths.
 	 */
-	public boolean hasAmbiguousState(TCNameSet names)
+	public boolean hasAmbiguousState(Collection<TCNameToken> names)
 	{
 		if (updatedState.containsKey(SOMETHING))
 		{
@@ -179,7 +178,7 @@ public class POGState
 	/**
 	 * Return the location of the last state update.
 	 */
-	public LexLocation getUpdatedLocation(TCNameSet names)
+	public LexLocation getUpdatedLocation(Collection<TCNameToken> names)
 	{
 		for (TCNameToken name: names)
 		{
