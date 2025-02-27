@@ -99,13 +99,12 @@ public class POAssignmentStatement extends POStatement
 			pogState.didUpdateState(update, location);
 			
 			TCNameSet varlist = exp.getVariableNames();		// All
-			boolean isMapSeq = false;
+			boolean isSimple = (target instanceof POIdentifierDesignator);
 			
 			if (target instanceof POMapSeqDesignator)
 			{
 				POMapSeqDesignator ms = (POMapSeqDesignator)target;
 				varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
-				isMapSeq = true;
 			}
 			
 			if (!pogState.hasAmbiguousState(varlist))
@@ -116,7 +115,7 @@ public class POAssignmentStatement extends POStatement
 				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
 				// like constants or variables that are unambiguous.
 				
-				if (!isMapSeq)	// Because other elements of map or seq may be ambiguous
+				if (isSimple)	// Other elements of complex designators may be ambiguous
 				{
 					pogState.notAmbiguous(update);
 				}
