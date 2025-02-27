@@ -49,7 +49,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public static final String LOOP_STATEMENT		= "Loop modifies state";
 	public static final String NON_DETERMINISTIC	= "Non-deterministic update";
 	public static final String HAS_UPDATED_STATE	= "Earlier statements updated state";
-	public static final String HAS_AMBIGUOUS_STATE	= "Earlier statements may have updated state";
+	public static final String HAS_AMBIGUOUS_STATE	= "Earlier statements create ambiguous state";
 	public static final String COMPLEX_ASSIGNMENT	= "Assignment too complex";
 	public static final String PO_HAS_ERRORS		= "PO has errors";
 	

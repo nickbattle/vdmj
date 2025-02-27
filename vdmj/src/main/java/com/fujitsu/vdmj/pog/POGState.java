@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -173,6 +174,26 @@ public class POGState
 	public void isAmbiguous(TCNameToken name, LexLocation location)
 	{
 		ambiguous.put(name, location);
+	}
+
+	public void isAmbiguous(Collection<TCNameToken> names, LexLocation location)
+	{
+		for (TCNameToken name: names)
+		{
+			ambiguous.put(name, location);
+		}
+	}
+
+	/**
+	 * Used for "let <pattern> = <exp> in ...", where pattern assigned vars become ambiguous
+	 * if the expression is ambiguous.
+	 */
+	public void markIfAmbiguous(TCNameList assigned, POExpression exp, LexLocation location)
+	{
+		if (hasAmbiguousState(exp.getVariableNames()))
+		{
+			isAmbiguous(assigned, location);
+		}
 	}
 
 	/**

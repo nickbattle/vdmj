@@ -98,7 +98,7 @@ public class POAssignmentStatement extends POStatement
 			TCNameToken update = updates.iterator().next();	// Always one
 			pogState.didUpdateState(update, location);
 			
-			if (!pogState.hasAmbiguousState(exp.readsState()))
+			if (!pogState.hasAmbiguousState(exp.getVariableNames()))	// All
 			{
 				// toPattern throws IllegalArgumentException for complex target patterns
 				ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
