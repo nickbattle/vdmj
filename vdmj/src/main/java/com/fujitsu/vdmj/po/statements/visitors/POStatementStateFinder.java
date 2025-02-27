@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateFinder;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindStateFinder;
@@ -41,13 +40,11 @@ import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
-import com.fujitsu.vdmj.po.statements.POLetDefStatement;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
@@ -103,30 +100,6 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Boolean updates)
 	{
 		return operationCall(node.fdef, updates);
-	}
-	
-	@Override
-	public TCNameSet caseLetDefStatement(POLetDefStatement node, Boolean updates)
-	{
-		TCNameSet all = super.caseLetDefStatement(node, updates);
-		
-		for (PODefinition def: node.localDefs)
-		{
-			if (def instanceof POValueDefinition)
-			{
-				POValueDefinition vdef = (POValueDefinition)def;
-				
-				if (!vdef.exp.readsState().isEmpty())
-				{
-					for (PODefinition ldef: vdef.defs)
-					{
-						ldef.setNameScope(NameScope.STATE);		// eg. "let x = s1 + s2 in..." makes x STATE
-					}
-				}
-			}
-		}
-		
-		return all;
 	}
 	
 	@Override
