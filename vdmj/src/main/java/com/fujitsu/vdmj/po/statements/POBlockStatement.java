@@ -31,11 +31,13 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -105,6 +107,27 @@ public class POBlockStatement extends POSimpleBlockStatement
 						if (!local)		// So assigning to outer state
 						{
 							for (TCNameToken name: actxt.expression.readsState())
+							{
+								if (dclState.hasLocalName(name))
+								{
+									updatesState = true;	// state assigned using locals
+									break;
+								}
+							}
+						}
+					}
+				}
+				else if (item instanceof POLetDefContext)
+				{
+					POLetDefContext lctxt = (POLetDefContext)item;
+					
+					for (PODefinition def: lctxt.localDefs)
+					{
+						if (def instanceof POValueDefinition)	// Can be fn defs
+						{
+							POValueDefinition vdef = (POValueDefinition)def;
+							
+							for (TCNameToken name: vdef.exp.readsState())
 							{
 								if (dclState.hasLocalName(name))
 								{

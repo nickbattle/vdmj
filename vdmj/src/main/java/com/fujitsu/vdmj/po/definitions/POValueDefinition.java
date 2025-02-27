@@ -76,7 +76,7 @@ public class POValueDefinition extends PODefinition
 	@Override
 	public String toExplicitString(LexLocation from)
 	{
-		return pattern + (type == null ? "" : ":" + type.apply(new TCExplicitTypeVisitor(), from.module)) + " = " + exp;
+		return pattern + (type == null ? "" : " : " + type.apply(new TCExplicitTypeVisitor(), from.module)) + " = " + exp;
 	}
 
 	@Override
