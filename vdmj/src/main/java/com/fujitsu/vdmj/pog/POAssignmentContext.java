@@ -33,14 +33,19 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
+import com.fujitsu.vdmj.po.expressions.POMuExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
+import com.fujitsu.vdmj.po.expressions.PORecordModifier;
+import com.fujitsu.vdmj.po.expressions.PORecordModifierList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -125,6 +130,46 @@ public class POAssignmentContext extends POContext
 					new LexKeywordToken(Token.PLUSPLUS, target.location),
 					new POMapEnumExpression(target.location, maplets, ltypes, rtypes),
 					ms.exp.getExptype(), expression.getExptype());
+			}
+			else
+			{
+				throw new IllegalArgumentException("Designator too complex");
+			}
+		}
+		else if (target instanceof POFieldDesignator)
+		{
+			POFieldDesignator fld = (POFieldDesignator)target;
+			
+			if (fld.object instanceof POIdentifierDesignator)
+			{
+				// For "rec.fld = e" create "let rec = mu(rec, {fld |-> e} in ..."
+				
+				POIdentifierDesignator id = (POIdentifierDesignator)fld.object;
+				this.pattern = id.toString();
+				this.tooComplex = null;
+				
+				if (id.vardef != null)
+				{
+					this.type = id.vardef.getType();		// eg. m(k) is a map
+				}
+				else
+				{
+					this.type = type;						// eg. x := 123 is a nat
+				}
+				
+				if (!(this.type instanceof TCRecordType))
+				{
+					throw new IllegalArgumentException("Designator too complex");
+				}
+				
+				PORecordModifierList muUpdates = new PORecordModifierList();
+				muUpdates.add(new PORecordModifier(fld.field, expression));
+				
+				TCTypeList ftypes = new TCTypeList(expression.getExptype());
+				TCRecordType rtype = (TCRecordType)this.type;
+				
+				this.expression = new POMuExpression(target.location,
+					new POVariableExpression(id.name, null), muUpdates, rtype, ftypes);
 			}
 			else
 			{
