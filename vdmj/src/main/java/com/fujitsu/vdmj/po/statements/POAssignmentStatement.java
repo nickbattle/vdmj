@@ -98,10 +98,18 @@ public class POAssignmentStatement extends POStatement
 			TCNameToken update = updates.iterator().next();	// Always one
 			pogState.didUpdateState(update, location);
 			
-			if (!pogState.hasAmbiguousState(exp.getVariableNames()))	// All
+			TCNameSet varlist = exp.getVariableNames();		// All
+			
+			if (target instanceof POMapSeqDesignator)
 			{
-				// toPattern throws IllegalArgumentException for complex target patterns
-				ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
+				POMapSeqDesignator ms = (POMapSeqDesignator)target;
+				varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
+			}
+			
+			if (!pogState.hasAmbiguousState(varlist))
+			{
+				// This throws IllegalArgumentException for complex target patterns
+				ctxt.push(new POAssignmentContext(target, targetType, exp, false));
 				
 				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
 				// like constants or variables that are unambiguous.
@@ -116,7 +124,7 @@ public class POAssignmentStatement extends POStatement
 		catch (IllegalArgumentException | NoSuchElementException e)	// Can't process a complex designator
 		{
 			tooComplex = true;
-			ctxt.push(new POAssignmentContext("/* " + target + " */ -", targetType, exp, true));
+			ctxt.push(new POAssignmentContext(target, targetType, exp, true));
 		}
 
 		if (!inConstructor && !tooComplex &&

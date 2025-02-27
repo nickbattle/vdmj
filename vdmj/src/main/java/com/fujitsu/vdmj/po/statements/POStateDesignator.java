@@ -45,15 +45,6 @@ public abstract class POStateDesignator extends PONode
 
 	@Override
 	abstract public String toString();
-	
-	/**
-	 * A pattern, such that "let <pattern> = <exp> in ..." can be used in POs. This
-	 * is not always possible.
-	 */
-	public String toPattern() throws IllegalArgumentException
-	{
-		throw new IllegalArgumentException("Cannot generate pattern for " + this);
-	}
 
 	/**
 	 * @param ctxt

@@ -24,14 +24,25 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
+import com.fujitsu.vdmj.po.expressions.POMapletExpression;
+import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
+import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
+import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
+import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POAssignmentContext extends POContext
 {
@@ -63,13 +74,67 @@ public class POAssignmentContext extends POContext
 		}
 	}
 
-	public POAssignmentContext(String pattern, TCType type, POExpression expression, boolean tooComplex)
+	public POAssignmentContext(POStateDesignator target, TCType type, POExpression expression, boolean tooComplex)
 	{
 		this.assignmentDefs = null;
-		this.pattern = pattern;
-		this.type = type;
-		this.expression = expression;
-		this.tooComplex = tooComplex ? ProofObligation.COMPLEX_ASSIGNMENT : null;
+		
+		if (tooComplex)
+		{
+			this.pattern = "/* " + target + " */ -";
+			this.tooComplex = ProofObligation.COMPLEX_ASSIGNMENT;
+			this.expression = expression;
+			this.type = type;
+		}
+		else if (target instanceof POIdentifierDesignator)
+		{
+			POIdentifierDesignator id = (POIdentifierDesignator)target;
+			this.pattern = id.toString();
+			this.tooComplex = null;
+			this.expression = expression;
+			this.type = type;
+		}
+		else if (target instanceof POMapSeqDesignator)
+		{
+			POMapSeqDesignator ms = (POMapSeqDesignator)target;
+			
+			if (ms.mapseq instanceof POIdentifierDesignator)
+			{
+				// For "s(i) = e" create "let s = s ++ {i |-> e} in ..." 
+				
+				POIdentifierDesignator id = (POIdentifierDesignator)ms.mapseq;
+				this.pattern = id.toString();
+				this.tooComplex = null;
+				
+				if (id.vardef != null)
+				{
+					this.type = id.vardef.getType();		// eg. m(k) is a map
+				}
+				else
+				{
+					this.type = type;						// eg. x := 123 is a nat
+				}
+				
+				POMapletExpressionList maplets = new POMapletExpressionList();
+				maplets.add(new POMapletExpression(target.location, ms.exp, expression));
+				
+				TCTypeList ltypes = new TCTypeList(ms.exp.getExptype());
+				TCTypeList rtypes = new TCTypeList(expression.getExptype());
+				
+				this.expression = new POPlusPlusExpression(
+					new POVariableExpression(id.name, null),
+					new LexKeywordToken(Token.PLUSPLUS, target.location),
+					new POMapEnumExpression(target.location, maplets, ltypes, rtypes),
+					ms.exp.getExptype(), expression.getExptype());
+			}
+			else
+			{
+				throw new IllegalArgumentException("Designator too complex");
+			}
+		}
+		else
+		{
+			throw new IllegalArgumentException("Designator too complex");
+		}
 	}
 
 	@Override
