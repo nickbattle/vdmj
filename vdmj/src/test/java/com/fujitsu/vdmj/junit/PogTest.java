@@ -71,12 +71,12 @@ public class PogTest extends TestCase
 			/* 5 */ "forall arg1:(int) * (int), arg2:seq of int & (exists bind1:(int) * (int), i:int, j:int & (arg1 = bind1) and (mk_(i, j) = bind1)) and (exists bind1:seq of int, k:int & (arg2 = bind1) and ([k] = bind1))\n",
 			/* 6 */ "(forall mk_(i, j):(int) * (int), [k]:seq of int &\n  i in set dom m)\n",
 			/* 7 */ "(forall mk_(i, j):(int) * (int) &\n  i in set dom m)\n",
-			/* 8 */ "(let x:nat1 = 123 in\n  -1 in set dom m)\n",
-			/* 9 */ "(let x:nat1 = 123 in\n  ((m(-1) > 0) =>\n    1 in set dom m))\n",
-			/* 10 */ "(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    -2 in set dom m))\n",
-			/* 11 */ "(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    ((m(-2) > 0) =>\n      2 in set dom m)))\n",
-			/* 12 */ "(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (((x < 0) or ((x > 10) or (x = 100))) =>\n        3 in set dom m))))\n",
-			/* 13 */ "(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (not ((x < 0) or ((x > 10) or (x = 100))) =>\n        999 in set dom m))))\n",
+			/* 8 */ "(let x : nat1 = 123 in\n  -1 in set dom m)\n",
+			/* 9 */ "(let x : nat1 = 123 in\n  ((m(-1) > 0) =>\n    1 in set dom m))\n",
+			/* 10 */ "(let x : nat1 = 123 in\n  (not (m(-1) > 0) =>\n    -2 in set dom m))\n",
+			/* 11 */ "(let x : nat1 = 123 in\n  (not (m(-1) > 0) =>\n    ((m(-2) > 0) =>\n      2 in set dom m)))\n",
+			/* 12 */ "(let x : nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (((x < 0) or ((x > 10) or (x = 100))) =>\n        3 in set dom m))))\n",
+			/* 13 */ "(let x : nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (not ((x < 0) or ((x > 10) or (x = 100))) =>\n        999 in set dom m))))\n",
 			/* 14 */ "(forall a:int, b:int & pre_pref(a, b) =>\n  a in set dom m)\n",
 			/* 15 */ "(forall a:int, b:int &\n  pre_prepostf(a, b) => post_prepostf(a, b, (a + b)))\n",
 			/* 16 */ "(forall mk_(a, b):(int) * (int), c:(int) * (int) &\n  is_(pre_prepostfi(mk_(a, b), c), bool))\n",
@@ -91,7 +91,7 @@ public class PogTest extends TestCase
 			/* 25 */ "(forall mk_(i, $any1):(int) * (int) &\n  (forall x in set {m(1), 2, 3} &\n    x in set dom m))\n",
 			/* 26 */ "(forall mk_(i, $any1):(int) * (int) &\n  (forall x in set {m(1), 2, 3} & (m(x) < i) =>\n    x in set dom m))\n",
 			/* 27 */ "1 in set dom m\n",
-			/* 28 */ "(let x:int = m(1) in\n  x in set dom m)\n",
+			/* 28 */ "(let x : int = m(1) in\n  x in set dom m)\n",
 			/* 29 */ "(let local: int -> int local(x) == m(x) in\n  (forall x:int &\n    x in set dom m))\n",
 			/* 30 */ "1 in set dom m\n",
 			/* 31 */ "(let x = m(1) in\n  2 in set dom m)\n",
@@ -148,7 +148,7 @@ public class PogTest extends TestCase
 			/* 82 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    (not (m(1) < 10) =>\n      2 in set dom m)))\n",
 			/* 83 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (not 1 = i =>\n    (2 = i => \n      3 in set dom m)))\n",
 			/* 84 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    while (x > 0) do ...))\n",
-			/* 85 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (let iv : int = (iv + 1) in\n      (iv < 10))))\n",
+			/* 85 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (let iv : int = (iv + 1) in\n      (iv < 10))))\n"
 	};
 
 	public void testPOG() throws Exception
