@@ -278,6 +278,14 @@ public class POGState
 		localNames.add(name);
 	}
 	
+	public void addDclLocal(Collection<TCNameToken> names)
+	{
+		for (TCNameToken name: names)
+		{
+			localNames.add(name);
+		}
+	}
+	
 	public void addOperationCall(LexLocation from, PODefinition called)
 	{
 		if (called == null)
