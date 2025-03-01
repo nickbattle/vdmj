@@ -101,6 +101,12 @@ public class ProofObligationList extends Vector<ProofObligation>
 			sb.append(po.number);
 			sb.append(": (");
 			sb.append(po.status);
+			
+			if (po.qualifier != null)
+			{
+				sb.append(" ");
+				sb.append(po.qualifier);
+			}
 
 			if (po.counterexample != null && !po.counterexample.isEmpty())
 			{
