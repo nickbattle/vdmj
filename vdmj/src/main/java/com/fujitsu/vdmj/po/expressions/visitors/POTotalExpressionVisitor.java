@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.visitors;
+package com.fujitsu.vdmj.po.expressions.visitors;
 
 import java.util.List;
 import java.util.Vector;
@@ -50,7 +50,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
  * Search a PO expression and note whether the expression is total (ie. defined for
  * all possible argument values).
  */
-public class TotalExpressionVisitor extends POLeafExpressionVisitor<Boolean, List<Boolean>, Object>
+public class POTotalExpressionVisitor extends POLeafExpressionVisitor<Boolean, List<Boolean>, Object>
 {
 	private boolean isTotal = true;		// Set false by some cases
 	

@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
+import com.fujitsu.vdmj.po.expressions.visitors.POTotalExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -53,8 +54,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
-
-import quickcheck.visitors.TotalExpressionVisitor;
 
 /**
  * A QC strategy to look for particular obligation types, to discharge them by
@@ -202,7 +201,7 @@ public class DirectQCStrategy extends QCStrategy
 
 	private StrategyResults directTotalObligation(TotalFunctionObligation po)
 	{
-		TotalExpressionVisitor visitor = new TotalExpressionVisitor();
+		POTotalExpressionVisitor visitor = new POTotalExpressionVisitor();
 		POExplicitFunctionDefinition exdef = (POExplicitFunctionDefinition) po.definition;
 		
 		if (exdef.bodyObligationCount > 0)
