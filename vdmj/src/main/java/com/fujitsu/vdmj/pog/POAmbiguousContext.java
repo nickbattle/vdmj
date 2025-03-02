@@ -24,7 +24,10 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Set;
+
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A context to represent missing ambiguous contexts
@@ -32,17 +35,20 @@ import com.fujitsu.vdmj.lex.LexLocation;
 public class POAmbiguousContext extends POContext
 {
 	private final String reason;
+	private final Set<TCNameToken> ambiguous;
 	private final LexLocation location;	
 	
-	public POAmbiguousContext(String reason, LexLocation location)
+	public POAmbiguousContext(String reason, POGState pogState, LexLocation location)
 	{
 		this.reason = reason;
+		this.ambiguous = pogState.getAmbiguousNames();
 		this.location = location;
 	}
 
 	@Override
 	public String getSource()
 	{
-		return "-- Ambiguous " + reason + " at " + location.startLine + ":" + location.startPos;
+		return "-- Ambiguous " + reason + ", " + ambiguous +
+				"? at " + location.startLine + ":" + location.startPos;
 	}
 }

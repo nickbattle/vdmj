@@ -112,7 +112,7 @@ public class POIfStatement extends POStatement
 
 		ctxt.popTo(base);
 		stateList.combineInto(pogState);
-		ctxt.push(new POAmbiguousContext("if statement", location));
+		ctxt.push(new POAmbiguousContext("if statement", pogState, location));
 		
 		return obligations;
 	}

@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.pog;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -230,6 +232,23 @@ public class POGState
 		}
 		
 		return LexLocation.ANY;
+	}
+	
+	/**
+	 * Get a snapshot of the ambiguous state names, if any.
+	 */
+	public Set<TCNameToken> getAmbiguousNames()
+	{
+		if (outerState != null)
+		{
+			return outerState.getAmbiguousNames();
+		}
+		else
+		{
+			Set<TCNameToken> set = new HashSet<TCNameToken>();
+			set.addAll(ambiguous.keySet());
+			return set;
+		}
 	}
 	
 	/**
