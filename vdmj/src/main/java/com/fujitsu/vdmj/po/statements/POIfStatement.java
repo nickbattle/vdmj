@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
@@ -110,7 +111,8 @@ public class POIfStatement extends POStatement
 		}
 
 		ctxt.popTo(base);
-		stateList.combineInto(pogState);	
+		stateList.combineInto(pogState);
+		ctxt.push(new POAmbiguousContext("if statement", location));
 		
 		return obligations;
 	}

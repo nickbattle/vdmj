@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
@@ -67,6 +68,7 @@ public class POAtomicStatement extends POStatement
 		stateList.combineInto(pogState);	// Delayed effect of every atomic assignment
 		ctxt.popTo(popto);
 		obligations.markUnchecked(ProofObligation.NON_DETERMINISTIC);
+		ctxt.push(new POAmbiguousContext("atomic statement", location));
 		
 		return obligations;
 	}
