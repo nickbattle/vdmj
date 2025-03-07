@@ -25,19 +25,36 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POFieldExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 
 public class POFieldDesignator extends POStateDesignator
 {
 	private static final long serialVersionUID = 1L;
 	public final POStateDesignator object;
 	public final TCIdentifierToken field;
+	public final TCRecordType recType;
+	public final TCClassType clsType;
 
-	public POFieldDesignator(POStateDesignator object, TCIdentifierToken field)
+	public POFieldDesignator(POStateDesignator object,
+			TCIdentifierToken field, TCRecordType recType, TCClassType clsType)
 	{
 		super(object.location);
 		this.object = object;
 		this.field = field;
+		this.recType = recType;
+		this.clsType = clsType;
+	}
+	
+	@Override
+	public POExpression toExpression()
+	{
+		POExpression root = object.toExpression();
+		return new POFieldExpression(root, field, new TCNameToken(location, location.module, field.getName()));
 	}
 
 	@Override

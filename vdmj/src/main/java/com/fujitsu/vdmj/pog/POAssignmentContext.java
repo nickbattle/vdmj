@@ -38,13 +38,13 @@ import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 import com.fujitsu.vdmj.po.expressions.PORecordModifier;
 import com.fujitsu.vdmj.po.expressions.PORecordModifierList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
-import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -53,7 +53,7 @@ public class POAssignmentContext extends POContext
 {
 	public final PODefinitionList assignmentDefs;
 	public final String pattern;
-	public final TCType type;
+	public TCType type;
 	public final POExpression expression;
 	public final String tooComplex;
 
@@ -85,96 +85,101 @@ public class POAssignmentContext extends POContext
 		
 		if (tooComplex)
 		{
+			this.type = type;
 			this.pattern = "/* " + target + " */ -";
 			this.tooComplex = ProofObligation.COMPLEX_ASSIGNMENT;
 			this.expression = expression;
-			this.type = type;
 		}
-		else if (target instanceof POIdentifierDesignator)
+		else
 		{
-			POIdentifierDesignator id = (POIdentifierDesignator)target;
-			this.pattern = id.toString();
+			this.type = type;
+			this.pattern = updatedVariable(target);
 			this.tooComplex = null;
-			this.expression = expression;
-			this.type = type;
+			this.expression = updateExpression(target, expression);
 		}
-		else if (target instanceof POMapSeqDesignator)
+	}
+	
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	private String updatedVariable(POStateDesignator designator)
+	{
+		if (designator instanceof POIdentifierDesignator)
 		{
-			POMapSeqDesignator ms = (POMapSeqDesignator)target;
+			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
 			
-			if (ms.mapseq instanceof POIdentifierDesignator)
+			if (idd.vardef != null)
 			{
-				// For "s(i) = e" create "let s = s ++ {i |-> e} in ..." 
-				
-				POIdentifierDesignator id = (POIdentifierDesignator)ms.mapseq;
-				this.pattern = id.toString();
-				this.tooComplex = null;
-				
-				if (id.vardef != null)
-				{
-					this.type = id.vardef.getType();		// eg. m(k) is a map
-				}
-				else
-				{
-					this.type = type;						// eg. x := 123 is a nat
-				}
-				
-				POMapletExpressionList maplets = new POMapletExpressionList();
-				maplets.add(new POMapletExpression(target.location, ms.exp, expression));
-				
-				TCTypeList ltypes = new TCTypeList(ms.exp.getExptype());
-				TCTypeList rtypes = new TCTypeList(expression.getExptype());
-				
-				this.expression = new POPlusPlusExpression(
-					new POVariableExpression(id.name, null),
-					new LexKeywordToken(Token.PLUSPLUS, target.location),
-					new POMapEnumExpression(target.location, maplets, ltypes, rtypes),
-					ms.exp.getExptype(), expression.getExptype());
+				this.type = idd.vardef.getType();	// eg. m(k) is a map/seq
 			}
-			else
-			{
-				throw new IllegalArgumentException("Designator too complex");
-			}
+
+			return idd.name.getName();
 		}
-		else if (target instanceof POFieldDesignator)
+		else if (designator instanceof POMapSeqDesignator)
 		{
-			POFieldDesignator fld = (POFieldDesignator)target;
+			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
+			return updatedVariable(msd.mapseq);
+		}
+		else if (designator instanceof POFieldDesignator)
+		{
+			POFieldDesignator fld = (POFieldDesignator)designator;
+			return updatedVariable(fld.object);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Designator too complex");
+		}
+	}
+	
+	/**
+	 * Return a POExpression for the update value for the updatedVariable above.
+	 * 
+	 * For x := E updates, it is "E"
+	 * For x(i) := E updates, it is "x ++ {i |-> E}"
+	 * For x.fld := E updates, it is "mu(x, {fld |-> E})"
+	 * 
+	 * More complex combinations nest these expressions.
+	 */
+	private POExpression updateExpression(POStateDesignator designator, POExpression update)
+	{
+		if (designator instanceof POIdentifierDesignator)
+		{
+			return update;
+		}
+		else if (designator instanceof POMapSeqDesignator)
+		{
+			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
 			
-			if (fld.object instanceof POIdentifierDesignator)
-			{
-				// For "rec.fld = e" create "let rec = mu(rec, {fld |-> e} in ..."
-				
-				POIdentifierDesignator id = (POIdentifierDesignator)fld.object;
-				this.pattern = id.toString();
-				this.tooComplex = null;
-				
-				if (id.vardef != null)
-				{
-					this.type = id.vardef.getType();		// eg. m(k) is a map
-				}
-				else
-				{
-					this.type = type;						// eg. x := 123 is a nat
-				}
-				
-				if (!(this.type instanceof TCRecordType))
-				{
-					throw new IllegalArgumentException("Designator too complex");
-				}
-				
-				PORecordModifierList muUpdates = new PORecordModifierList();
-				muUpdates.add(new PORecordModifier(fld.field, expression));
-				
-				TCTypeList ftypes = new TCTypeList(expression.getExptype());
-				TCRecordType rtype = (TCRecordType)this.type;
-				
-				this.expression = new POMuExpression(target.location,
-					new POVariableExpression(id.name, null), muUpdates, rtype, ftypes);
-			}
-			else
-			{
-				throw new IllegalArgumentException("Designator too complex");
-			}
+			POMapletExpressionList maplets = new POMapletExpressionList();
+			maplets.add(new POMapletExpression(msd.location, msd.exp, update));
+			
+			TCTypeList ltypes = new TCTypeList(msd.exp.getExptype());
+			TCTypeList rtypes = new TCTypeList(update.getExptype());
+			
+			POPlusPlusExpression ppe = new POPlusPlusExpression(
+				msd.mapseq.toExpression(),
+				new LexKeywordToken(Token.PLUSPLUS, msd.location),
+				new POMapEnumExpression(msd.location, maplets, ltypes, rtypes),
+				msd.exp.getExptype(), update.getExptype());
+			
+			return updateExpression(msd.mapseq, ppe);
+		}
+		else if (designator instanceof POFieldDesignator)
+		{
+			POFieldDesignator fld = (POFieldDesignator)designator;
+			
+			PORecordModifierList muUpdates = new PORecordModifierList();
+			muUpdates.add(new PORecordModifier(fld.field, update));
+			
+			TCField rfield = fld.recType.findField(fld.field.getName());
+			TCTypeList ftypes = new TCTypeList(rfield.type);
+			TCRecordType rtype = fld.recType;
+			
+			POMuExpression mu = new POMuExpression(fld.location,
+				fld.object.toExpression(), muUpdates, rtype, ftypes);
+			
+			return updateExpression(fld.object, mu);
 		}
 		else
 		{

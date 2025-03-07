@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -45,6 +46,8 @@ public abstract class POStateDesignator extends PONode
 
 	@Override
 	abstract public String toString();
+	
+	abstract public POExpression toExpression();
 
 	/**
 	 * @param ctxt
