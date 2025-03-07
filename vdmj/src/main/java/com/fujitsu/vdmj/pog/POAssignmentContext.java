@@ -105,31 +105,14 @@ public class POAssignmentContext extends POContext
 	 */
 	private String updatedVariable(POStateDesignator designator)
 	{
-		if (designator instanceof POIdentifierDesignator)
+		TCType type = POStateDesignator.updatedVariableType(designator);
+		
+		if (type != null)
 		{
-			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
-			
-			if (idd.vardef != null)
-			{
-				this.type = idd.vardef.getType();	// eg. m(k) is a map/seq
-			}
-
-			return idd.name.getName();
+			this.type = type;	// eg. a map or seq type
 		}
-		else if (designator instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
-			return updatedVariable(msd.mapseq);
-		}
-		else if (designator instanceof POFieldDesignator)
-		{
-			POFieldDesignator fld = (POFieldDesignator)designator;
-			return updatedVariable(fld.object);
-		}
-		else
-		{
-			throw new IllegalArgumentException("Designator too complex");
-		}
+		
+		return POStateDesignator.updatedVariableName(designator).getName();
 	}
 	
 	/**

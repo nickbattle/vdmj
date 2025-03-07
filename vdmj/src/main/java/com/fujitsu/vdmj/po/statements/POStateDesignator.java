@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * The root of the state designator hierarchy.
@@ -48,6 +50,68 @@ public abstract class POStateDesignator extends PONode
 	abstract public String toString();
 	
 	abstract public POExpression toExpression();
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	public static TCNameToken updatedVariableName(POStateDesignator designator)
+	{
+		if (designator instanceof POIdentifierDesignator)
+		{
+			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
+			return idd.name;
+		}
+		else if (designator instanceof POMapSeqDesignator)
+		{
+			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
+			return updatedVariableName(msd.mapseq);
+		}
+		else if (designator instanceof POFieldDesignator)
+		{
+			POFieldDesignator fld = (POFieldDesignator)designator;
+			return updatedVariableName(fld.object);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Designator too complex");
+		}
+	}
+
+	/**
+	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the type of the variable "x".
+	 */
+	public static TCType updatedVariableType(POStateDesignator designator)
+	{
+		if (designator instanceof POIdentifierDesignator)
+		{
+			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
+
+			if (idd.vardef != null)
+			{
+				return idd.vardef.getType();	// eg. m(k) is a map/seq
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else if (designator instanceof POMapSeqDesignator)
+		{
+			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
+			return updatedVariableType(msd.mapseq);
+		}
+		else if (designator instanceof POFieldDesignator)
+		{
+			POFieldDesignator fld = (POFieldDesignator)designator;
+			return updatedVariableType(fld.object);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Designator too complex");
+		}
+	}
 
 	/**
 	 * @param ctxt

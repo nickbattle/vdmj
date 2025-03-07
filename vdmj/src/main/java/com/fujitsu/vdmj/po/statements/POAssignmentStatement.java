@@ -24,13 +24,10 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.util.NoSuchElementException;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -94,8 +91,7 @@ public class POAssignmentStatement extends POStatement
 
 		try
 		{
-			TCNameSet updates = this.apply(new POStatementStateFinder(), true);
-			TCNameToken update = updates.iterator().next();	// Always one
+			TCNameToken update = POStateDesignator.updatedVariableName(target);
 			pogState.didUpdateState(update, location);
 			
 			TCNameSet varlist = exp.getVariableNames();		// All
@@ -126,7 +122,7 @@ public class POAssignmentStatement extends POStatement
 				pogState.isAmbiguous(update, exp.location);
 			}
 		}
-		catch (IllegalArgumentException | NoSuchElementException e)	// Can't process a complex designator
+		catch (IllegalArgumentException e)	// Can't process a complex designator
 		{
 			tooComplex = true;
 			ctxt.push(new POAssignmentContext(target, targetType, exp, true));
