@@ -71,7 +71,7 @@ public class POMapSeqDesignator extends POStateDesignator
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList list = new ProofObligationList();
+		ProofObligationList list = mapseq.getProofObligations(ctxt);
 
 		if (seqType != null)
 		{

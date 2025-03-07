@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POFieldExpression;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
@@ -48,6 +50,12 @@ public class POFieldDesignator extends POStateDesignator
 		this.field = field;
 		this.recType = recType;
 		this.clsType = clsType;
+	}
+	
+	@Override
+	public ProofObligationList getProofObligations(POContextStack ctxt)
+	{
+		return object.getProofObligations(ctxt);
 	}
 	
 	@Override
