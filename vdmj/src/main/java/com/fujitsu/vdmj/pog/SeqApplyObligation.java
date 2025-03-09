@@ -41,6 +41,6 @@ public class SeqApplyObligation extends ProofObligation
 	public SeqApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
-		source = ctxt.getSource(arg + " > 0 and " + arg + " <= len (" + root + ") + 1");
+		source = ctxt.getSource(arg + " in set inds " + root);
 	}
 }

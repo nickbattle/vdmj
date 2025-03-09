@@ -31,11 +31,13 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -70,13 +72,13 @@ public class POBlockStatement extends POSimpleBlockStatement
 			int dcls = ctxt.pushAt(new POAssignmentContext(assignmentDefs));
 			obligations.addAll(super.getProofObligations(ctxt, dclState, env));
 			
-			// Remove the POAssignmentContext for the dcls, unless they are used in
-			// assignments to outer state within the block, since the dcls are needed
+			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
+			// assignments to outer state within the block, since the dcls/lets are needed
 			// in any POs relating to those updated state values.
 			
-			boolean updatesState = false;
-			List<Integer> localUpdates = new LinkedList<Integer>();
-			localUpdates.add(dcls);
+			boolean keepLets = false;
+			List<Integer> toDelete = new LinkedList<Integer>();
+			toDelete.add(dcls);
 			
 			for (int sp = dcls + 1; sp < ctxt.size(); sp++)
 			{
@@ -96,30 +98,46 @@ public class POBlockStatement extends POSimpleBlockStatement
 							
 							if (adef.name.getName().equals(actxt.pattern))
 							{
-								localUpdates.add(0, sp);	// Caused by x := to local x.
+								toDelete.add(0, sp);	// Caused by x := to local x.
 								local = true;
 								break;
 							}
 						}
 
-						if (!local)		// So assigning to outer state
+						if (!local)	// So assigning to outer state, sv := <expression>
 						{
-							for (TCNameToken name: actxt.expression.readsState())
+							for (TCNameToken name: actxt.expression.getVariableNames())
 							{
 								if (dclState.hasLocalName(name))
 								{
-									updatesState = true;	// state assigned using locals
+									keepLets = true;	// state assigned using locals/dcls
 									break;
 								}
 							}
 						}
 					}
 				}
+				else if (item instanceof POLetDefContext)	// A "let x = y in ..."
+				{
+					POLetDefContext lctxt = (POLetDefContext)item;
+					toDelete.add(0, sp);
+					
+					for (PODefinition def: lctxt.localDefs)
+					{
+						if (def instanceof POValueDefinition)	// Ignore fn defs
+						{
+							POValueDefinition vdef = (POValueDefinition)def;
+							
+							// Add var name(s) to dclState, so visible above
+							dclState.addDclLocal(vdef.pattern.getVariableNames());
+						}
+					}
+				}
 			}
 			
-			if (!updatesState)			// dcl variables not used in state assignments
+			if (!keepLets)				// dcl/let variables not used in state assignments
 			{
-				for (int sp: localUpdates)	// Added in reverse order
+				for (int sp: toDelete)	// Added in reverse order
 				{
 					ctxt.remove(sp);
 				}

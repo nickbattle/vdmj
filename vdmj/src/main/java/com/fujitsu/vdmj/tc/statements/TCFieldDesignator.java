@@ -42,7 +42,10 @@ public class TCFieldDesignator extends TCStateDesignator
 	private static final long serialVersionUID = 1L;
 	public final TCStateDesignator object;
 	public final TCIdentifierToken field;
+	
 	private TCNameToken objectfield = null;
+	private TCRecordType recType = null;
+	private TCClassType clsType = null;
 
 	public TCFieldDesignator(TCStateDesignator object, TCIdentifierToken field)
 	{
@@ -66,8 +69,8 @@ public class TCFieldDesignator extends TCStateDesignator
 
 		if (type.isRecord(location))
 		{
-    		TCRecordType rec = type.getRecord();
-    		TCField rf = rec.findField(field.getName());
+    		recType = type.getRecord();
+    		TCField rf = recType.findField(field.getName());
 
     		if (rf == null)
     		{
@@ -82,11 +85,11 @@ public class TCFieldDesignator extends TCStateDesignator
 
 		if (type.isClass(env))
 		{
-			TCClassType ctype = type.getClassType(env);
-			String cname = ctype.name.getName();
+			clsType = type.getClassType(env);
+			String cname = clsType.name.getName();
 
 			objectfield = new TCNameToken(location, cname, field.getName(), false);
-			TCDefinition fdef = ctype.classdef.findName(objectfield, NameScope.STATE);
+			TCDefinition fdef = clsType.classdef.findName(objectfield, NameScope.STATE);
 
 			if (fdef == null)
 			{

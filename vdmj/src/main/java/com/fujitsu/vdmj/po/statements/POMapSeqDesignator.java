@@ -24,11 +24,16 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POMapSeqDesignator extends POStateDesignator
 {
@@ -50,11 +55,23 @@ public class POMapSeqDesignator extends POStateDesignator
 	{
 		return mapseq + "(" + exp + ")";
 	}
+	
+	@Override
+	public POExpression toExpression()
+	{
+		POExpression root = mapseq.toExpression();
+		POExpressionList args = new POExpressionList();
+		args.add(exp);
+		TCTypeList argtypes = new TCTypeList();
+		TCType type = new TCUnknownType(location);
+		argtypes.add(type);
+		return new POApplyExpression(root, args , type, argtypes, null, null);
+	}
 
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList list = new ProofObligationList();
+		ProofObligationList list = mapseq.getProofObligations(ctxt);
 
 		if (seqType != null)
 		{

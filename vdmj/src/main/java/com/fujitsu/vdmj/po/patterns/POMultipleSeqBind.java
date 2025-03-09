@@ -54,6 +54,12 @@ public class POMultipleSeqBind extends POMultipleBind
 	{
 		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
 		obligations.markIfAmbiguous(pogState, sequence);
+		
+		for (POPattern p: plist)
+		{
+			pogState.markIfAmbiguous(p.getVariableNames(), sequence, location);
+		}
+		
 		return obligations;
 	}
 	

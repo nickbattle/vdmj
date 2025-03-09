@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -92,29 +91,41 @@ public class POAssignmentStatement extends POStatement
 
 		try
 		{
-			TCNameSet updates = this.apply(new POStatementStateFinder(), true);
-			TCNameToken update = updates.iterator().next();	// Always one
+			TCNameToken update = POStateDesignator.updatedVariableName(target);
 			pogState.didUpdateState(update, location);
 			
-			if (!pogState.hasAmbiguousState(exp.readsState()))
+			TCNameSet varlist = exp.getVariableNames();		// All
+			boolean isSimple = (target instanceof POIdentifierDesignator);
+			
+			if (target instanceof POMapSeqDesignator)
 			{
-				// toPattern throws IllegalArgumentException for complex target patterns
-				ctxt.push(new POAssignmentContext(target.toPattern(), targetType, exp, false));
+				POMapSeqDesignator ms = (POMapSeqDesignator)target;
+				varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
+			}
+			
+			if (!pogState.hasAmbiguousState(varlist))
+			{
+				// This throws IllegalArgumentException for complex target patterns
+				ctxt.push(new POAssignmentContext(target, targetType, exp, false));
 				
 				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
 				// like constants or variables that are unambiguous.
-				pogState.notAmbiguous(update);
+				
+				if (isSimple)	// Other elements of complex designators may be ambiguous
+				{
+					pogState.notAmbiguous(update);
+				}
 			}
 			else
 			{
 				// Updated a variable with an ambiguous value, so it becomes ambiguous
-				pogState.isAmbiguous(update, location);
+				pogState.isAmbiguous(update, exp.location);
 			}
 		}
 		catch (IllegalArgumentException e)	// Can't process a complex designator
 		{
 			tooComplex = true;
-			ctxt.push(new POAssignmentContext("/* " + target + " */ -", targetType, exp, true));
+			ctxt.push(new POAssignmentContext(target, targetType, exp, true));
 		}
 
 		if (!inConstructor && !tooComplex &&

@@ -24,17 +24,22 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POIdentifierDesignator extends POStateDesignator
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken name;
+	public final PODefinition vardef;
 
-	public POIdentifierDesignator(TCNameToken name)
+	public POIdentifierDesignator(TCNameToken name, PODefinition vardef)
 	{
 		super(name.getLocation());
 		this.name = name;
+		this.vardef = vardef;
 	}
 
 	@Override
@@ -42,10 +47,10 @@ public class POIdentifierDesignator extends POStateDesignator
 	{
 		return name.getName();
 	}
-
+	
 	@Override
-	public String toPattern() throws IllegalArgumentException
+	public POExpression toExpression()
 	{
-		return name.getName();
+		return new POVariableExpression(name, vardef);
 	}
 }

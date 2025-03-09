@@ -26,16 +26,18 @@ package com.fujitsu.vdmj.pog;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
@@ -112,7 +114,7 @@ public class POGState
 	/**
 	 * True if state has been updated, either here or in outer levels.
 	 */
-	public boolean hasUpdatedState(TCNameSet names)
+	public boolean hasUpdatedState(Collection<TCNameToken> names)
 	{
 		if (updatedState.containsKey(SOMETHING))
 		{
@@ -137,7 +139,7 @@ public class POGState
 	/**
 	 * True if state may have been updated on alternative paths.
 	 */
-	public boolean hasAmbiguousState(TCNameSet names)
+	public boolean hasAmbiguousState(Collection<TCNameToken> names)
 	{
 		if (updatedState.containsKey(SOMETHING))
 		{
@@ -176,10 +178,30 @@ public class POGState
 		ambiguous.put(name, location);
 	}
 
+	public void isAmbiguous(Collection<TCNameToken> names, LexLocation location)
+	{
+		for (TCNameToken name: names)
+		{
+			ambiguous.put(name, location);
+		}
+	}
+
+	/**
+	 * Used for "let <pattern> = <exp> in ...", where pattern assigned vars become ambiguous
+	 * if the expression is ambiguous.
+	 */
+	public void markIfAmbiguous(TCNameList assigned, POExpression exp, LexLocation location)
+	{
+		if (hasAmbiguousState(exp.getVariableNames()))
+		{
+			isAmbiguous(assigned, location);
+		}
+	}
+
 	/**
 	 * Return the location of the last state update.
 	 */
-	public LexLocation getUpdatedLocation(TCNameSet names)
+	public LexLocation getUpdatedLocation(Collection<TCNameToken> names)
 	{
 		for (TCNameToken name: names)
 		{
@@ -210,6 +232,23 @@ public class POGState
 		}
 		
 		return LexLocation.ANY;
+	}
+	
+	/**
+	 * Get a snapshot of the ambiguous state names, if any.
+	 */
+	public Set<TCNameToken> getAmbiguousNames()
+	{
+		if (outerState != null)
+		{
+			return outerState.getAmbiguousNames();
+		}
+		else
+		{
+			Set<TCNameToken> set = new HashSet<TCNameToken>();
+			set.addAll(ambiguous.keySet());
+			return set;
+		}
 	}
 	
 	/**
@@ -256,6 +295,14 @@ public class POGState
 	public void addDclLocal(TCNameToken name)
 	{
 		localNames.add(name);
+	}
+	
+	public void addDclLocal(Collection<TCNameToken> names)
+	{
+		for (TCNameToken name: names)
+		{
+			localNames.add(name);
+		}
 	}
 	
 	public void addOperationCall(LexLocation from, PODefinition called)

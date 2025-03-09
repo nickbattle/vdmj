@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.visitors.POTotalExpressionVisitor;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
@@ -101,6 +102,12 @@ public class ProofObligationList extends Vector<ProofObligation>
 			sb.append(po.number);
 			sb.append(": (");
 			sb.append(po.status);
+			
+			if (po.qualifier != null)
+			{
+				sb.append(" ");
+				sb.append(po.qualifier);
+			}
 
 			if (po.counterexample != null && !po.counterexample.isEmpty())
 			{
@@ -275,10 +282,9 @@ public class ProofObligationList extends Vector<ProofObligation>
 		// in some proof strategies.
 		
 		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convertLocal(tcexp);
-		POContextStack stack = new POContextStack();
-		stack.push(new PONameContext());	// Must have one context
-		ProofObligationList popos = poexp.getProofObligations(stack, new POGState(), env);
-		obligation.setHasObligations(!popos.isEmpty());
+		POTotalExpressionVisitor visitor = new POTotalExpressionVisitor();
+		poexp.apply(visitor, null);
+		obligation.setHasObligations(!visitor.isTotal());
 	}
 
 	public TCDefinitionList getTypeParamDefinitions(ProofObligation po)

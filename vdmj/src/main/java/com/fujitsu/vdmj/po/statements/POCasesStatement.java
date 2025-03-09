@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
@@ -103,6 +104,7 @@ public class POCasesStatement extends POStatement
 
 		ctxt.popTo(popto);
 		stateList.combineInto(pogState);
+		ctxt.push(new POAmbiguousContext("cases statement", pogState, location));
 
 		return obligations;
 	}

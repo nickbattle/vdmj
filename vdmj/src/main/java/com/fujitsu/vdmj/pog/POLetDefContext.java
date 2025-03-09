@@ -69,7 +69,7 @@ public class POLetDefContext extends POContext
 				{
 					POAssignmentDefinition ass = (POAssignmentDefinition)def;
 					sb.append(ass.name);
-					sb.append(":");
+					sb.append(" : ");
 					sb.append(ass.expType);
 					sb.append(" = ");
 					sb.append(ass.expression);

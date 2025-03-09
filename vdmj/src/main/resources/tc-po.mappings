@@ -256,11 +256,11 @@ map TCErrorStatement{location, stmttype} to POErrorStatement(location) set stmtt
 map TCExitStatement{location, expression, stmttype} to POExitStatement(location, expression) set stmttype;
 map TCExternalClause{mode, identifiers, type} to POExternalClause(mode, identifiers, type);
 map TCExternalClauseList{} to POExternalClauseList(this);
-map TCFieldDesignator{object, field} to POFieldDesignator(object, field);
+map TCFieldDesignator{object, field, recType, clsType} to POFieldDesignator(object, field, recType, clsType);
 map TCForAllStatement{location, pattern, set, statement, stmttype} to POForAllStatement(location, pattern, set, statement) set stmttype;
 map TCForIndexStatement{location, var, from, to, by, statement, stmttype} to POForIndexStatement(location, var, from, to, by, statement) set stmttype;
 map TCForPatternBindStatement{location, patternBind, reverse, exp, expType, statement, stmttype} to POForPatternBindStatement(location, patternBind, reverse, exp, expType, statement) set stmttype;
-map TCIdentifierDesignator{name} to POIdentifierDesignator(name);
+map TCIdentifierDesignator{name, vardef} to POIdentifierDesignator(name, vardef);
 map TCIfStatement{location, ifExp, thenStmt, elseList, elseStmt, stmttype} to POIfStatement(location, ifExp, thenStmt, elseList, elseStmt) set stmttype;
 map TCLetBeStStatement{location, bind, suchThat, statement, stmttype} to POLetBeStStatement(location, bind, suchThat, statement) set stmttype;
 map TCLetDefStatement{location, localDefs, statement, stmttype} to POLetDefStatement(location, localDefs, statement) set stmttype;
