@@ -84,10 +84,8 @@ public class POIfStatement extends POStatement
 		obligations.markIfAmbiguous(pogState, ifExp);
 		
 		int base = ctxt.pushAt(new POImpliesContext(ifExp));
-		
-		int popto = base;
 		obligations.addAll(thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
-		ctxt.popInto(popto, altContext.add());
+		ctxt.popInto(base, altContext.add());
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
@@ -96,7 +94,7 @@ public class POIfStatement extends POStatement
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
 			oblist.markIfAmbiguous(pogState, stmt.elseIfExp);
 
-			popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
+			int popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
 			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
@@ -107,14 +105,14 @@ public class POIfStatement extends POStatement
 
 		if (elseStmt != null)
 		{
-			popto = ctxt.size();
+			int popto = ctxt.size();
 			obligations.addAll(elseStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
 		}
 
 		ctxt.popTo(base);
-		// stateList.combineInto(pogState);
+		stateList.combineInto(pogState, false);
 		// ctxt.push(new POAmbiguousContext("if statement", pogState, location));
 		ctxt.push(altContext);
 		

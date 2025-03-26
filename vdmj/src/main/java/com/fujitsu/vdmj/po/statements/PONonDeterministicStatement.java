@@ -47,7 +47,7 @@ public class PONonDeterministicStatement extends POSimpleBlockStatement
 		int popto = ctxt.size();
 		POGState copy = pogState.getCopy();
 		ProofObligationList obligations = super.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy);
+		pogState.combineWith(copy, true);
 		ctxt.popTo(popto);
 		
 		for (POStatement statement: statements)

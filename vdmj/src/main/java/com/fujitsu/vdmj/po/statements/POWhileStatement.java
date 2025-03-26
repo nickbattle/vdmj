@@ -65,7 +65,7 @@ public class POWhileStatement extends POStatement
 		int popto = ctxt.size();
 		POGState copy = pogState.getCopy();
 		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy);
+		pogState.combineWith(copy, true);
 		ctxt.popTo(popto);
 
 		if (!statement.updatesState().isEmpty())

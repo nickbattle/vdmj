@@ -103,7 +103,7 @@ public class POCasesStatement extends POStatement
 		}
 
 		ctxt.popTo(popto);
-		stateList.combineInto(pogState);
+		stateList.combineInto(pogState, true);
 		ctxt.push(new POAmbiguousContext("cases statement", pogState, location));
 
 		return obligations;

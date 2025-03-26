@@ -66,7 +66,7 @@ public class POForAllStatement extends POStatement
 		int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
 		POGState copy = pogState.getCopy();
 		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy);
+		pogState.combineWith(copy, true);
 		ctxt.popTo(popto);
 
 		if (!statement.updatesState().isEmpty())

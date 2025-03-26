@@ -46,11 +46,11 @@ public class POGStateList extends Vector<POGState>
 	/**
 	 * Combine all of the subclause states and update the parent.
 	 */
-	public void combineInto(POGState parent)
+	public void combineInto(POGState parent, boolean updatesAmbiguous)
 	{
 		for (POGState state: this)
 		{
-			parent.combineWith(state);
+			parent.combineWith(state, updatesAmbiguous);
 		}
 	}
 }

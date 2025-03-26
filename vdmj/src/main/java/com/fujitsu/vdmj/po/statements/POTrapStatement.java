@@ -97,7 +97,7 @@ public class POTrapStatement extends POStatement
 		list.addAll(with.getProofObligations(ctxt, copy, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 		ctxt.popTo(popto);
 		
-		pogState.combineWith(copy);
+		pogState.combineWith(copy, true);
 		return list;
 	}
 

@@ -65,7 +65,7 @@ public class POAtomicStatement extends POStatement
 			obligations.addAll(stmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
 		}
 
-		stateList.combineInto(pogState);	// Delayed effect of every atomic assignment
+		stateList.combineInto(pogState, true);	// Delayed effect of every atomic assignment
 		ctxt.popTo(popto);
 		obligations.markUnchecked(ProofObligation.NON_DETERMINISTIC);
 		ctxt.push(new POAmbiguousContext("atomic statement", pogState, location));

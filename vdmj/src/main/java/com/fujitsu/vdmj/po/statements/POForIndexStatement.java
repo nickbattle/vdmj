@@ -79,7 +79,7 @@ public class POForIndexStatement extends POStatement
 		ctxt.push(new POForAllSequenceContext(var, from, to, by));
 		POGState copy = pogState.getCopy();
 		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy);
+		pogState.combineWith(copy, true);
 		ctxt.popTo(popto);
 
 		if (!statement.updatesState().isEmpty())

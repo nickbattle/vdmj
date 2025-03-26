@@ -343,12 +343,16 @@ public class POGState
 	/**
 	 * Combine copies for if/else branches, created by getCopy().
 	 */
-	public void combineWith(POGState copy)
+	public void combineWith(POGState copy, boolean updatesAmbiguous)
 	{
 		updatedState.putAll(copy.updatedState);
 		updatedLocals.putAll(copy.updatedLocals);
 		ambiguous.putAll(copy.ambiguous);
-		ambiguous.putAll(copy.updatedState);
-		ambiguous.putAll(copy.updatedLocals);
+		
+		if (updatesAmbiguous)
+		{
+			ambiguous.putAll(copy.updatedState);
+			ambiguous.putAll(copy.updatedLocals);
+		}
 	}
 }
