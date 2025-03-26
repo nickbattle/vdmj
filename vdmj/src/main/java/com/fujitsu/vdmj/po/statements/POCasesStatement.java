@@ -28,7 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
@@ -83,8 +83,10 @@ public class POCasesStatement extends POStatement
 		obligations.markIfAmbiguous(pogState, exp);		
 		
 		POGStateList stateList = new POGStateList();
+		POAltContext altContext = new POAltContext();
+
 		boolean hasIgnore = false;
-		int popto = ctxt.size();
+		int base = ctxt.size();
 
 		for (POCaseStmtAlternative alt: cases)
 		{
@@ -93,18 +95,20 @@ public class POCasesStatement extends POStatement
 				hasIgnore = true;
 			}
 
-			// Pushes PONotCaseContext
-			obligations.addAll(alt.getProofObligations(ctxt, stateList.addCopy(pogState), expType, env));
+			// Pushes PONotCaseContext and altContext updated
+			obligations.addAll(alt.getProofObligations(ctxt, altContext, base, stateList.addCopy(pogState), expType, env));
 		}
 
 		if (others != null && !hasIgnore)
 		{
 			obligations.addAll(others.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			ctxt.copyInto(base, altContext.add());
 		}
 
-		ctxt.popTo(popto);
-		stateList.combineInto(pogState, true);
-		ctxt.push(new POAmbiguousContext("cases statement", pogState, location));
+		ctxt.popTo(base);
+		stateList.combineInto(pogState, false);
+		// ctxt.push(new POAmbiguousContext("cases statement", pogState, location));
+		ctxt.push(altContext);
 
 		return obligations;
 	}

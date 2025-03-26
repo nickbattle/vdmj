@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POCaseContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
@@ -59,12 +60,13 @@ public class POCaseStmtAlternative extends PONode
 		return "case " + pattern + " -> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, TCType type, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POAltContext alt, int base, POGState pogState, TCType type, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		int popto = ctxt.pushAt(new POCaseContext(pattern, type, cexp));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		ctxt.copyInto(base, alt.add());
 		ctxt.popTo(popto);
 		
 		ctxt.push(new PONotCaseContext(pattern, type, cexp));
