@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -98,6 +99,8 @@ public class POTrapStatement extends POStatement
 		ctxt.popTo(popto);
 		
 		pogState.combineWith(copy, true);
+		ctxt.push(new POAmbiguousContext("trap statement", pogState, location));
+
 		return list;
 	}
 
