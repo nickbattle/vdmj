@@ -24,8 +24,10 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -58,6 +60,71 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 	
+	public void popInto(int size, POContextStack into)
+	{
+		while (size() > size)
+		{
+			into.add(0, pop());		// Preserve order
+		}
+	}
+	
+	public void copyInto(int size, POContextStack into)
+	{
+		for (int i=size; i < size(); i++)
+		{
+			into.add(get(i));		// Preserve order
+		}
+	}
+	
+	/**
+	 * If the stack contains POAltContext items, these produce alternative substacks that
+	 * have to be iterated through, before creating a set of obligations.
+	 */
+	public List<POContextStack> getAlternatives()
+	{
+		List<POContextStack> results = new Vector<POContextStack>();
+		results.add(new POContextStack());
+		
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POAltContext)
+			{
+				POAltContext alt = (POAltContext)ctxt;
+				List<POContextStack> toAdd = new Vector<POContextStack>();
+				
+				for (POContextStack substack: alt.alternatives)
+				{
+					for (POContextStack alternative: substack.getAlternatives())
+					{
+						for (POContextStack original: results)
+						{
+							POContextStack combined = new POContextStack();
+							combined.addAll(original);
+							combined.addAll(alternative);
+							toAdd.add(combined);
+						}
+					}
+				}
+				
+				results.clear();
+				results.addAll(toAdd);
+			}
+			else
+			{
+				for (POContextStack choice: results)
+				{
+					choice.add(ctxt);
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * The name is typically the name of the top level definition that this context
+	 * belongs to, like the function or operation name. It is only used for labelling.
+	 */
 	public String getName()
 	{
 		StringBuilder result = new StringBuilder();
@@ -78,6 +145,10 @@ public class POContextStack extends Stack<POContext>
 		return result.toString();
 	}
 
+	/**
+	 * Get the full VDM-SL source of the obligation, including the context stack and
+	 * the base obligation source passed in.
+	 */
 	public String getSource(String poSource)
 	{
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before stack

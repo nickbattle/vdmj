@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
@@ -78,6 +78,7 @@ public class POIfStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		POGStateList stateList = new POGStateList();
+		POAltContext altContext = new POAltContext();
 
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, pogState, env);
 		obligations.markIfAmbiguous(pogState, ifExp);
@@ -86,7 +87,7 @@ public class POIfStatement extends POStatement
 		
 		int popto = base;
 		obligations.addAll(thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
-		ctxt.popTo(popto);
+		ctxt.popInto(popto, altContext.add());
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
@@ -95,8 +96,9 @@ public class POIfStatement extends POStatement
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
 			oblist.markIfAmbiguous(pogState, stmt.elseIfExp);
 
-			popto = ctxt.size();
+			popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
 			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
 			obligations.addAll(oblist);
 
@@ -107,12 +109,14 @@ public class POIfStatement extends POStatement
 		{
 			popto = ctxt.size();
 			obligations.addAll(elseStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
 		}
 
 		ctxt.popTo(base);
-		stateList.combineInto(pogState);
-		ctxt.push(new POAmbiguousContext("if statement", pogState, location));
+		// stateList.combineInto(pogState);
+		// ctxt.push(new POAmbiguousContext("if statement", pogState, location));
+		ctxt.push(altContext);
 		
 		return obligations;
 	}

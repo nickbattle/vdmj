@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
@@ -35,5 +38,17 @@ public class NonZeroObligation extends ProofObligation
 		source = ctxt.getSource(right + " <> 0");
 		setObligationVars(right);
 		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	public static List<ProofObligation> getAllPOs(LexLocation location, POExpression right, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new NonZeroObligation(location, right, choice));
+		}
+		
+		return results;
 	}
 }
