@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.pog;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+
 /**
  * A POContext that represents a set of alternative paths in an operation PO.
  */
@@ -49,7 +51,27 @@ public class POAltContext extends POContext
 	{
 		return add(new POContextStack());
 	}
-	
+
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		if (alternatives.isEmpty())
+		{
+			return null;
+		}
+		else
+		{
+			TCNameSet set = new TCNameSet();
+			
+			for (POContextStack stack: alternatives)
+			{
+				set.addAll(stack.getReasonsAbout());
+			}
+			
+			return set;
+		}
+	}
+
 	@Override
 	public String getSource()
 	{

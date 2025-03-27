@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class NonZeroObligation extends ProofObligation
 {
-	public NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
+	private NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
 	{
 		super(location, POType.NON_ZERO, ctxt);
 		source = ctxt.getSource(right + " <> 0");

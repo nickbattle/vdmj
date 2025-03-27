@@ -76,7 +76,7 @@ public class PODivExpression extends PONumericBinaryExpression
 
 		if (!rtype.isAlways(TCNaturalOneType.class, location))
 		{
-			obligations.add(new NonZeroObligation(location, right, ctxt));
+			obligations.addAll(NonZeroObligation.getAllPOs(location, right, ctxt));
 		}
 		
 		return obligations;
