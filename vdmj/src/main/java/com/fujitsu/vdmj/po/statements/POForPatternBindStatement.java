@@ -92,7 +92,7 @@ public class POForPatternBindStatement extends POStatement
 			
 			if (s != null && !TypeComparator.isSubType(s.seqof, bind.type))
 			{
-				list.add(new SubTypeObligation(bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
 			}
 		}
 		else if (patternBind.bind instanceof POSetBind)
@@ -101,7 +101,7 @@ public class POForPatternBindStatement extends POStatement
 			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 			
 			ctxt.push(new POForAllSequenceContext(bind, sequence));
-			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
+			list.addAll(SetMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
@@ -109,7 +109,7 @@ public class POForPatternBindStatement extends POStatement
 			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 			
 			ctxt.push(new POForAllSequenceContext(bind, sequence));
-			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+			list.addAll(SeqMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 
 		POGState copy = pogState.getCopy();

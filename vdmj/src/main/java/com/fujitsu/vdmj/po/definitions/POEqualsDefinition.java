@@ -138,7 +138,7 @@ public class POEqualsDefinition extends PODefinition
 	    				ctxt.checkType(test, expType), compatible))
 	    			{
 	    				list.add(new ValueBindingObligation(this, ctxt));
-	    				list.add(new SubTypeObligation(test, compatible, expType, ctxt));
+	    				list.addAll(SubTypeObligation.getAllPOs(test, compatible, expType, ctxt));
 	    			}
 				}
 			}
@@ -147,18 +147,18 @@ public class POEqualsDefinition extends PODefinition
 		{
 			if (!TypeComparator.isSubType(ctxt.checkType(test, expType), defType))
 			{
-				list.add(new SubTypeObligation(test, defType, expType, ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(test, defType, expType, ctxt));
 			}
 		}
 		else if (bind instanceof POSetBind)
 		{
 			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt, pogState, env));
-			list.add(new SetMemberObligation(test, ((POSetBind)bind).set, ctxt));
+			list.addAll(SetMemberObligation.getAllPOs(test, ((POSetBind)bind).set, ctxt));
 		}
 		else if (bind instanceof POSeqBind)
 		{
 			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt, pogState, env));
-			list.add(new SeqMemberObligation(test, ((POSeqBind)bind).sequence, ctxt));
+			list.addAll(SeqMemberObligation.getAllPOs(test, ((POSeqBind)bind).sequence, ctxt));
 		}
 
 		list.addAll(test.getProofObligations(ctxt, pogState, env));

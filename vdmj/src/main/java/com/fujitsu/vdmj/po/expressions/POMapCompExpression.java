@@ -89,7 +89,7 @@ public class POMapCompExpression extends POMapExpression
 
 		if (finiteTest)
 		{
-			obligations.add(new FiniteMapObligation(this, maptype, ctxt));
+			obligations.addAll(FiniteMapObligation.getAllPOs(this, maptype, ctxt));
 		}
 
 		if (predicate != null)

@@ -66,13 +66,13 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 		if (ltype instanceof TCOptionalType)
 		{
 			TCOptionalType op = (TCOptionalType)ltype;
-			obligations.add(new SubTypeObligation(left, op.type, ltype, ctxt));
+			obligations.addAll(SubTypeObligation.getAllPOs(left, op.type, ltype, ctxt));
 		}
 		
 		if (rtype instanceof TCOptionalType)
 		{
 			TCOptionalType op = (TCOptionalType)rtype;
-			obligations.add(new SubTypeObligation(right, op.type, rtype, ctxt));
+			obligations.addAll(SubTypeObligation.getAllPOs(right, op.type, rtype, ctxt));
 		}
 
 		return obligations;
@@ -144,7 +144,7 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 		
 		if (poNeeded && !poTypes.isEmpty())
 		{
-			obligations.add(new OrderedObligation(left, right, poTypes, ctxt));
+			obligations.addAll(OrderedObligation.getAllPOs(left, right, poTypes, ctxt));
 		}
 		
 		return obligations;

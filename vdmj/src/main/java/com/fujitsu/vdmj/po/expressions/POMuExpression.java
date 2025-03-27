@@ -79,7 +79,7 @@ public class POMuExpression extends POExpression
 			{
 				if (!TypeComparator.isSubType(mtype, f.type))
 				{
-					list.add(new SubTypeObligation(rm.value, f.type, mtype, ctxt));
+					list.addAll(SubTypeObligation.getAllPOs(rm.value, f.type, mtype, ctxt));
 				}
 			}
 		}

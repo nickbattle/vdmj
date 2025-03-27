@@ -59,7 +59,7 @@ public class POHeadExpression extends POUnaryExpression
 		
 		if (!etype.isAlways(TCSeq1Type.class, location))
 		{
-			obligations.add(new NonEmptySeqObligation(exp, ctxt));
+			obligations.addAll(NonEmptySeqObligation.getAllPOs(exp, ctxt));
 		}
 		
 		return obligations;

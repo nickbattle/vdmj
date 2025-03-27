@@ -99,12 +99,12 @@ public class POApplyExpression extends POExpression
 			if (type.isMap(location))
 			{
 				TCMapType m = type.getMap();
-				obligations.add(new MapApplyObligation(root, args.get(0), ctxt));
+				obligations.addAll(MapApplyObligation.getAllPOs(root, args.get(0), ctxt));
 				TCType atype = ctxt.checkType(args.get(0), argtypes.get(0));
 	
 				if (!TypeComparator.isSubType(atype, m.from))
 				{
-					obligations.add(new SubTypeObligation(args.get(0), m.from, atype, ctxt));
+					obligations.addAll(SubTypeObligation.getAllPOs(args.get(0), m.from, atype, ctxt));
 				}
 			}
 			
@@ -114,7 +114,7 @@ public class POApplyExpression extends POExpression
 	
 				if (type.isFunction(location) && prename != null && !prename.isEmpty())
 				{
-					obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
+					obligations.addAll(FunctionApplyObligation.getAllPOs(root, args, prename, ctxt));
 				}
 				
 				TCTypeList paramTypes = type.isFunction(location) ?
@@ -129,7 +129,7 @@ public class POApplyExpression extends POExpression
 	
 					if (!TypeComparator.isSubType(at, pt))
 					{
-						obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+						obligations.addAll(SubTypeObligation.getAllPOs(args.get(i), pt, at, ctxt));
 					}
 	
 					i++;
@@ -146,7 +146,7 @@ public class POApplyExpression extends POExpression
 					 */
 					for (PODefinitionList loop: recursiveCycles)
 					{
-						obligations.add(new RecursiveObligation(location, loop, this, ctxt));
+						obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
 					}
 				}
 			}
@@ -162,12 +162,12 @@ public class POApplyExpression extends POExpression
 					
 					if (e.value.value != 1)		// s(1) is always okay for seq1
 					{
-						obligations.add(new SeqApplyObligation(root, arg, ctxt));
+						obligations.addAll(SeqApplyObligation.getAllPOs(root, arg, ctxt));
 					}
 				}
 				else
 				{
-					obligations.add(new SeqApplyObligation(root, arg, ctxt));
+					obligations.addAll(SeqApplyObligation.getAllPOs(root, arg, ctxt));
 				}
 			}
 			

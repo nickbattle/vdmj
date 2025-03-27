@@ -40,6 +40,10 @@ public class NonZeroObligation extends ProofObligation
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
 	public static List<ProofObligation> getAllPOs(LexLocation location, POExpression right, POContextStack ctxt)
 	{
 		Vector<ProofObligation> results = new Vector<ProofObligation>();

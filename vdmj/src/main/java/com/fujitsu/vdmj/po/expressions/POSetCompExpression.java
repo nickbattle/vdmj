@@ -88,7 +88,7 @@ public class POSetCompExpression extends POSetExpression
 
 		if (finiteTest)
 		{
-			obligations.add(new FiniteSetObligation(this, settype, ctxt));
+			obligations.addAll(FiniteSetObligation.getAllPOs(this, settype, ctxt));
 		}
 
 		if (predicate != null)

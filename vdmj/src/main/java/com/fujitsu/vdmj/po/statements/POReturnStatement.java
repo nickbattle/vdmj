@@ -82,7 +82,7 @@ public class POReturnStatement extends POStatement
 			
 			if (result != null && !TypeComparator.isSubType(getStmttype(), result))
 			{
-				obligations.add(new SubTypeObligation(expression, result, getStmttype(), ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(expression, result, getStmttype(), ctxt));
 			}
 
 			obligations.markIfAmbiguous(pogState, expression);

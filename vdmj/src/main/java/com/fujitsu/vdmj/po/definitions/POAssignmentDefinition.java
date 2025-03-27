@@ -75,7 +75,7 @@ public class POAssignmentDefinition extends PODefinition
 
 		if (!TypeComparator.isSubType(ctxt.checkType(expression, expType), type))
 		{
-			obligations.add(new SubTypeObligation(expression, type, expType, ctxt));
+			obligations.addAll(SubTypeObligation.getAllPOs(expression, type, expType, ctxt));
 		}
 
 		return obligations;

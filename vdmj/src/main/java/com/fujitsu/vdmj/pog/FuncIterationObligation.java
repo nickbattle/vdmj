@@ -24,12 +24,14 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POStarStarExpression;
 
 public class FuncIterationObligation extends ProofObligation
 {
-	public FuncIterationObligation(
-		POStarStarExpression exp, String prename, POContextStack ctxt)
+	private FuncIterationObligation(POStarStarExpression exp, String prename, POContextStack ctxt)
 	{
 		super(exp.location, POType.FUNC_ITERATION, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -60,5 +62,21 @@ public class FuncIterationObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(sb.toString());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POStarStarExpression exp, String prename, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new FuncIterationObligation(exp, prename, choice));
+		}
+		
+		return results;
 	}
 }

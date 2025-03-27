@@ -92,7 +92,7 @@ public class POCallObjectStatement extends POStatement
 			
 			if (!TypeComparator.isSubType(at, pt))
 			{
-				obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(args.get(i), pt, at, ctxt));
 			}
 
 			i++;

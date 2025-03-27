@@ -24,15 +24,34 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class MapApplyObligation extends ProofObligation
 {
-	public MapApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
+	private MapApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
 	{
 		super(root.location, POType.MAP_APPLY, ctxt);
 		source = ctxt.getSource(poExpression + " in set dom " + root);
 		setObligationVars(poExpression, root);
 		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExpression root, POExpression poExpression, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new MapApplyObligation(root, poExpression, choice));
+		}
+		
+		return results;
 	}
 }

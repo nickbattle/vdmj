@@ -79,14 +79,14 @@ public class POTrapStatement extends POStatement
 			POSetBind bind = (POSetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 
-			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
+			list.addAll(SetMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
 			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 
-			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+			list.addAll(SeqMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 		
 		// The "with" clause sees the "body" state updates, so this comes first

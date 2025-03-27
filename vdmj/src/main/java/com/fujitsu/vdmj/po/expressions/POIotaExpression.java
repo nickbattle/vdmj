@@ -58,7 +58,7 @@ public class POIotaExpression extends POExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = bind.getProofObligations(ctxt, pogState, env);
-		obligations.add(new UniqueExistenceObligation(this, ctxt));
+		obligations.addAll(UniqueExistenceObligation.getAllPOs(this, ctxt));
 
 		ctxt.push(new POForAllContext(this));
 		obligations.addAll(predicate.getProofObligations(ctxt, pogState, env));

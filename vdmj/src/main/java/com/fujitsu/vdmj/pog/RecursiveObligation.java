@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -41,7 +44,7 @@ public class RecursiveObligation extends ProofObligation
 {
 	public final boolean mutuallyRecursive;
 	
-	public RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	private RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		super(location, POType.RECURSIVE, ctxt);
 		
@@ -223,5 +226,21 @@ public class RecursiveObligation extends ProofObligation
 		{
 			return lhs + " > " + rhs;
 		}
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new RecursiveObligation(location, defs, apply, choice));
+		}
+		
+		return results;
 	}
 }

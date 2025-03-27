@@ -75,7 +75,7 @@ public class POMapEnumExpression extends POMapExpression
 
 		if (members.size() > 1)
 		{
-			list.add(new MapSeqOfCompatibleObligation(this, ctxt));
+			list.addAll(MapSeqOfCompatibleObligation.getAllPOs(this, ctxt));
 		}
 
 		return list;

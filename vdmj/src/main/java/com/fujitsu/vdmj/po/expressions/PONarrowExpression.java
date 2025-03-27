@@ -72,7 +72,7 @@ public class PONarrowExpression extends POExpression
 
 		if (!TypeComparator.isSubType(testtype, expected))
 		{
-			obligations.add(new SubTypeObligation(test, expected, testtype, ctxt));
+			obligations.addAll(SubTypeObligation.getAllPOs(test, expected, testtype, ctxt));
 		}
 
 		obligations.addAll(test.getProofObligations(ctxt, pogState, env));

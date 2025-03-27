@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POClassInvariantDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -35,7 +38,7 @@ import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 
 public class StateInvariantObligation extends ProofObligation
 {
-	public StateInvariantObligation(POAssignmentStatement ass, POContextStack ctxt)
+	private StateInvariantObligation(POAssignmentStatement ass, POContextStack ctxt)
 	{
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -117,5 +120,21 @@ public class StateInvariantObligation extends ProofObligation
 		}
 
     	return sb.toString();
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POAssignmentStatement ass, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new StateInvariantObligation(ass, choice));
+		}
+		
+		return results;
 	}
 }
