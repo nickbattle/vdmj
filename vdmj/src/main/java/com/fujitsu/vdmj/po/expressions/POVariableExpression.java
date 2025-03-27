@@ -66,7 +66,7 @@ public class POVariableExpression extends POExpression
 		{
 			POExplicitFunctionDefinition ex = (POExplicitFunctionDefinition)vardef;
 
-			if (ex.precondition == null)
+			if (ex.precondition == null || ex.isCurried)
 			{
 				return "";		// A function without a precondition
 			}

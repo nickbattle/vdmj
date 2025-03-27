@@ -72,6 +72,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final TCType expectedResult;
 	public final TCType actualResult;
 	public final boolean isUndefined;
+	public final boolean isCurried;
 	public final boolean recursive;
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
@@ -96,6 +97,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 		this.typeParams = typeParams;
 		this.type = type;
 		this.paramPatternList = parameters;
+		this.isCurried = parameters.size() > 1;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
 		this.body = body;
