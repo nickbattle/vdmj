@@ -110,6 +110,10 @@ public class POIfStatement extends POStatement
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
 		}
+		else
+		{
+			ctxt.copyInto(base, altContext.add());	// eg. for an if with no else
+		}
 
 		ctxt.popTo(base);
 		stateList.combineInto(pogState, false);
