@@ -276,7 +276,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		if (other instanceof ProofObligation)
 		{
 			ProofObligation opo = (ProofObligation)other;
-			return kind == opo.kind && location == opo.location && source == opo.source;
+			return kind == opo.kind && location == opo.location && source.equals(opo.source);
 		}
 		
 		return false; 
