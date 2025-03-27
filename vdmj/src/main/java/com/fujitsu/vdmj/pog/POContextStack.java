@@ -60,20 +60,48 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 	
+	/**
+	 * The popInto/copyInto are designed to be used with POAltContexts, extracting a
+	 * part of the context stack into an alternative. If this process encounters a
+	 * POReturnContext, the alternative is cleared since it does not play any part
+	 * in obligations further down the operation.
+	 */
 	public void popInto(int size, POContextStack into)
 	{
+		boolean returns = false;
+		
 		while (size() > size)
 		{
-			into.add(0, pop());		// Preserve order
+			POContext popped = pop();
+			
+			if (popped instanceof POReturnContext)
+			{
+				returns = true;
+			}
+			
+			into.add(0, popped);		// Preserve order
 		}
+		
+		if (returns) into.clear();		// ie. has no further effect
 	}
 	
 	public void copyInto(int size, POContextStack into)
 	{
+		boolean returns = false;
+		
 		for (int i=size; i < size(); i++)
 		{
-			into.add(get(i));		// Preserve order
+			POContext item = get(i);
+			
+			if (item instanceof POReturnContext)
+			{
+				returns = true;
+			}
+			
+			into.add(item);				// Preserve order
 		}
+		
+		if (returns) into.clear();		// ie. has no further effect
 	}
 	
 	/**
