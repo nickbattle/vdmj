@@ -93,23 +93,17 @@ public class POAssignmentStatement extends POStatement
 		TCNameToken update = POStateDesignator.updatedVariableName(target);
 		pogState.didUpdateState(update, location);
 		
-		TCNameSet varlist = exp.getVariableNames();		// All
-		boolean isSimple = (target instanceof POIdentifierDesignator);
-		
-		if (target instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator ms = (POMapSeqDesignator)target;
-			varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
-		}
+		TCNameSet varlist = exp.getVariableNames();
+		varlist.addAll(POStateDesignator.getVariableNames(target));
 		
 		if (!ctxt.hasAmbiguousState(varlist))
 		{
 			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			
-			// We can disambiguate variables in a simple assignment that assigns unambiguous values,
+			// We can disambiguate variables in an assignment that assigns unambiguous values,
 			// like constants or variables that are unambiguous.
 			
-			if (isSimple && ctxt.isAmbiguous(update))
+			if (ctxt.isAmbiguous(update))
 			{
 				ctxt.push(new POResolveContext(update, location));
 			}

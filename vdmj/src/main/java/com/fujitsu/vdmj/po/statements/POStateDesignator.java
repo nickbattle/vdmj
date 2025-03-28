@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -110,6 +111,30 @@ public abstract class POStateDesignator extends PONode
 		else
 		{
 			throw new IllegalArgumentException("Designator too complex");
+		}
+	}
+	
+	/**
+	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	public static TCNameSet getVariableNames(POStateDesignator designator)
+	{
+		if (designator instanceof POIdentifierDesignator)
+		{
+			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
+			return new TCNameSet(idd.name);
+		}
+		else if (designator instanceof POMapSeqDesignator)
+		{
+			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
+			TCNameSet set = getVariableNames(msd.mapseq);
+			set.addAll(msd.exp.getVariableNames());
+			return set;
+		}
+		else // if (designator instanceof POFieldDesignator)
+		{
+			POFieldDesignator fld = (POFieldDesignator)designator;
+			return getVariableNames(fld.object);
 		}
 	}
 
