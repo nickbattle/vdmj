@@ -37,13 +37,6 @@ public class POAmbiguousContext extends POContext
 	private final TCNameSet variables;
 	private final LexLocation location;
 	
-	public POAmbiguousContext(String reason, POGState pogState, LexLocation location)
-	{
-		this.reason = reason;
-		this.variables = pogState.getAmbiguousNames();
-		this.location = location;
-	}
-	
 	public POAmbiguousContext(String reason, TCNameList variables, LexLocation location)
 	{
 		this.reason = reason;

@@ -80,7 +80,6 @@ public class POCasesStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, exp);		
 		
 		POGStateList stateList = new POGStateList();
 		POAltContext altContext = new POAltContext();
@@ -106,7 +105,7 @@ public class POCasesStatement extends POStatement
 		}
 
 		ctxt.popTo(base);
-		stateList.combineInto(pogState, false);
+		stateList.combineInto(pogState);
 		// ctxt.push(new POAmbiguousContext("cases statement", pogState, location));
 		ctxt.push(altContext);
 

@@ -55,7 +55,6 @@ public class POCyclesStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = cycles.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, cycles);
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		return obligations;
 	}

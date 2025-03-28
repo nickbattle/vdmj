@@ -85,7 +85,7 @@ public class POCallObjectStatement extends POStatement
 
 		for (POExpression exp: args)
 		{
-			obligations.addAll(exp.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, exp));
+			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 			TCType pt = paramTypes.get(i);
 			TCType at = exp.getExptype();

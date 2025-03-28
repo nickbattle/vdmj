@@ -29,14 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
@@ -49,7 +42,6 @@ public class POGState
 	
 	private final Map<TCNameToken, LexLocation> updatedState;
 	private final Map<TCNameToken, LexLocation> updatedLocals;
-	private final Map<TCNameToken, LexLocation> ambiguous;
 	private final POGState outerState;
 	private final TCNameList localNames;
 	
@@ -57,7 +49,6 @@ public class POGState
 	{
 		this.updatedState = new HashMap<TCNameToken, LexLocation>();
 		this.updatedLocals = new HashMap<TCNameToken, LexLocation>();
-		this.ambiguous = new HashMap<TCNameToken, LexLocation>();
 		this.outerState = null;
 		this.localNames = new TCNameList();
 	}
@@ -66,11 +57,10 @@ public class POGState
 	 * Used by getCopy and getLink.
 	 */
 	private POGState(Map<TCNameToken, LexLocation> updatedState, Map<TCNameToken, LexLocation> updatedLocals,
-			Map<TCNameToken, LexLocation> ambiguous, POGState outerState, TCNameList localNames)
+			POGState outerState, TCNameList localNames)
 	{
 		this.updatedState = updatedState;
 		this.updatedLocals = updatedLocals;
-		this.ambiguous = ambiguous;
 		this.outerState = outerState;
 		this.localNames = localNames;
 	}
@@ -80,7 +70,6 @@ public class POGState
 	{
 		return "state: " + updatedState.keySet() +
 				", locals: " + updatedLocals.keySet() +
-				", ambiguous: " + ambiguous.keySet() +
 				(outerState != null ? " / " + outerState.toString() : "");
 	}
 	
@@ -94,7 +83,7 @@ public class POGState
 		return new POGState(
 				new HashMap<TCNameToken, LexLocation>(),
 				new HashMap<TCNameToken, LexLocation>(),
-				ambiguous, null, localNames);
+				null, localNames);
 	}
 	
 	/**
@@ -107,7 +96,7 @@ public class POGState
 		return new POGState(
 				new HashMap<TCNameToken, LexLocation>(),
 				new HashMap<TCNameToken, LexLocation>(),
-				ambiguous, this, new TCNameList());
+				this, new TCNameList());
 	}
 	
 	/**
@@ -136,65 +125,11 @@ public class POGState
 	}
 	
 	/**
-	 * True if state may have been updated on alternative paths.
-	 */
-	public boolean hasAmbiguousState(Collection<TCNameToken> names)
-	{
-		if (updatedState.containsKey(SOMETHING))
-		{
-			return true;
-		}
-
-		for (TCNameToken name: names)
-		{
-			if (ambiguous.containsKey(name))
-			{
-				return true;
-			}
-		}
-		
-		return (outerState != null && outerState.hasAmbiguousState(names));
-	}
-	
-	/**
 	 * True if POGState has a local variable of this name.
 	 */
 	public boolean hasLocalName(TCNameToken name)
 	{
 		return localNames.contains(name);
-	}
-	
-	/**
-	 * Used when a state value is given an unambiguous value, like "x := 0"
-	 */
-	public void notAmbiguous(TCNameToken name)
-	{
-		ambiguous.remove(name);
-	}
-
-	public void isAmbiguous(TCNameToken name, LexLocation location)
-	{
-		ambiguous.put(name, location);
-	}
-
-	public void isAmbiguous(Collection<TCNameToken> names, LexLocation location)
-	{
-		for (TCNameToken name: names)
-		{
-			ambiguous.put(name, location);
-		}
-	}
-
-	/**
-	 * Used for "let <pattern> = <exp> in ...", where pattern assigned vars become ambiguous
-	 * if the expression is ambiguous.
-	 */
-	public void markIfAmbiguous(TCNameList assigned, POExpression exp, LexLocation location)
-	{
-		if (hasAmbiguousState(exp.getVariableNames()))
-		{
-			isAmbiguous(assigned, location);
-		}
 	}
 
 	/**
@@ -231,23 +166,6 @@ public class POGState
 		}
 		
 		return LexLocation.ANY;
-	}
-	
-	/**
-	 * Get a snapshot of the ambiguous state names, if any.
-	 */
-	public TCNameSet getAmbiguousNames()
-	{
-		if (outerState != null)
-		{
-			return outerState.getAmbiguousNames();
-		}
-		else
-		{
-			TCNameSet set = new TCNameSet();
-			set.addAll(ambiguous.keySet());
-			return set;
-		}
 	}
 	
 	/**
@@ -303,55 +221,13 @@ public class POGState
 			localNames.add(name);
 		}
 	}
-	
-	public void addOperationCall(LexLocation from, PODefinition called)
-	{
-		if (called == null)
-		{
-			didUpdateState(from);	// Assumed to update something
-		}
-		else if (called.accessSpecifier.isPure)
-		{
-			return;		// No updates, by definition
-		}
-		else if (called instanceof POImplicitOperationDefinition)
-		{
-			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
-			
-			if (imp.externals != null)
-			{
-				for (POExternalClause ext: imp.externals)
-				{
-					if (ext.mode.is(Token.WRITE))
-					{
-						didUpdateState(ext.identifiers, from);
-					}
-				}
-			}
-			else
-			{
-				didUpdateState(from);
-			}
-		}
-		else if (called instanceof POExplicitOperationDefinition)
-		{
-			didUpdateState(from);
-		}
-	}
 
 	/**
 	 * Combine copies for if/else branches, created by getCopy().
 	 */
-	public void combineWith(POGState copy, boolean updatesAmbiguous)
+	public void combineWith(POGState copy)
 	{
 		updatedState.putAll(copy.updatedState);
 		updatedLocals.putAll(copy.updatedLocals);
-		ambiguous.putAll(copy.ambiguous);
-		
-		if (updatesAmbiguous)
-		{
-			ambiguous.putAll(copy.updatedState);
-			ambiguous.putAll(copy.updatedLocals);
-		}
 	}
 }

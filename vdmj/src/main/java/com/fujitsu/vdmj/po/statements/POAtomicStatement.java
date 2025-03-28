@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -59,16 +60,18 @@ public class POAtomicStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 		POGStateList stateList = new POGStateList();
 		int popto = ctxt.size();
+		TCNameList names = new TCNameList();
 
 		for (POAssignmentStatement stmt: assignments)
 		{
 			obligations.addAll(stmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			names.add(POStateDesignator.updatedVariableName(stmt.target));
 		}
 
-		stateList.combineInto(pogState, true);	// Delayed effect of every atomic assignment
+		stateList.combineInto(pogState);	// Delayed effect of every atomic assignment
 		ctxt.popTo(popto);
 		obligations.markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
-		ctxt.push(new POAmbiguousContext("atomic statement", pogState, location));
+		ctxt.push(new POAmbiguousContext("atomic statement", names, location));
 		
 		return obligations;
 	}

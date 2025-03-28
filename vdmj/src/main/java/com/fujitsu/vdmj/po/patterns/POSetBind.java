@@ -65,9 +65,7 @@ public class POSetBind extends POBind
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, set);
-		return obligations;
+		return set.getProofObligations(ctxt, pogState, env);
 	}
 	
 	@Override

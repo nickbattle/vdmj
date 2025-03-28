@@ -85,8 +85,6 @@ public class POReturnStatement extends POStatement
 			{
 				obligations.addAll(SubTypeObligation.getAllPOs(expression, result, getStmttype(), ctxt));
 			}
-
-			obligations.markIfAmbiguous(pogState, expression);
 		}
 		
 		// Identify this (sub)stack as having a return

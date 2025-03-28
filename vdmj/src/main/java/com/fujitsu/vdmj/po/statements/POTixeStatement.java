@@ -70,8 +70,8 @@ public class POTixeStatement extends POStatement
 			ctxt.popTo(popto);
 		}
 
-		stateList.combineInto(pogState, true);
-		ctxt.push(new POAmbiguousContext("tixe statement", pogState, location));
+		stateList.combineInto(pogState);
+		ctxt.push(new POAmbiguousContext("tixe statement", ctxt.getStateVariables(), location));
 		return obligations;
 	}
 

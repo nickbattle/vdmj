@@ -81,7 +81,6 @@ public class POIfStatement extends POStatement
 		POAltContext altContext = new POAltContext();
 
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, ifExp);
 		
 		int base = ctxt.pushAt(new POImpliesContext(ifExp));
 		obligations.addAll(thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
@@ -92,7 +91,6 @@ public class POIfStatement extends POStatement
 		for (POElseIfStatement stmt: elseList)
 		{
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
-			oblist.markIfAmbiguous(pogState, stmt.elseIfExp);
 
 			int popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
 			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
@@ -116,7 +114,7 @@ public class POIfStatement extends POStatement
 		}
 
 		ctxt.popTo(base);
-		stateList.combineInto(pogState, false);
+		stateList.combineInto(pogState);
 		// ctxt.push(new POAmbiguousContext("if statement", pogState, location));
 		ctxt.push(altContext);
 		

@@ -144,9 +144,6 @@ public class POValueDefinition extends PODefinition
 			list.addAll(SubTypeObligation.getAllPOs(exp, type, expType, ctxt));
 		}
 		
-		list.markIfAmbiguous(pogState, exp);
-		pogState.markIfAmbiguous(pattern.getVariableNames(), exp, location);
-
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}

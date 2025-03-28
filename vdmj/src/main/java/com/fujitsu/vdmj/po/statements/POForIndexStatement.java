@@ -67,19 +67,18 @@ public class POForIndexStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = from.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, from);
-		obligations.addAll(to.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, to));
+		obligations.addAll(to.getProofObligations(ctxt, pogState, env));
 
 		if (by != null)
 		{
-			obligations.addAll(by.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, by));
+			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
 		}
 
 		int popto = ctxt.pushAt(new POScopeContext());
 		ctxt.push(new POForAllSequenceContext(var, from, to, by));
 		POGState copy = pogState.getCopy();
 		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy, true);
+		pogState.combineWith(copy);
 		ctxt.popTo(popto);
 
 		if (!statement.updatesState().isEmpty())

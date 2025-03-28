@@ -52,15 +52,7 @@ public class POMultipleSetBind extends POMultipleBind
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, set);
-		
-		for (POPattern p: plist)
-		{
-			pogState.markIfAmbiguous(p.getVariableNames(), set, location);
-		}
-
-		return obligations;
+		return set.getProofObligations(ctxt, pogState, env);
 	}
 	
 	@Override

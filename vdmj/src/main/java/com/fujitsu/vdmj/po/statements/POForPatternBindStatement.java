@@ -75,7 +75,6 @@ public class POForPatternBindStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = sequence.getProofObligations(ctxt, pogState, env);
-		list.markIfAmbiguous(pogState, sequence);
 
 		int popto = ctxt.size();
 
@@ -114,7 +113,7 @@ public class POForPatternBindStatement extends POStatement
 
 		POGState copy = pogState.getCopy();
 		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy, true);
+		pogState.combineWith(copy);
 		ctxt.popTo(popto);
 
 		if (!statement.updatesState().isEmpty())

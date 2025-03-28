@@ -52,15 +52,7 @@ public class POMultipleSeqBind extends POMultipleBind
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, sequence);
-		
-		for (POPattern p: plist)
-		{
-			pogState.markIfAmbiguous(p.getVariableNames(), sequence, location);
-		}
-		
-		return obligations;
+		return sequence.getProofObligations(ctxt, pogState, env);
 	}
 	
 	@Override

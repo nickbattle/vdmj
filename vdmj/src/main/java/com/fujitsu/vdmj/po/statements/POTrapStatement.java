@@ -98,8 +98,8 @@ public class POTrapStatement extends POStatement
 		list.addAll(with.getProofObligations(ctxt, copy, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 		ctxt.popTo(popto);
 		
-		pogState.combineWith(copy, true);
-		ctxt.push(new POAmbiguousContext("trap statement", pogState, location));
+		pogState.combineWith(copy);
+		ctxt.push(new POAmbiguousContext("trap statement", ctxt.getStateVariables(), location));
 
 		return list;
 	}
