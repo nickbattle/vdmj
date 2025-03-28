@@ -36,7 +36,7 @@ public class NonZeroObligation extends ProofObligation
 	{
 		super(location, POType.NON_ZERO, ctxt);
 		source = ctxt.getSource(right + " <> 0");
-		setObligationVars(right);
+		setObligationVars(ctxt, right);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	

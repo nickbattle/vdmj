@@ -47,7 +47,7 @@ public class MapIterationObligation extends ProofObligation
 		sb.append(")");
 
 		source = ctxt.getSource(sb.toString());
-		setObligationVars(exp);
+		setObligationVars(ctxt, exp);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	

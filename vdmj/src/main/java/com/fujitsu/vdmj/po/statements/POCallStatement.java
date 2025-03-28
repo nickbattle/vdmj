@@ -86,7 +86,7 @@ public class POCallStatement extends POStatement
 			i++;
 		}
 
-		pogState.addOperationCall(location, opdef);
+		ctxt.addOperationCall(location, opdef);
 
 		return obligations;
 	}

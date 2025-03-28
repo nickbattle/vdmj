@@ -35,7 +35,7 @@ public class SeqModificationObligation extends ProofObligation
 	{
 		super(exp.location, POType.SEQ_MODIFICATION, ctxt);
 		source = ctxt.getSource("dom " + exp.right + " subset inds " + exp.left);
-		setObligationVars(exp);
+		setObligationVars(ctxt, exp);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	

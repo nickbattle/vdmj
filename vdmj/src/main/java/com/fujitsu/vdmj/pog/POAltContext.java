@@ -53,6 +53,38 @@ public class POAltContext extends POContext
 	}
 
 	@Override
+	public TCNameSet ambiguousVariables()
+	{
+		TCNameSet set = new TCNameSet();
+		
+		for (POContextStack stack: alternatives)
+		{
+			for (POContext ctxt: stack)
+			{
+				set.addAll(ctxt.ambiguousVariables());
+			}
+		}
+		
+		return set;
+	}
+
+	@Override
+	public TCNameSet resolvedVariables()
+	{
+		TCNameSet set = new TCNameSet();
+		
+		for (POContextStack stack: alternatives)
+		{
+			for (POContext ctxt: stack)
+			{
+				set.addAll(ctxt.resolvedVariables());
+			}
+		}
+		
+		return set;
+	}
+
+	@Override
 	public TCNameSet reasonsAbout()
 	{
 		if (alternatives.isEmpty())

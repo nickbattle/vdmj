@@ -35,7 +35,7 @@ public class MapApplyObligation extends ProofObligation
 	{
 		super(root.location, POType.MAP_APPLY, ctxt);
 		source = ctxt.getSource(poExpression + " in set dom " + root);
-		setObligationVars(poExpression, root);
+		setObligationVars(ctxt, poExpression, root);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	

@@ -69,14 +69,19 @@ abstract public class POContext
 		return null;
 	}
 
-	public String markObligation()
-	{
-		return null;
-	}
-	
 	public TCNameSet reasonsAbout()
 	{
 		return null;
+	}
+
+	public TCNameSet ambiguousVariables()
+	{
+		return new TCNameSet();
+	}
+
+	public TCNameSet resolvedVariables()
+	{
+		return new TCNameSet();
 	}
 
 	public boolean isScopeBoundary()

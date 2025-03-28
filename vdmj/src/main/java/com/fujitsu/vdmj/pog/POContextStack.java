@@ -29,11 +29,22 @@ import java.util.ListIterator;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -150,6 +161,46 @@ public class POContextStack extends Stack<POContext>
 	}
 	
 	/**
+	 * Operation calls may cause ambiguities in the state. This is affected by whether
+	 * they are pure or have ext clauses.
+	 */
+	public void addOperationCall(LexLocation from, PODefinition called)
+	{
+		if (called == null)	// Assumed to update something
+		{
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+		}
+		else if (called.accessSpecifier.isPure)
+		{
+			return;			// No updates, by definition
+		}
+		else if (called instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (ext.mode.is(Token.WRITE))
+					{
+						push(new POAmbiguousContext("operation ext clause", ext.identifiers, from));
+					}
+				}
+			}
+			else
+			{
+				push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			}
+		}
+		else if (called instanceof POExplicitOperationDefinition)
+		{
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+		}
+	}
+
+	
+	/**
 	 * The name is typically the name of the top level definition that this context
 	 * belongs to, like the function or operation name. It is only used for labelling.
 	 */
@@ -238,6 +289,46 @@ public class POContextStack extends Stack<POContext>
 		
 		return null;
 	}
+	
+	public TCNameList getStateVariables()
+	{
+		TCNameList names = new TCNameList();
+		
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POOperationDefinitionContext)
+			{
+				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
+				
+				if (opdef.stateDefinition instanceof POStateDefinition)
+				{
+					POStateDefinition state = (POStateDefinition)opdef.stateDefinition;
+					
+					for (TCField field: state.fields)
+					{
+						names.add(field.tagname);
+					}
+				}
+				else if (opdef.stateDefinition instanceof POClassDefinition)
+				{
+					POClassDefinition clazz = (POClassDefinition)opdef.stateDefinition;
+					
+					for (PODefinition def: clazz.definitions)
+					{
+						if (def instanceof POInstanceVariableDefinition)
+						{
+							POInstanceVariableDefinition iv = (POInstanceVariableDefinition)def;
+							names.add(iv.name);
+						}
+					}
+				}
+				
+				break;
+			}
+		}
+		
+		return names;
+	}
 
 	public TCTypeList getTypeParams()
 	{
@@ -270,20 +361,46 @@ public class POContextStack extends Stack<POContext>
 		
 		return set;
 	}
-	
-	public String markObligation()
+
+	/**
+	 * Look through the stack for POAmbiguousContexts at this point.
+	 */
+	public TCNameSet getAmbiguousVariables()
 	{
-		for (POContext ctxt: this)
+		TCNameSet set = new TCNameSet();
+
+		for (POContext ctxt: this)	// In push order
 		{
-			String message = ctxt.markObligation();
-			
-			if (message != null)
+			set.addAll(ctxt.ambiguousVariables());
+			set.removeAll(ctxt.resolvedVariables());
+		}
+		
+		return set;
+	}
+	
+	public boolean hasAmbiguousState(TCNameSet varlist)
+	{
+		if (varlist.isEmpty())
+		{
+			return false;
+		}
+
+		TCNameSet ambiguous = getAmbiguousVariables();
+		
+		for (TCNameToken var: varlist)
+		{
+			if (ambiguous.contains(var))
 			{
-				return message;
+				return true;
 			}
 		}
 		
-		return null;
+		return false;
+	}
+	
+	public boolean isAmbiguous(TCNameToken var)
+	{
+		return getAmbiguousVariables().contains(var);
 	}
 
 	private String indentNewLines(String line, String indent)
