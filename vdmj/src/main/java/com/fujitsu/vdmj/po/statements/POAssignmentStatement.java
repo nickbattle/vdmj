@@ -87,48 +87,37 @@ public class POAssignmentStatement extends POStatement
 				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
 		}
 		
-		boolean tooComplex = false;
-
-		try
+		TCNameToken update = POStateDesignator.updatedVariableName(target);
+		pogState.didUpdateState(update, location);
+		
+		TCNameSet varlist = exp.getVariableNames();		// All
+		boolean isSimple = (target instanceof POIdentifierDesignator);
+		
+		if (target instanceof POMapSeqDesignator)
 		{
-			TCNameToken update = POStateDesignator.updatedVariableName(target);
-			pogState.didUpdateState(update, location);
+			POMapSeqDesignator ms = (POMapSeqDesignator)target;
+			varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
+		}
+		
+		if (!pogState.hasAmbiguousState(varlist))
+		{
+			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			
-			TCNameSet varlist = exp.getVariableNames();		// All
-			boolean isSimple = (target instanceof POIdentifierDesignator);
+			// We can disambiguate variables in a simple assignment that assigns unambiguous values,
+			// like constants or variables that are unambiguous.
 			
-			if (target instanceof POMapSeqDesignator)
+			if (isSimple)	// Other elements of complex designators may be ambiguous
 			{
-				POMapSeqDesignator ms = (POMapSeqDesignator)target;
-				varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
-			}
-			
-			if (!pogState.hasAmbiguousState(varlist))
-			{
-				// This throws IllegalArgumentException for complex target patterns
-				ctxt.push(new POAssignmentContext(target, targetType, exp, false));
-				
-				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
-				// like constants or variables that are unambiguous.
-				
-				if (isSimple)	// Other elements of complex designators may be ambiguous
-				{
-					pogState.notAmbiguous(update);
-				}
-			}
-			else
-			{
-				// Updated a variable with an ambiguous value, so it becomes ambiguous
-				pogState.isAmbiguous(update, exp.location);
+				pogState.notAmbiguous(update);
 			}
 		}
-		catch (IllegalArgumentException e)	// Can't process a complex designator
+		else
 		{
-			tooComplex = true;
-			ctxt.push(new POAssignmentContext(target, targetType, exp, true));
+			// Updated a variable with an ambiguous value, so it becomes ambiguous
+			pogState.isAmbiguous(update, exp.location);
 		}
 
-		if (!inConstructor && !tooComplex &&
+		if (!inConstructor &&
 			(classDefinition != null && classDefinition.invariant != null) ||
 			(stateDefinition != null && stateDefinition.invExpression != null))
 		{
