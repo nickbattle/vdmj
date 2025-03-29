@@ -45,6 +45,8 @@ public class POCaseStmtAlternative extends PONode
 	public final POExpression cexp;
 	public final POPattern pattern;
 	public final POStatement statement;
+	
+	private boolean hasEffect = false;
 
 	public POCaseStmtAlternative(POExpression cexp, POPattern pattern, POStatement stmt)
 	{
@@ -66,10 +68,16 @@ public class POCaseStmtAlternative extends PONode
 
 		int popto = ctxt.pushAt(new POCaseContext(pattern, type, cexp));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		hasEffect = ctxt.size() > popto + 1;
 		ctxt.copyInto(base, alt.add());
 		ctxt.popTo(popto);
 		
 		ctxt.push(new PONotCaseContext(pattern, type, cexp));
 		return obligations;
+	}
+
+	public boolean hasEffect()
+	{
+		return hasEffect;
 	}
 }

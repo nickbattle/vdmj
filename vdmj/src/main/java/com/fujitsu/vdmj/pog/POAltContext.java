@@ -52,6 +52,11 @@ public class POAltContext extends POContext
 		return add(new POContextStack());
 	}
 
+	public boolean isEmpty()
+	{
+		return alternatives.isEmpty();
+	}
+
 	@Override
 	public TCNameSet ambiguousVariables()
 	{

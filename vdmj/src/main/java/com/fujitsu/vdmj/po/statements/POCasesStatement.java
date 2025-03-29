@@ -83,8 +83,9 @@ public class POCasesStatement extends POStatement
 		
 		POGStateList stateList = new POGStateList();
 		POAltContext altContext = new POAltContext();
-
+		boolean hasEffect = false;
 		boolean hasIgnore = false;
+		
 		int base = ctxt.size();
 
 		for (POCaseStmtAlternative alt: cases)
@@ -96,18 +97,24 @@ public class POCasesStatement extends POStatement
 
 			// Pushes PONotCaseContext and altContext updated
 			obligations.addAll(alt.getProofObligations(ctxt, altContext, base, stateList.addCopy(pogState), expType, env));
+			hasEffect = hasEffect || alt.hasEffect();
 		}
 
 		if (others != null && !hasIgnore)
 		{
+			int before = ctxt.size();
 			obligations.addAll(others.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			hasEffect = hasEffect || ctxt.size() > before;
 			ctxt.copyInto(base, altContext.add());
 		}
 
 		ctxt.popTo(base);
 		stateList.combineInto(pogState);
-		// ctxt.push(new POAmbiguousContext("cases statement", pogState, location));
-		ctxt.push(altContext);
+
+		if (hasEffect)
+		{
+			ctxt.push(altContext);
+		}
 
 		return obligations;
 	}
