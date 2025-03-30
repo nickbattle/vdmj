@@ -191,7 +191,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			obligationVars.addAll(exp.getVariableNames());
 		}
 		
-		if (ctxt.hasAmbiguousState(obligationVars))
+		if (ctxt.hasAmbiguous(obligationVars))
 		{
 			markUnchecked(HAS_AMBIGUOUS_STATE);
 		}

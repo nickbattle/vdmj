@@ -24,9 +24,11 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Collection;
+
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A context to represent ambiguous variables
@@ -37,7 +39,7 @@ public class POAmbiguousContext extends POContext
 	private final TCNameSet variables;
 	private final LexLocation location;
 	
-	public POAmbiguousContext(String reason, TCNameList variables, LexLocation location)
+	public POAmbiguousContext(String reason, Collection<? extends TCNameToken> variables, LexLocation location)
 	{
 		this.reason = reason;
 		this.variables = new TCNameSet();

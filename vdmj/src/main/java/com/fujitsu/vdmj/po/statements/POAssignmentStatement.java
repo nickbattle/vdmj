@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -93,10 +92,7 @@ public class POAssignmentStatement extends POStatement
 		TCNameToken update = POStateDesignator.updatedVariableName(target);
 		pogState.didUpdateState(update, location);
 		
-		TCNameSet varlist = exp.getVariableNames();
-		varlist.addAll(POStateDesignator.getVariableNames(target));
-		
-		if (!ctxt.hasAmbiguousState(varlist))
+		if (!ctxt.hasAmbiguous(exp.getVariableNames()))
 		{
 			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			
@@ -111,7 +107,7 @@ public class POAssignmentStatement extends POStatement
 		else
 		{
 			// Updated a variable with an ambiguous value, so it becomes ambiguous
-			ctxt.push(new POAmbiguousContext("ambiguous assignment", new TCNameList(update), exp.location));
+			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
 		}
 
 		if (!inConstructor &&

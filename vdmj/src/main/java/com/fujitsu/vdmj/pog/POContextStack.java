@@ -378,7 +378,7 @@ public class POContextStack extends Stack<POContext>
 		return set;
 	}
 	
-	public boolean hasAmbiguousState(TCNameSet varlist)
+	public boolean hasAmbiguous(TCNameSet varlist)
 	{
 		if (varlist.isEmpty())
 		{

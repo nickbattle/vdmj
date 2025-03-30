@@ -27,12 +27,13 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POScopeContext;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -81,9 +82,11 @@ public class POForIndexStatement extends POStatement
 		pogState.combineWith(copy);
 		ctxt.popTo(popto);
 
-		if (!statement.updatesState().isEmpty())
+		TCNameSet updates = statement.updatesState();
+
+		if (!updates.isEmpty())
 		{
-			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+			ctxt.push(new POAmbiguousContext("for loop", updates, location));
 		}
 		
 		obligations.addAll(loops);

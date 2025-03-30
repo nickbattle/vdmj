@@ -31,14 +31,15 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -116,9 +117,11 @@ public class POForPatternBindStatement extends POStatement
 		pogState.combineWith(copy);
 		ctxt.popTo(popto);
 
-		if (!statement.updatesState().isEmpty())
+		TCNameSet updates = statement.updatesState();
+
+		if (!updates.isEmpty())
 		{
-			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+			ctxt.push(new POAmbiguousContext("for loop", updates, location));
 		}
 
 		list.addAll(loops);
