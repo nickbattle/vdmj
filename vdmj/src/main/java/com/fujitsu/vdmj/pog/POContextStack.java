@@ -79,45 +79,25 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public void popInto(int size, POContextStack into)
 	{
-		boolean returns = false;
-		
 		while (size() > size)
 		{
-			POContext popped = pop();
-			
-			if (popped instanceof POReturnContext)
-			{
-				returns = true;
-			}
-			
-			into.add(0, popped);		// Preserve order
+			into.add(0, pop());		// Preserve order
 		}
-		
-		if (returns) into.clear();		// ie. has no further effect
 	}
 	
 	public void copyInto(int size, POContextStack into)
 	{
-		boolean returns = false;
-		
 		for (int i=size; i < size(); i++)
 		{
-			POContext item = get(i);
-			
-			if (item instanceof POReturnContext)
-			{
-				returns = true;
-			}
-			
-			into.add(item);				// Preserve order
+			into.add(get(i));		// Preserve order
 		}
-		
-		if (returns) into.clear();		// ie. has no further effect
 	}
 	
 	/**
 	 * If the stack contains POAltContext items, these produce alternative substacks that
-	 * have to be iterated through, before creating a set of obligations.
+	 * have to be iterated through, before creating a set of obligations. Note that if
+	 * a POReturnContext is encountered at the top level, this immediately returns no
+	 * stacks, because this path can play no part in further obligations.
 	 */
 	public List<POContextStack> getAlternatives()
 	{
@@ -147,6 +127,12 @@ public class POContextStack extends Stack<POContext>
 				
 				results.clear();
 				results.addAll(toAdd);
+			}
+			else if (ctxt instanceof POReturnContext)
+			{
+				// This stack plays no part in further obligations, including any
+				// alternatives it contains. So immediately return nothing.
+				return new Vector<POContextStack>();
 			}
 			else
 			{
