@@ -97,9 +97,10 @@ public class POAssignmentStatement extends POStatement
 			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			
 			// We can disambiguate variables in an assignment that assigns unambiguous values,
-			// like constants or variables that are unambiguous.
+			// like constants or variables that are unambiguous, but only if the entire value
+			// is being replaced. So we check that we are assigning to an IdentifierDesignator.
 			
-			if (ctxt.isAmbiguous(update))
+			if (target instanceof POIdentifierDesignator && ctxt.isAmbiguous(update))
 			{
 				ctxt.push(new POResolveContext(update, location));
 			}
