@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.po.expressions.POMuExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 import com.fujitsu.vdmj.po.expressions.PORecordModifier;
 import com.fujitsu.vdmj.po.expressions.PORecordModifierList;
-import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
@@ -64,13 +63,15 @@ public class POAssignmentContext extends POContext
 		this.expression = null;
 		
 		/**
-		 * Filter out things like "dcl x:nat;", which become lets with undefined values.
+		 * Filter out things like "dcl x:nat;", which become "let x : nat = (undefined) in"?
+		 * These type check, but they are a problem for QuickCheck and some more complex cases
+		 * do get confused by missing variables.
 		 */
 		for (PODefinition def: assignmentDefs)
 		{
 			POAssignmentDefinition adef = (POAssignmentDefinition) def;
 
-			if (!(adef.expression instanceof POUndefinedExpression))
+			// if (!(adef.expression instanceof POUndefinedExpression))
 			{
 				this.assignmentDefs.add(adef);
 			}
