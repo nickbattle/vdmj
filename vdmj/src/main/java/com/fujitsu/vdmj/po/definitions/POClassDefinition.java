@@ -91,7 +91,7 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
-	public String toPattern()
+	public String toPattern(boolean maximal)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("obj_");

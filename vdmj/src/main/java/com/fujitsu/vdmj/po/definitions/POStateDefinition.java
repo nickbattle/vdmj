@@ -86,11 +86,12 @@ public class POStateDefinition extends PODefinition
 	}
 	
 	@Override
-	public String toPattern()
+	public String toPattern(boolean maximal)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("mk_");
 		sb.append(name);
+		if (maximal) sb.append("!");
 		sb.append("(");
 		String sep = "";
 
