@@ -26,13 +26,9 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.POGStateList;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -58,21 +54,26 @@ public class POAtomicStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		POGStateList stateList = new POGStateList();
-		int popto = ctxt.size();
-		TCNameList names = new TCNameList();
+		int var = 0;	// Create $atomic<++var> locals
 
 		for (POAssignmentStatement stmt: assignments)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
-			names.add(POStateDesignator.updatedVariableName(stmt.target));
+			// This checks POs for the assignment expressions, creating $atomic<n> locals
+			obligations.addAll(stmt.prepareAssignment(ctxt, pogState, env, ++var));
 		}
-
-		stateList.combineInto(pogState);	// Delayed effect of every atomic assignment
-		ctxt.popTo(popto);
-		obligations.markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
-		ctxt.push(new POAmbiguousContext("atomic statement", names, location));
 		
+		var = 0;
+
+		for (POAssignmentStatement stmt: assignments)
+		{
+			// This assigns using the $atomic<n> locals created above
+			obligations.addAll(stmt.completeAssignment(ctxt, pogState, env, ++var));
+		}
+		
+		// Finally check any state invariant holds for the new assignments. This just uses
+		// any of the assignments to find the stateDefinition.
+		obligations.addAll(assignments.get(0).checkInvariant(ctxt));
+
 		return obligations;
 	}
 	

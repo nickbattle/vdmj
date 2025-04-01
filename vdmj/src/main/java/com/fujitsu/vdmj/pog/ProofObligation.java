@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -169,6 +172,12 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	
 	public void setObligationVars(POContextStack ctxt, POExpression... expressions)
 	{
+		List<POExpression> list = Arrays.asList(expressions);
+		setObligationVars(ctxt, list);
+	}
+	
+	public void setObligationVars(POContextStack ctxt, List<POExpression> expressions)
+	{	
 		if (obligationVars == null)
 		{
 			obligationVars = new TCNameSet();

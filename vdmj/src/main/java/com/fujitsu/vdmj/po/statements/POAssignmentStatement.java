@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
@@ -121,6 +122,73 @@ public class POAssignmentStatement extends POStatement
 		return obligations;
 	}
 	
+	/**
+	 * Prepare an assignment during an "atomic" - see POAtomicStatement.
+	 */
+	public ProofObligationList prepareAssignment(POContextStack ctxt, POGState pogState, Environment env, int var)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+
+		obligations.addAll(target.getProofObligations(ctxt));
+		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+
+		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
+		{
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
+		}
+		
+		// Create a temporary name, which is used in the completeObligations call
+		TCNameToken temp = new TCNameToken(location, location.module, "$atomic" + var);
+		POIdentifierDesignator tempTarget = new POIdentifierDesignator(temp, null);
+		
+		ctxt.push(new POAssignmentContext(tempTarget, targetType, exp));
+
+		if (ctxt.hasAmbiguous(exp.getVariableNames()))
+		{
+			// Updated a variable with an ambiguous value, so it becomes ambiguous
+			TCNameToken update = POStateDesignator.updatedVariableName(target);
+			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
+		}
+
+		return obligations;
+	}
+
+	/**
+	 * Complete an assignment during an "atomic" - see POAtomicStatement.
+	 */
+	public ProofObligationList completeAssignment(POContextStack ctxt, POGState pogState, Environment env, int var)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		TCNameToken update = POStateDesignator.updatedVariableName(target);
+		pogState.didUpdateState(update, location);
+		
+		// Create a temporary name, which was created in the completeObligations call
+		TCNameToken temp = new TCNameToken(location, location.module, "$atomic" + var);
+		POVariableExpression tempExp = new POVariableExpression(temp, null);
+		ctxt.push(new POAssignmentContext(target, targetType, tempExp));
+
+		return obligations;
+	}
+	
+	/**
+	 * Check invariant holds after an "atomic" - see POAtomicStatement.
+	 */
+	public ProofObligationList checkInvariant(POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (!inConstructor &&
+			(classDefinition != null && classDefinition.invariant != null) ||
+			(stateDefinition != null && stateDefinition.invExpression != null))
+		{
+			obligations.addAll(StateInvariantObligation.getAllPOs(this, ctxt));
+		}
+		
+		return obligations;
+	}
+
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{

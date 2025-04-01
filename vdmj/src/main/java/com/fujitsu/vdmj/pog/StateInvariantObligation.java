@@ -34,7 +34,10 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class StateInvariantObligation extends ProofObligation
 {
@@ -46,17 +49,42 @@ public class StateInvariantObligation extends ProofObligation
 		if (ass.classDefinition != null)
 		{
 			sb.append(invDefs(ass.classDefinition));
+			
+			PODefinitionList invdefs = ass.classDefinition.getInvDefs();
+			POExpressionList vars = new POExpressionList();
+
+			for (PODefinition d: invdefs)
+			{
+				POClassInvariantDefinition cid = (POClassInvariantDefinition)d;
+				vars.add(cid.expression);
+			}
+
+			// Obligation should cover the variables in its invariant
+			setObligationVars(ctxt, vars);
+			setReasonsAbout(ctxt.getReasonsAbout());
 		}
 		else	// must be because we have a module state invariant
 		{
-			POStateDefinition def = ass.stateDefinition;
+			POStateDefinition sdef = ass.stateDefinition;
 
 			sb.append("let ");
-			sb.append(def.invPattern);
+			sb.append(sdef.invPattern);
 			sb.append(" = ");
-			sb.append(def.toPattern(true));		// maximal
+			sb.append(sdef.toPattern(true));	// maximal
 			sb.append(" in\n");
-			sb.append(def.invExpression);
+			sb.append(sdef.invExpression);
+			
+			// Obligation should cover all state variables
+			POExpressionList vars = new POExpressionList();
+			vars.add(sdef.invExpression);
+			
+			for (TCNameToken svar: sdef.getVariableNames())
+			{
+				vars.add(new POVariableExpression(svar, null));
+			}
+
+			setObligationVars(ctxt, vars);
+			setReasonsAbout(ctxt.getReasonsAbout());
 		}
 
 		source = ctxt.getSource(sb.toString());
