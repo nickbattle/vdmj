@@ -31,14 +31,15 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -75,7 +76,6 @@ public class POForPatternBindStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = sequence.getProofObligations(ctxt, pogState, env);
-		list.markIfAmbiguous(pogState, sequence);
 
 		int popto = ctxt.size();
 
@@ -92,7 +92,7 @@ public class POForPatternBindStatement extends POStatement
 			
 			if (s != null && !TypeComparator.isSubType(s.seqof, bind.type))
 			{
-				list.add(new SubTypeObligation(bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
 			}
 		}
 		else if (patternBind.bind instanceof POSetBind)
@@ -101,7 +101,7 @@ public class POForPatternBindStatement extends POStatement
 			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 			
 			ctxt.push(new POForAllSequenceContext(bind, sequence));
-			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
+			list.addAll(SetMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
@@ -109,7 +109,7 @@ public class POForPatternBindStatement extends POStatement
 			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 			
 			ctxt.push(new POForAllSequenceContext(bind, sequence));
-			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+			list.addAll(SeqMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 
 		POGState copy = pogState.getCopy();
@@ -117,9 +117,11 @@ public class POForPatternBindStatement extends POStatement
 		pogState.combineWith(copy);
 		ctxt.popTo(popto);
 
-		if (!statement.updatesState().isEmpty())
+		TCNameSet updates = statement.updatesState();
+
+		if (!updates.isEmpty())
 		{
-			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+			ctxt.push(new POAmbiguousContext("for loop", updates, location));
 		}
 
 		list.addAll(loops);

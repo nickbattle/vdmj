@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.po.expressions.POMuExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 import com.fujitsu.vdmj.po.expressions.PORecordModifier;
 import com.fujitsu.vdmj.po.expressions.PORecordModifierList;
-import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
@@ -55,7 +54,6 @@ public class POAssignmentContext extends POContext
 	public final String pattern;
 	public TCType type;
 	public final POExpression expression;
-	public final String tooComplex;
 
 	public POAssignmentContext(PODefinitionList assignmentDefs)
 	{
@@ -63,40 +61,30 @@ public class POAssignmentContext extends POContext
 		this.pattern = null;
 		this.type = null;
 		this.expression = null;
-		this.tooComplex = null;
 		
 		/**
-		 * Filter out things like "dcl x:nat;", which become lets with undefined values.
+		 * Filter out things like "dcl x:nat;", which become "let x : nat = (undefined) in"?
+		 * These type check, but they are a problem for QuickCheck and some more complex cases
+		 * do get confused by missing variables.
 		 */
 		for (PODefinition def: assignmentDefs)
 		{
 			POAssignmentDefinition adef = (POAssignmentDefinition) def;
 
-			if (!(adef.expression instanceof POUndefinedExpression))
+			// if (!(adef.expression instanceof POUndefinedExpression))
 			{
 				this.assignmentDefs.add(adef);
 			}
 		}
 	}
 
-	public POAssignmentContext(POStateDesignator target, TCType type, POExpression expression, boolean tooComplex)
+	public POAssignmentContext(POStateDesignator target, TCType type, POExpression expression)
 	{
 		this.assignmentDefs = null;
 		
-		if (tooComplex)
-		{
-			this.type = type;
-			this.pattern = "/* " + target + " */ -";
-			this.tooComplex = ProofObligation.COMPLEX_ASSIGNMENT;
-			this.expression = expression;
-		}
-		else
-		{
-			this.type = type;
-			this.pattern = updatedVariable(target);
-			this.tooComplex = null;
-			this.expression = updateExpression(target, expression);
-		}
+		this.type = type;
+		this.pattern = updatedVariable(target);
+		this.expression = updateExpression(target, expression);
 	}
 	
 	/**
@@ -166,7 +154,7 @@ public class POAssignmentContext extends POContext
 		}
 		else
 		{
-			throw new IllegalArgumentException("Designator too complex");
+			throw new IllegalArgumentException("Unexpected designator?");
 		}
 	}
 
@@ -174,12 +162,6 @@ public class POAssignmentContext extends POContext
 	public boolean isScopeBoundary()
 	{
 		return true;
-	}
-	
-	@Override
-	public String markObligation()
-	{
-		return tooComplex;
 	}
 
 	@Override

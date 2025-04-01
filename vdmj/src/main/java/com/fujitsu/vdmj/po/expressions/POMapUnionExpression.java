@@ -48,7 +48,7 @@ public class POMapUnionExpression extends POBinaryExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
-		obligations.add(new MapCompatibleObligation(left, right, ctxt));
+		obligations.addAll(MapCompatibleObligation.getAllPOs(left, right, ctxt));
 		return obligations;
 	}
 

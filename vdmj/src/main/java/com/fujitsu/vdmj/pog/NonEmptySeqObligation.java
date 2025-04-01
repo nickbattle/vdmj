@@ -24,15 +24,34 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class NonEmptySeqObligation extends ProofObligation
 {
-	public NonEmptySeqObligation(POExpression exp, POContextStack ctxt)
+	private NonEmptySeqObligation(POExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.NON_EMPTY_SEQ, ctxt);
 		source = ctxt.getSource(exp + " <> []");
-		setObligationVars(exp);
+		setObligationVars(ctxt, exp);
 		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExpression exp, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new NonEmptySeqObligation(exp, choice));
+		}
+		
+		return results;
 	}
 }

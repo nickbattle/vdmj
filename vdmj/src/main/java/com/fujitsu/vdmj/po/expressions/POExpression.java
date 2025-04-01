@@ -167,7 +167,7 @@ public abstract class POExpression extends PONode implements Serializable
 			
 			if (sets.size() < ut.types.size() && sets.size() > 0)
 			{
-				obligations.add(new SubTypeObligation(exp, sets.getType(location), exp.getExptype(), ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(exp, sets.getType(location), exp.getExptype(), ctxt));
 			}
 		}
 

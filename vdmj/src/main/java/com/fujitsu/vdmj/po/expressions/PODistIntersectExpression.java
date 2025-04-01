@@ -56,7 +56,7 @@ public class PODistIntersectExpression extends POUnaryExpression
 		
 		if (!exp.getExptype().isAlways(TCSet1Type.class, location))
 		{
-			obligations.add(new NonEmptySetObligation(exp, ctxt));
+			obligations.addAll(NonEmptySetObligation.getAllPOs(exp, ctxt));
 		}
 		
 		return obligations;

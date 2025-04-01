@@ -78,7 +78,7 @@ public class POMkTypeExpression extends POExpression
 			if (!TypeComparator.isSubType(
 				ctxt.checkType(args.get(i), atype), f.type))
 			{
-				list.add(new SubTypeObligation(args.get(i), f.type, atype, ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(args.get(i), f.type, atype, ctxt));
 			}
 
 			i++;
@@ -86,7 +86,7 @@ public class POMkTypeExpression extends POExpression
 
 		if (recordType.invdef != null && !recordType.isMaximal())
 		{
-			list.add(new SubTypeObligation(this, recordType, recordType, ctxt));
+			list.addAll(SubTypeObligation.getAllPOs(this, recordType, recordType, ctxt));
 		}
 
 		return list;

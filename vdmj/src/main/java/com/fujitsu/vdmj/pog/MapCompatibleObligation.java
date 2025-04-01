@@ -24,11 +24,14 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class MapCompatibleObligation extends ProofObligation
 {
-	public MapCompatibleObligation(POExpression left, POExpression right, POContextStack ctxt)
+	private MapCompatibleObligation(POExpression left, POExpression right, POContextStack ctxt)
 	{
 		super(left.location, POType.MAP_COMPATIBLE, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -47,5 +50,21 @@ public class MapCompatibleObligation extends ProofObligation
 		sb.append("(" + rdom + ")");
 
 		source = ctxt.getSource(sb.toString());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExpression left, POExpression right, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new MapCompatibleObligation(left, right, choice));
+		}
+		
+		return results;
 	}
 }

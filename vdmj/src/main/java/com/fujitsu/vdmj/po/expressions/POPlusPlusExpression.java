@@ -51,7 +51,7 @@ public class POPlusPlusExpression extends POBinaryExpression
 
 		if (ltype.isSeq(location))
 		{
-			obligations.add(new SeqModificationObligation(this, ctxt));
+			obligations.addAll(SeqModificationObligation.getAllPOs(this, ctxt));
 		}
 
 		return obligations;

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POReturnContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -82,11 +83,12 @@ public class POReturnStatement extends POStatement
 			
 			if (result != null && !TypeComparator.isSubType(getStmttype(), result))
 			{
-				obligations.add(new SubTypeObligation(expression, result, getStmttype(), ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(expression, result, getStmttype(), ctxt));
 			}
-
-			obligations.markIfAmbiguous(pogState, expression);
 		}
+		
+		// Identify this (sub)stack as having a return
+		ctxt.push(new POReturnContext());
 
 		return obligations;
 	}

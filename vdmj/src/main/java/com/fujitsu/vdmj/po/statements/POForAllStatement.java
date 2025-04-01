@@ -28,11 +28,12 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POForAllStatement extends POStatement
@@ -61,17 +62,18 @@ public class POForAllStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
-		obligations.markIfAmbiguous(pogState, set);
 
 		int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
 		POGState copy = pogState.getCopy();
 		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
 		pogState.combineWith(copy);
 		ctxt.popTo(popto);
+		
+		TCNameSet updates = statement.updatesState();
 
-		if (!statement.updatesState().isEmpty())
+		if (!updates.isEmpty())
 		{
-			loops.markUnchecked(ProofObligation.LOOP_STATEMENT);
+			ctxt.push(new POAmbiguousContext("for all loop", updates, location));
 		}
 		
 		obligations.addAll(loops);

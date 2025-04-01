@@ -24,15 +24,34 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 
 public class SeqModificationObligation extends ProofObligation
 {
-	public SeqModificationObligation(POPlusPlusExpression exp, POContextStack ctxt)
+	private SeqModificationObligation(POPlusPlusExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.SEQ_MODIFICATION, ctxt);
 		source = ctxt.getSource("dom " + exp.right + " subset inds " + exp.left);
-		setObligationVars(exp);
+		setObligationVars(ctxt, exp);
 		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POPlusPlusExpression exp, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new SeqModificationObligation(exp, choice));
+		}
+		
+		return results;
 	}
 }

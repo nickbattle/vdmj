@@ -24,13 +24,16 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class FiniteMapObligation extends ProofObligation
 {
-	public FiniteMapObligation(POMapCompExpression exp, TCType maptype, POContextStack ctxt)
+	private FiniteMapObligation(POMapCompExpression exp, TCType maptype, POContextStack ctxt)
 	{
 		super(exp.location, POType.FINITE_MAP, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -64,5 +67,21 @@ public class FiniteMapObligation extends ProofObligation
 		sb.append("}");
 
 		source = ctxt.getSource(sb.toString());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POMapCompExpression exp, TCType maptype, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new FiniteMapObligation(exp, maptype, choice));
+		}
+		
+		return results;
 	}
 }

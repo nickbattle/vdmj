@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.PONotYetSpecifiedExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POPatternListList;
@@ -72,6 +73,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final TCType expectedResult;
 	public final TCType actualResult;
 	public final boolean isUndefined;
+	public final boolean isCurried;
 	public final boolean recursive;
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
@@ -96,6 +98,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 		this.typeParams = typeParams;
 		this.type = type;
 		this.paramPatternList = parameters;
+		this.isCurried = parameters.size() > 1;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
 		this.body = body;
@@ -176,7 +179,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		if (postcondition != null)
 		{
-			// if (!(body instanceof PONotYetSpecifiedExpression))
+			if (!(body instanceof PONotYetSpecifiedExpression))
 			{
 				ctxt.push(new POFunctionDefinitionContext(this, false));
 				obligations.add(new FuncPostConditionObligation(this, ctxt));

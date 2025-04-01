@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -78,14 +79,14 @@ public class POTrapStatement extends POStatement
 			POSetBind bind = (POSetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 
-			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
+			list.addAll(SetMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
 			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 
-			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+			list.addAll(SeqMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 		
 		// The "with" clause sees the "body" state updates, so this comes first
@@ -98,6 +99,8 @@ public class POTrapStatement extends POStatement
 		ctxt.popTo(popto);
 		
 		pogState.combineWith(copy);
+		ctxt.push(new POAmbiguousContext("trap statement", ctxt.getStateVariables(), location));
+
 		return list;
 	}
 

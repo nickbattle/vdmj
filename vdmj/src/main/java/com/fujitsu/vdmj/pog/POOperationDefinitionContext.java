@@ -47,7 +47,7 @@ public class POOperationDefinitionContext extends POContext
 	public final boolean addPrecond;
 	public final String precondition;
 	public final PODefinition definition;
-	public final PODefinition stateDefinition;
+	public final PODefinition stateDefinition;	// Can be POClassDefinition
 	public final boolean expandState;
 	public final POExpression preExp;
 	
@@ -147,7 +147,7 @@ public class POOperationDefinitionContext extends POContext
 			
 			if (expandState)
 			{
-				sb.append(def.toPattern());
+				sb.append(def.toPattern(false));
 				sb.append(":");
 				sb.append(def.name.getName());
 			}
@@ -163,7 +163,7 @@ public class POOperationDefinitionContext extends POContext
 
 			if (expandState)
 			{
-				sb.append(def.toPattern());
+				sb.append(def.toPattern(false));
 				sb.append(":");
 				sb.append(def.name.getName());
 			}

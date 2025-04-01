@@ -201,8 +201,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		if (!isConstructor &&
 			!TypeComparator.isSubType(actualResult, type.result))
 		{
-			obligations.add(new SubTypeObligation(this, actualResult, ctxt).
-				markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 		}
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);

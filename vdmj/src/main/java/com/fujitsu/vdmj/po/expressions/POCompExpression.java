@@ -56,13 +56,13 @@ public class POCompExpression extends POBinaryExpression
 
 			if (pref1 == null || !pref1.equals(""))
 			{
-				obligations.add(new FuncComposeObligation(this, pref1, pref2, ctxt));
+				obligations.addAll(FuncComposeObligation.getAllPOs(this, pref1, pref2, ctxt));
 			}
 		}
 
 		if (ltype.isMap(location))
 		{
-			obligations.add(new MapComposeObligation(this, ctxt));
+			obligations.addAll(MapComposeObligation.getAllPOs(this, ctxt));
 		}
 
 		return obligations;

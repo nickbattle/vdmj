@@ -57,7 +57,6 @@ public class POExitStatement extends POStatement
 		if (expression != null)
 		{
 			obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
-			obligations.markIfAmbiguous(pogState, expression);
 		}
 
 		return obligations;

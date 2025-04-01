@@ -58,7 +58,7 @@ public class POMapInverseExpression extends POUnaryExpression
 
 		if (!type.empty)
 		{
-			list.add(new InvariantObligation(this, ctxt));
+			list.addAll(InvariantObligation.getAllPOs(this, ctxt));
 		}
 
 		return list;

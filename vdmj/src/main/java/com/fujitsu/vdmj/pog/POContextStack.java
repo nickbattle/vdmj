@@ -24,14 +24,27 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
+import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
@@ -58,6 +71,125 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 	
+	/**
+	 * The popInto/copyInto are designed to be used with POAltContexts, extracting a
+	 * part of the context stack into an alternative. If this process encounters a
+	 * POReturnContext, the alternative is cleared since it does not play any part
+	 * in obligations further down the operation.
+	 */
+	public void popInto(int size, POContextStack into)
+	{
+		while (size() > size)
+		{
+			into.add(0, pop());		// Preserve order
+		}
+	}
+	
+	public void copyInto(int size, POContextStack into)
+	{
+		for (int i=size; i < size(); i++)
+		{
+			into.add(get(i));		// Preserve order
+		}
+	}
+	
+	/**
+	 * If the stack contains POAltContext items, these produce alternative substacks that
+	 * have to be iterated through, before creating a set of obligations. Note that if
+	 * a POReturnContext is encountered at the top level, this immediately returns no
+	 * stacks, because this path can play no part in further obligations.
+	 */
+	public List<POContextStack> getAlternatives()
+	{
+		List<POContextStack> results = new Vector<POContextStack>();
+		results.add(new POContextStack());
+		
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POAltContext)
+			{
+				POAltContext alt = (POAltContext)ctxt;
+				List<POContextStack> toAdd = new Vector<POContextStack>();
+				
+				for (POContextStack substack: alt.alternatives)
+				{
+					for (POContextStack alternative: substack.getAlternatives())
+					{
+						for (POContextStack original: results)
+						{
+							POContextStack combined = new POContextStack();
+							combined.addAll(original);
+							combined.addAll(alternative);
+							toAdd.add(combined);
+						}
+					}
+				}
+				
+				results.clear();
+				results.addAll(toAdd);
+			}
+			else if (ctxt instanceof POReturnContext)
+			{
+				// This stack plays no part in further obligations, including any
+				// alternatives it contains. So immediately return nothing.
+				return new Vector<POContextStack>();
+			}
+			else
+			{
+				for (POContextStack choice: results)
+				{
+					choice.add(ctxt);
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Operation calls may cause ambiguities in the state. This is affected by whether
+	 * they are pure or have ext clauses.
+	 */
+	public void addOperationCall(LexLocation from, PODefinition called)
+	{
+		if (called == null)	// Assumed to update something
+		{
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+		}
+		else if (called.accessSpecifier.isPure)
+		{
+			return;			// No updates, by definition
+		}
+		else if (called instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+			
+			if (imp.externals != null)
+			{
+				for (POExternalClause ext: imp.externals)
+				{
+					if (ext.mode.is(Token.WRITE))
+					{
+						push(new POAmbiguousContext("operation ext clause", ext.identifiers, from));
+					}
+				}
+			}
+			else
+			{
+				push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			}
+		}
+		else if (called instanceof POExplicitOperationDefinition)
+		{
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+		}
+	}
+
+	
+	/**
+	 * The name is typically the name of the top level definition that this context
+	 * belongs to, like the function or operation name. It is only used for labelling.
+	 */
 	public String getName()
 	{
 		StringBuilder result = new StringBuilder();
@@ -78,6 +210,10 @@ public class POContextStack extends Stack<POContext>
 		return result.toString();
 	}
 
+	/**
+	 * Get the full VDM-SL source of the obligation, including the context stack and
+	 * the base obligation source passed in.
+	 */
 	public String getSource(String poSource)
 	{
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before stack
@@ -139,6 +275,46 @@ public class POContextStack extends Stack<POContext>
 		
 		return null;
 	}
+	
+	public TCNameList getStateVariables()
+	{
+		TCNameList names = new TCNameList();
+		
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POOperationDefinitionContext)
+			{
+				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
+				
+				if (opdef.stateDefinition instanceof POStateDefinition)
+				{
+					POStateDefinition state = (POStateDefinition)opdef.stateDefinition;
+					
+					for (TCField field: state.fields)
+					{
+						names.add(field.tagname);
+					}
+				}
+				else if (opdef.stateDefinition instanceof POClassDefinition)
+				{
+					POClassDefinition clazz = (POClassDefinition)opdef.stateDefinition;
+					
+					for (PODefinition def: clazz.definitions)
+					{
+						if (def instanceof POInstanceVariableDefinition)
+						{
+							POInstanceVariableDefinition iv = (POInstanceVariableDefinition)def;
+							names.add(iv.name);
+						}
+					}
+				}
+				
+				break;
+			}
+		}
+		
+		return names;
+	}
 
 	public TCTypeList getTypeParams()
 	{
@@ -171,20 +347,46 @@ public class POContextStack extends Stack<POContext>
 		
 		return set;
 	}
-	
-	public String markObligation()
+
+	/**
+	 * Look through the stack for POAmbiguousContexts at this point.
+	 */
+	public TCNameSet getAmbiguousVariables()
 	{
-		for (POContext ctxt: this)
+		TCNameSet set = new TCNameSet();
+
+		for (POContext ctxt: this)	// In push order
 		{
-			String message = ctxt.markObligation();
-			
-			if (message != null)
+			set.addAll(ctxt.ambiguousVariables());
+			set.removeAll(ctxt.resolvedVariables());
+		}
+		
+		return set;
+	}
+	
+	public boolean hasAmbiguous(TCNameSet varlist)
+	{
+		if (varlist.isEmpty())
+		{
+			return false;
+		}
+
+		TCNameSet ambiguous = getAmbiguousVariables();
+		
+		for (TCNameToken var: varlist)
+		{
+			if (ambiguous.contains(var))
 			{
-				return message;
+				return true;
 			}
 		}
 		
-		return null;
+		return false;
+	}
+	
+	public boolean isAmbiguous(TCNameToken var)
+	{
+		return getAmbiguousVariables().contains(var);
 	}
 
 	private String indentNewLines(String line, String indent)

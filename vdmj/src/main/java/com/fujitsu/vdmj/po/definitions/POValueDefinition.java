@@ -134,19 +134,16 @@ public class POValueDefinition extends PODefinition
     			if (!TypeComparator.isSubType(type, compatible))
     			{
     				list.add(new ValueBindingObligation(this, ctxt));
-    				list.add(new SubTypeObligation(exp, compatible, type, ctxt));
+    				list.addAll(SubTypeObligation.getAllPOs(exp, compatible, type, ctxt));
     			}
 			}
 		}
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), type))
 		{
-			list.add(new SubTypeObligation(exp, type, expType, ctxt));
+			list.addAll(SubTypeObligation.getAllPOs(exp, type, expType, ctxt));
 		}
 		
-		list.markIfAmbiguous(pogState, exp);
-		pogState.markIfAmbiguous(pattern.getVariableNames(), exp, location);
-
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}

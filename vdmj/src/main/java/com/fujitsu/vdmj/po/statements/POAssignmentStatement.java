@@ -28,14 +28,17 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POResolveContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -79,65 +82,113 @@ public class POAssignmentStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 
 		obligations.addAll(target.getProofObligations(ctxt));
-		obligations.addAll(exp.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, exp));
+		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{
-			obligations.add(
-				new SubTypeObligation(exp, targetType, expType, ctxt));
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
 		}
 		
-		boolean tooComplex = false;
-
-		try
+		TCNameToken update = POStateDesignator.updatedVariableName(target);
+		pogState.didUpdateState(update, location);
+		
+		if (!ctxt.hasAmbiguous(exp.getVariableNames()))
 		{
-			TCNameToken update = POStateDesignator.updatedVariableName(target);
-			pogState.didUpdateState(update, location);
+			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			
-			TCNameSet varlist = exp.getVariableNames();		// All
-			boolean isSimple = (target instanceof POIdentifierDesignator);
+			// We can disambiguate variables in an assignment that assigns unambiguous values,
+			// like constants or variables that are unambiguous, but only if the entire value
+			// is being replaced. So we check that we are assigning to an IdentifierDesignator.
 			
-			if (target instanceof POMapSeqDesignator)
+			if (target instanceof POIdentifierDesignator && ctxt.isAmbiguous(update))
 			{
-				POMapSeqDesignator ms = (POMapSeqDesignator)target;
-				varlist.addAll(ms.exp.getVariableNames());	// eg. add "x" in m(x)
-			}
-			
-			if (!pogState.hasAmbiguousState(varlist))
-			{
-				// This throws IllegalArgumentException for complex target patterns
-				ctxt.push(new POAssignmentContext(target, targetType, exp, false));
-				
-				// We can disambiguate variables in a simple assignment that assigns unambiguous values,
-				// like constants or variables that are unambiguous.
-				
-				if (isSimple)	// Other elements of complex designators may be ambiguous
-				{
-					pogState.notAmbiguous(update);
-				}
-			}
-			else
-			{
-				// Updated a variable with an ambiguous value, so it becomes ambiguous
-				pogState.isAmbiguous(update, exp.location);
+				ctxt.push(new POResolveContext(update, location));
 			}
 		}
-		catch (IllegalArgumentException e)	// Can't process a complex designator
+		else
 		{
-			tooComplex = true;
-			ctxt.push(new POAssignmentContext(target, targetType, exp, true));
+			// Updated a variable with an ambiguous value, so it becomes ambiguous
+			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
 		}
 
-		if (!inConstructor && !tooComplex &&
+		if (!inConstructor &&
 			(classDefinition != null && classDefinition.invariant != null) ||
 			(stateDefinition != null && stateDefinition.invExpression != null))
 		{
-			obligations.add(new StateInvariantObligation(this, ctxt));
+			obligations.addAll(StateInvariantObligation.getAllPOs(this, ctxt));
 		}
 
 		return obligations;
 	}
 	
+	/**
+	 * Prepare an assignment during an "atomic" - see POAtomicStatement.
+	 */
+	public ProofObligationList prepareAssignment(POContextStack ctxt, POGState pogState, Environment env, int var)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+
+		obligations.addAll(target.getProofObligations(ctxt));
+		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+
+		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
+		{
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
+		}
+		
+		// Create a temporary name, which is used in the completeObligations call
+		TCNameToken temp = new TCNameToken(location, location.module, "$atomic" + var);
+		POIdentifierDesignator tempTarget = new POIdentifierDesignator(temp, null);
+		
+		ctxt.push(new POAssignmentContext(tempTarget, targetType, exp));
+
+		if (ctxt.hasAmbiguous(exp.getVariableNames()))
+		{
+			// Updated a variable with an ambiguous value, so it becomes ambiguous
+			TCNameToken update = POStateDesignator.updatedVariableName(target);
+			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
+		}
+
+		return obligations;
+	}
+
+	/**
+	 * Complete an assignment during an "atomic" - see POAtomicStatement.
+	 */
+	public ProofObligationList completeAssignment(POContextStack ctxt, POGState pogState, Environment env, int var)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		TCNameToken update = POStateDesignator.updatedVariableName(target);
+		pogState.didUpdateState(update, location);
+		
+		// Create a temporary name, which was created in the completeObligations call
+		TCNameToken temp = new TCNameToken(location, location.module, "$atomic" + var);
+		POVariableExpression tempExp = new POVariableExpression(temp, null);
+		ctxt.push(new POAssignmentContext(target, targetType, tempExp));
+
+		return obligations;
+	}
+	
+	/**
+	 * Check invariant holds after an "atomic" - see POAtomicStatement.
+	 */
+	public ProofObligationList checkInvariant(POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (!inConstructor &&
+			(classDefinition != null && classDefinition.invariant != null) ||
+			(stateDefinition != null && stateDefinition.invExpression != null))
+		{
+			obligations.addAll(StateInvariantObligation.getAllPOs(this, ctxt));
+		}
+		
+		return obligations;
+	}
+
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{

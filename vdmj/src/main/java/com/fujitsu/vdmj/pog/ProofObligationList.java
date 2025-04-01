@@ -50,7 +50,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -314,57 +313,5 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 		
 		return this;	// Convenient for getProofObligations(ctxt, env).markUnchecked("Some reason")
-	}
-
-	/**
-	 * Update the obligations in this list because of updates to the state read by the expression.
-	 * This is used by various statements and definitions to suppress obligations that cannot
-	 * yet be checked.
-	 */
-	public ProofObligationList markIfUpdated(POGState pstate, POExpression expression)
-	{
-		TCNameSet varreads = expression.readsState();
-		
-		if (!varreads.isEmpty() && pstate.hasUpdatedState(varreads))
-		{
-			LexLocation at = pstate.getUpdatedLocation(varreads);
-			
-			if (at == LexLocation.ANY)
-			{
-				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + varreads);
-			}
-			else
-			{
-				markUnchecked(ProofObligation.HAS_UPDATED_STATE + " " + at.toShortString());
-			}
-		}
-		
-		return this;
-	}
-
-	/**
-	 * Update the obligations in this list because of updates to the state read by the expression.
-	 * This is used by various statements and definitions to suppress obligations that cannot
-	 * yet be checked.
-	 */
-	public ProofObligationList markIfAmbiguous(POGState pstate, POExpression expression)
-	{
-		TCNameSet varreads = expression.readsState();
-		
-		if (!varreads.isEmpty() && pstate.hasAmbiguousState(varreads))
-		{
-			LexLocation at = pstate.getUpdatedLocation(varreads);
-			
-			if (at == LexLocation.ANY)
-			{
-				markUnchecked(ProofObligation.HAS_AMBIGUOUS_STATE + " " + varreads);
-			}
-			else
-			{
-				markUnchecked(ProofObligation.HAS_AMBIGUOUS_STATE + " " + at.toShortString());
-			}
-		}
-		
-		return this;
 	}
 }

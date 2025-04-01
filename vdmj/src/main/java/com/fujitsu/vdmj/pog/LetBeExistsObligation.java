@@ -24,12 +24,15 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POLetBeStExpression;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
 
 public class LetBeExistsObligation extends ProofObligation
 {
-	public LetBeExistsObligation(POLetBeStExpression exp, POContextStack ctxt)
+	private LetBeExistsObligation(POLetBeStExpression exp, POContextStack ctxt)
 	{
 		super(exp.bind.location, POType.LET_BE_EXISTS, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -50,7 +53,7 @@ public class LetBeExistsObligation extends ProofObligation
 		source = ctxt.getSource(sb.toString());
 	}
 
-	public LetBeExistsObligation(POLetBeStStatement stmt, POContextStack ctxt)
+	private LetBeExistsObligation(POLetBeStStatement stmt, POContextStack ctxt)
 	{
 		super(stmt.bind.location, POType.LET_BE_EXISTS, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -69,5 +72,37 @@ public class LetBeExistsObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(sb.toString());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POLetBeStExpression exp, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new LetBeExistsObligation(exp, choice));
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POLetBeStStatement stmt, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new LetBeExistsObligation(stmt, choice));
+		}
+		
+		return results;
 	}
 }

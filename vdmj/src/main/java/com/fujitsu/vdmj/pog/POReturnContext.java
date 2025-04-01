@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2025 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -24,34 +24,16 @@
 
 package com.fujitsu.vdmj.pog;
 
-import java.util.List;
-import java.util.Vector;
-
-import com.fujitsu.vdmj.po.expressions.POExpression;
-
-public class NonEmptySetObligation extends ProofObligation
+public class POReturnContext extends POContext
 {
-	private NonEmptySetObligation(POExpression exp, POContextStack ctxt)
+	public POReturnContext()
 	{
-		super(exp.location, POType.NON_EMPTY_SET, ctxt);
-		source = ctxt.getSource(exp + " <> {}");
-		setObligationVars(ctxt, exp);
-		setReasonsAbout(ctxt.getReasonsAbout());
+		// This Context contains a return statement
 	}
-	
-	/**
-	 * Create an obligation for each of the alternative stacks contained in the ctxt.
-	 * This happens with operation POs that push POAltContexts onto the stack.
-	 */
-	public static List<ProofObligation> getAllPOs(POExpression exp, POContextStack ctxt)
+
+	@Override
+	public String getSource()
 	{
-		Vector<ProofObligation> results = new Vector<ProofObligation>();
-		
-		for (POContextStack choice: ctxt.getAlternatives())
-		{
-			results.add(new NonEmptySetObligation(exp, choice));
-		}
-		
-		return results;
+		return "";
 	}
 }

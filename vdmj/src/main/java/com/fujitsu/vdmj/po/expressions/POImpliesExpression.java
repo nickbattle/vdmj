@@ -52,14 +52,14 @@ public class POImpliesExpression extends POBooleanBinaryExpression
 
 		if (ltype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(left, new TCBooleanType(left.location), ltype, ctxt));
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(left, new TCBooleanType(left.location), ltype, ctxt));
 		}
 
 		if (rtype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(right, new TCBooleanType(right.location), rtype, ctxt));
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(right, new TCBooleanType(right.location), rtype, ctxt));
 		}
 
 		ctxt.push(new POImpliesContext(left));

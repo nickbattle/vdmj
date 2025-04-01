@@ -83,7 +83,10 @@ public class INPluginPR extends INPlugin
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(super.getCommandHelp(), ClassesCommand.HELP, LogCommand.HELP);
+		return new HelpList(
+			super.getCommandHelp(),
+			ClassesCommand.HELP,
+			LogCommand.HELP);
 	}
 	
 	@Override

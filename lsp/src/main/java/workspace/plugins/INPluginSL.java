@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.ModulesCommand;
+import vdmj.commands.StateCommand;
 import workspace.events.CheckPrepareEvent;
 
 public class INPluginSL extends INPlugin
@@ -72,6 +73,7 @@ public class INPluginSL extends INPlugin
 		switch (parts[0])
 		{
 			case "modules":	return new ModulesCommand(line);
+			case "state":	return new StateCommand(line);
 			
 			default:
 				return super.getCommand(line);
@@ -81,7 +83,10 @@ public class INPluginSL extends INPlugin
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(super.getCommandHelp(), ModulesCommand.HELP);
+		return new HelpList(
+			super.getCommandHelp(),
+			ModulesCommand.HELP,
+			StateCommand.HELP);
 	}
 
 	@Override

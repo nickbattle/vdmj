@@ -24,11 +24,14 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POCompExpression;
 
 public class MapComposeObligation extends ProofObligation
 {
-	public MapComposeObligation(POCompExpression poCompExpression, POContextStack ctxt)
+	private MapComposeObligation(POCompExpression poCompExpression, POContextStack ctxt)
 	{
 		super(poCompExpression.location, POType.MAP_COMPOSE, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -40,7 +43,23 @@ public class MapComposeObligation extends ProofObligation
 		sb.append(")");
 
 		source = ctxt.getSource(sb.toString());
-		setObligationVars(poCompExpression);
+		setObligationVars(ctxt, poCompExpression);
 		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POCompExpression poCompExpression, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new MapComposeObligation(poCompExpression, choice));
+		}
+		
+		return results;
 	}
 }

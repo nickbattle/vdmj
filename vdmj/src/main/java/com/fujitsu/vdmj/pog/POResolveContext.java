@@ -24,31 +24,33 @@
 
 package com.fujitsu.vdmj.pog;
 
-import java.util.Collection;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A context to represent ambiguous variables
+ * A context to represent resolved ambiguous variables
  */
-public class POAmbiguousContext extends POContext
+public class POResolveContext extends POContext
 {
-	private final String reason;
 	private final TCNameSet variables;
 	private final LexLocation location;
 	
-	public POAmbiguousContext(String reason, Collection<? extends TCNameToken> variables, LexLocation location)
+	public POResolveContext(TCNameList variables, LexLocation location)
 	{
-		this.reason = reason;
 		this.variables = new TCNameSet();
 		this.variables.addAll(variables);
 		this.location = location;
 	}
 	
+	public POResolveContext(TCNameToken var, LexLocation location)
+	{
+		this(new TCNameList(var), location);
+	}
+	
 	@Override
-	public TCNameSet ambiguousVariables()
+	public TCNameSet resolvedVariables()
 	{
 		return variables;
 	}
@@ -56,7 +58,7 @@ public class POAmbiguousContext extends POContext
 	@Override
 	public String getSource()
 	{
-		return "-- Ambiguous " + reason + ", " + variables +
-			"? at " + location.startLine + ":" + location.startPos;
+		return "-- Resolved ambiguity " + variables +
+				" at " + location.startLine + ":" + location.startPos;
 	}
 }

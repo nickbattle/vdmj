@@ -56,13 +56,13 @@ public class POStarStarExpression extends POBinaryExpression
 
 			if (prename == null || !prename.equals(""))
 			{
-				obligations.add(new FuncIterationObligation(this, prename, ctxt));
+				obligations.addAll(FuncIterationObligation.getAllPOs(this, prename, ctxt));
 			}
 		}
 
 		if (ltype.isMap(location))
 		{
-			obligations.add(new MapIterationObligation(this, ctxt));
+			obligations.addAll(MapIterationObligation.getAllPOs(this, ctxt));
 		}
 
 		return obligations;

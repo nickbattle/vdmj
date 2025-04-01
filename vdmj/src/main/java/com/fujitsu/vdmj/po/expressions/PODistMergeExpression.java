@@ -52,7 +52,7 @@ public class PODistMergeExpression extends POUnaryExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.add(new MapSetOfCompatibleObligation(exp, ctxt));
+		obligations.addAll(MapSetOfCompatibleObligation.getAllPOs(exp, ctxt));
 		return obligations;
 	}
 

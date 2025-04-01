@@ -69,14 +69,19 @@ abstract public class POContext
 		return null;
 	}
 
-	public String markObligation()
-	{
-		return null;
-	}
-	
 	public TCNameSet reasonsAbout()
 	{
 		return null;
+	}
+
+	public TCNameSet ambiguousVariables()
+	{
+		return new TCNameSet();
+	}
+
+	public TCNameSet resolvedVariables()
+	{
+		return new TCNameSet();
 	}
 
 	public boolean isScopeBoundary()
@@ -150,7 +155,7 @@ abstract public class POContext
 		if (state instanceof POStateDefinition)
 		{
 			call.append(sep);
-			call.append(state.toPattern());
+			call.append(state.toPattern(false));
 		}
 		else if (state instanceof POClassDefinition)
 		{

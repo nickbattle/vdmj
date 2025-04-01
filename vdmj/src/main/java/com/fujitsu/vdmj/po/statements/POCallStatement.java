@@ -73,20 +73,20 @@ public class POCallStatement extends POStatement
 
 		for (POExpression exp: args)
 		{
-			obligations.addAll(exp.getProofObligations(ctxt, pogState, env).markIfAmbiguous(pogState, exp));
+			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 			TCType pt = paramTypes.get(i);
 			TCType at = exp.getExptype();
 			
 			if (!TypeComparator.isSubType(at, pt))
 			{
-				obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(args.get(i), pt, at, ctxt));
 			}
 
 			i++;
 		}
 
-		pogState.addOperationCall(location, opdef);
+		ctxt.addOperationCall(location, opdef);
 
 		return obligations;
 	}

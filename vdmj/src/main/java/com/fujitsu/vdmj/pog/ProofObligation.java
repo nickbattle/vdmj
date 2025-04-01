@@ -24,11 +24,13 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
@@ -92,13 +94,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		this.obligationVars = null;
 		this.reasonsAbout = null;
-		
-		String message = ctxt.markObligation();
-		
-		if (message != null)
-		{
-			markUnchecked(message);
-		}
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
@@ -175,8 +170,14 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.message = message;
 	}
 	
-	public void setObligationVars(POExpression... expressions)
+	public void setObligationVars(POContextStack ctxt, POExpression... expressions)
 	{
+		List<POExpression> list = Arrays.asList(expressions);
+		setObligationVars(ctxt, list);
+	}
+	
+	public void setObligationVars(POContextStack ctxt, List<POExpression> expressions)
+	{	
 		if (obligationVars == null)
 		{
 			obligationVars = new TCNameSet();
@@ -198,18 +199,10 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			
 			obligationVars.addAll(exp.getVariableNames());
 		}
-	}
-	
-	public void setObligationVars(POPattern... patterns)
-	{
-		if (obligationVars == null)
-		{
-			obligationVars = new TCNameSet();
-		}
 		
-		for (POPattern pattern: patterns)
+		if (ctxt.hasAmbiguous(obligationVars))
 		{
-			obligationVars.addAll(pattern.getVariableNames());
+			markUnchecked(HAS_AMBIGUOUS_STATE);
 		}
 	}
 	
@@ -276,7 +269,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		if (other instanceof ProofObligation)
 		{
 			ProofObligation opo = (ProofObligation)other;
-			return kind == opo.kind && location == opo.location;
+			return kind == opo.kind && location == opo.location && source.equals(opo.source);
 		}
 		
 		return false; 

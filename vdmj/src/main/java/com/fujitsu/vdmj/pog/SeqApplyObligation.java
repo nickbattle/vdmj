@@ -24,23 +24,58 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 
 public class SeqApplyObligation extends ProofObligation
 {
-	public SeqApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
+	private SeqApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
 		source = ctxt.getSource(poExpression + " in set inds " + root);
-		setObligationVars(root, poExpression);
+		setObligationVars(ctxt, root, poExpression);
 		// Note, the LHS included, eg. "len s in set inds s"
 		setReasonsAbout(ctxt.getReasonsAbout(), poExpression.getVariableNames());
 	}
 
-	public SeqApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
+	private SeqApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
 		source = ctxt.getSource(arg + " in set inds " + root);
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExpression root, POExpression poExpression, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new SeqApplyObligation(root, poExpression, choice));
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POStateDesignator root, POExpression arg, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new SeqApplyObligation(root, arg, choice));
+		}
+		
+		return results;
 	}
 }

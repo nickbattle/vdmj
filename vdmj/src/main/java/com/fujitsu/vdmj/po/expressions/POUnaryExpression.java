@@ -59,7 +59,7 @@ abstract public class POUnaryExpression extends POExpression
 			
 			if (sets.size() < ut.types.size())
 			{
-				list.add(new SubTypeObligation(exp, sets.getType(location), exp.getExptype(), ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(exp, sets.getType(location), exp.getExptype(), ctxt));
 			}
 		}
 		

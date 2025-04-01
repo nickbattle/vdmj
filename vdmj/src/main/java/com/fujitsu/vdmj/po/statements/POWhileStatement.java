@@ -60,7 +60,6 @@ public class POWhileStatement extends POStatement
 		obligations.add(new WhileLoopObligation(this, ctxt));
 		
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
-		obligations.markIfAmbiguous(pogState, exp);
 		
 		int popto = ctxt.size();
 		POGState copy = pogState.getCopy();

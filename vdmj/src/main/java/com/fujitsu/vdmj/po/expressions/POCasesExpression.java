@@ -97,7 +97,7 @@ public class POCasesExpression extends POExpression
 
 		if (others == null && !hasIgnore)
 		{
-			_obligations.add(new CasesExhaustiveObligation(this, ctxt));
+			_obligations.addAll(CasesExhaustiveObligation.getAllPOs(this, ctxt));
 		}
 
 		if (!hidden.isEmpty())

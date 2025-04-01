@@ -75,7 +75,7 @@ public class POMapSeqDesignator extends POStateDesignator
 
 		if (seqType != null)
 		{
-			list.add(new SeqApplyObligation(mapseq, exp, ctxt));
+			list.addAll(SeqApplyObligation.getAllPOs(mapseq, exp, ctxt));
 		}
 		
 		// Maps are OK, as you can create new map domain entries
