@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -186,7 +187,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			obligationVars = new TCNameSet();
 		}
 		
-		TCNameSet withInvariants = new TCNameSet();
+		TCNameSet ignoreThese = new TCNameSet();
 		POFreeVariableFinder visitor = new POFreeVariableFinder();
 		
 		for (POExpression exp: expressions)
@@ -204,8 +205,13 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 					if (itype.invdef != null)
 					{
 						// The variable's invariant "reasons about" this exp
-						withInvariants.add(freev.name);
+						ignoreThese.add(freev.name);
 					}
+				}
+				
+				if (freev.vardef != null && freev.vardef.nameScope == NameScope.GLOBAL)
+				{
+					ignoreThese.add(freev.name);	// Globals are a given
 				}
 				
 				obligationVars.add(freev.name);
@@ -218,7 +224,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		
 		// Finally, remove the ones that are covered by invariant checks.
-		obligationVars.removeAll(withInvariants);
+		obligationVars.removeAll(ignoreThese);
 	}
 	
 	public void setReasonsAbout(TCNameSet... reasons)
