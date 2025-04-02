@@ -37,6 +37,8 @@ public class TheoremObligation extends ProofObligation
 		super(location, POType.THEOREM, ctxt);
 		this.theoremName = theoremName;
 		this.source = theorem.toString();
+		setObligationVars(ctxt, theorem);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	public POVariableExpression getTheoremName()

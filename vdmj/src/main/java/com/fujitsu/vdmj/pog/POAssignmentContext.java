@@ -93,14 +93,14 @@ public class POAssignmentContext extends POContext
 	 */
 	private String updatedVariable(POStateDesignator designator)
 	{
-		TCType type = POStateDesignator.updatedVariableType(designator);
+		TCType type = designator.updatedVariableType();
 		
 		if (type != null)
 		{
 			this.type = type;	// eg. a map or seq type
 		}
 		
-		return POStateDesignator.updatedVariableName(designator).getName();
+		return designator.updatedVariableName().getName();
 	}
 	
 	/**

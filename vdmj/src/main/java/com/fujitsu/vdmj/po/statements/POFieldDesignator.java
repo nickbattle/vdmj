@@ -26,13 +26,16 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POFieldExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POFieldDesignator extends POStateDesignator
 {
@@ -69,5 +72,40 @@ public class POFieldDesignator extends POStateDesignator
 	public String toString()
 	{
 		return object + "." + field;
+	}
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	public TCNameToken updatedVariableName()
+	{
+		return object.updatedVariableName();
+	}
+
+	/**
+	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the type of the variable "x".
+	 */
+	public TCType updatedVariableType()
+	{
+		return object.updatedVariableType();
+	}
+	
+	/**
+	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	public TCNameSet getVariableNames()
+	{
+		return object.getVariableNames();
+	}
+	
+	/**
+	 * All expressions used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	@Override
+	public POExpressionList getExpressions()
+	{
+		return object.getExpressions();
 	}
 }

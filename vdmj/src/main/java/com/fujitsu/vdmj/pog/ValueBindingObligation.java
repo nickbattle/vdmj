@@ -47,6 +47,8 @@ public class ValueBindingObligation extends ProofObligation
 		sb.append(poValueDefinition.exp);
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, poValueDefinition.exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public ValueBindingObligation(POEqualsDefinition def, POContextStack ctxt)
@@ -66,5 +68,7 @@ public class ValueBindingObligation extends ProofObligation
 		sb.append(def.test);
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, def.test);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }

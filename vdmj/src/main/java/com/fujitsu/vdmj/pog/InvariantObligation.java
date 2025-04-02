@@ -45,6 +45,8 @@ public class InvariantObligation extends ProofObligation
 		sb.append(")");
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

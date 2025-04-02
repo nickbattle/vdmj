@@ -66,6 +66,8 @@ public class OrderedObligation extends ProofObligation
 		}
 		
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, left, right);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

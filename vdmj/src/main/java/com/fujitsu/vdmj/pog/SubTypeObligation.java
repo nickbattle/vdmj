@@ -86,7 +86,8 @@ public class SubTypeObligation extends ProofObligation
 	{
 		super(exp.location, POType.SUB_TYPE, ctxt);
 		source = ctxt.getSource(oneTypeSafe(false, exp, etype, atype));
-		return;
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public SubTypeObligation(
@@ -130,6 +131,8 @@ public class SubTypeObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(oneTypeSafe(false, body, etype, atype));
+		setObligationVars(ctxt, body);
+		setReasonsAbout(ctxt.getReasonsAbout());
 		definition = func;
 	}
 

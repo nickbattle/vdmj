@@ -62,6 +62,8 @@ public class FuncIterationObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

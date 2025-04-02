@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -56,87 +57,23 @@ public abstract class POStateDesignator extends PONode
 	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
 	 * all return the updated variable "x".
 	 */
-	public static TCNameToken updatedVariableName(POStateDesignator designator)
-	{
-		if (designator instanceof POIdentifierDesignator)
-		{
-			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
-			return idd.name;
-		}
-		else if (designator instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
-			return updatedVariableName(msd.mapseq);
-		}
-		else if (designator instanceof POFieldDesignator)
-		{
-			POFieldDesignator fld = (POFieldDesignator)designator;
-			return updatedVariableName(fld.object);
-		}
-		else
-		{
-			throw new IllegalArgumentException("Designator too complex");
-		}
-	}
+	abstract public TCNameToken updatedVariableName();
 
 	/**
 	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
 	 * all return the type of the variable "x".
 	 */
-	public static TCType updatedVariableType(POStateDesignator designator)
-	{
-		if (designator instanceof POIdentifierDesignator)
-		{
-			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
-
-			if (idd.vardef != null)
-			{
-				return idd.vardef.getType();	// eg. m(k) is a map/seq
-			}
-			else
-			{
-				return null;
-			}
-		}
-		else if (designator instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
-			return updatedVariableType(msd.mapseq);
-		}
-		else if (designator instanceof POFieldDesignator)
-		{
-			POFieldDesignator fld = (POFieldDesignator)designator;
-			return updatedVariableType(fld.object);
-		}
-		else
-		{
-			throw new IllegalArgumentException("Designator too complex");
-		}
-	}
+	abstract public TCType updatedVariableType();
 	
 	/**
 	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
 	 */
-	public static TCNameSet getVariableNames(POStateDesignator designator)
-	{
-		if (designator instanceof POIdentifierDesignator)
-		{
-			POIdentifierDesignator idd = (POIdentifierDesignator)designator;
-			return new TCNameSet(idd.name);
-		}
-		else if (designator instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
-			TCNameSet set = getVariableNames(msd.mapseq);
-			set.addAll(msd.exp.getVariableNames());
-			return set;
-		}
-		else // if (designator instanceof POFieldDesignator)
-		{
-			POFieldDesignator fld = (POFieldDesignator)designator;
-			return getVariableNames(fld.object);
-		}
-	}
+	abstract public TCNameSet getVariableNames();
+	
+	/**
+	 * All expressions used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	abstract public POExpressionList getExpressions();
 
 	/**
 	 * @param ctxt

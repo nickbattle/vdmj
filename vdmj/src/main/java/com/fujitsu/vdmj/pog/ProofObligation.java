@@ -183,6 +183,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			obligationVars = new TCNameSet();
 		}
 		
+		TCNameSet withInvariants = new TCNameSet();
+		
 		for (POExpression exp: expressions)
 		{
 			TCType etype = exp.getExptype();
@@ -193,17 +195,21 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 				
 				if (itype.invdef != null)
 				{
-					continue;	// Invariant "reasons about" this exp
+					// The variable's invariant "reasons about" this exp
+					withInvariants.addAll(exp.getVariableNames());
 				}
 			}
 			
 			obligationVars.addAll(exp.getVariableNames());
 		}
 		
-		if (ctxt.hasAmbiguous(obligationVars))
+		if (ctxt.hasAmbiguous(obligationVars))	// Including invariant checked ones
 		{
 			markUnchecked(HAS_AMBIGUOUS_STATE);
 		}
+		
+		// Finally, remove the ones that are covered by invariant checks.
+		obligationVars.removeAll(withInvariants);
 	}
 	
 	public void setReasonsAbout(TCNameSet... reasons)

@@ -37,6 +37,8 @@ public class MapSetOfCompatibleObligation extends ProofObligation
 		StringBuilder sb = new StringBuilder();
 		append(sb, exp.toString());
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	private void append(StringBuilder sb, String exp)
