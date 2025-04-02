@@ -42,6 +42,8 @@ public class UniqueExistenceObligation extends ProofObligation
 		sb.append(poIotaExpression.predicate);
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, poIotaExpression);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

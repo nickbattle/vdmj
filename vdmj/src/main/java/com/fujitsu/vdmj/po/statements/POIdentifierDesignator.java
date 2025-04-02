@@ -26,8 +26,11 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POIdentifierDesignator extends POStateDesignator
 {
@@ -52,5 +55,49 @@ public class POIdentifierDesignator extends POStateDesignator
 	public POExpression toExpression()
 	{
 		return new POVariableExpression(name, vardef);
+	}
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	public TCNameToken updatedVariableName()
+	{
+		return name;
+	}
+
+	/**
+	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the type of the variable "x".
+	 */
+	public TCType updatedVariableType()
+	{
+		if (vardef != null)
+		{
+			return vardef.getType();	// eg. m(k) is a map/seq
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
+	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	public TCNameSet getVariableNames()
+	{
+		return new TCNameSet(name);
+	}
+	
+	/**
+	 * All expressions used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	@Override
+	public POExpressionList getExpressions()
+	{
+		POExpressionList list = new POExpressionList();
+		list.add(new POVariableExpression(name, vardef));
+		return list;
 	}
 }

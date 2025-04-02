@@ -158,7 +158,19 @@ public class POFunctionDefinitionContext extends POContext
 	{
 		if (addPrecond && preExp != null)
 		{
-			return preExp.getVariableNames();
+			TCNameSet used = preExp.getVariableNames();
+			
+			// Add the names of the parameters, since these are effective "used"
+			
+    		for (POPatternList pl: paramPatternList)
+    		{
+    			for (POPattern p: pl)
+    			{
+					used.addAll(p.getVariableNames());
+    			}
+    		}
+    		
+    		return used;
 		}
 		
 		return super.reasonsAbout();

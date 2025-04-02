@@ -50,6 +50,8 @@ public class MapCompatibleObligation extends ProofObligation
 		sb.append("(" + rdom + ")");
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, left, right);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

@@ -51,6 +51,8 @@ public class LetBeExistsObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	private LetBeExistsObligation(POLetBeStStatement stmt, POContextStack ctxt)
@@ -65,6 +67,8 @@ public class LetBeExistsObligation extends ProofObligation
 		{
 			sb.append(" & ");
 			sb.append(stmt.suchThat);
+			setObligationVars(ctxt, stmt.suchThat);
+			setReasonsAbout(ctxt.getReasonsAbout());
 		}
 		else
 		{

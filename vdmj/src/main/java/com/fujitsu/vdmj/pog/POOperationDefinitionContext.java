@@ -90,7 +90,16 @@ public class POOperationDefinitionContext extends POContext
 	{
 		if (addPrecond && preExp != null)
 		{
-			return preExp.getVariableNames();
+			TCNameSet used = preExp.getVariableNames();
+			
+			// Add the names of the parameters, since these are effective "used"
+			
+			for (POPattern p: paramPatternList)
+			{
+				used.addAll(p.getVariableNames());
+			}
+    		
+    		return used;
 		}
 		
 		return super.reasonsAbout();

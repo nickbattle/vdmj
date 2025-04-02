@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBindList;
 import com.fujitsu.vdmj.util.Utils;
@@ -42,7 +43,19 @@ public class POTypeBindList extends POMappedList<TCTypeBind, POTypeBind>
 	{
 		super();
 	}
-	
+
+	public TCNameSet getVariableNames()
+	{
+		TCNameSet all = new TCNameSet();
+		
+		for (POTypeBind mb: this)
+		{
+			all.addAll(mb.getVariableNames());
+		}
+		
+		return all;
+	}
+
 	@Override
 	public String toString()
 	{

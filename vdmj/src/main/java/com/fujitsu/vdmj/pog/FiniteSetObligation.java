@@ -67,6 +67,8 @@ public class FiniteSetObligation extends ProofObligation
 		sb.append(exp.first);
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

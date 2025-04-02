@@ -90,7 +90,7 @@ public class POAssignmentStatement extends POStatement
 				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
 		}
 		
-		TCNameToken update = POStateDesignator.updatedVariableName(target);
+		TCNameToken update = target.updatedVariableName();
 		pogState.didUpdateState(update, location);
 		
 		if (!ctxt.hasAmbiguous(exp.getVariableNames()))
@@ -147,7 +147,7 @@ public class POAssignmentStatement extends POStatement
 		if (ctxt.hasAmbiguous(exp.getVariableNames()))
 		{
 			// Updated a variable with an ambiguous value, so it becomes ambiguous
-			TCNameToken update = POStateDesignator.updatedVariableName(target);
+			TCNameToken update = target.updatedVariableName();
 			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
 		}
 
@@ -161,7 +161,7 @@ public class POAssignmentStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		
-		TCNameToken update = POStateDesignator.updatedVariableName(target);
+		TCNameToken update = target.updatedVariableName();
 		pogState.didUpdateState(update, location);
 		
 		// Create a temporary name, which was created in the completeObligations call

@@ -45,6 +45,8 @@ public class SeqApplyObligation extends ProofObligation
 	{
 		super(root.location, POType.SEQ_APPLY, ctxt);
 		source = ctxt.getSource(arg + " in set inds " + root);
+		setObligationVars(ctxt, root.getExpressions());
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

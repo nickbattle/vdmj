@@ -31,6 +31,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.expressions.visitors.POFreeVariableFinder;
+import com.fujitsu.vdmj.po.patterns.visitors.Locals;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
@@ -39,6 +42,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -183,27 +187,44 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			obligationVars = new TCNameSet();
 		}
 		
+		TCNameSet ignoreThese = new TCNameSet();
+		POFreeVariableFinder visitor = new POFreeVariableFinder();
+		
 		for (POExpression exp: expressions)
 		{
-			TCType etype = exp.getExptype();
+			List<POVariableExpression> freevars = exp.apply(visitor, new Locals());
 			
-			if (etype instanceof TCInvariantType)
+			for (POVariableExpression freev: freevars)
 			{
-				TCInvariantType itype = (TCInvariantType)etype;
+				TCType etype = freev.getExptype();
 				
-				if (itype.invdef != null)
+				if (etype instanceof TCInvariantType)
 				{
-					continue;	// Invariant "reasons about" this exp
+					TCInvariantType itype = (TCInvariantType)etype;
+					
+					if (itype.invdef != null)
+					{
+						// The variable's invariant "reasons about" this exp
+						ignoreThese.add(freev.name);
+					}
 				}
+				
+				if (freev.vardef != null && freev.vardef.nameScope == NameScope.GLOBAL)
+				{
+					ignoreThese.add(freev.name);	// Globals are a given
+				}
+				
+				obligationVars.add(freev.name);
 			}
-			
-			obligationVars.addAll(exp.getVariableNames());
 		}
 		
-		if (ctxt.hasAmbiguous(obligationVars))
+		if (ctxt.hasAmbiguous(obligationVars))	// Including invariant checked ones
 		{
 			markUnchecked(HAS_AMBIGUOUS_STATE);
 		}
+		
+		// Finally, remove the ones that are covered by invariant checks.
+		obligationVars.removeAll(ignoreThese);
 	}
 	
 	public void setReasonsAbout(TCNameSet... reasons)

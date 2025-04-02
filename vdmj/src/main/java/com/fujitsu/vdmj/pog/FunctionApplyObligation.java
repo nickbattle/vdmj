@@ -60,6 +60,8 @@ public class FunctionApplyObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, args);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**

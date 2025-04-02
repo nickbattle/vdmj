@@ -59,6 +59,8 @@ public class MapSeqOfCompatibleObligation extends ProofObligation
 		sb.append("    " + d1 + " = " + d2 + " => " + m1 + "(" + d1 + ") = " + m2 + "(" + d2 + ")");
 
 		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
 	/**
