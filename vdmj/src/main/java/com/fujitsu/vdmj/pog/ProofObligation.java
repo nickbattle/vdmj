@@ -31,6 +31,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.expressions.visitors.POFreeVariableFinder;
+import com.fujitsu.vdmj.po.patterns.visitors.Locals;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
@@ -184,23 +187,29 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		
 		TCNameSet withInvariants = new TCNameSet();
+		POFreeVariableFinder visitor = new POFreeVariableFinder();
 		
 		for (POExpression exp: expressions)
 		{
-			TCType etype = exp.getExptype();
+			List<POVariableExpression> freevars = exp.apply(visitor, new Locals());
 			
-			if (etype instanceof TCInvariantType)
+			for (POVariableExpression freev: freevars)
 			{
-				TCInvariantType itype = (TCInvariantType)etype;
+				TCType etype = freev.getExptype();
 				
-				if (itype.invdef != null)
+				if (etype instanceof TCInvariantType)
 				{
-					// The variable's invariant "reasons about" this exp
-					withInvariants.addAll(exp.getVariableNames());
+					TCInvariantType itype = (TCInvariantType)etype;
+					
+					if (itype.invdef != null)
+					{
+						// The variable's invariant "reasons about" this exp
+						withInvariants.add(freev.name);
+					}
 				}
+				
+				obligationVars.add(freev.name);
 			}
-			
-			obligationVars.addAll(exp.getVariableNames());
 		}
 		
 		if (ctxt.hasAmbiguous(obligationVars))	// Including invariant checked ones
