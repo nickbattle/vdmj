@@ -32,6 +32,9 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -99,14 +102,31 @@ public class POClassDefinition extends PODefinition
 		sb.append("(");
 		String sep = "";
 
-		for (PODefinition field: definitions)
+		for (TCDefinition def: tcdef.localInheritedDefinitions)
 		{
-			if (field instanceof POInstanceVariableDefinition)
+			if (def instanceof TCInheritedDefinition)
+			{
+				TCInheritedDefinition idef = (TCInheritedDefinition)def;
+
+				if (idef.superdef instanceof TCInstanceVariableDefinition)
+				{
+					sb.append(sep);
+					sb.append(idef.superdef.name.getName());
+					sb.append(" |-> ");
+					sb.append(idef.superdef.name.getName());
+					sep = ", ";
+				}
+			}
+		}
+
+		for (PODefinition def: definitions)
+		{
+			if (def instanceof POInstanceVariableDefinition)
 			{
 				sb.append(sep);
-				sb.append(field.name.getName());
+				sb.append(def.name.getName());
 				sb.append(" |-> ");
-				sb.append(field.name.getName());
+				sb.append(def.name.getName());
 				sep = ", ";
 			}
 		}
