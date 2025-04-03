@@ -127,8 +127,27 @@ public class RandomRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseClassType(TCClassType node, Integer limit)
 	{
-		// ObjectValue obj = new ObjectValue(node, new NameValuePairMap(), new Vector<ObjectValue>(), CPUValue.vCPU, null);
-		return new ValueSet();
+		if (done.has(node))
+		{
+			return new ValueSet();		// recursing
+		}
+		
+		done.add(node);
+		ValueSet result = new ValueSet();
+		
+		for (int i=1; i <= limit; i++)
+		{
+			try
+			{
+				result.add(createObject(node.classdef, i));
+			}
+			catch (Throwable t)
+			{
+				break;	// Give up and return what we've got
+			}
+		}
+		
+		return result;
 	}
 
 	@Override

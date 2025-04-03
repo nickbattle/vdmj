@@ -37,14 +37,24 @@ import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.util.KCombinator;
+import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.NameValuePair;
+import com.fujitsu.vdmj.values.NameValuePairMap;
+import com.fujitsu.vdmj.values.ObjectValue;
+import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.ValueSet;
 
 public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
@@ -175,5 +185,45 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		
 		return new FunctionValue(node.location, "$qc_dummy", ptype, params, body, null);
+	}
+	
+	/**
+	 * try to make an object that matches the class definition passed, without using
+	 * any construction etc. This is just a means to create something that matches
+	 * the object pattern in the top level forall, to try to enable simple VDM++
+	 * specifications to be tested with QC.
+	 */
+	protected ObjectValue createObject(TCClassDefinition cdef, int number)
+	{
+		TCClassType ctype = (TCClassType)cdef.getType();
+		List<ObjectValue> superobjects = new Vector<ObjectValue>();
+		NameValuePairMap members = new NameValuePairMap();
+		
+		for (TCClassDefinition sdef: cdef.superdefs)
+		{
+			superobjects.add(createObject(sdef, number));
+		}
+		
+		for (TCDefinition def: cdef.definitions)
+		{
+			if (def instanceof TCInstanceVariableDefinition)
+			{
+				TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
+				TCType itype = idef.getType();
+				
+				ValueSet value = itype.apply(this, number);
+				
+				if (!value.isEmpty())
+				{
+					members.put(new NameValuePair(idef.name, value.lastElement()));
+				}
+				else
+				{
+					members.put(new NameValuePair(idef.name, new UndefinedValue()));
+				}
+			}
+		}
+		
+		return new ObjectValue(ctype, members, superobjects, CPUValue.vCPU, null);
 	}
 }
