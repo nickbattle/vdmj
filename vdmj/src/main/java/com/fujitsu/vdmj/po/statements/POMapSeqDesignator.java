@@ -89,6 +89,7 @@ public class POMapSeqDesignator extends POStateDesignator
 	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
 	 * all return the updated variable "x".
 	 */
+	@Override
 	public TCNameToken updatedVariableName()
 	{
 		return mapseq.updatedVariableName();
@@ -98,6 +99,7 @@ public class POMapSeqDesignator extends POStateDesignator
 	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
 	 * all return the type of the variable "x".
 	 */
+	@Override
 	public TCType updatedVariableType()
 	{
 		return mapseq.updatedVariableType();
@@ -106,6 +108,7 @@ public class POMapSeqDesignator extends POStateDesignator
 	/**
 	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
 	 */
+	@Override
 	public TCNameSet getVariableNames()
 	{
 		TCNameSet set = mapseq.getVariableNames();
