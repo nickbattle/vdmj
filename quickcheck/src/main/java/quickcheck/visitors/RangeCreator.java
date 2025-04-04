@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
@@ -36,8 +37,12 @@ import com.fujitsu.vdmj.in.expressions.INUndefinedExpression;
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.types.INInstantiate;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassInvariantDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -205,28 +210,70 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		
 		// Seed with the number passed in
-		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed);		
+		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed);
+		boolean invFailed = superobjects.contains(null);
+		ObjectValue object = null;
+		int retries = 5;
 		
-		for (TCDefinition def: cdef.definitions)
+		if (invFailed)
 		{
-			if (def instanceof TCInstanceVariableDefinition)
+			return null;	// Superclasses failed
+		}
+		
+		do
+		{
+			for (TCDefinition def: cdef.definitions)
 			{
-				TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
-				TCType itype = idef.getType();
-				
-				ValueSet value = itype.apply(generator, 1);
-				
-				if (!value.isEmpty())
+				if (def instanceof TCInstanceVariableDefinition)
 				{
-					members.put(new NameValuePair(idef.name, value.get(0)));
+					TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
+					TCType itype = idef.getType();
+					
+					ValueSet value = itype.apply(generator, 1);
+					
+					if (!value.isEmpty())
+					{
+						members.put(new NameValuePair(idef.name, value.get(0)));
+					}
+					else
+					{
+						members.put(new NameValuePair(idef.name, new UndefinedValue()));
+					}
 				}
-				else
+			}
+			
+			object = new ObjectValue(ctype, members, superobjects, CPUValue.vCPU, null);
+			
+			if (!cdef.getInvDefs().isEmpty())
+			{
+				Context invCtxt = new ObjectContext(LexLocation.ANY, "class invariant", ctxt, object);
+				invCtxt.putAll(members);
+				
+				for (TCDefinition inv: cdef.getInvDefs())
 				{
-					members.put(new NameValuePair(idef.name, new UndefinedValue()));
+					try
+					{
+						TCClassInvariantDefinition cinv = (TCClassInvariantDefinition)inv;
+						INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(cinv.expression);
+						
+						if (!inexp.eval(invCtxt).boolValue(invCtxt))
+						{
+							invFailed = true;
+							object = null;
+							break;
+						}
+					}
+					catch (Exception e)
+					{
+						invFailed = true;
+						object = null;
+						break;
+					}
 				}
 			}
 		}
-		
-		return new ObjectValue(ctype, members, superobjects, CPUValue.vCPU, null);
+		while (invFailed && --retries > 0);
+	
+		return object;	// Can be null if inv fails
 	}
 }

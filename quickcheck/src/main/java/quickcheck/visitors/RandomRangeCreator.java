@@ -74,6 +74,7 @@ import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -144,7 +145,12 @@ public class RandomRangeCreator extends RangeCreator
 		{
 			try
 			{
-				result.add(createObject(node.classdef, nextNat(1000)));
+				ObjectValue object = createObject(node.classdef, i);
+				
+				if (object != null)
+				{
+					result.add(object);
+				}
 			}
 			catch (Throwable t)
 			{
