@@ -56,7 +56,7 @@ public class POAmbiguousContext extends POContext
 	@Override
 	public String getSource()
 	{
-		return "-- Ambiguous " + reason + ", " + variables +
+		return "-- Ambiguous " + reason + ", affects " + variables +
 			"? at " + location.startLine + ":" + location.startPos;
 	}
 }

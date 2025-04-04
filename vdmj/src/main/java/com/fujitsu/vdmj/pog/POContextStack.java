@@ -160,7 +160,10 @@ public class POContextStack extends Stack<POContext>
 		{
 			return;			// No updates, by definition
 		}
-		else if (called instanceof POImplicitOperationDefinition)
+		
+		String opname = called.name.toExplicitString(from);
+		
+		if (called instanceof POImplicitOperationDefinition)
 		{
 			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 			
@@ -170,18 +173,18 @@ public class POContextStack extends Stack<POContext>
 				{
 					if (ext.mode.is(Token.WRITE))
 					{
-						push(new POAmbiguousContext("operation ext clause", ext.identifiers, from));
+						push(new POAmbiguousContext("operation ext clause in " + opname, ext.identifiers, from));
 					}
 				}
 			}
 			else
 			{
-				push(new POAmbiguousContext("operation call", getStateVariables(), from));
+				push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
 			}
 		}
 		else if (called instanceof POExplicitOperationDefinition)
 		{
-			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
 		}
 	}
 
