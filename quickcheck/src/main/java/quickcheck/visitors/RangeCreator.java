@@ -193,7 +193,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	 * the object pattern in the top level forall, to try to enable simple VDM++
 	 * specifications to be tested with QC.
 	 */
-	protected ObjectValue createObject(TCClassDefinition cdef, int number)
+	protected ObjectValue createObject(TCClassDefinition cdef, int seed)
 	{
 		TCClassType ctype = (TCClassType)cdef.getType();
 		List<ObjectValue> superobjects = new Vector<ObjectValue>();
@@ -201,8 +201,11 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		for (TCClassDefinition sdef: cdef.superdefs)
 		{
-			superobjects.add(createObject(sdef, number));
+			superobjects.add(createObject(sdef, seed));
 		}
+		
+		// Seed with the number passed in
+		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed);		
 		
 		for (TCDefinition def: cdef.definitions)
 		{
@@ -211,11 +214,11 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 				TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
 				TCType itype = idef.getType();
 				
-				ValueSet value = itype.apply(this, number);
+				ValueSet value = itype.apply(generator, 1);
 				
 				if (!value.isEmpty())
 				{
-					members.put(new NameValuePair(idef.name, value.lastElement()));
+					members.put(new NameValuePair(idef.name, value.get(0)));
 				}
 				else
 				{

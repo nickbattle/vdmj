@@ -97,6 +97,11 @@ public class RandomRangeCreator extends RangeCreator
 		this.prng = new Random(seed);
 	}
 	
+	public void seed(long seed)
+	{
+		this.prng.setSeed(seed);
+	}
+	
 	private int nextNat(int bound)
 	{
 		int n = -1;
@@ -139,7 +144,7 @@ public class RandomRangeCreator extends RangeCreator
 		{
 			try
 			{
-				result.add(createObject(node.classdef, i));
+				result.add(createObject(node.classdef, nextNat(1000)));
 			}
 			catch (Throwable t)
 			{
