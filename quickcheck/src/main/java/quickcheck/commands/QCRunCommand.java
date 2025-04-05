@@ -162,6 +162,12 @@ public class QCRunCommand extends AnalysisCommand
 								}
 							}
 						}
+						else if (Settings.dialect != Dialect.VDM_SL && postate != null)
+						{
+							println("Cannot automatically set object state in VDM++/RT");
+							String classname = obligation.location.module;
+							return "State: new " + classname + " {" + postate.toStringLine() + "}";
+						}
 						
 						// Temporarily allow maximal parsing, for invariant POs
 						boolean saved = Properties.parser_maximal_types;
