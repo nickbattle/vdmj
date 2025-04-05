@@ -215,8 +215,9 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			return null;	// A superclass failed
 		}
 		
-		// Seed with the number passed in
-		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed);
+		// Seed with the number passed in, and passed this generator, so that
+		// we can copy the "done" types.
+		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed, this);
 		
 		for (TCDefinition def: cdef.definitions)
 		{

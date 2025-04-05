@@ -98,6 +98,12 @@ public class RandomRangeCreator extends RangeCreator
 		this.prng = new Random(seed);
 	}
 	
+	public RandomRangeCreator(Context ctxt, int seed, RangeCreator rangeCreator)
+	{
+		this(ctxt, seed);
+		this.done.addAll(rangeCreator.done);	// See createObject
+	}
+
 	public void seed(long seed)
 	{
 		this.prng.setSeed(seed);
