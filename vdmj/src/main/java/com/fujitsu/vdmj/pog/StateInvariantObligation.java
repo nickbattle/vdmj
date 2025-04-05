@@ -48,15 +48,21 @@ public class StateInvariantObligation extends ProofObligation
 		
 		if (ass.classDefinition != null)
 		{
-			sb.append(invDefs(ass.classDefinition));
-			
 			PODefinitionList invdefs = ass.classDefinition.getInvDefs();
 			POExpressionList vars = new POExpressionList();
+			String sep = "";
 
 			for (PODefinition d: invdefs)
 			{
 				POClassInvariantDefinition cid = (POClassInvariantDefinition)d;
-				vars.add(cid.expression);
+				
+				if (cid.location.module.equals(ass.location.module))
+				{
+					sb.append(sep);
+					sb.append(cid.expression);
+					vars.add(cid.expression);
+					sep = " and ";
+				}
 			}
 
 			// Obligation should cover the variables in its invariant
