@@ -145,12 +145,21 @@ public class RandomRangeCreator extends RangeCreator
 		{
 			try
 			{
-				ObjectValue object = createObject(node.classdef, i);
+				boolean ok = false;
+				int retries = 5;
 				
-				if (object != null)
+				do
 				{
-					result.add(object);
+					ObjectValue object = createObject(node.classdef, i);
+					ok = checkObject(node.classdef, object);
+				
+					if (ok)		// object matches its invariant(s)
+					{
+						result.add(object);
+						break;
+					}
 				}
+				while (--retries > 0);
 			}
 			catch (Throwable t)
 			{

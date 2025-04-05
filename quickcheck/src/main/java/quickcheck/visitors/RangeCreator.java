@@ -196,7 +196,8 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	 * try to make an object that matches the class definition passed, without using
 	 * any construction etc. This is just a means to create something that matches
 	 * the object pattern in the top level forall, to try to enable simple VDM++
-	 * specifications to be tested with QC.
+	 * specifications to be tested with QC. Note that and class invariants are
+	 * checked separately by checkObject below.
 	 */
 	protected ObjectValue createObject(TCClassDefinition cdef, int seed)
 	{
@@ -209,71 +210,65 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			superobjects.add(createObject(sdef, seed));
 		}
 		
+		if (superobjects.contains(null))
+		{
+			return null;	// A superclass failed
+		}
+		
 		// Seed with the number passed in
 		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed);
-		boolean invFailed = superobjects.contains(null);
-		ObjectValue object = null;
-		int retries = 5;
 		
-		if (invFailed)
+		for (TCDefinition def: cdef.definitions)
 		{
-			return null;	// Superclasses failed
-		}
-		
-		do
-		{
-			for (TCDefinition def: cdef.definitions)
+			if (def instanceof TCInstanceVariableDefinition)
 			{
-				if (def instanceof TCInstanceVariableDefinition)
-				{
-					TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
-					TCType itype = idef.getType();
-					
-					ValueSet value = itype.apply(generator, 1);
-					
-					if (!value.isEmpty())
-					{
-						members.put(new NameValuePair(idef.name, value.get(0)));
-					}
-					else
-					{
-						members.put(new NameValuePair(idef.name, new UndefinedValue()));
-					}
-				}
-			}
-			
-			object = new ObjectValue(ctype, members, superobjects, CPUValue.vCPU, null);
-			
-			if (!cdef.getInvDefs().isEmpty())
-			{
-				Context invCtxt = new ObjectContext(LexLocation.ANY, "class invariant", ctxt, object);
-				invCtxt.putAll(members);
+				TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
+				TCType itype = idef.getType();
 				
-				for (TCDefinition inv: cdef.getInvDefs())
+				ValueSet value = itype.apply(generator, 1);
+				
+				if (!value.isEmpty())
 				{
-					try
-					{
-						TCClassInvariantDefinition cinv = (TCClassInvariantDefinition)inv;
-						INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(cinv.expression);
-						
-						if (!inexp.eval(invCtxt).boolValue(invCtxt))
-						{
-							invFailed = true;
-							object = null;
-							break;
-						}
-					}
-					catch (Exception e)
-					{
-						invFailed = true;
-						object = null;
-						break;
-					}
+					members.put(new NameValuePair(idef.name, value.get(0)));
+				}
+				else
+				{
+					members.put(new NameValuePair(idef.name, new UndefinedValue()));
 				}
 			}
 		}
-		while (invFailed && --retries > 0);
+			
+		return new ObjectValue(ctype, members, superobjects, CPUValue.vCPU, null);
+	}
 	
-		return object;	// Can be null if inv fails
+	/**
+	 * Check whether an object value meets its class invariants.
+	 */
+	protected boolean checkObject(TCClassDefinition cdef, ObjectValue object)
+	{
+		if (!cdef.getInvDefs().isEmpty())
+		{
+			Context invCtxt = new ObjectContext(LexLocation.ANY, "class invariant", ctxt, object);
+			
+			for (TCDefinition inv: cdef.getInvDefs())
+			{
+				try
+				{
+					TCClassInvariantDefinition cinv = (TCClassInvariantDefinition)inv;
+					INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(cinv.expression);
+					
+					if (!inexp.eval(invCtxt).boolValue(invCtxt))
+					{
+						return false;
+					}
+				}
+				catch (Exception e)
+				{
+					return false;
+				}
+			}
+		}
+	
+		return true;
 	}
 }
