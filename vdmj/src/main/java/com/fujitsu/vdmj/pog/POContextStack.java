@@ -152,36 +152,42 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public void addOperationCall(LexLocation from, PODefinition called)
 	{
-		if (called == null)	// Assumed to update something
+		if (called == null)	// An op called in an expression.
 		{
+			// Assumed to update something
 			push(new POAmbiguousContext("operation call", getStateVariables(), from));
 		}
 		else if (called.accessSpecifier.isPure)
 		{
 			return;			// No updates, by definition
 		}
-		else if (called instanceof POImplicitOperationDefinition)
+		else
 		{
-			POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+			String opname = called.name.toExplicitString(from);
 			
-			if (imp.externals != null)
+			if (called instanceof POImplicitOperationDefinition)
 			{
-				for (POExternalClause ext: imp.externals)
+				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+				
+				if (imp.externals != null)
 				{
-					if (ext.mode.is(Token.WRITE))
+					for (POExternalClause ext: imp.externals)
 					{
-						push(new POAmbiguousContext("operation ext clause", ext.identifiers, from));
+						if (ext.mode.is(Token.WRITE))
+						{
+							push(new POAmbiguousContext("operation ext clause in " + opname, ext.identifiers, from));
+						}
 					}
 				}
+				else
+				{
+					push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
+				}
 			}
-			else
+			else if (called instanceof POExplicitOperationDefinition)
 			{
-				push(new POAmbiguousContext("operation call", getStateVariables(), from));
+				push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
 			}
-		}
-		else if (called instanceof POExplicitOperationDefinition)
-		{
-			push(new POAmbiguousContext("operation call", getStateVariables(), from));
 		}
 	}
 

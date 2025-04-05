@@ -74,6 +74,7 @@ import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -95,6 +96,17 @@ public class RandomRangeCreator extends RangeCreator
 	{
 		super(ctxt);
 		this.prng = new Random(seed);
+	}
+	
+	public RandomRangeCreator(Context ctxt, int seed, RangeCreator rangeCreator)
+	{
+		this(ctxt, seed);
+		this.done.addAll(rangeCreator.done);	// See createObject
+	}
+
+	public void seed(long seed)
+	{
+		this.prng.setSeed(seed);
 	}
 	
 	private int nextNat(int bound)
@@ -139,7 +151,21 @@ public class RandomRangeCreator extends RangeCreator
 		{
 			try
 			{
-				result.add(createObject(node.classdef, i));
+				boolean ok = false;
+				int retries = 5;
+				
+				do
+				{
+					ObjectValue object = createObject(node.classdef, i);
+					ok = checkObject(node.classdef, object);
+				
+					if (ok)		// object matches its invariant(s)
+					{
+						result.add(object);
+						break;
+					}
+				}
+				while (--retries > 0);
 			}
 			catch (Throwable t)
 			{

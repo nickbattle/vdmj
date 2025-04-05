@@ -862,6 +862,11 @@ public class QuickCheck
 
 		for (TCNameToken name: path.keySet())
 		{
+			if (name.getName().equals("self"))
+			{
+				continue;	// Confuses the output otherwise
+			}
+			
 			result.append(sep);
 			result.append(name);
 			result.append(" = ");

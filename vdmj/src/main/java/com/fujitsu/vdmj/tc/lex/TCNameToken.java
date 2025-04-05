@@ -147,6 +147,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	{
 		return  lexname.toString() + (parameters == null ? "" : parameters);
 	}
+	
+	public final String toExplicitString(LexLocation from)
+	{
+		return (from.module.equals(lexname.location.module)) ? getName() : getModule() + "`" + getName(); 
+	}
 
 	public String getName()		// Simple name, never explicit
 	{
