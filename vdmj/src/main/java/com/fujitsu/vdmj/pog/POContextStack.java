@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
+import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
@@ -165,11 +166,17 @@ public class POContextStack extends Stack<POContext>
 		{
 			String opname = called.name.toExplicitString(from);
 			
+			if (called instanceof PORenamedDefinition)
+			{
+				PORenamedDefinition rdef = (PORenamedDefinition)called;
+				called = rdef.def;
+			}
+			
 			if (called instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 				
-				if (imp.externals != null)
+				if (imp.externals != null && imp.location.module.equals(from.module))
 				{
 					for (POExternalClause ext: imp.externals)
 					{
