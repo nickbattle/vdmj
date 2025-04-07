@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
@@ -64,18 +65,36 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
+		TCNameSet updates = statement.updatesState();
+		String warning = null;
+		
+		if (annotation != null)
+		{
+			TCNameSet reasonsAbout = annotation.invariant.getVariableNames();
+			
+			if (!reasonsAbout.containsAll(updates))
+			{
+				// Invariant doesn't reason about some variable updated, so delete the
+				// annotation and make things ambiguous :-)
+				annotation = null;
+				TCNameSet missing = new TCNameSet();
+				missing.addAll(updates);
+				missing.removeAll(reasonsAbout);
+				warning = "@LoopInvariant does not reason about " + missing;
+			}
+		}
 		
 		if (annotation == null)		// No loop invariant defined
 		{
-			obligations.add(new LoopInvariantObligation(location, ctxt));
+			ProofObligation loop = new LoopInvariantObligation(location, ctxt);
+			loop.setMessage(warning);
+			obligations.add(loop);
 			
 			int popto = ctxt.size();
 			POGState copy = pogState.getCopy();
 			ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
 			pogState.combineWith(copy);
 			ctxt.popTo(popto);
-			
-			TCNameSet updates = statement.updatesState();
 
 			if (!updates.isEmpty())
 			{
@@ -112,7 +131,9 @@ public class POWhileStatement extends POStatement
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs
-			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			POExpression negated = new PONotExpression(location, this.exp);
+			ctxt.push(new POImpliesContext(annotation.invariant, negated));	// invariant && not C => ...
+			
 			return obligations;
 		}
 	}

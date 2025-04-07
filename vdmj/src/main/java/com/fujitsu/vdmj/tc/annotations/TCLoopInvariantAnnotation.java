@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
-import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
