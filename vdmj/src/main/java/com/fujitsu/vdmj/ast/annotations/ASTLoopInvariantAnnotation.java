@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,51 +22,16 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.ast.annotations;
 
-import java.util.function.Predicate;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
-
-public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
+public class ASTLoopInvariantAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	
-	public INAnnotationList()
-	{
-		super();
-	}
-	
-	public INAnnotationList(TCAnnotationList from) throws Exception
-	{
-		super(from);
-		
-		/**
-		 * Annotations are MappingOptional, so we remove any nulls here.
-		 */
-		this.removeIf(new Predicate<INAnnotation>()
-		{
-			@Override
-			public boolean test(INAnnotation a)
-			{
-				return a == null;
-			}
-		});
-	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends INAnnotation> T getInstance(Class<?> type)
+	public ASTLoopInvariantAnnotation(LexIdentifierToken name)
 	{
-		for (INAnnotation instance: this)
-		{
-			if (type.isAssignableFrom(instance.getClass()))
-			{
-				return (T) instance;
-			}
-		}
-		
-		return null;
+		super(name);
 	}
 }

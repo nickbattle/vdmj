@@ -34,10 +34,22 @@ public class POImpliesContext extends POContext
 	public final String exp;
 	private final TCNameSet reasonsAbout;
 
-	public POImpliesContext(POExpression precondition)
+	public POImpliesContext(POExpression... preconditions)
 	{
-		this.exp = precondition.toString();
-		this.reasonsAbout = precondition.getVariableNames();
+		this.reasonsAbout = new TCNameSet();
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (POExpression precondition: preconditions)
+		{
+			sb.append(sep);
+			sb.append(precondition);
+			sep = " and ";
+
+			this.reasonsAbout.addAll(precondition.getVariableNames());
+		}
+		
+		this.exp = sb.toString();
 	}
 
 	public POImpliesContext(POExplicitOperationDefinition def)

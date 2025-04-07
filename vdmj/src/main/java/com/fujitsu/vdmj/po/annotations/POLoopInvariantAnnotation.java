@@ -22,51 +22,22 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.po.annotations;
 
-import java.util.function.Predicate;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
-
-public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
+public class POLoopInvariantAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	
-	public INAnnotationList()
-	{
-		super();
-	}
-	
-	public INAnnotationList(TCAnnotationList from) throws Exception
-	{
-		super(from);
-		
-		/**
-		 * Annotations are MappingOptional, so we remove any nulls here.
-		 */
-		this.removeIf(new Predicate<INAnnotation>()
-		{
-			@Override
-			public boolean test(INAnnotation a)
-			{
-				return a == null;
-			}
-		});
-	}
+	public final POExpression invariant;
 
-	@SuppressWarnings("unchecked")
-	public <T extends INAnnotation> T getInstance(Class<?> type)
+	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
-		for (INAnnotation instance: this)
-		{
-			if (type.isAssignableFrom(instance.getClass()))
-			{
-				return (T) instance;
-			}
-		}
-		
-		return null;
+		super(name, args);
+		this.invariant = args.firstElement();
 	}
 }

@@ -28,6 +28,8 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -45,6 +47,9 @@ public abstract class INStatement extends INNode implements Serializable
 
 	/** The statement's breakpoint, if any. */
 	public Breakpoint breakpoint;
+	
+	/** A list of annotations, if any. See POAnnotatedStatement */
+	protected INAnnotationList annotations = new INAnnotationList();
 
 	/**
 	 * Create a statement at the given location.
@@ -74,6 +79,14 @@ public abstract class INStatement extends INNode implements Serializable
 		{
 			throw new ContextException(4177, "Not permitted during initialization", location, ctxt);
 		}
+	}
+
+	/**
+	 * Add annotations from POAnnotatedAnnotation
+	 */
+	public void addAnnotation(INAnnotation annotation)
+	{
+		annotations.add(annotation);
 	}
 
 	/**

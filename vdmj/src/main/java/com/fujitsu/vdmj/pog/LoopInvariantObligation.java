@@ -24,14 +24,21 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.po.statements.POWhileStatement;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 
-public class WhileLoopObligation extends ProofObligation
+public class LoopInvariantObligation extends ProofObligation
 {
-	public WhileLoopObligation(POWhileStatement stmt, POContextStack ctxt)
+	public LoopInvariantObligation(LexLocation location, POContextStack ctxt, POExpression invariant)
 	{
-		super(stmt.location, POType.WHILE_LOOP, ctxt);
-		source = ctxt.getSource("while " + stmt.exp + " do ...");
-		markUnchecked(ProofObligation.LOOP_STATEMENT);
+		super(location, POType.LOOP_INVARIANT, ctxt);
+		source = ctxt.getSource(invariant.toString());
+	}
+	
+	public LoopInvariantObligation(LexLocation location, POContextStack ctxt)
+	{
+		super(location, POType.LOOP_INVARIANT, ctxt);
+		source = ctxt.getSource("-- Missing loop invariant");
+		this.markUnchecked("Missing loop invariant");
 	}
 }

@@ -349,6 +349,10 @@ unmapped com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 unmapped com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 
+# Annotations
+package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
+map TCLoopInvariantAnnotation{name, args} to POLoopInvariantAnnotation(name, args);
+
 # Java - usually unmappeds
 unmapped java.lang.Boolean;
 unmapped java.lang.String;

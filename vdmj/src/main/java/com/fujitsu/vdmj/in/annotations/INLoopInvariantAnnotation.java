@@ -24,46 +24,26 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class INAnnotatedStatement extends INStatement
+public class INLoopInvariantAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public final INAnnotation annotation;
-	public final INStatement statement;
-	
-	public INAnnotatedStatement(LexLocation location, INAnnotation annotation, INStatement statement)
+	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
-		super(location);
-		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
-		this.statement = statement;
-		this.statement.addAnnotation(annotation);
-	}
-
-	@Override
-	public String toString()
-	{
-		return annotation + " " + statement;
-	}
-
-	@Override
-	public Value eval(Context ctxt)
-	{
-		breakpoint.check(location, ctxt);
-		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
-		Value rv = statement.eval(ctxt);
-		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
-		return rv;
+		super(name, args);
 	}
 	
-	@Override
-	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	public void check(Context ctxt) throws ValueException
 	{
-		return visitor.caseAnnotatedStatement(this, arg);
+		if (!args.get(0).eval(ctxt).boolValue(ctxt))
+		{
+			throw new ValueException(4178, "Loop invariant violated", ctxt);
+		}
 	}
 }
