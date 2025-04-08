@@ -66,29 +66,10 @@ public class POWhileStatement extends POStatement
 
 		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
 		TCNameSet updates = statement.updatesState();
-		String warning = null;
-		
-		if (annotation != null)
-		{
-			TCNameSet reasonsAbout = annotation.invariant.getVariableNames();
-			
-			if (!reasonsAbout.containsAll(updates))
-			{
-				// Invariant doesn't reason about some variable updated, so delete the
-				// annotation and make things ambiguous :-)
-				annotation = null;
-				TCNameSet missing = new TCNameSet();
-				missing.addAll(updates);
-				missing.removeAll(reasonsAbout);
-				warning = "@LoopInvariant does not reason about " + missing;
-			}
-		}
 		
 		if (annotation == null)		// No loop invariant defined
 		{
-			ProofObligation loop = new LoopInvariantObligation(location, ctxt);
-			loop.setMessage(warning);
-			obligations.add(loop);
+			obligations.add(new LoopInvariantObligation(location, ctxt));
 			
 			int popto = ctxt.size();
 			POGState copy = pogState.getCopy();

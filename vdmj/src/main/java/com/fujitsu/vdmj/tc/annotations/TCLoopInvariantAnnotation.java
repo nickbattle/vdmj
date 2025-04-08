@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
@@ -91,6 +93,18 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			if (!(type instanceof TCBooleanType))
 			{
 				inv.report(6007, "Invariant must be a boolean expression");
+			}
+			
+			TCNameSet reasonsAbout = inv.getVariableNames();
+			TCNameSet updates = astmt.statement.updatesState();
+			
+			if (!reasonsAbout.containsAll(updates))
+			{
+				// Invariant doesn't reason about some variable updated
+				TCNameList missing = new TCNameList();
+				missing.addAll(updates);
+				missing.removeAll(reasonsAbout);
+				name.report(6007, "@LoopInvariant does not reason about " + missing);
 			}
 		}
 	}

@@ -45,7 +45,7 @@ public class TCVariableExpression extends TCExpression
 	public TCNameToken name;
 	public final String original;
 
-	private TCDefinition vardef = null;
+	public TCDefinition vardef = null;
 
 	public TCVariableExpression(LexLocation location, TCNameToken name, String original)
 	{
