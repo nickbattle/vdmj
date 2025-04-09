@@ -26,17 +26,23 @@ package com.fujitsu.vdmj.tc.annotations;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
+import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
+import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLoopInvariantAnnotation extends TCAnnotation
@@ -73,11 +79,11 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
+	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
 	{
 		TCAnnotatedStatement astmt = (TCAnnotatedStatement)stmt;
 		
-		if (!(astmt.statement instanceof TCWhileStatement))
+		if (!isLoop(astmt.statement))
 		{
 			name.report(6006, "@LoopInvariant only applies to loop statements");
 		}
@@ -88,9 +94,10 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		else
 		{
 			TCExpression inv = args.get(0);
-			TCType type = inv.typeCheck(env, null, scope, null);	// Just checks scope
+			Environment local = loopEnvironment(astmt.statement, env);
+			TCType itype = inv.typeCheck(local, null, scope, null);	// Just checks scope
 			
-			if (!(type instanceof TCBooleanType))
+			if (!(itype instanceof TCBooleanType))
 			{
 				inv.report(6007, "Invariant must be a boolean expression");
 			}
@@ -106,6 +113,54 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 				missing.removeAll(reasonsAbout);
 				name.report(6007, "@LoopInvariant does not reason about " + missing);
 			}
+		}
+	}
+	
+	private boolean isLoop(TCStatement stmt)
+	{
+		return
+			(stmt instanceof TCWhileStatement) ||
+			(stmt instanceof TCForIndexStatement) ||
+			(stmt instanceof TCForAllStatement) ||
+			(stmt instanceof TCForPatternBindStatement);
+	}
+	
+	/**
+	 * The for-loops create local variables, while loops don't.
+	 */
+	private Environment loopEnvironment(TCStatement stmt, Environment env)
+	{
+		if (stmt instanceof TCWhileStatement)
+		{
+			return env;		// No loop variable
+		}
+		else if (stmt instanceof TCForIndexStatement)
+		{
+			TCForIndexStatement fstmt = (TCForIndexStatement)stmt;
+			return new FlatEnvironment(fstmt.vardef, env);
+		}
+		else if (stmt instanceof TCForAllStatement)
+		{
+			TCForAllStatement fstmt = (TCForAllStatement)stmt;
+			
+			if (fstmt.setType.isSet(fstmt.location))
+			{
+				TCSetType st = fstmt.setType.getSet();
+				TCDefinitionList defs = fstmt.pattern.getDefinitions(st.setof, NameScope.LOCAL);
+				return new FlatEnvironment(defs, env);
+			}
+
+			return env;		// TC error reported elsewhere?
+		}
+		else if (stmt instanceof TCForPatternBindStatement)
+		{
+			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
+			TCDefinitionList defs = fstmt.patternBind.getDefinitions();
+			return new FlatEnvironment(defs, env);
+		}
+		else
+		{
+			return env;		// TC error reported elsewhere?
 		}
 	}
 }

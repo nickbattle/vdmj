@@ -25,13 +25,20 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.POScopeContext;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -45,9 +52,11 @@ public class POForIndexStatement extends POStatement
 	public final POExpression to;
 	public final POExpression by;
 	public final POStatement statement;
+	public final PODefinition vardef;
 
 	public POForIndexStatement(LexLocation location,
-		TCNameToken var, POExpression from, POExpression to, POExpression by, POStatement body)
+		TCNameToken var, POExpression from, POExpression to, POExpression by, POStatement body,
+		PODefinition vardef)
 	{
 		super(location);
 		this.var = var;
@@ -55,6 +64,7 @@ public class POForIndexStatement extends POStatement
 		this.to = to;
 		this.by = by;
 		this.statement = body;
+		this.vardef = vardef;
 	}
 
 	@Override
@@ -75,22 +85,62 @@ public class POForIndexStatement extends POStatement
 			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
 		}
 
-		int popto = ctxt.pushAt(new POScopeContext());
-		ctxt.push(new POForAllSequenceContext(var, from, to, by));
-		POGState copy = pogState.getCopy();
-		ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-		pogState.combineWith(copy);
-		ctxt.popTo(popto);
-
+		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
 		TCNameSet updates = statement.updatesState();
-
-		if (!updates.isEmpty())
-		{
-			ctxt.push(new POAmbiguousContext("for loop", updates, location));
-		}
 		
-		obligations.addAll(loops);
-		return obligations;
+		if (annotation == null)		// No loop invariant defined
+		{
+			int popto = ctxt.pushAt(new POScopeContext());
+			ctxt.push(new POForAllSequenceContext(var, from, to, by));
+			POGState copy = pogState.getCopy();
+			ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
+			pogState.combineWith(copy);
+			ctxt.popTo(popto);
+	
+			if (!updates.isEmpty())
+			{
+				ctxt.push(new POAmbiguousContext("for loop", updates, location));
+			}
+			
+			obligations.addAll(loops);
+			return obligations;
+		}
+		else
+		{
+			POAssignmentDefinition assign = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
+			ctxt.push(new POLetDefContext(assign));
+			ProofObligation initial = new LoopInvariantObligation(annotation.location, ctxt, annotation.invariant);
+			initial.setMessage("check initial for-loop");
+			obligations.add(initial);
+			ctxt.pop();
+			
+			int popto = ctxt.size();
+			POGState copy = pogState.getCopy();
+			
+			ctxt.push(new POForAllSequenceContext(var, from, to, by));
+			ProofObligation before = new LoopInvariantObligation(statement.location, ctxt, annotation.invariant);
+			before.setMessage("check before for-loop");
+			obligations.add(before);
+			
+			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
+			
+			ProofObligation after = new LoopInvariantObligation(statement.location, ctxt, annotation.invariant);
+			after.setMessage("check after for-loop");
+			obligations.add(after);
+
+			pogState.combineWith(copy);
+			ctxt.popTo(popto);
+			
+//			POExpression end = new POEqualsExpression(
+//					new POVariableExpression(var, vardef),
+//					new LexKeywordToken(Token.EQUALS, location),
+//					to, vardef.getType(), vardef.getType());
+			
+			// Leave implication for following POs
+			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			
+			return obligations;
+		}
 	}
 
 	@Override
