@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.POScopeContext;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -109,24 +108,21 @@ public class POForIndexStatement extends POStatement
 		{
 			POAssignmentDefinition assign = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
 			ctxt.push(new POLetDefContext(assign));
-			ProofObligation initial = new LoopInvariantObligation(annotation.location, ctxt, annotation.invariant);
-			initial.setMessage("check initial for-loop");
-			obligations.add(initial);
+			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check initial for-loop");
 			ctxt.pop();
 			
 			int popto = ctxt.size();
 			POGState copy = pogState.getCopy();
 			
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
-			ProofObligation before = new LoopInvariantObligation(statement.location, ctxt, annotation.invariant);
-			before.setMessage("check before for-loop");
-			obligations.add(before);
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check before for-loop");
 			
 			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
 			
-			ProofObligation after = new LoopInvariantObligation(statement.location, ctxt, annotation.invariant);
-			after.setMessage("check after for-loop");
-			obligations.add(after);
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check after for-loop");
 
 			pogState.combineWith(copy);
 			ctxt.popTo(popto);

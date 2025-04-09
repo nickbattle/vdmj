@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -88,25 +87,22 @@ public class POWhileStatement extends POStatement
 		else
 		{
 			// Note: location of first loop check is the @LoopInvariant itself.
-			ProofObligation initial = new LoopInvariantObligation(annotation.location, ctxt, annotation.invariant);
-			initial.setMessage("check before while condition");
-			obligations.add(initial);
+			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check before while condition");
 			
 			int popto = ctxt.size();
 			POGState copy = pogState.getCopy();
 			
 			ctxt.push(new POImpliesContext(this.exp));	// while C => ...
-			ProofObligation before = new LoopInvariantObligation(statement.location, ctxt, annotation.invariant);
-			before.setMessage("check before while body");
-			obligations.add(before);
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check before while body");
 			ctxt.pop();
 			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));	// invariant && while C => ...
 			
 			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
 			
-			ProofObligation after = new LoopInvariantObligation(statement.location, ctxt, annotation.invariant);
-			after.setMessage("check after while body");
-			obligations.add(after);
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check after while body");
 
 			pogState.combineWith(copy);
 			ctxt.popTo(popto);

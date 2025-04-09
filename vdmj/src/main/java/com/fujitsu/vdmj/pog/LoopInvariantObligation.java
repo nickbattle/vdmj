@@ -24,12 +24,15 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class LoopInvariantObligation extends ProofObligation
 {
-	public LoopInvariantObligation(LexLocation location, POContextStack ctxt, POExpression invariant)
+	private LoopInvariantObligation(LexLocation location, POContextStack ctxt, POExpression invariant)
 	{
 		super(location, POType.LOOP_INVARIANT, ctxt);
 		source = ctxt.getSource(invariant.toString());
@@ -40,5 +43,21 @@ public class LoopInvariantObligation extends ProofObligation
 		super(location, POType.LOOP_INVARIANT, ctxt);
 		source = ctxt.getSource("-- Missing loop invariant");
 		this.markUnchecked("Missing loop invariant");
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(LexLocation location, POContextStack ctxt, POExpression invariant)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new LoopInvariantObligation(location, choice, invariant));
+		}
+		
+		return results;
 	}
 }
