@@ -118,7 +118,8 @@ public class POForIndexStatement extends POStatement
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check before for-loop");
-			
+
+			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
 			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
 			
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));

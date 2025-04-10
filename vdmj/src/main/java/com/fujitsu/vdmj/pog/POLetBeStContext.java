@@ -25,8 +25,10 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POLetBeStContext extends POContext
 {
@@ -38,6 +40,14 @@ public class POLetBeStContext extends POContext
 	public POLetBeStContext(POPattern pattern, String bind, POExpression expression, POExpression best)
 	{
 		this.pattern = pattern;
+		this.bind = bind;
+		this.expression = expression;
+		this.best = best;
+	}
+
+	public POLetBeStContext(TCNameToken var, String bind, POExpression expression, POExpression best)
+	{
+		this.pattern = new POIdentifierPattern(var);
 		this.bind = bind;
 		this.expression = expression;
 		this.best = best;

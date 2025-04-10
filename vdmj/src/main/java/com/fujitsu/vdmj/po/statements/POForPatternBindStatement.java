@@ -200,6 +200,7 @@ public class POForPatternBindStatement extends POStatement
 			}
 	
 			POGState copy = pogState.getCopy();
+			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
 			ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check after for-loop");

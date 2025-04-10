@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
@@ -96,7 +95,7 @@ public class POForAllStatement extends POStatement
 			PODefinitionList defs = pattern.getDefinitions(stype.setof);
 			POLocalDefinition first = (POLocalDefinition) defs.firstElement();
 			
-			ctxt.push(new POLetBeStContext(new POIdentifierPattern(first.name), "in set", set, null));
+			ctxt.push(new POLetBeStContext(first.name, "in set", set, null));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check initial for-loop");
 			ctxt.pop();
@@ -108,6 +107,7 @@ public class POForAllStatement extends POStatement
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check before for-loop");
 			
+			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
 			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
 			
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
