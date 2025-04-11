@@ -171,9 +171,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			ctxt.push(new POFunctionDefinitionContext(this, false));
-			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
-			ctxt.pop();
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
 		}
 
 		if (postcondition != null)
