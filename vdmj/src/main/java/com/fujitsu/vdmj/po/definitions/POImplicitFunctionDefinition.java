@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -173,6 +174,10 @@ public class POImplicitFunctionDefinition extends PODefinition
 				ctxt.push(new POFunctionResultContext(this));
 				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 				ctxt.pop();
+				ctxt.pop();
+
+				ctxt.push(new POFunctionDefinitionContext(postdef, true));
+				obligations.add(new TotalFunctionObligation(postdef, ctxt));
 				ctxt.pop();
 			}
 		}

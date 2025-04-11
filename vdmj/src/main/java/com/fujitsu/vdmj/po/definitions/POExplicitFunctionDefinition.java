@@ -184,6 +184,10 @@ public class POExplicitFunctionDefinition extends PODefinition
 				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 				ctxt.pop();
 				ctxt.pop();
+
+				ctxt.push(new POFunctionDefinitionContext(postdef, true));
+				obligations.add(new TotalFunctionObligation(postdef, ctxt));
+				ctxt.pop();
 			}
 		}
 		
