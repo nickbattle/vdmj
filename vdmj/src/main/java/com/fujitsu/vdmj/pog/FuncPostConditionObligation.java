@@ -32,10 +32,13 @@ import com.fujitsu.vdmj.po.expressions.POSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class FuncPostConditionObligation extends ProofObligation
 {
+	private static final String NOT_YET_SPECIFIED = "not yet specified";
+	
 	public FuncPostConditionObligation(POExplicitFunctionDefinition func, POContextStack ctxt)
 	{
 		super(func.location, POType.FUNC_POST_CONDITION, ctxt);
@@ -44,15 +47,14 @@ public class FuncPostConditionObligation extends ProofObligation
 		if (func.body instanceof PONotYetSpecifiedExpression ||
 			func.body instanceof POSubclassResponsibilityExpression)
 		{
-			// We have to say "f(a)" because we have no expression yet
-			body = functionCall(func, null);
+			body = NOT_YET_SPECIFIED;
 		}
 		else
 		{
 			body = func.body.toString();
 		}
 
-		source = ctxt.getSource(generate(func.predef, func.postdef, body));
+		source = ctxt.getSource(generate(func.predef, func.postdef, body, func.type));
 		// reasonsAbout ?
 	}
 
@@ -76,28 +78,21 @@ public class FuncPostConditionObligation extends ProofObligation
 		else if (func.body instanceof PONotYetSpecifiedExpression ||
 				 func.body instanceof POSubclassResponsibilityExpression)
 		{
-			// We have to say "f(a)" because we have no expression yet
-
-			StringBuilder sb = new StringBuilder();
-			sb.append(func.name.getName());
-			sb.append("(");
-			sb.append(params);
-			sb.append(")");
-			body = sb.toString();
+			body = NOT_YET_SPECIFIED;
 		}
 		else
 		{
 			body = func.body.toString();
 		}
 
-		source = ctxt.getSource(generate(func.predef, func.postdef, body));
+		source = ctxt.getSource(generate(func.predef, func.postdef, body, func.type));
 		// reasonsAbout ?
 	}
 
 	private String generate(
 		POExplicitFunctionDefinition predef,
 		POExplicitFunctionDefinition postdef,
-		String body)
+		String body, TCFunctionType ftype)
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -107,7 +102,17 @@ public class FuncPostConditionObligation extends ProofObligation
 			sb.append(" => ");
 		}
 
-		sb.append(functionCall(postdef, body));
+		if (body == NOT_YET_SPECIFIED)
+		{
+			sb.append("exists RESULT : ");
+			sb.append(ftype.result);
+			sb.append(" & ");
+			sb.append(functionCall(postdef, "RESULT"));
+		}
+		else
+		{
+			sb.append(functionCall(postdef, body));
+		}
 
 		return sb.toString();
 	}
