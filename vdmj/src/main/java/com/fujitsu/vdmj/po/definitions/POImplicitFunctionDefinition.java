@@ -156,11 +156,15 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
 			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			ctxt.pop();
 		}
 
 		if (postcondition != null)
 		{
+			ctxt.push(new PONameContext(new TCNameList(postdef.name)));
+
 			if (body != null)	// else satisfiability, below
 			{
 				ctxt.push(new POFunctionDefinitionContext(this, false));
@@ -180,6 +184,8 @@ public class POImplicitFunctionDefinition extends PODefinition
 				obligations.add(new TotalFunctionObligation(postdef, ctxt));
 				ctxt.pop();
 			}
+			
+			ctxt.pop();		// The NameContext
 		}
 
 		if (measureDef != null && measureName != null && measureName.isMeasureName())

@@ -171,13 +171,16 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
 			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			ctxt.pop();
 		}
 
 		if (postcondition != null)
 		{
 			// if (!(body instanceof PONotYetSpecifiedExpression))
 			{
+				ctxt.push(new PONameContext(new TCNameList(postdef.name)));
 				ctxt.push(new POFunctionDefinitionContext(this, false));
 				obligations.add(new FuncPostConditionObligation(this, ctxt));
 				ctxt.push(new POFunctionResultContext(this));
@@ -187,6 +190,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 				ctxt.push(new POFunctionDefinitionContext(postdef, true));
 				obligations.add(new TotalFunctionObligation(postdef, ctxt));
+				ctxt.pop();
 				ctxt.pop();
 			}
 		}
