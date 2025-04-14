@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -167,11 +168,15 @@ public class POImplicitOperationDefinition extends PODefinition
 		 */
 		if (precondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
 			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			ctxt.pop();
 		}
 
 		if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
+			ctxt.push(new PONameContext(new TCNameList(postdef.name)));
+
 			if (precondition != null)
 			{
 				ctxt.push(new POFunctionDefinitionContext(postdef, true));
@@ -186,6 +191,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			}
 			
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
+			ctxt.pop();
 		}
 		
 		if (body != null)
