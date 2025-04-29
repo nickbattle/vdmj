@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NaturalOneValue;
+import com.fujitsu.vdmj.values.NaturalValue;
+import com.fujitsu.vdmj.values.NumericValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -44,7 +46,7 @@ public class MATH
 	private static Random random = new Random();
 	private static long seed = 0;
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value sin(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -52,7 +54,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value cos(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -60,7 +62,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value tan(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -68,7 +70,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value cot(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -76,7 +78,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value asin(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -84,7 +86,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value acos(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -92,7 +94,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value atan(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -100,7 +102,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value sqrt(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -115,7 +117,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMOperation
+	@VDMOperation(params = {IntegerValue.class})
 	public static Value rand(Value arg) throws ValueException
 	{
 		BigInteger lv = arg.intValue(null).abs();
@@ -134,7 +136,7 @@ public class MATH
 		}
 	}
 
-	@VDMOperation
+	@VDMOperation(params = {IntegerValue.class})
 	public static Value srand2(Value arg) throws ValueException
 	{
 		seed = arg.intValue(null).longValue();
@@ -142,7 +144,7 @@ public class MATH
 		return new IntegerValue(seed);
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value exp(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -150,7 +152,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value ln(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -158,7 +160,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NumericValue.class})
 	public static Value log(Value arg) throws ValueException, Exception
 	{
 		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
@@ -166,7 +168,7 @@ public class MATH
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {NaturalValue.class})
 	public static Value fac(Value arg) throws ValueException, Exception
 	{
 		return new NaturalOneValue(factorial(arg.natValue(null)));

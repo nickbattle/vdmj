@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2024 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,24 +21,32 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+package com.fujitsu.vdmj.tc.patterns.visitors;
 
-package com.fujitsu.vdmj.runtime;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import com.fujitsu.vdmj.values.Value;
-
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.ElementType;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 
 /**
- * Used to label VDM operations for access via the Delegate class.
+ * A visitor set to explore the PO tree and return the variable names accessed.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface VDMOperation
+public class TCMultipleBindVariableFinder extends TCLeafMultipleBindVisitor<TCNameToken, TCNameSet, Object>
 {
-	public Class<? extends Value>[] params() default {};
-}
+	public TCMultipleBindVariableFinder(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+	
+	@Override
+	protected TCNameSet newCollection()
+	{
+		return new TCNameSet();
+	}
 
+	@Override
+	public TCNameSet caseMultipleBind(TCMultipleBind node, Object arg)
+	{
+		return newCollection();
+	}
+}

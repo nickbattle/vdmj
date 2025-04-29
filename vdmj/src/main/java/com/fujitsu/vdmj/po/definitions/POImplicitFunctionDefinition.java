@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -155,11 +156,15 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
 			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			ctxt.pop();
 		}
 
 		if (postcondition != null)
 		{
+			ctxt.push(new PONameContext(new TCNameList(postdef.name)));
+
 			if (body != null)	// else satisfiability, below
 			{
 				ctxt.push(new POFunctionDefinitionContext(this, false));
@@ -174,7 +179,13 @@ public class POImplicitFunctionDefinition extends PODefinition
 				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 				ctxt.pop();
 				ctxt.pop();
+
+				ctxt.push(new POFunctionDefinitionContext(postdef, true));
+				obligations.add(new TotalFunctionObligation(postdef, ctxt));
+				ctxt.pop();
 			}
+			
+			ctxt.pop();		// The NameContext
 		}
 
 		if (measureDef != null && measureName != null && measureName.isMeasureName())

@@ -99,6 +99,11 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		}
 	};
 	
+	public TCVisitorSet<E, C, S> getVistorSet()
+	{
+		return visitorSet;
+	}
+	
 	@Override
 	public C caseAnnotatedStatement(TCAnnotatedStatement node, S arg)
 	{

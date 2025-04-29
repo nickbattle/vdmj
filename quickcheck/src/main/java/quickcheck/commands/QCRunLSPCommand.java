@@ -166,6 +166,13 @@ public class QCRunLSPCommand extends AnalysisCommand
 							}
 						}
 					}
+					else if (Settings.dialect != Dialect.VDM_SL && postate != null)
+					{
+						println("Cannot automatically set object state in VDM++/RT");
+						String classname = obligation.location.module;
+						return new DAPMessageList(request, false,
+							"State: new " + classname + " {" + postate.toStringLine() + "}", null);
+					}
 
 					// This allows maximal types to parse, for invariant POs, and allows POs to
 					// reference types outside their module in VDM-SL.

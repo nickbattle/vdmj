@@ -55,4 +55,18 @@ public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
 			}
 		});
 	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends INAnnotation> T getInstance(Class<?> type)
+	{
+		for (INAnnotation instance: this)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				return (T) instance;
+			}
+		}
+		
+		return null;
+	}
 }

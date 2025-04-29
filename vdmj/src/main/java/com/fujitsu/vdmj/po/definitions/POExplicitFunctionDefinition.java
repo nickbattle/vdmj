@@ -29,7 +29,6 @@ import java.util.List;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.PONotYetSpecifiedExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POPatternListList;
@@ -172,20 +171,28 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			ctxt.push(new POFunctionDefinitionContext(this, false));
-			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
 			ctxt.pop();
 		}
 
 		if (postcondition != null)
 		{
-			if (!(body instanceof PONotYetSpecifiedExpression))
+			// if (!(body instanceof PONotYetSpecifiedExpression))
 			{
+				ctxt.push(new PONameContext(new TCNameList(postdef.name)));
+				
 				ctxt.push(new POFunctionDefinitionContext(this, false));
 				obligations.add(new FuncPostConditionObligation(this, ctxt));
 				ctxt.push(new POFunctionResultContext(this));
 				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 				ctxt.pop();
+				ctxt.pop();
+
+				ctxt.push(new POFunctionDefinitionContext(postdef, true));
+				obligations.add(new TotalFunctionObligation(postdef, ctxt));
+				ctxt.pop();
+				
 				ctxt.pop();
 			}
 		}

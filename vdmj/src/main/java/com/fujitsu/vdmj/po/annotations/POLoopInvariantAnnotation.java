@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2018 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,23 +22,22 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.runtime;
+package com.fujitsu.vdmj.po.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-import com.fujitsu.vdmj.values.Value;
-
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.ElementType;
-
-/**
- * Used to label VDM operations for access via the Delegate class.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface VDMOperation
+public class POLoopInvariantAnnotation extends POAnnotation
 {
-	public Class<? extends Value>[] params() default {};
-}
+	private static final long serialVersionUID = 1L;
+	
+	public final POExpression invariant;
 
+	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args)
+	{
+		super(name, args);
+		this.invariant = args.firstElement();
+	}
+}

@@ -45,6 +45,7 @@ public class POAnnotatedStatement extends POStatement
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
 		setStmttype(statement.getStmttype());
+		this.statement.addAnnotation(annotation);
 	}
 
 	@Override

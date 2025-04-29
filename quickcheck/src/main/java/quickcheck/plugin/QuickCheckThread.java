@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -187,6 +188,13 @@ public class QuickCheckThread extends CancellableThread
 		
 		if (po.counterexample != null)
 		{
+			if (po.definition != null)
+			{
+				// Remove any VDM++ self, because these are not accurate (see RangeCreator)
+				TCNameToken self = po.definition.name.getSelfName();
+				po.counterexample.remove(self);
+			}
+			
 			JSONObject cexample = new JSONObject();
 			cexample.put("variables", Utils.contextToJSON(po.counterexample));
 			JSONObject launch = pog.getCexLaunch(po);

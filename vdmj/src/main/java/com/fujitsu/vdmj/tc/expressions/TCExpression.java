@@ -29,9 +29,14 @@ import java.io.Serializable;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVariableFinder;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCQualifiedDefinitionFinder;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.statements.visitors.TCStatementStateFinder;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -261,6 +266,24 @@ public abstract class TCExpression extends TCNode implements Serializable
 	{
 		this.exptype = exptype;
 		return exptype;
+	}
+	
+	/**
+	 * Get the variable names from an expression.
+	 */
+	public TCNameSet getVariableNames()
+	{
+		TCExpressionVariableFinder visitor = new TCExpressionVariableFinder();
+		TCNameSet set = new TCNameSet();
+		set.addAll(this.apply(visitor, null));
+		return set;
+	}
+
+	public TCNameSet updatesState()
+	{
+		TCStatementStateFinder finder = new TCStatementStateFinder();
+		TCVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		return vset.applyExpressionVisitor(this, true);
 	}
 
 	/**

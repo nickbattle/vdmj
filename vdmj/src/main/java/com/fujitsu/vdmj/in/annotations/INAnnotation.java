@@ -55,6 +55,7 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 
 	public INAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
+		super(name.getLocation());
 		this.name = name;
 		this.args = args;
 

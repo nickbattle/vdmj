@@ -34,7 +34,9 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.statements.visitors.TCExitChecker;
+import com.fujitsu.vdmj.tc.statements.visitors.TCStatementStateFinder;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -210,6 +212,15 @@ public abstract class TCStatement extends TCNode implements Serializable
 	{
 		this.stmttype = stmttype;
 		return stmttype;
+	}
+
+	/**
+	 * State variables updated by this statement.
+	 */
+	public TCNameSet updatesState()
+	{
+		TCStatementStateFinder visitor = new TCStatementStateFinder();
+		return this.apply(visitor, true);
 	}
 
 	/**

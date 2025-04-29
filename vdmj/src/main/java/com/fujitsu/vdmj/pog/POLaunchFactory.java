@@ -217,9 +217,23 @@ public class POLaunchFactory
 				
 				return result;
 			}
+			
+			return null;
 		}
-
-		return null;
+		else	// OO dialects
+		{
+			Context result = new Context(LexLocation.ANY, "Counterexample state", null);
+			
+			for (Entry<TCNameToken, Value> entry: cex.entrySet())
+			{
+				if (!entry.getKey().getName().equals("self"))
+				{
+					result.put(entry.getKey(), entry.getValue());
+				}
+			}
+			
+			return result;
+		}
 	}
 	
 	private String launchNameTypes(TCNameToken name, TCTypeList typeParams, Context ctxt) throws Exception

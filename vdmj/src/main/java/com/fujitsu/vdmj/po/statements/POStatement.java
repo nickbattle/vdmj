@@ -28,6 +28,8 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -46,6 +48,9 @@ public abstract class POStatement extends PONode implements Serializable
 
 	/** The type of this sub-expression */
 	private TCType stmttype;
+	
+	/** A list of annotations, if any. See POAnnotatedStatement */
+	protected POAnnotationList annotations = new POAnnotationList();
 
 	/**
 	 * Create a statement at the given location.
@@ -102,6 +107,14 @@ public abstract class POStatement extends PONode implements Serializable
 		return this.apply(visitor, false);
 	}
 
+	/**
+	 * Add annotations from POAnnotatedAnnotation
+	 */
+	public void addAnnotation(POAnnotation annotation)
+	{
+		annotations.add(annotation);
+	}
+	
 	/**
 	 * Implemented by all definitions to allow visitor processing.
 	 */

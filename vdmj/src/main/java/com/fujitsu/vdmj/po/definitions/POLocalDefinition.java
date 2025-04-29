@@ -54,7 +54,7 @@ public class POLocalDefinition extends PODefinition
 	@Override
 	public String toExplicitString(LexLocation from)
 	{
-		return name.getName() + " = " + type.apply(new TCExplicitTypeVisitor(), from.module);
+		return name.getName() + " : " + type.apply(new TCExplicitTypeVisitor(), from.module);
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class TCForPatternBindStatement extends TCStatement
 	public final TCExpression exp;
 	public final TCStatement statement;
 	
-	private TCType expType;
+	public TCType expType;
 
 	public TCForPatternBindStatement(LexLocation location,
 		TCPatternBind patternBind, boolean reverse, TCExpression exp, TCStatement body)

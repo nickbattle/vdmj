@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -263,15 +264,29 @@ public class Delegate implements Serializable
 				"Native method should be static: " + m.getName());
 		}
 		
-		if (section == Token.FUNCTIONS && m.getAnnotation(VDMOperation.class) != null)
+		Class<? extends Value> paramTypes[] = null;
+		
+		if (section == Token.FUNCTIONS)
 		{
-			throw new InternalException(72,
+			if (m.getAnnotation(VDMOperation.class) != null)
+			{
+				throw new InternalException(72,
 					"Native method marked as @VDMOperation: " + m.getName());
+			}
+			
+			VDMFunction annotation = m.getAnnotation(VDMFunction.class);
+			paramTypes = annotation.params();
 		}
-		else if (section == Token.OPERATIONS && m.getAnnotation(VDMFunction.class) != null)
+		else if (section == Token.OPERATIONS)
 		{
-			throw new InternalException(71,
+			if (m.getAnnotation(VDMFunction.class) != null)
+			{
+				throw new InternalException(71,
 					"Native method marked as @VDMFunction: " + m.getName());
+			}
+			
+			VDMOperation annotation = m.getAnnotation(VDMOperation.class);
+			paramTypes = annotation.params();
 		}
 
 		TCNameList anames = delegateArgs.get(ctxt.title);
@@ -284,9 +299,32 @@ public class Delegate implements Serializable
 			avals[a++] = ctxt.get(arg);
 		}
 		
+		if (paramTypes.length > 0)	// Only check if provided
+		{
+			if (avals.length == paramTypes.length)
+			{
+				for (int p = 0; p < avals.length; p++)
+				{
+					if (!paramTypes[p].isAssignableFrom(avals[p].getClass()))
+					{
+						Parameter jp = m.getParameters()[p];
+						
+						throw new InternalException(76,
+								"Native method parameter " + m.getName() + "." + jp.getName() +
+								" should be type " + paramTypes[p].getSimpleName());
+					}
+				}
+			}
+			else
+			{
+				throw new InternalException(77,
+					"Native method " + m.getName() + " expects " + paramTypes.length + " Value arguments");
+			}
+		}
+		
 		if (hasCtxt)
 		{
-			avals[a] = ctxt;
+			avals[a] = ctxt;	// Not included in check above
 		}
 
 		try

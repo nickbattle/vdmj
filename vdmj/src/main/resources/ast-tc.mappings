@@ -367,6 +367,10 @@ map ASTUnresolvedType{typename, maximal} to TCUnresolvedType(typename, maximal);
 map ASTVoidReturnType{location} to TCVoidReturnType(location);
 map ASTVoidType{location} to TCVoidType(location);
 
+# Annotations
+package com.fujitsu.vdmj.ast.annotations to com.fujitsu.vdmj.tc.annotations;
+map ASTLoopInvariantAnnotation{name, args} to TCLoopInvariantAnnotation(name, args);
+
 # Java - usually unmappeds
 unmapped java.lang.Boolean;
 unmapped java.lang.String;

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,23 +22,38 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.runtime;
+package com.fujitsu.vdmj.tc.patterns.visitors;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
+import com.fujitsu.vdmj.tc.patterns.TCPattern;
 
-import com.fujitsu.vdmj.values.Value;
-
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.ElementType;
-
-/**
- * Used to label VDM operations for access via the Delegate class.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface VDMOperation
+public class TCPatternVariableFinder extends TCLeafPatternVisitor<TCNameToken, TCNameSet, Object>
 {
-	public Class<? extends Value>[] params() default {};
-}
+	public TCPatternVariableFinder(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	{
+		this.visitorSet = visitors;
+	}
 
+	@Override
+	protected TCNameSet newCollection()
+	{
+		return new TCNameSet();
+	}
+
+	@Override
+	public TCNameSet casePattern(TCPattern node, Object arg)
+	{
+		return newCollection();
+	}
+	
+	@Override
+	public TCNameSet caseIdentifierPattern(TCIdentifierPattern node, Object arg)
+	{
+		TCNameSet list = newCollection();
+		list.add(node.name);
+		return list;
+	}
+}

@@ -42,6 +42,7 @@ public class INAnnotatedStatement extends INStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.statement = statement;
+		this.statement.addAnnotation(annotation);
 	}
 
 	@Override
