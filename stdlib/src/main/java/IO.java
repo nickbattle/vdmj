@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.NilValue;
+import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
@@ -70,11 +71,11 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {SeqValue.class, SeqValue.class, QuoteValue.class})
 	public static Value fwriteval(Value fval, Value tval, Value dval)
 	{
 		String filename = stringOf(fval);
-		String text = tval.toString();// stringOf(tval);
+		String text = tval.toString();	// stringOf(tval);
 		String fdir = dval.toString();	// <start>|<append>
 
 		try
@@ -97,7 +98,7 @@ public class IO implements Serializable
 	// Note that this method needs access to the Context to call any type invariants involved while
 	// reading the data. This is handled by the Delegate class.
 	
-	@VDMFunction
+	@VDMFunction(params = {SeqValue.class})
 	public static Value freadval(Value fval, Context ctxt)
 	{
 		ValueList result = new ValueList();
@@ -134,7 +135,7 @@ public class IO implements Serializable
 		return new TupleValue(result);
 	}
 
-	@VDMOperation
+	@VDMOperation(params = {SeqValue.class, SeqValue.class, QuoteValue.class})
 	public static Value fecho(Value fval, Value tval, Value dval)
 	{
 		String text = stringOf(tval);
@@ -221,7 +222,7 @@ public class IO implements Serializable
 		return new VoidValue();
 	}
 
-	@VDMOperation
+	@VDMOperation(params = {SeqValue.class, SeqValue.class})
 	public static Value printf(Value fv, Value vs)
 		throws ValueException
 	{

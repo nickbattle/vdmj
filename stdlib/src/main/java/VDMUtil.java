@@ -67,7 +67,7 @@ public class VDMUtil
 		return new SeqValue(arg.toString());
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {SeqValue.class})
 	public static Value seq_of_char2val_(Value arg)		// Note, with underscore - see VDM
 	{
 		ValueList result = new ValueList();

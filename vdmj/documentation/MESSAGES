@@ -51,6 +51,8 @@ as the expected and actual values.
 0073, "Cannot evaluate power set of size <size>"
 0074, "Cannot evaluate type bind of size <size>"
 0075, "Maplet getAllNamedValues called"
+0076, "Native method parameter <method>.<param> should be type <type>"
+0077, "Native methods expects <n> Value arguments"
 
 
 1000, "Malformed quoted character"
