@@ -749,11 +749,17 @@ public class DAPDebugExecutor implements DebugExecutor
 	private RootContext buildLocals(Context c, Frame frame)
 	{
 		Context locals = new Context(frame.location, "Locals", null);
+		List<Context> lets = new Vector<Context>();
 
 		while (!(c instanceof RootContext) && c != null)
 		{
-			locals.putAll(c);
+			lets.add(0, c);		// Keep top level names last, to show correct "hiding"
 			c = c.outer;
+		}
+		
+		for (Context let: lets)
+		{
+			locals.putAll(let);
 		}
 
 		if (!locals.isEmpty())
