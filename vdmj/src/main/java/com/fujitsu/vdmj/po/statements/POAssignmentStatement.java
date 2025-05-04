@@ -93,7 +93,10 @@ public class POAssignmentStatement extends POStatement
 		TCNameToken update = target.updatedVariableName();
 		pogState.didUpdateState(update, location);
 		
-		if (!ctxt.hasAmbiguous(exp.getVariableNames()))
+		// If the expression is unambiguous, and it doesn't update state (ie. it doesn't
+		// call any impure operations), we can disambiguate it.
+		
+		if (!ctxt.hasAmbiguous(exp.getVariableNames()) && exp.updatesState().isEmpty())
 		{
 			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			

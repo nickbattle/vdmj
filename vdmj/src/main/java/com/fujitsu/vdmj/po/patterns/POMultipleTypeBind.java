@@ -59,12 +59,7 @@ public class POMultipleTypeBind extends POMultipleBind
 	public TCNameSet getVariableNames()
 	{
 		TCNameSet names = new TCNameSet();
-		
-		for (POPattern p: plist)
-		{
-			names.addAll(p.getAllVariableNames());
-		}
-		
+		names.addAll(plist.getAllVariableNames());
 		return names;
 	}
 

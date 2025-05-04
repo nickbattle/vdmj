@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
@@ -108,7 +109,15 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 			else
 			{
 				// Regular definitions are only defined after themselves
+				pogState.setAmbiguous(false);
 				obligations.addAll(d.getProofObligations(ctxt, pogState, env));
+				
+				if (pogState.isAmbiguous())		// Definition defined with ambiguous values
+				{
+					ctxt.push(new POAmbiguousContext("definition", d.getVariableNames(), d.location));
+					pogState.setAmbiguous(false);
+				}
+				
 				ctxt.push(new POLetDefContext(d));
 			}
 			

@@ -59,12 +59,7 @@ public class POMultipleSeqBind extends POMultipleBind
 	public TCNameSet getVariableNames()
 	{
 		TCNameSet names = sequence.getVariableNames();
-		
-		for (POPattern p: plist)
-		{
-			names.addAll(p.getAllVariableNames());
-		}
-		
+		names.addAll(plist.getAllVariableNames());
 		return names;
 	}
 

@@ -179,6 +179,10 @@ public class POApplyExpression extends POExpression
 				// it may read state even if pure, and an apply uses the return value. So QC can't
 				// evaluate them. This makes subsequent POs Unchecked.
 				ctxt.addOperationCall(location, null);
+				
+				// Additionally, we mark the state as generally ambiguous, so that if this expression
+				// is being used to define something in a "let", we can mark that as ambiguous too.
+				pogState.setAmbiguous(true);
 			}
 		}
 
