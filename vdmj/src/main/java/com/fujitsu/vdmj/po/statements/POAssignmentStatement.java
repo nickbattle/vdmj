@@ -80,6 +80,7 @@ public class POAssignmentStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		pogState.setAmbiguous(false);
 
 		obligations.addAll(target.getProofObligations(ctxt));
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
@@ -93,10 +94,9 @@ public class POAssignmentStatement extends POStatement
 		TCNameToken update = target.updatedVariableName();
 		pogState.didUpdateState(update, location);
 		
-		// If the expression is unambiguous, and it doesn't update state (ie. it doesn't
-		// call any impure operations), we can disambiguate it.
+		// If the expression is unambiguous, we can disambiguate the state being updated.
 		
-		if (!ctxt.hasAmbiguous(exp.getVariableNames()) && exp.updatesState().isEmpty())
+		if (!pogState.isAmbiguous())
 		{
 			ctxt.push(new POAssignmentContext(target, targetType, exp));
 			
