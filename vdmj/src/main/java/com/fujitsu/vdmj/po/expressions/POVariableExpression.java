@@ -30,7 +30,11 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POVariableExpression extends POExpression
 {
@@ -57,6 +61,17 @@ public class POVariableExpression extends POExpression
 		{
 			return name.getName() + (name.isOld() ? "~" : "");
 		}
+	}
+	
+	@Override
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
+	{
+		if (ctxt.isAmbiguous(name))
+		{
+			pogState.setAmbiguous(true);	// Mark expression as ambiguous
+		}
+		
+		return super.getProofObligations(ctxt, pogState, env);
 	}
 
 	@Override

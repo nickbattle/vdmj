@@ -63,9 +63,7 @@ public class POReturnStatement extends POStatement
 
 		if (expression != null)
 		{
-			// Don't process POG state here, because we're returning, so the expression can
-			// have no further effect in the operation.
-			obligations.addAll(expression.getProofObligations(ctxt, new POGState(), env));
+			obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 			
 			PODefinition definition = ctxt.getDefinition();
 			TCType result = null;
