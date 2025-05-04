@@ -169,9 +169,9 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	 * Use the operation's pure and ext clauses to try to determine the variable
 	 * access.
 	 */
-	private TCNameSet operationCall(PODefinition def, boolean updates)
+	public static TCNameSet operationCall(PODefinition def, boolean updates)
 	{
-		TCNameSet all = newCollection();
+		TCNameSet all = new TCNameSet();
 		
 		if (def == null)
 		{

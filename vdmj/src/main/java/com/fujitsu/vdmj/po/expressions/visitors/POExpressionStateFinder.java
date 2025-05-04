@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -63,11 +64,7 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 		
 		if (node.type instanceof TCOperationType)
 		{
-			if (node.root instanceof POVariableExpression)
-			{
-				POVariableExpression name = (POVariableExpression)node.root;
-				all.add(name.name);
-			}
+			all.addAll(POStatementStateFinder.operationCall(node.opdef, updates));
 		}
 		
 		return all;
