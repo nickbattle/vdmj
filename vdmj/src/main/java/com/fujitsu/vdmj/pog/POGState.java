@@ -45,6 +45,8 @@ public class POGState
 	private final POGState outerState;
 	private final TCNameList localNames;
 	
+	private boolean ambiguousExpression = false;
+	
 	public POGState()
 	{
 		this.updatedState = new HashMap<TCNameToken, LexLocation>();
@@ -229,5 +231,18 @@ public class POGState
 	{
 		updatedState.putAll(copy.updatedState);
 		updatedLocals.putAll(copy.updatedLocals);
+	}
+	
+	/**
+	 * Mark an expression as ambiguous - used in let def to mark locals as ambiguous.
+	 */
+	public void setAmbiguous(boolean ambiguous)
+	{
+		ambiguousExpression = ambiguous;
+	}
+	
+	public boolean isAmbiguous()
+	{
+		return ambiguousExpression;
 	}
 }

@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LetBeExistsObligation;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
@@ -64,6 +65,8 @@ public class POLetBeStStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.addAll(LetBeExistsObligation.getAllPOs(this, ctxt));
+		
+		pogState.setAmbiguous(false);
 		obligations.addAll(bind.getProofObligations(ctxt, pogState, env));
 
 		if (suchThat != null)
@@ -72,6 +75,12 @@ public class POLetBeStStatement extends POStatement
 			ProofObligationList oblist = suchThat.getProofObligations(ctxt, pogState, env);
 			obligations.addAll(oblist);
 			ctxt.pop();
+		}
+
+		if (pogState.isAmbiguous())		// Definition defined with ambiguous values
+		{
+			ctxt.push(new POAmbiguousContext("definition", bind.plist.getAllVariableNames(), bind.location));
+			pogState.setAmbiguous(false);
 		}
 
 		int popto = ctxt.pushAt(new POForAllPredicateContext(this));
