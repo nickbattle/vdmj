@@ -92,7 +92,6 @@ public class POAssignmentStatement extends POStatement
 		}
 		
 		TCNameToken update = target.updatedVariableName();
-		pogState.didUpdateState(update, location);
 		
 		// If the expression is unambiguous, we can disambiguate the state being updated.
 		
@@ -163,9 +162,6 @@ public class POAssignmentStatement extends POStatement
 	public ProofObligationList completeAssignment(POContextStack ctxt, POGState pogState, Environment env, int var)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		
-		TCNameToken update = target.updatedVariableName();
-		pogState.didUpdateState(update, location);
 		
 		// Create a temporary name, which was created in the completeObligations call
 		TCNameToken temp = new TCNameToken(location, location.module, "$atomic" + var);

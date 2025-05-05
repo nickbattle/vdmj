@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -57,7 +56,6 @@ public class POTixeStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		POGStateList stateList = new POGStateList();
 
 		// The trap clauses see the "body" state updates, so this comes first
 		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
@@ -65,12 +63,10 @@ public class POTixeStatement extends POStatement
 		for (POTixeStmtAlternative alt: traps)
 		{
 			int popto = ctxt.size();
-			POGState copy = stateList.addCopy(pogState);
-			obligations.addAll(alt.getProofObligations(ctxt, copy, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+			obligations.addAll(alt.getProofObligations(ctxt, pogState, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 			ctxt.popTo(popto);
 		}
 
-		stateList.combineInto(pogState);
 		ctxt.push(new POAmbiguousContext("tixe statement", ctxt.getStateVariables(), location));
 		return obligations;
 	}

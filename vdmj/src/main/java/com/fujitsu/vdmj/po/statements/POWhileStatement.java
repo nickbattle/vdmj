@@ -71,9 +71,7 @@ public class POWhileStatement extends POStatement
 			obligations.add(new LoopInvariantObligation(location, ctxt));
 			
 			int popto = ctxt.size();
-			POGState copy = pogState.getCopy();
-			ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-			pogState.combineWith(copy);
+			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 
 			if (!updates.isEmpty())
@@ -91,7 +89,6 @@ public class POWhileStatement extends POStatement
 			obligations.lastElement().setMessage("check before while condition");
 			
 			int popto = ctxt.size();
-			POGState copy = pogState.getCopy();
 			
 			ctxt.push(new POImpliesContext(this.exp));	// while C => ...
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
@@ -99,12 +96,11 @@ public class POWhileStatement extends POStatement
 			ctxt.pop();
 			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));	// invariant && while C => ...
 			
-			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check after while body");
 
-			pogState.combineWith(copy);
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs

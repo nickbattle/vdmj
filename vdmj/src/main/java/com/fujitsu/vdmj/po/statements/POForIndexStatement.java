@@ -91,9 +91,7 @@ public class POForIndexStatement extends POStatement
 		{
 			int popto = ctxt.pushAt(new POScopeContext());
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
-			POGState copy = pogState.getCopy();
-			ProofObligationList loops = statement.getProofObligations(ctxt, copy, env);
-			pogState.combineWith(copy);
+			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 	
 			if (!updates.isEmpty())
@@ -113,25 +111,18 @@ public class POForIndexStatement extends POStatement
 			ctxt.pop();
 			
 			int popto = ctxt.size();
-			POGState copy = pogState.getCopy();
 			
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check before for-loop");
 
 			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
-			obligations.addAll(statement.getProofObligations(ctxt, copy, env));
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check after for-loop");
 
-			pogState.combineWith(copy);
 			ctxt.popTo(popto);
-			
-//			POExpression end = new POEqualsExpression(
-//					new POVariableExpression(var, vardef),
-//					new LexKeywordToken(Token.EQUALS, location),
-//					to, vardef.getType(), vardef.getType());
 			
 			// Leave implication for following POs
 			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...

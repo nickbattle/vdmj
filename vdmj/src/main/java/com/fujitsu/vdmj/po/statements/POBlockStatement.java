@@ -76,72 +76,7 @@ public class POBlockStatement extends POSimpleBlockStatement
 			// assignments to outer state within the block, since the dcls/lets are needed
 			// in any POs relating to those updated state values.
 			
-			boolean keepLets = false;
-			List<Integer> toDelete = new LinkedList<Integer>();
-			toDelete.add(dcls);
-			
-			for (int sp = dcls + 1; sp < ctxt.size(); sp++)
-			{
-				POContext item = ctxt.get(sp);
-				
-				if (item instanceof POAssignmentContext)
-				{
-					POAssignmentContext actxt = (POAssignmentContext)item;
-					
-					if (actxt.expression != null)	// <name> := <exp>
-					{
-						boolean local = false;
-						
-						for (PODefinition dcl: assignmentDefs)
-						{
-							POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
-							
-							if (adef.name.getName().equals(actxt.pattern))
-							{
-								toDelete.add(0, sp);	// Caused by x := to local x.
-								local = true;
-								break;
-							}
-						}
-
-						if (!local)	// So assigning to outer state, sv := <expression>
-						{
-							for (TCNameToken name: actxt.expression.getVariableNames())
-							{
-								if (dclState.hasLocalName(name))
-								{
-									keepLets = true;	// state assigned using locals/dcls
-									break;
-								}
-							}
-						}
-					}
-				}
-				else if (item instanceof POLetDefContext)	// A "let x = y in ..."
-				{
-					POLetDefContext lctxt = (POLetDefContext)item;
-					toDelete.add(0, sp);
-					
-					for (PODefinition def: lctxt.localDefs)
-					{
-						if (def instanceof POValueDefinition)	// Ignore fn defs
-						{
-							POValueDefinition vdef = (POValueDefinition)def;
-							
-							// Add var name(s) to dclState, so visible above
-							dclState.addDclLocal(vdef.pattern.getVariableNames());
-						}
-					}
-				}
-			}
-			
-			if (!keepLets)				// dcl/let variables not used in state assignments
-			{
-				for (int sp: toDelete)	// Added in reverse order
-				{
-					ctxt.remove(sp);
-				}
-			}
+			cleanStack(ctxt, dclState, dcls);
 			
 			// The dclState goes out of scope here and its localUpdates have no further
 			// effect. But updates made to locals in outer scopes will still be available.
@@ -152,6 +87,76 @@ public class POBlockStatement extends POSimpleBlockStatement
 		}
 
 		return obligations;
+	}
+
+	private void cleanStack(POContextStack ctxt, POGState dclState, int dcls)
+	{
+		boolean keepLets = false;
+		List<Integer> toDelete = new LinkedList<Integer>();
+		toDelete.add(dcls);
+		
+		for (int sp = dcls + 1; sp < ctxt.size(); sp++)
+		{
+			POContext item = ctxt.get(sp);
+			
+			if (item instanceof POAssignmentContext)
+			{
+				POAssignmentContext actxt = (POAssignmentContext)item;
+				
+				if (actxt.expression != null)	// <name> := <exp>
+				{
+					boolean local = false;
+					
+					for (PODefinition dcl: assignmentDefs)
+					{
+						POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
+						
+						if (adef.name.getName().equals(actxt.pattern))
+						{
+							toDelete.add(0, sp);	// Caused by x := to local x.
+							local = true;
+							break;
+						}
+					}
+
+					if (!local)	// So assigning to outer state, sv := <expression>
+					{
+						for (TCNameToken name: actxt.expression.getVariableNames())
+						{
+							if (dclState.hasLocalName(name))
+							{
+								keepLets = true;	// state assigned using locals/dcls
+								break;
+							}
+						}
+					}
+				}
+			}
+			else if (item instanceof POLetDefContext)	// A "let x = y in ..."
+			{
+				POLetDefContext lctxt = (POLetDefContext)item;
+				toDelete.add(0, sp);
+				
+				for (PODefinition def: lctxt.localDefs)
+				{
+					if (def instanceof POValueDefinition)	// Ignore fn defs
+					{
+						POValueDefinition vdef = (POValueDefinition)def;
+						
+						// Add var name(s) to dclState, so visible above
+						dclState.addDclLocal(vdef.pattern.getVariableNames());
+					}
+				}
+			}
+		}
+		
+		if (!keepLets)				// dcl/let variables not used in state assignments
+		{
+			for (int sp: toDelete)	// Added in reverse order
+			{
+				ctxt.remove(sp);
+			}
+		}
 	}
 
 	@Override

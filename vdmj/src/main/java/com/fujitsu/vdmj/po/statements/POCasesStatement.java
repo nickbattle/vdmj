@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -81,7 +80,6 @@ public class POCasesStatement extends POStatement
 	{
 		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
 		
-		POGStateList stateList = new POGStateList();
 		POAltContext altContext = new POAltContext();
 		boolean hasEffect = false;
 		boolean hasIgnore = false;
@@ -96,20 +94,19 @@ public class POCasesStatement extends POStatement
 			}
 
 			// Pushes PONotCaseContext and altContext updated
-			obligations.addAll(alt.getProofObligations(ctxt, altContext, base, stateList.addCopy(pogState), expType, env));
+			obligations.addAll(alt.getProofObligations(ctxt, altContext, base, pogState, expType, env));
 			hasEffect = hasEffect || alt.hasEffect();
 		}
 
 		if (others != null && !hasIgnore)
 		{
 			int before = ctxt.size();
-			obligations.addAll(others.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			obligations.addAll(others.getProofObligations(ctxt, pogState, env));
 			hasEffect = hasEffect || ctxt.size() > before;
 			ctxt.copyInto(base, altContext.add());
 		}
 
 		ctxt.popTo(base);
-		stateList.combineInto(pogState);
 
 		if (hasEffect)
 		{
