@@ -30,18 +30,23 @@ import java.net.URL;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
+import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.syntax.ClassReader;
+import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
+import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 import junit.framework.TestCase;
@@ -62,7 +67,7 @@ public class PogTest extends TestCase
 		super.tearDown();
 	}
 
-	private String[] expected =
+	private String[] expectedPP =
 	{
 			/* 1 */ "(forall a:T2! &\n  is_(inv_T2(a), bool))\n",
 			/* 2 */ "exists a : seq of nat1 & (a <> [])\n",
@@ -156,24 +161,82 @@ public class PogTest extends TestCase
 			/* 90 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    -- Missing loop invariant))\n",
 			/* 91 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (let iv : int = (iv + 1) in\n      (iv < 10))))\n",
 	};
-
-	public void testPOG() throws Exception
+	
+	private String[] expectedSL =
 	{
-		URL rurl = getClass().getResource("/pogtest/pog.vpp");
+			/* 1 */ "(forall z:nat, oldSigma:Sigma &\n  is_(pre_op1(z, oldSigma), bool))\n",
+			/* 2 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma & pre_op1(z, mk_Sigma(sv, xv, si, sr)) =>\n  ((z > 10) =>\n    (let sv : nat = z in\n      (let sv : nat = (sv * 2) in\n        sv <> 0))))\n",
+			/* 3 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let a : nat = 0 in\n    (let a : nat = (a + 1) in\n      (let b : nat = (a + 1) in\n        (let sv : nat = b in\n          sv <> 0)))))\n",
+			/* 4 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  1 in set inds sr)\n",
+			/* 5 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sr : seq of R = (sr ++ {1 |-> mu(sr(1), size |-> 456)}) in\n    1 in set inds sr))\n",
+			/* 6 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sr : seq of R = (sr ++ {1 |-> mu(sr(1), size |-> 456)}) in\n    (sr(1).size) <> 0))\n",
+			/* 7 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  ((z > 10) =>\n    ((z > 100) =>\n      (let sv : nat = 999 in\n        sv <> 0))))\n",
+			/* 8 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  ((z > 10) =>\n    (not (z > 100) =>\n      (let sv : nat = 888 in\n        sv <> 0))))\n",
+			/* 9 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not (z > 10) =>\n    (let sv : nat = (z + 1) in\n      sv <> 0)))\n",
+			/* 10 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous operation call to call, affects (si, sv, xv, sr)? at 68:9\n    sv <> 0))\n",
+			/* 11 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous operation call to call, affects (si, sv, xv, sr)? at 75:9\n    (let sv : nat = 999 in\n      (-- Resolved ambiguity (sv) at 76:9\n        sv <> 0))))\n",
+			/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (-- Ambiguous operation call to call, affects (si, sv, xv, sr)? at 83:21\n      sv <> 0)))\n",
+			/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
+			/* 14 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      -- Missing loop invariant)))\n",
+			/* 15 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      si <> [])))\n"
+	};
+	
+	public void testVDMSL() throws Exception
+	{
+		runPOG(Dialect.VDM_SL, "/pogtest/pog.vdmsl", expectedSL);
+	}
+	
+	public void testVDMPP() throws Exception
+	{
+		runPOG(Dialect.VDM_PP, "/pogtest/pog.vdmpp", expectedPP);
+	}
+
+	/**
+	 * Compare the processing of one file with a list of expected POs.
+	 */
+	private void runPOG(Dialect dialect, String filename, String[] expected) throws Exception
+	{
+		URL rurl = getClass().getResource(filename);
 		String file = rurl.getPath();
+		ProofObligationList polist = null;
 
-		LexTokenReader ltr = new LexTokenReader(new File(file), Dialect.VDM_PP);
-		ClassReader cr = new ClassReader(ltr);
-		ASTClassList parsed = cr.readClasses();
+		switch (dialect)
+		{
+			case VDM_PP:
+			case VDM_RT:
+			{
+				LexTokenReader ltr = new LexTokenReader(new File(file), dialect);
+				ClassReader cr = new ClassReader(ltr);
+				ASTClassList parsed = cr.readClasses();
+		
+				TCClassList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
+				TypeChecker typeChecker = new ClassTypeChecker(checked);
+				typeChecker.typeCheck();
+				TypeChecker.printErrors(Console.out);
+				assertEquals("Spec type check errors", 0, TypeChecker.getErrorCount());
+		
+				POClassList poglist = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checked);
+				polist = poglist.getProofObligations();
+				break;
+			}
 
-		TCClassList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
-		TypeChecker typeChecker = new ClassTypeChecker(checked);
-		typeChecker.typeCheck();
-		TypeChecker.printErrors(Console.out);
-		assertEquals("Spec type check errors", 0, TypeChecker.getErrorCount());
-
-		POClassList poglist = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checked);
-		ProofObligationList polist = poglist.getProofObligations();
+			case VDM_SL:
+			{
+				LexTokenReader ltr = new LexTokenReader(new File(file), dialect);
+				ModuleReader cr = new ModuleReader(ltr);
+				ASTModuleList parsed = cr.readModules();
+		
+				TCModuleList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
+				TypeChecker typeChecker = new ModuleTypeChecker(checked);
+				typeChecker.typeCheck();
+				TypeChecker.printErrors(Console.out);
+				assertEquals("Spec type check errors", 0, TypeChecker.getErrorCount());
+		
+				POModuleList poglist = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checked);
+				polist = poglist.getProofObligations();
+				break;
+			}				
+		}
 
 		// Copy this output to re-generate the expected from the actuals...
 		int i = 0;
@@ -183,6 +246,8 @@ public class PogTest extends TestCase
 			Console.out.println("/* " + ++i + " */ \"" + po.source.replaceAll("\n", "\\\\n") + "\",");
 			assertTrue("PO type checked failed", !po.isCheckable || po.getCheckedExpression() != null);
 		}
+
+		assertEquals("POs generated", expected.length, polist.size());
 
 		i = 0;
 		int errs = 0;
@@ -201,6 +266,5 @@ public class PogTest extends TestCase
 		}
 
 		assertEquals("POs failed", 0, errs);
-		assertEquals("POs generated", expected.length, polist.size());
 	}
 }
