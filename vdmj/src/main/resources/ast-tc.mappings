@@ -277,7 +277,7 @@ map ASTExternalClauseList{} to TCExternalClauseList(this);
 map ASTFieldDesignator{object, field} to TCFieldDesignator(object, field);
 map ASTForAllStatement{location, pattern, set, statement, comments} to TCForAllStatement(location, pattern, set, statement) set comments;
 map ASTForIndexStatement{location, var, from, to, by, statement, comments} to TCForIndexStatement(location, var, from, to, by, statement) set comments;
-map ASTForPatternBindStatement{location, patternBind, reverse, exp, statement, comments} to TCForPatternBindStatement(location, patternBind, reverse, exp, statement) set comments;
+map ASTForPatternBindStatement{location, patternBind, reverse, seqexp, statement, comments} to TCForPatternBindStatement(location, patternBind, reverse, seqexp, statement) set comments;
 map ASTIdentifierDesignator{name} to TCIdentifierDesignator(name);
 map ASTIfStatement{location, ifExp, thenStmt, elseList, elseStmt, comments} to TCIfStatement(location, ifExp, thenStmt, elseList, elseStmt) set comments;
 map ASTLetBeStStatement{location, bind, suchThat, statement, comments} to TCLetBeStStatement(location, bind, suchThat, statement) set comments;

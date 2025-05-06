@@ -279,7 +279,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
 		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
-		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.seqexp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
