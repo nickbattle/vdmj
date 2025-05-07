@@ -30,11 +30,14 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POReturnContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -64,6 +67,7 @@ public class POReturnStatement extends POStatement
 
 		if (expression != null)
 		{
+			pogState.setAmbiguous(false);
 			obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 			
 			PODefinition definition = ctxt.getDefinition();
@@ -92,6 +96,13 @@ public class POReturnStatement extends POStatement
 		
 		if (needRESULT)
 		{
+			if (pogState.isAmbiguous())		// expression has ambiguous values
+			{
+				TCNameToken result = TCNameToken.getResult(location);
+				ctxt.push(new POAmbiguousContext("return", new TCNameSet(result), location));
+				pogState.setAmbiguous(false);
+			}
+
 			ctxt.push(new POReturnContext(expression));
 		}
 		else

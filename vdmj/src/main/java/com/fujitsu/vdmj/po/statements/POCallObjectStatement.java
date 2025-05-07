@@ -98,7 +98,7 @@ public class POCallObjectStatement extends POStatement
 			i++;
 		}
 
-		ctxt.addOperationCall(location, fdef);
+		ctxt.addOperationCall(location, fdef, true);
 		
 		return obligations;
 	}

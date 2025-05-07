@@ -175,7 +175,7 @@ public class POApplyExpression extends POExpression
 			{
 				// Mark the context stack as ambiguous, if needed. This marks subsequent POs Unchecked.
 				
-				ctxt.addOperationCall(location, opdef);
+				ctxt.addOperationCall(location, opdef, false);
 				
 				// Additionally, we mark the state as generally ambiguous, so that if this expression
 				// is being used to define something in a "let", we can mark that as ambiguous too.

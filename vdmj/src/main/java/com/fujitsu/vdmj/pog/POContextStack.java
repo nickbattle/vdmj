@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
 import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -169,12 +170,23 @@ public class POContextStack extends Stack<POContext>
 	 * Operation calls may cause ambiguities in the state. This is affected by whether
 	 * they are pure or have ext clauses.
 	 */
-	public void addOperationCall(LexLocation from, PODefinition called)
+	public void addOperationCall(LexLocation from, PODefinition called, boolean addReturn)
 	{
-		if (called == null)	// An op called in an expression.
+		if (called == null)	// An op called in an expression?
 		{
-			// Assumed to update something
-			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			if (addReturn)
+			{
+				TCNameToken result = TCNameToken.getResult(from);
+				TCNameList names = getStateVariables();
+				names.add(result);
+				
+				push(new POAmbiguousContext("operation call", names, from));
+				push(new POReturnContext(new POUndefinedExpression(from)));
+			}
+			else
+			{
+				push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			}
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -211,7 +223,19 @@ public class POContextStack extends Stack<POContext>
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
-				push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
+				if (addReturn)
+				{
+					TCNameToken result = TCNameToken.getResult(from);
+					TCNameList names = getStateVariables();
+					names.add(result);
+					
+					push(new POAmbiguousContext("operation call to " + opname, names, from));
+					push(new POReturnContext(new POUndefinedExpression(from)));
+				}
+				else
+				{
+					push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
+				}
 			}
 		}
 	}

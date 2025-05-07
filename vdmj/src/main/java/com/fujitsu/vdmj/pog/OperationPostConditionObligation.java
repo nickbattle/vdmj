@@ -39,7 +39,9 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, null));
-		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
+		// markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
+		setObligationVars(ctxt, op.postcondition);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public OperationPostConditionObligation(
