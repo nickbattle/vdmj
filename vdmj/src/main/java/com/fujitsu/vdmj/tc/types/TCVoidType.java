@@ -56,8 +56,13 @@ public class TCVoidType extends TCType
 		return true;
 	}
 	
+	public boolean isReturn()
+	{
+		return false;
+	}
+
 	@Override
-	public boolean hasNonVoid()
+	public boolean hasReturn()
 	{
 		return false;
 	}

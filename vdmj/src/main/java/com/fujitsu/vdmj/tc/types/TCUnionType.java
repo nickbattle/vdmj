@@ -172,11 +172,25 @@ public class TCUnionType extends TCType
 	}
 	
 	@Override
-	public boolean hasNonVoid()
+	public boolean isReturn()
 	{
 		for (TCType t: types)
 		{
-			if (!t.isVoid())
+			if (!t.isReturn())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	@Override
+	public boolean hasReturn()
+	{
+		for (TCType t: types)
+		{
+			if (t.isReturn())
 			{
 				return true;
 			}

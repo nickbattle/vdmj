@@ -55,12 +55,6 @@ public class TCVoidReturnType extends TCType
 	{
 		return true;
 	}
-	
-	@Override
-	public boolean hasNonVoid()
-	{
-		return false;
-	}
 
 	@Override
 	public String toDisplay()

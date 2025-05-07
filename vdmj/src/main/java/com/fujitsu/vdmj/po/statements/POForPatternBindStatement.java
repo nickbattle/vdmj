@@ -127,7 +127,7 @@ public class POForPatternBindStatement extends POStatement
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 	
-			if (statement.getStmttype().hasNonVoid())
+			if (statement.getStmttype().hasReturn())
 			{
 				updates.add(TCNameToken.getResult(location));
 			}
