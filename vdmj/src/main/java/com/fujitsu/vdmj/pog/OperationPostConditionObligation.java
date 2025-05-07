@@ -72,7 +72,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		if (errs == null)
 		{
-			return postexp.toString();
+			return postexp.toString().replaceAll("~", "\\$");
 		}
 		else
 		{
@@ -100,7 +100,7 @@ public class OperationPostConditionObligation extends ProofObligation
 				sb.append(")");
 			}
 
-			return sb.toString();
+			return sb.toString().replaceAll("~", "\\$");
 		}
 	}
 }

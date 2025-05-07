@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POPatternListList;
@@ -39,6 +41,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
@@ -169,6 +172,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		if (stateDefinition != null)
 		{
 			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+			addOldContext(ctxt);
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
@@ -223,6 +227,30 @@ public class POExplicitOperationDefinition extends PODefinition
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
+	}
+
+	private void addOldContext(POContextStack ctxt)
+	{
+		if (postcondition != null)
+		{
+			PODefinitionList olddefs = new PODefinitionList();
+			
+			for (TCNameToken name: postcondition.getVariableNames())
+			{
+				if (name.isOld())
+				{
+					TCNameToken varname = new TCNameToken(name.getLocation(), name.getModule(), name.getName() + "$");
+					
+					olddefs.add(new POValueDefinition(null, new POIdentifierPattern(varname), null,
+							new POVariableExpression(name.getNewName(), null), null, null));
+				}
+			}
+			
+			if (!olddefs.isEmpty())
+			{
+				ctxt.push(new POLetDefContext(olddefs));
+			}
+		}
 	}
 
 	public POPatternListList getParamPatternList()
