@@ -60,6 +60,7 @@ public class POReturnStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		boolean needRESULT = false;
 
 		if (expression != null)
 		{
@@ -72,11 +73,13 @@ public class POReturnStatement extends POStatement
 			{
 				POExplicitOperationDefinition opdef = (POExplicitOperationDefinition)definition;
 				result = opdef.type.result;
+				needRESULT = true;
 			}
 			else if (definition instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition opdef = (POImplicitOperationDefinition)definition;
 				result = opdef.type.result;
+				needRESULT = false;		// RESULT is explicit in the definition
 			}
 			
 			if (result != null && !TypeComparator.isSubType(getStmttype(), result))
@@ -86,7 +89,15 @@ public class POReturnStatement extends POStatement
 		}
 		
 		// Identify this (sub)stack as having a return
-		ctxt.push(new POReturnContext());
+		
+		if (needRESULT)
+		{
+			ctxt.push(new POReturnContext(expression));
+		}
+		else
+		{
+			ctxt.push(new POReturnContext(null));
+		}
 
 		return obligations;
 	}

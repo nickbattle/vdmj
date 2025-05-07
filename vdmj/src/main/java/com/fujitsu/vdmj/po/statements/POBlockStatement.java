@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.pog.POContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
+import com.fujitsu.vdmj.pog.POReturnContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -83,7 +84,14 @@ public class POBlockStatement extends POSimpleBlockStatement
 		}
 		else
 		{
+			int base = ctxt.size();
 			obligations.addAll(super.getProofObligations(ctxt, pogState, env));
+			
+			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
+			// return values, since the lets may be needed in the postcondition.
+			
+			POGState dclState = pogState.getLink();		// empty dcls
+			cleanStack(ctxt, dclState, base);
 		}
 
 		return obligations;
@@ -93,7 +101,11 @@ public class POBlockStatement extends POSimpleBlockStatement
 	{
 		boolean keepLets = false;
 		List<Integer> toDelete = new LinkedList<Integer>();
-		toDelete.add(dcls);
+		
+		if (!assignmentDefs.isEmpty())
+		{
+			toDelete.add(dcls);
+		}
 		
 		for (int sp = dcls + 1; sp < ctxt.size(); sp++)
 		{
@@ -146,6 +158,15 @@ public class POBlockStatement extends POSimpleBlockStatement
 						// Add var name(s) to dclState, so visible above
 						dclState.addDclLocal(vdef.pattern.getVariableNames());
 					}
+				}
+			}
+			else if (item instanceof POReturnContext)
+			{
+				POReturnContext rctxt = (POReturnContext)item;
+				
+				if (rctxt.result != null)
+				{
+					keepLets = true;	// Preserve stack for postcondition
 				}
 			}
 		}

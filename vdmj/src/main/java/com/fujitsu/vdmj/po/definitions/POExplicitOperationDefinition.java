@@ -163,15 +163,20 @@ public class POExplicitOperationDefinition extends PODefinition
 				obligations.addAll(postdef.getProofObligations(ctxt, pogState, env));
 			}
 
-			obligations.add(new OperationPostConditionObligation(this, ctxt));
 			ctxt.pop();
 		}
 		
 		if (stateDefinition != null)
 		{
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
-			ctxt.pop();
+
+			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
+			{
+				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
+			}
+			
+			ctxt.popTo(popto);
 		}
 		else if (classDefinition != null)
 		{
@@ -192,9 +197,15 @@ public class POExplicitOperationDefinition extends PODefinition
 		}
 		else	// Flat spec with no state defined
 		{
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), null, true));
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
-			ctxt.pop();
+
+			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
+			{
+				obligations.add(new OperationPostConditionObligation(this, ctxt));
+			}
+			
+			ctxt.popTo(popto);
 		}
 
 		if (isConstructor &&

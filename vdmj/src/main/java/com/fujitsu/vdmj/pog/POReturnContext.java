@@ -24,16 +24,27 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.po.expressions.POExpression;
+
 public class POReturnContext extends POContext
 {
-	public POReturnContext()
+	public final POExpression result;
+	
+	public POReturnContext(POExpression result)
 	{
-		// This Context contains a return statement
+		this.result = result;
 	}
 
 	@Override
 	public String getSource()
 	{
-		return "";
+		if (result != null)
+		{
+			return "let RESULT = " + result + " in";
+		}
+		else
+		{
+			return "";
+		}
 	}
 }
