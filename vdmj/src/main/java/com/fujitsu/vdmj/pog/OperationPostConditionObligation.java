@@ -37,9 +37,8 @@ public class OperationPostConditionObligation extends ProofObligation
 	public OperationPostConditionObligation(
 		POExplicitOperationDefinition op, POContextStack ctxt)
 	{
-		super(op.location, POType.OP_POST_CONDITION, ctxt);
+		super(op.postcondition.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, null));
-		// markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 		setObligationVars(ctxt, op.postcondition);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
@@ -47,7 +46,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	public OperationPostConditionObligation(
 		POImplicitOperationDefinition op, POContextStack ctxt)
 	{
-		super(op.location, POType.OP_POST_CONDITION, ctxt);
+		super(op.postcondition.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, op.errors));
 		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
