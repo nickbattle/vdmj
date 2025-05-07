@@ -58,7 +58,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		Vector<ProofObligation> results = new Vector<ProofObligation>();
 		
-		for (POContextStack choice: ctxt.getAlternatives())
+		for (POContextStack choice: ctxt.getAlternatives(false))	// NB! don't exclude returns
 		{
 			results.add(new OperationPostConditionObligation(op, choice));
 		}

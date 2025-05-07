@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 
@@ -76,15 +75,12 @@ abstract public class POSimpleBlockStatement extends POStatement
 		{
 			obligations.addAll(stmt.getProofObligations(ctxt, pogState, env));
 			
-			if (stmt.getStmttype() instanceof TCVoidType ||
-				stmt.getStmttype() instanceof TCUnknownType)
+			if (stmt.getStmttype().hasVoid() || stmt.getStmttype() instanceof TCUnknownType)
 			{
-				// Block continues...
-				continue;
+				continue;	// Block continues...
 			}
 			
-			// Block returns
-			break;
+			break;	// Block returns
 		}
 		
 		return obligations;
