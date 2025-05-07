@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
@@ -74,6 +75,11 @@ public class POWhileStatement extends POStatement
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 
+			if (statement.getStmttype().hasNonVoid())
+			{
+				updates.add(TCNameToken.getResult(location));
+			}
+			
 			if (!updates.isEmpty())
 			{
 				ctxt.push(new POAmbiguousContext("while loop", updates, location));

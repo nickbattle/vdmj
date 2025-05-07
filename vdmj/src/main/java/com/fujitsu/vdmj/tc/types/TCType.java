@@ -239,6 +239,11 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return false;	// TCVoidType and TCVoidReturnType are void.
 	}
 
+	public boolean hasNonVoid()
+	{
+		return true;
+	}
+
 	/**
 	 * @param from
 	 */

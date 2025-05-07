@@ -170,6 +170,20 @@ public class TCUnionType extends TCType
 
 		return false;
 	}
+	
+	@Override
+	public boolean hasNonVoid()
+	{
+		for (TCType t: types)
+		{
+			if (!t.isVoid())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean isUnion(LexLocation from)

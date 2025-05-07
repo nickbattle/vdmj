@@ -94,6 +94,11 @@ public class POForIndexStatement extends POStatement
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 	
+			if (statement.getStmttype().hasNonVoid())
+			{
+				updates.add(TCNameToken.getResult(location));
+			}
+			
 			if (!updates.isEmpty())
 			{
 				ctxt.push(new POAmbiguousContext("for loop", updates, location));

@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -126,6 +127,11 @@ public class POForPatternBindStatement extends POStatement
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 	
+			if (statement.getStmttype().hasNonVoid())
+			{
+				updates.add(TCNameToken.getResult(location));
+			}
+			
 			if (!updates.isEmpty())
 			{
 				ctxt.push(new POAmbiguousContext("for loop", updates, location));
