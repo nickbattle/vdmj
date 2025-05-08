@@ -48,7 +48,6 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.NilValue;
-import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
@@ -71,7 +70,7 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
-	@VDMFunction(params = {SeqValue.class, SeqValue.class, QuoteValue.class})
+	@VDMFunction(params = {SeqValue.class, Value.class, Value.class})
 	public static Value fwriteval(Value fval, Value tval, Value dval)
 	{
 		String filename = stringOf(fval);
@@ -135,7 +134,7 @@ public class IO implements Serializable
 		return new TupleValue(result);
 	}
 
-	@VDMOperation(params = {SeqValue.class, SeqValue.class, QuoteValue.class})
+	@VDMOperation(params = {SeqValue.class, SeqValue.class, Value.class})
 	public static Value fecho(Value fval, Value tval, Value dval)
 	{
 		String text = stringOf(tval);
