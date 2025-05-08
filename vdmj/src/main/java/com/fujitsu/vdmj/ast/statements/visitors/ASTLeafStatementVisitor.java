@@ -258,7 +258,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 	{
  		C all = visitorSet.applyBindVisitor(node.patternBind.bind, arg);
  		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
-		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.seqexp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}

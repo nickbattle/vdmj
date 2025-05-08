@@ -145,7 +145,7 @@ public class TCDependencyStatementVisitor extends TCLeafStatementVisitor<TCNameT
 	@Override
 	public TCNameSet caseForPatternBindStatement(TCForPatternBindStatement node, EnvTriple arg)
 	{
-		return visitorSet.applyExpressionVisitor(node.exp, arg);
+		return visitorSet.applyExpressionVisitor(node.seqexp, arg);
 	}
 	
 	@Override

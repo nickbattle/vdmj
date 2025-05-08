@@ -44,18 +44,18 @@ public class TCForPatternBindStatement extends TCStatement
 	private static final long serialVersionUID = 1L;
 	public final TCPatternBind patternBind;
 	public final boolean reverse;
-	public final TCExpression exp;
+	public final TCExpression seqexp;
 	public final TCStatement statement;
 	
 	public TCType expType;
 
 	public TCForPatternBindStatement(LexLocation location,
-		TCPatternBind patternBind, boolean reverse, TCExpression exp, TCStatement body)
+		TCPatternBind patternBind, boolean reverse, TCExpression seqexp, TCStatement body)
 	{
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
-		this.exp = exp;
+		this.seqexp = seqexp;
 		this.statement = body;
 	}
 
@@ -63,13 +63,13 @@ public class TCForPatternBindStatement extends TCStatement
 	public String toString()
 	{
 		return "for " + patternBind + " in " +
-			(reverse ? " reverse " : "") + exp + " do\n" + statement;
+			(reverse ? " reverse " : "") + seqexp + " do\n" + statement;
 	}
 
 	@Override
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		expType = exp.typeCheck(base, null, scope, null);
+		expType = seqexp.typeCheck(base, null, scope, null);
 		Environment local = base;
 
 		if (expType.isSeq(location))
@@ -92,7 +92,7 @@ public class TCForPatternBindStatement extends TCStatement
 		}
 		else
 		{
-			exp.report(3223, "Expecting sequence type after 'in'");
+			seqexp.report(3223, "Expecting sequence type after 'in'");
 			return setType(new TCUnknownType(location));
 		}
 	}

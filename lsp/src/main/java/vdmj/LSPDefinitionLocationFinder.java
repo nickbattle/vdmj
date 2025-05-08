@@ -183,15 +183,18 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			all.add(node);
 		}
 		
-		for (TCDefinitionList plist: node.paramDefinitionList)
+		if (node.paramDefinitionList != null)
 		{
-			for (TCDefinition pdef: plist)
+			for (TCDefinitionList plist: node.paramDefinitionList)
 			{
-				if (sought.touches(pdef.name.getLocation()))
+				for (TCDefinition pdef: plist)
 				{
-					all.clear();	// Remove pattern match
-					all.add(pdef);
-					return all;
+					if (sought.touches(pdef.name.getLocation()))
+					{
+						all.clear();	// Remove pattern match
+						all.add(pdef);
+						return all;
+					}
 				}
 			}
 		}

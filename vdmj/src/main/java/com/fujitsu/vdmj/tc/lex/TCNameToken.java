@@ -239,6 +239,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 		return new TCNameToken(l, getModule(), "RESULT", false, false);
 	}
 	
+	public static TCNameToken getResult(LexLocation l)
+	{
+		return new TCNameToken(l, l.module, "RESULT", false, false);
+	}
+	
 	public boolean isReserved()
 	{
 		String name = getName();

@@ -25,7 +25,16 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POReturnContext;
+import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POErrorStatement extends POStatement
 {
@@ -40,6 +49,19 @@ public class POErrorStatement extends POStatement
 	public String toString()
 	{
 		return "error";
+	}
+	
+	@Override
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
+	{
+		TCNameToken result = TCNameToken.getResult(location);
+		TCNameList names = ctxt.getStateVariables();
+		names.add(result);
+		
+		ctxt.push(new POAmbiguousContext("error reached", names, location));
+		ctxt.push(new POReturnContext(pogState.getResult(), new POUndefinedExpression(location)));
+		
+		return super.getProofObligations(ctxt, pogState, env);
 	}
 
 	@Override

@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
 import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -102,6 +103,11 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
+		return getAlternatives(true);	// exclude return paths by default
+	}
+	
+	public List<POContextStack> getAlternatives(boolean excludeReturns)
+	{
 		List<POContextStack> results = new Vector<POContextStack>();
 		results.add(new POContextStack());
 		
@@ -114,7 +120,7 @@ public class POContextStack extends Stack<POContext>
 				
 				for (POContextStack substack: alt.alternatives)
 				{
-					for (POContextStack alternative: substack.getAlternatives())
+					for (POContextStack alternative: substack.getAlternatives(excludeReturns))
 					{
 						for (POContextStack original: results)
 						{
@@ -129,16 +135,29 @@ public class POContextStack extends Stack<POContext>
 				results.clear();
 				results.addAll(toAdd);
 			}
-			else if (ctxt instanceof POReturnContext)
-			{
-				// This stack plays no part in further obligations, including any
-				// alternatives it contains. So immediately return nothing.
-				return new Vector<POContextStack>();
-			}
 			else
 			{
+				if (ctxt instanceof POReturnContext)
+				{
+					// This stack plays no part in further obligations, including any
+					// alternatives it contains. So immediately return nothing if we
+					// are excluding paths that return.
+					
+					if (excludeReturns)
+					{
+						return new Vector<POContextStack>();
+					}
+					
+					// Else add it as usual...
+				}
+
 				for (POContextStack choice: results)
 				{
+					if (!choice.isEmpty() && choice.lastElement() instanceof POReturnContext)
+					{
+						continue;	// skip this choice, as it has already returned
+					}
+					
 					choice.add(ctxt);
 				}
 			}
@@ -151,12 +170,23 @@ public class POContextStack extends Stack<POContext>
 	 * Operation calls may cause ambiguities in the state. This is affected by whether
 	 * they are pure or have ext clauses.
 	 */
-	public void addOperationCall(LexLocation from, PODefinition called)
+	public void addOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
-		if (called == null)	// An op called in an expression.
+		if (called == null)	// An op called in an expression?
 		{
-			// Assumed to update something
-			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			if (addReturn)
+			{
+				TCNameToken result = TCNameToken.getResult(from);
+				TCNameList names = getStateVariables();
+				names.add(result);
+				
+				push(new POAmbiguousContext("operation call", names, from));
+				push(new POReturnContext(pogState.getResult(), new POUndefinedExpression(from)));
+			}
+			else
+			{
+				push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			}
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -193,7 +223,19 @@ public class POContextStack extends Stack<POContext>
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
-				push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
+				if (addReturn)
+				{
+					TCNameToken result = TCNameToken.getResult(from);
+					TCNameList names = getStateVariables();
+					names.add(result);
+					
+					push(new POAmbiguousContext("operation call to " + opname, names, from));
+					push(new POReturnContext(pogState.getResult(), new POUndefinedExpression(from)));
+				}
+				else
+				{
+					push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
+				}
 			}
 		}
 	}

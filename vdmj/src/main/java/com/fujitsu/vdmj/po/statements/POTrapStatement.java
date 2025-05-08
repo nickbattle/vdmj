@@ -94,11 +94,9 @@ public class POTrapStatement extends POStatement
 		
 		// We don't know the exception type to match against the trap pattern/bind, so unchecked
 		int popto = ctxt.size();
-		POGState copy = pogState.getCopy();
-		list.addAll(with.getProofObligations(ctxt, copy, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+		list.addAll(with.getProofObligations(ctxt, pogState, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
 		ctxt.popTo(popto);
 		
-		pogState.combineWith(copy);
 		ctxt.push(new POAmbiguousContext("trap statement", ctxt.getStateVariables(), location));
 
 		return list;

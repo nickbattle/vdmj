@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.POGStateList;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -77,14 +76,13 @@ public class POIfStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		POGStateList stateList = new POGStateList();
 		POAltContext altContext = new POAltContext();
 		boolean hasEffect = false;
 
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, pogState, env);
 		
 		int base = ctxt.pushAt(new POImpliesContext(ifExp));
-		obligations.addAll(thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+		obligations.addAll(thenStmt.getProofObligations(ctxt, pogState, env));
 		hasEffect = ctxt.size() > base + 1;
 		ctxt.popInto(base, altContext.add());
 
@@ -95,7 +93,7 @@ public class POIfStatement extends POStatement
 			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
 
 			int popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
-			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, pogState, env));
 			hasEffect = hasEffect || ctxt.size() > popto + 1;
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
@@ -107,7 +105,7 @@ public class POIfStatement extends POStatement
 		if (elseStmt != null)
 		{
 			int popto = ctxt.size();
-			obligations.addAll(elseStmt.getProofObligations(ctxt, stateList.addCopy(pogState), env));
+			obligations.addAll(elseStmt.getProofObligations(ctxt, pogState, env));
 			hasEffect = hasEffect || ctxt.size() > popto + 1;
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
@@ -118,7 +116,6 @@ public class POIfStatement extends POStatement
 		}
 
 		ctxt.popTo(base);
-		stateList.combineInto(pogState);
 		
 		if (hasEffect)
 		{

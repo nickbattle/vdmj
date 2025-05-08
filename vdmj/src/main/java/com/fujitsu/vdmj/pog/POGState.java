@@ -25,67 +25,45 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A class to hold state information for POG of statements, which involve potentially
- * changing state variables.
+ * changing local variables.
  */
 public class POGState
 {
-	private static final TCNameToken SOMETHING = new TCNameToken(LexLocation.ANY, "?", "?");
-	
-	private final Map<TCNameToken, LexLocation> updatedState;
-	private final Map<TCNameToken, LexLocation> updatedLocals;
-	private final POGState outerState;
 	private final TCNameList localNames;
+	private final POGState outerState;
 	
 	private boolean ambiguousExpression = false;
+	private POPattern resultPattern = null;
 	
 	public POGState()
 	{
-		this.updatedState = new HashMap<TCNameToken, LexLocation>();
-		this.updatedLocals = new HashMap<TCNameToken, LexLocation>();
-		this.outerState = null;
 		this.localNames = new TCNameList();
+		this.outerState = null;
 	}
 	
 	/**
-	 * Used by getCopy and getLink.
+	 * Used by getLink.
 	 */
-	private POGState(Map<TCNameToken, LexLocation> updatedState, Map<TCNameToken, LexLocation> updatedLocals,
-			POGState outerState, TCNameList localNames)
+	private POGState(POGState outerState)
 	{
-		this.updatedState = updatedState;
-		this.updatedLocals = updatedLocals;
+		this.localNames = new TCNameList();
 		this.outerState = outerState;
-		this.localNames = localNames;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "state: " + updatedState.keySet() +
-				", locals: " + updatedLocals.keySet() +
+		return "locals: " + localNames +
 				(outerState != null ? " / " + outerState.toString() : "");
-	}
-	
-	/**
-	 * Copy a state for use in if/else branches etc, where changes in each are not visible
-	 * in the other branches, but all changes are combined afterwards. Note that it has
-	 * the same local names and ambiguous state, but no outer state changes.
-	 */
-	public POGState getCopy()
-	{
-		return new POGState(
-				new HashMap<TCNameToken, LexLocation>(),
-				new HashMap<TCNameToken, LexLocation>(),
-				null, localNames);
 	}
 	
 	/**
@@ -95,39 +73,12 @@ public class POGState
 	 */
 	public POGState getLink()
 	{
-		return new POGState(
-				new HashMap<TCNameToken, LexLocation>(),
-				new HashMap<TCNameToken, LexLocation>(),
-				this, new TCNameList());
+		return new POGState(this);
 	}
 	
 	/**
-	 * True if state has been updated, either here or in outer levels.
-	 */
-	public boolean hasUpdatedState(Collection<TCNameToken> names)
-	{
-		if (updatedState.containsKey(SOMETHING))
-		{
-			return true;
-		}
-
-		for (TCNameToken name: names)
-		{
-			if (localNames.contains(name))
-			{
-				return updatedLocals.containsKey(name);
-			}
-			else if (updatedState.containsKey(name))
-			{
-				return true;
-			}
-		}
-		
-		return (outerState != null && outerState.hasUpdatedState(names));
-	}
-	
-	/**
-	 * True if POGState has a local variable of this name.
+	 * True if this POGState has a local variable of this name. Note, this doesn't look
+	 * at the outer states.
 	 */
 	public boolean hasLocalName(TCNameToken name)
 	{
@@ -135,82 +86,8 @@ public class POGState
 	}
 
 	/**
-	 * Return the location of the last state update.
+	 * Declare new "dcl" local(s).
 	 */
-	public LexLocation getUpdatedLocation(Collection<TCNameToken> names)
-	{
-		for (TCNameToken name: names)
-		{
-			if (localNames.contains(name))
-			{
-				if (updatedLocals.containsKey(name))
-				{
-					return updatedLocals.get(name);
-				}
-			}
-			else
-			{
-				if (updatedState.containsKey(name))
-				{
-					return updatedState.get(name);
-				}
-				
-				if (updatedState.containsKey(SOMETHING))
-				{
-					return updatedState.get(SOMETHING);
-				}
-			}
-		}
-
-		if (outerState != null)
-		{
-			return outerState.getUpdatedLocation(names);
-		}
-		
-		return LexLocation.ANY;
-	}
-	
-	/**
-	 * State updates either update the updatedLocals of the nearest getLink, or they
-	 * update the updatedState in the lowest level. 
-	 */
-	
-	public void didUpdateState(LexLocation from)
-	{
-		if (outerState != null)
-		{
-			outerState.didUpdateState(from);	// Find outermost level
-		}
-		else
-		{
-			updatedState.put(SOMETHING, from);
-		}
-	}
-
-	public void didUpdateState(TCNameToken name, LexLocation from)
-	{
-		if (localNames.contains(name))
-		{
-			updatedLocals.put(name, from);			// A local dcl update
-		}
-		else if (outerState != null)
-		{
-			outerState.didUpdateState(name, from);	// May be an outer* local, or state
-		}
-		else
-		{
-			updatedState.put(name, from);			// An outermost state update
-		}
-	}
-
-	public void didUpdateState(Collection<TCNameToken> names, LexLocation from)
-	{
-		for (TCNameToken name: names)
-		{
-			didUpdateState(name, from);
-		}
-	}
-	
 	public void addDclLocal(TCNameToken name)
 	{
 		localNames.add(name);
@@ -223,14 +100,37 @@ public class POGState
 			localNames.add(name);
 		}
 	}
-
+	
 	/**
-	 * Combine copies for if/else branches, created by getCopy().
+	 * Set the name of the RESULT variable. Null means "RESULT"
 	 */
-	public void combineWith(POGState copy)
+	public void setResult(POPattern result)
 	{
-		updatedState.putAll(copy.updatedState);
-		updatedLocals.putAll(copy.updatedLocals);
+		if (outerState != null)
+		{
+			outerState.setResult(result);
+		}
+		else if (result == null)
+		{
+			TCNameToken R = TCNameToken.getResult(LexLocation.ANY);
+			resultPattern = new POIdentifierPattern(R);
+		}
+		else
+		{
+			resultPattern = result;
+		}
+	}
+	
+	public POPattern getResult()
+	{
+		if (outerState != null)
+		{
+			return outerState.getResult();
+		}
+		else
+		{
+			return resultPattern;
+		}
 	}
 	
 	/**

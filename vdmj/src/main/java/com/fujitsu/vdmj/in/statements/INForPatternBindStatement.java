@@ -46,16 +46,16 @@ public class INForPatternBindStatement extends INStatement
 	private static final long serialVersionUID = 1L;
 	public final INPatternBind patternBind;
 	public final boolean reverse;
-	public final INExpression exp;
+	public final INExpression seqexp;
 	public final INStatement statement;
 
 	public INForPatternBindStatement(LexLocation location,
-		INPatternBind patternBind, boolean reverse, INExpression exp, INStatement body)
+		INPatternBind patternBind, boolean reverse, INExpression seqexp, INStatement body)
 	{
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
-		this.exp = exp;
+		this.seqexp = seqexp;
 		this.statement = body;
 	}
 
@@ -63,7 +63,7 @@ public class INForPatternBindStatement extends INStatement
 	public String toString()
 	{
 		return "for " + patternBind + " in " +
-			(reverse ? " reverse " : "") + exp + " do\n" + statement;
+			(reverse ? " reverse " : "") + seqexp + " do\n" + statement;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class INForPatternBindStatement extends INStatement
 
 		try
 		{
-			ValueList values = exp.eval(ctxt).seqValue(ctxt);
+			ValueList values = seqexp.eval(ctxt).seqValue(ctxt);
 
 			if (reverse)
 			{

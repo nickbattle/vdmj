@@ -240,6 +240,22 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
+	 * Test whether this DOES cause a statement block to return.
+	 */
+	public boolean isReturn()
+	{
+		return true;
+	}
+
+	/**
+	 * Test whether this CAN cause a statement block to return.
+	 */
+	public boolean hasReturn()
+	{
+		return true;
+	}
+
+	/**
 	 * @param from
 	 */
 	public boolean isSeq(LexLocation from)

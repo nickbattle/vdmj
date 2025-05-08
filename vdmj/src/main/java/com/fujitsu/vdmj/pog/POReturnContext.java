@@ -24,16 +24,36 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
+
 public class POReturnContext extends POContext
 {
+	public final POPattern pattern;
+	public final POExpression result;
+	
+	public POReturnContext(POPattern pattern, POExpression result)
+	{
+		this.pattern = pattern;
+		this.result = result;
+	}
+	
 	public POReturnContext()
 	{
-		// This Context contains a return statement
+		this.pattern = null;
+		this.result = null;
 	}
 
 	@Override
 	public String getSource()
 	{
-		return "";
+		if (result != null)
+		{
+			return "let " + pattern + " = " + result + " in";
+		}
+		else
+		{
+			return "";
+		}
 	}
 }

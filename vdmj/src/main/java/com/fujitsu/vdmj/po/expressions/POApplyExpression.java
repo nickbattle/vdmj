@@ -175,14 +175,17 @@ public class POApplyExpression extends POExpression
 			
 			if (type.isOperation(location))
 			{
-				// We have to say that the POGState is as if the operation updates state, because
-				// it may read state even if pure, and an apply uses the return value. So QC can't
-				// evaluate them. This makes subsequent POs Unchecked.
-				ctxt.addOperationCall(location, null);
+				// Mark the context stack as ambiguous, if needed. This marks subsequent POs Unchecked.
+				
+				ctxt.addOperationCall(location, pogState, opdef, false);
 				
 				// Additionally, we mark the state as generally ambiguous, so that if this expression
 				// is being used to define something in a "let", we can mark that as ambiguous too.
-				pogState.setAmbiguous(true);
+				
+				if (opdef == null || !opdef.accessSpecifier.isPure)
+				{
+					pogState.setAmbiguous(true);
+				}
 			}
 		}
 

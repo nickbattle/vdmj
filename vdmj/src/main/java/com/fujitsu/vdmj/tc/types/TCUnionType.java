@@ -170,6 +170,34 @@ public class TCUnionType extends TCType
 
 		return false;
 	}
+	
+	@Override
+	public boolean isReturn()
+	{
+		for (TCType t: types)
+		{
+			if (!t.isReturn())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	@Override
+	public boolean hasReturn()
+	{
+		for (TCType t: types)
+		{
+			if (t.isReturn())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean isUnion(LexLocation from)

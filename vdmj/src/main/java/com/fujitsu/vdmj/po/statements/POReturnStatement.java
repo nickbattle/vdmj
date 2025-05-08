@@ -29,7 +29,9 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POReturnContext;
@@ -60,35 +62,50 @@ public class POReturnStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		TCType rtype = null;
 
 		if (expression != null)
 		{
-			// Don't process POG state here, because we're returning, so the expression can
-			// have no further effect in the operation.
-			obligations.addAll(expression.getProofObligations(ctxt, new POGState(), env));
+			pogState.setAmbiguous(false);
+			obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 			
 			PODefinition definition = ctxt.getDefinition();
-			TCType result = null;
 			
 			if (definition instanceof POExplicitOperationDefinition)
 			{
 				POExplicitOperationDefinition opdef = (POExplicitOperationDefinition)definition;
-				result = opdef.type.result;
+				rtype = opdef.type.result;
 			}
 			else if (definition instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition opdef = (POImplicitOperationDefinition)definition;
-				result = opdef.type.result;
+				rtype = opdef.type.result;
 			}
 			
-			if (result != null && !TypeComparator.isSubType(getStmttype(), result))
+			if (rtype != null && !TypeComparator.isSubType(getStmttype(), rtype))
 			{
-				obligations.addAll(SubTypeObligation.getAllPOs(expression, result, getStmttype(), ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(expression, rtype, getStmttype(), ctxt));
 			}
 		}
 		
 		// Identify this (sub)stack as having a return
-		ctxt.push(new POReturnContext());
+		
+		if (rtype != null && rtype.isReturn())
+		{
+			POPattern result = pogState.getResult();
+
+			if (pogState.isAmbiguous())		// expression has ambiguous values
+			{
+				ctxt.push(new POAmbiguousContext("return", result.getVariableNames(), location));
+				pogState.setAmbiguous(false);
+			}
+
+			ctxt.push(new POReturnContext(result, expression));
+		}
+		else
+		{
+			ctxt.push(new POReturnContext());
+		}
 
 		return obligations;
 	}

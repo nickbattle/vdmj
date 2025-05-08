@@ -1,0 +1,131 @@
+-- @Warning(5000)
+module VDMSL
+exports all
+definitions
+
+state Sigma of
+	sv : nat
+	xv : nat
+	si : seq of int
+	sr : seq of R
+end
+
+types
+  R ::
+    size : real;
+
+operations
+	call(a:nat) == is not yet specified;
+
+	op1(z:nat) r:real ==
+	  if z > 10 then
+	  (
+	      sv := z;
+	      sv := sv * 2;
+	      return 1/sv
+	  )
+	  else
+	  (
+	    return 0
+	  )
+	pre z > sv;
+
+	op2(z:nat) r:real ==
+	(
+	    dcl a:nat := 0;
+	    a := a + 1;
+	 	 
+	    ( dcl b:nat := a + 1;
+	      sv := b );
+	    	
+	    ( dcl c:nat := a + 2;
+	      c := c + 1 );
+	 
+	    return 1/sv
+	);
+
+	op3(z:nat) r:real ==
+	(
+	    sr(1).size := 456;
+	    return 1/sr(1).size
+	);
+
+	op4(z:nat) r:real ==
+	(
+	  if z > 10 then
+	    if z > 100 then
+	      sv := 999
+	    else
+	      sv := 888
+	  else
+	    sv := z+1;
+	
+	  return 1/sv
+	);
+
+	op5a(z:nat) r:real ==
+	(
+	    call(z);
+	    -- sv := 999
+	    return 1/sv
+	);
+
+	op5b(z:nat) r:real ==
+	(
+	    call(z);
+	    sv := 999;
+	    return 1/sv
+	);
+	
+	op5c(z:nat) r:real ==
+	(
+	    cases z:
+	      123    -> call(z),
+	      others -> sv := z
+	    end;
+	
+	    return 1/sv
+	);
+	
+	op6(a:nat) ==
+	(
+	    atomic
+	    (
+	        sv := xv;
+	        xv := sv
+	    )
+	);
+	
+	op7a: nat ==> nat
+	op7a(a) ==
+	(
+	    sv := a + 1;
+	    xv := sv + a;
+	    return xv
+	)
+	post RESULT > xv~ + sv~;
+	
+	op7b(a: nat) r: nat ==
+	(
+	    sv := a + 1;
+	    xv := sv + a;
+	    return xv
+	)
+	post r > xv~ + sv~;
+	
+	op8(data:seq of int) ==
+	(
+	  dcl count : int := 0;
+	  si := data;
+	
+	  -- @LoopInvariant(count + len si = len data);
+	  while si <> [] do
+	  (
+	    si := tl si;
+	    count := count + 1
+	  )
+	
+	  -- Here, invariant holds and si = []
+	);
+
+end VDMSL
