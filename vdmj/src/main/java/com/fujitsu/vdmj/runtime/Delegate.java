@@ -301,9 +301,9 @@ public class Delegate implements Serializable
 		
 		if (paramTypes.length > 0)	// Only check if provided
 		{
-			if (avals.length == paramTypes.length)
+			if (anames.size() == paramTypes.length)
 			{
-				for (int p = 0; p < avals.length; p++)
+				for (int p = 0; p < anames.size(); p++)
 				{
 					if (!paramTypes[p].isAssignableFrom(avals[p].getClass()))
 					{
