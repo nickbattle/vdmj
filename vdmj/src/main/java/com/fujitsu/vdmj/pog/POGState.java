@@ -26,6 +26,9 @@ package com.fujitsu.vdmj.pog;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -39,6 +42,7 @@ public class POGState
 	private final POGState outerState;
 	
 	private boolean ambiguousExpression = false;
+	private POPattern resultPattern = null;
 	
 	public POGState()
 	{
@@ -94,6 +98,38 @@ public class POGState
 		for (TCNameToken name: names)
 		{
 			localNames.add(name);
+		}
+	}
+	
+	/**
+	 * Set the name of the RESULT variable. Null means "RESULT"
+	 */
+	public void setResult(POPattern result)
+	{
+		if (outerState != null)
+		{
+			outerState.setResult(result);
+		}
+		else if (result == null)
+		{
+			TCNameToken R = TCNameToken.getResult(LexLocation.ANY);
+			resultPattern = new POIdentifierPattern(R);
+		}
+		else
+		{
+			resultPattern = result;
+		}
+	}
+	
+	public POPattern getResult()
+	{
+		if (outerState != null)
+		{
+			return outerState.getResult();
+		}
+		else
+		{
+			return resultPattern;
 		}
 	}
 	

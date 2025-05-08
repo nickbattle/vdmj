@@ -48,7 +48,8 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.postcondition.location, POType.OP_POST_CONDITION, ctxt);
 		source = ctxt.getSource(getExp(op.precondition, op.postcondition, op.errors));
-		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
+		setObligationVars(ctxt, op.postcondition);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	/**
@@ -56,6 +57,18 @@ public class OperationPostConditionObligation extends ProofObligation
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
 	public static List<ProofObligation> getAllPOs(POExplicitOperationDefinition op, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives(false))	// NB! don't exclude returns
+		{
+			results.add(new OperationPostConditionObligation(op, choice));
+		}
+		
+		return results;
+	}
+
+	public static List<ProofObligation> getAllPOs(POImplicitOperationDefinition op, POContextStack ctxt)
 	{
 		Vector<ProofObligation> results = new Vector<ProofObligation>();
 		

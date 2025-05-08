@@ -56,6 +56,7 @@ public class TCVoidType extends TCType
 		return true;
 	}
 	
+	@Override
 	public boolean isReturn()
 	{
 		return false;

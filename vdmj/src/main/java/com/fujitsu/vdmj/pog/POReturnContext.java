@@ -25,14 +25,23 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 
 public class POReturnContext extends POContext
 {
+	public final POPattern pattern;
 	public final POExpression result;
 	
-	public POReturnContext(POExpression result)
+	public POReturnContext(POPattern pattern, POExpression result)
 	{
+		this.pattern = pattern;
 		this.result = result;
+	}
+	
+	public POReturnContext()
+	{
+		this.pattern = null;
+		this.result = null;
 	}
 
 	@Override
@@ -40,7 +49,7 @@ public class POReturnContext extends POContext
 	{
 		if (result != null)
 		{
-			return "let RESULT = " + result + " in";
+			return "let " + pattern + " = " + result + " in";
 		}
 		else
 		{

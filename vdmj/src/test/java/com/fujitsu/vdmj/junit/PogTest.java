@@ -177,8 +177,12 @@ public class PogTest extends TestCase
 			/* 11 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous operation call to call, affects (si, sv, xv, sr)? at 75:9\n    (let sv : nat = 999 in\n      (-- Resolved ambiguity (sv) at 76:9\n        sv <> 0))))\n",
 			/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (-- Ambiguous operation call to call, affects (si, sv, xv, sr)? at 83:21\n      sv <> 0)))\n",
 			/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
-			/* 14 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      -- Missing loop invariant)))\n",
-			/* 15 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      si <> [])))\n"
+			/* 14 */ "(forall a:nat, RESULT:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7a(a, RESULT, oldSigma, Sigma), bool))\n",
+			/* 15 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let RESULT = xv in\n          (RESULT > (xv$ + sv$)))))))\n",
+			/* 16 */ "(forall a:nat, r:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7b(a, r, oldSigma, Sigma), bool))\n",
+			/* 17 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let r = xv in\n          (r > (xv$ + sv$)))))))\n",
+			/* 18 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      -- Missing loop invariant)))\n",
+			/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      si <> [])))\n"
 	};
 	
 	public void testVDMSL() throws Exception

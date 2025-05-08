@@ -96,7 +96,24 @@ operations
 	    )
 	);
 	
-	op7(data:seq of int) ==
+	op7a: nat ==> nat
+	op7a(a) ==
+	(
+	    sv := a + 1;
+	    xv := sv + a;
+	    return xv
+	)
+	post RESULT > xv~ + sv~;
+	
+	op7b(a: nat) r: nat ==
+	(
+	    sv := a + 1;
+	    xv := sv + a;
+	    return xv
+	)
+	post r > xv~ + sv~;
+	
+	op8(data:seq of int) ==
 	(
 	  dcl count : int := 0;
 	  si := data;

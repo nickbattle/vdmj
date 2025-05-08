@@ -169,6 +169,8 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
+		pogState.setResult(null);	// Indicate "RESULT" should be used
+		
 		if (stateDefinition != null)
 		{
 			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
