@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -220,7 +221,11 @@ public class TCFieldExpression extends TCExpression
 
 		if (results.isEmpty())
 		{
-    		if (!recOrClass)
+			if (root instanceof TCProductType)
+			{
+				object.report(3093, "Field '" + field.getName() + "' applied to tuple type (use #n)");
+			}
+			else if (!recOrClass)
     		{
     			if (root instanceof TCRecordType && ((TCRecordType)root).isOpaque(location))
     			{
