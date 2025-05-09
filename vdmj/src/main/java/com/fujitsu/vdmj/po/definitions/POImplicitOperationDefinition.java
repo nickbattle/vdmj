@@ -60,6 +60,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
@@ -84,6 +85,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final TCType actualResult;
 	public final PODefinition stateDefinition;
 	public final boolean isConstructor;
+	public final TCTypeSet possibleExceptions;
 
 	public POImplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name,
@@ -99,7 +101,8 @@ public class POImplicitOperationDefinition extends PODefinition
 		TCType actualResult,
 		POStateDefinition stateDefinition,
 		POClassDefinition classDefinition,
-		boolean isConstructor)
+		boolean isConstructor,
+		TCTypeSet possibleExceptions)
 	{
 		super(name.getLocation(), name);
 		
@@ -118,6 +121,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		this.stateDefinition = stateDefinition;
 		this.classDefinition = classDefinition;
 		this.isConstructor = isConstructor;
+		this.possibleExceptions = possibleExceptions;
 	}
 
 	@Override
@@ -253,7 +257,7 @@ public class POImplicitOperationDefinition extends PODefinition
 				obligations.add(new StateInvariantObligation(this, ctxt));
 			}
 
-			if (!isConstructor &&
+			if (!isConstructor && result != null &&
 				!TypeComparator.isSubType(actualResult, type.result))
 			{
 				obligations.add(new SubTypeObligation(this, actualResult, ctxt).
@@ -323,6 +327,12 @@ public class POImplicitOperationDefinition extends PODefinition
 		return plist;
 	}
 
+	@Override
+	public TCTypeSet getPossibleExceptions()
+	{
+		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
+	}
+	
 	@Override
 	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
 	{
