@@ -15,7 +15,7 @@ types
     size : real;
 
 operations
-	call(a:nat) == is not yet specified;
+	call(a:nat) == return;
 
 	op1(z:nat) r:real ==
 	  if z > 10 then

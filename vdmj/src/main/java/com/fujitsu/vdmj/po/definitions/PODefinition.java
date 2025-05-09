@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -164,6 +165,14 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();
+	}
+
+	/**
+	 * Get a set of possible exceptions raised from the definition (see operations)
+	 */
+	public TCTypeSet getPossibleExceptions()
+	{
+		return null;
 	}
 
 	/**

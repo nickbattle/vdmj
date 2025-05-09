@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
@@ -75,6 +76,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final POStateDefinition stateDefinition;
 	public final TCType actualResult;
 	public final boolean isConstructor;
+	public final TCTypeSet possibleExceptions;
 
 	public POExplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name, TCOperationType type,
@@ -85,7 +87,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		PODefinitionList paramDefinitions,
 		POStateDefinition state,
 		POClassDefinition classDefinition,
-		TCType actualResult, boolean isConstructor)
+		TCType actualResult, boolean isConstructor,
+		TCTypeSet possibleExceptions)
 	{
 		super(name.getLocation(), name);
 
@@ -102,6 +105,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.classDefinition = classDefinition;
 		this.actualResult = actualResult;
 		this.isConstructor = isConstructor;
+		this.possibleExceptions = possibleExceptions;
 	}
 
 	@Override
@@ -260,6 +264,12 @@ public class POExplicitOperationDefinition extends PODefinition
 		POPatternListList list = new POPatternListList();
 		list.add(parameterPatterns);
 		return list;
+	}
+	
+	@Override
+	public TCTypeSet getPossibleExceptions()
+	{
+		return possibleExceptions.isEmpty() ? null : possibleExceptions;
 	}
 
 	@Override

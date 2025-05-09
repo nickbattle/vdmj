@@ -188,6 +188,10 @@ public class POContextStack extends Stack<POContext>
 				push(new POAmbiguousContext("operation call", getStateVariables(), from));
 			}
 		}
+		else if (called.getPossibleExceptions() != null)
+		{
+			push(new POAmbiguousContext("operation throws exceptions", getStateVariables(), from));
+		}
 		else if (called.accessSpecifier.isPure)
 		{
 			return;			// No updates, by definition
