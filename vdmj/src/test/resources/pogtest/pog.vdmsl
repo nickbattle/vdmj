@@ -16,6 +16,7 @@ types
 
 operations
 	call(a:nat) == return;
+	bang(a:nat) == exit "BANG";
 
 	op1(z:nat) r:real ==
 	  if z > 10 then
@@ -126,6 +127,13 @@ operations
 	  )
 	
 	  -- Here, invariant holds and si = []
+	);
+	
+	op9: nat ==> real
+	op9(a) ==
+	(
+		bang(a);
+		return 1/a
 	);
 
 end VDMSL

@@ -190,7 +190,8 @@ public class POContextStack extends Stack<POContext>
 		}
 		else if (called.getPossibleExceptions() != null)
 		{
-			push(new POAmbiguousContext("operation throws exceptions", getStateVariables(), from));
+			String opname = called.name.toExplicitString(from);
+			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
 		}
 		else if (called.accessSpecifier.isPure)
 		{
