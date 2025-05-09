@@ -106,7 +106,7 @@ public class POIfStatement extends POStatement
 		{
 			int popto = ctxt.size();
 			obligations.addAll(elseStmt.getProofObligations(ctxt, pogState, env));
-			hasEffect = hasEffect || ctxt.size() > popto + 1;
+			hasEffect = hasEffect || ctxt.size() > popto;
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
 		}

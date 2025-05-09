@@ -137,7 +137,7 @@ public class POContextStack extends Stack<POContext>
 			}
 			else
 			{
-				if (ctxt instanceof POReturnContext)
+				if (ctxt instanceof POReturnContext)	// Includes POExitContext
 				{
 					// This stack plays no part in further obligations, including any
 					// alternatives it contains. So immediately return nothing if we

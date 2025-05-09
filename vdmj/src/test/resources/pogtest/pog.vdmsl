@@ -135,5 +135,15 @@ operations
 		bang(a);
 		return 1/a
 	);
+	
+	op10(a:real) r:real ==
+	(
+		if a > 10
+		then exit 123
+		else sv := a + 1;
+		
+		return 1/sv
+   	)
+   	post sv > sv~;
 
 end VDMSL
