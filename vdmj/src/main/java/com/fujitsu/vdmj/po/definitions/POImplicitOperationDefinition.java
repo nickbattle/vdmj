@@ -330,7 +330,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	@Override
 	public TCTypeSet getPossibleExceptions()
 	{
-		return possibleExceptions.isEmpty() ? null : possibleExceptions;
+		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
 	}
 	
 	@Override
