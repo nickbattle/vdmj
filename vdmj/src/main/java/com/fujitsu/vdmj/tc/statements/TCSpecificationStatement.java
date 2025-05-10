@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
@@ -44,6 +45,8 @@ public class TCSpecificationStatement extends TCStatement
 	public final TCExpression precondition;
 	public final TCExpression postcondition;
 	public final TCErrorCaseList errors;
+	
+	public TCStateDefinition stateDefinition;
 
 	public TCSpecificationStatement(LexLocation location,
 		TCExternalClauseList externals, TCExpression precondition,
@@ -127,6 +130,8 @@ public class TCSpecificationStatement extends TCStatement
 		{
 			postcondition.report(3234, "postcondition is not a boolean expression");
 		}
+		
+		stateDefinition = base.findStateDefinition();
 
 		return setType(new TCVoidType(location));
 	}

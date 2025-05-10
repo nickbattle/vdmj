@@ -24,12 +24,17 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSpecificationStatement extends POStatement
@@ -39,10 +44,12 @@ public class POSpecificationStatement extends POStatement
 	public final POExpression precondition;
 	public final POExpression postcondition;
 	public final POErrorCaseList errors;
+	public final POStateDefinition stateDefinition;
 
 	public POSpecificationStatement(LexLocation location,
 		POExternalClauseList externals, POExpression precondition,
-		POExpression postcondition, POErrorCaseList errors)
+		POExpression postcondition, POErrorCaseList errors,
+		POStateDefinition stateDefinition)
 	{
 		super(location);
 
@@ -50,6 +57,7 @@ public class POSpecificationStatement extends POStatement
 		this.precondition = precondition;
 		this.postcondition = postcondition;
 		this.errors = errors;
+		this.stateDefinition = stateDefinition;
 	}
 
 	@Override
@@ -84,6 +92,11 @@ public class POSpecificationStatement extends POStatement
 		if (postcondition != null)
 		{
 			obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
+			
+			if (Settings.dialect == Dialect.VDM_SL && Settings.release == Release.VDM_10)
+			{
+				obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt));
+			}
 		}
 
 		return obligations;

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
+import com.fujitsu.vdmj.po.statements.POSpecificationStatement;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.po.types.POPatternTypePair;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -106,6 +107,24 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(")");
 
 		source = ctxt.getSource(sb.toString());
+	}
+
+	public SatisfiabilityObligation(POSpecificationStatement spec,
+		PODefinition stateDefinition, POContextStack ctxt)
+	{
+		super(spec.location, POType.OP_SATISFIABILITY, ctxt);
+		StringBuilder sb = new StringBuilder();
+
+		if (spec.precondition != null)
+		{
+    		sb.append(spec.precondition);
+    		sb.append(" =>\n");
+		}
+
+		sb.append(spec.postcondition);
+
+		source = ctxt.getSource(sb.toString());
+		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)

@@ -58,6 +58,7 @@ public enum POType
 	OP_POST_CONDITION("operation post condition"),
 	OPERATION_PATTERNS("operation parameter patterns"),
 	OP_SATISFIABILITY("operation satisfiability", true),
+	STMT_SATISFIABILITY("statement satisfiability", true),
 	SET_MEMBER("set membership", true),
 	SEQ_MEMBER("sequence membership", true),
 	ORDERED("ordered"),
