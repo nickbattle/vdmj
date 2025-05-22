@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -43,19 +44,21 @@ public class POAnnotatedStatement extends POStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
+		setStmttype(statement.getStmttype());
+		this.statement.addAnnotation(annotation);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "/* " + annotation + " */ " + statement;
+		return statement.toString();	// Don't include annotation in PO source
 	}
 	
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		annotation.poBefore(this, ctxt);
-		ProofObligationList obligations = statement.getProofObligations(ctxt, env);
+		ProofObligationList obligations = statement.getProofObligations(ctxt, pogState, env);
 		annotation.poAfter(this, obligations, ctxt);
 		return obligations;
 	}

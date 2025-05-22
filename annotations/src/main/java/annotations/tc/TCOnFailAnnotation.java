@@ -25,8 +25,10 @@
 package annotations.tc;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -40,11 +42,13 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.values.SeqValue;
 
 public class TCOnFailAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private String format = null;
+	private TCAnnotationList doclinks = null;
 
 	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -120,13 +124,21 @@ public class TCOnFailAnnotation extends TCAnnotation
 				try
 				{
 					// Try to format with string arguments to check they are all %s (up to 20)
-					Object[] args = new String[20];
-					Arrays.fill(args, "A string");
+					Object[] args = new SeqValue[20];
+					Arrays.fill(args, new SeqValue("abc"));
 					String.format(format, args);
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@OnFail must only use %[arg$][width]s conversions");
+					name.report(6008, "@OnFail must only use %[arg$][#][width]s conversions");
+				}
+				
+				Stack<TCDocLinkAnnotation> enclosing = TCDocLinkAnnotation.enclosing();
+				
+				if (!enclosing.isEmpty())
+				{
+					doclinks = new TCAnnotationList();
+					doclinks.addAll(enclosing);
 				}
 			}
 			else
@@ -139,7 +151,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 	@Override
 	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
 	{
-		if (!(type instanceof TCBooleanType))
+		if (!type.isType(TCBooleanType.class, exp.location))
 		{
 			name.report(3361, "@OnFail not applied to boolean expression");
 		}

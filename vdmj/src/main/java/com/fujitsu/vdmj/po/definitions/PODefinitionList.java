@@ -25,9 +25,10 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
-import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -72,15 +73,16 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		return sb.toString();
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	/**
+	 * Get the proof obligations from every definition in the list and track POGState.
+	 */
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (PODefinition d: this)
 		{
-			ctxt.push(new PONameContext(d.getVariableNames()));
-			obligations.addAll(d.getProofObligations(ctxt, env));
-			ctxt.pop();
+			obligations.addAll(d.getProofObligations(ctxt, pogState, env));
 		}
 
 		return obligations;
@@ -91,19 +93,38 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	 * one. This is used in let/def expressions, where definitions can depend on
 	 * earlier definitions in the same expression.
 	 */
-	public ProofObligationList getDefProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getDefProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		int count = 0;
 
 		for (PODefinition d: this)
 		{
-			ctxt.push(new PONameContext(d.getVariableNames()));
-			obligations.addAll(d.getProofObligations(ctxt, env));
-			ctxt.pop();
-			ctxt.push(new POLetDefContext(d));
+			if (d instanceof POExplicitFunctionDefinition || d instanceof POImplicitFunctionDefinition)
+			{
+				// local functions push their context first, to be callable in the POs that they generate.
+				ctxt.push(new POLetDefContext(d));
+				obligations.addAll(d.getProofObligations(ctxt, pogState, env));
+			}
+			else
+			{
+				// Regular definitions are only defined after themselves
+				pogState.setAmbiguous(false);
+				obligations.addAll(d.getProofObligations(ctxt, pogState, env));
+				
+				if (pogState.isAmbiguous())		// Definition defined with ambiguous values
+				{
+					ctxt.push(new POAmbiguousContext("definition", d.getVariableNames(), d.location));
+					pogState.setAmbiguous(false);
+				}
+				
+				ctxt.push(new POLetDefContext(d));
+			}
+			
+			count++;
 		}
 		
-		for (int i=0; i<this.size(); i++)
+		for (int i=0; i<count; i++)
 		{
 			ctxt.pop();
 		}

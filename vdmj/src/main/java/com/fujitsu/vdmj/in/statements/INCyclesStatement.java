@@ -56,6 +56,8 @@ public class INCyclesStatement extends INStatement
 	{
 		location.hit();
 		cycles.location.hit();
+		
+		assertNotInit(ctxt);
 
 		SchedulableThread me = (SchedulableThread)Thread.currentThread();
 

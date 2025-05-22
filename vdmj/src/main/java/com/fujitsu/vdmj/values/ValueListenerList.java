@@ -44,6 +44,11 @@ public class ValueListenerList extends Vector<ValueListener>
 		addAll(list);
 	}
 	
+	public ValueListenerList()
+	{
+		// empty
+	}
+
 	public void changedValue(LexLocation location, Value value, Context ctxt) throws ValueException
 	{
 		// Copy the list so that any additions caused by changeValue are not concurrent

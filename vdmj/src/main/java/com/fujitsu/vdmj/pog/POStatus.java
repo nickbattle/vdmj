@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.pog;
 
 public enum POStatus
 {
-	UNPROVED("Unproved"), PROVED("Proved"), TRIVIAL("Trivial"), UNCHECKED("Unchecked");
+	UNPROVED("Unproved"), PROVABLE("Provable"),
+	MAYBE("Maybe"), UNCHECKED("Unchecked"), FAILED("Failed"),
+	TIMEOUT("Timeout");
 
 	private String text;
 

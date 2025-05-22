@@ -29,24 +29,28 @@ import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;
-import workspace.DAPXWorkspaceManager;
+import lsp.Utils;
+import workspace.Diag;
+import workspace.PluginRegistry;
+import workspace.plugins.CTPlugin;
+import workspace.plugins.DAPPlugin;
 
-public class RuntraceCommand extends Command implements InitRunnable
+public class RuntraceCommand extends AnalysisCommand implements InitRunnable
 {
 	public static final String USAGE = "Usage: runtrace <trace> <number>";
-	public static final String[] HELP = { "runtrace", "runtrace <trace> <number> - run one test from a trace" };
+	public static final String HELP = "runtrace <trace> <number> - run one test from a trace";
 	
 	public final String tracename;
 	public final long testNumber;
 
 	public RuntraceCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 3);
+		super(line);
 		
-		if (parts.length == 3)
+		if (argv.length == 3)
 		{
-			this.tracename = parts[1];
-			this.testNumber = Long.parseLong(parts[2]);
+			this.tracename = argv[1];
+			this.testNumber = Long.parseLong(argv[2]);
 		}
 		else
 		{
@@ -65,13 +69,36 @@ public class RuntraceCommand extends Command implements InitRunnable
 	{
 		try
 		{
-			DAPXWorkspaceManager manager = DAPXWorkspaceManager.getInstance();
-			JSONObject result = manager.ctRunOneTrace(request, tracename, testNumber);
-			return display(result);
+			DAPPlugin dapManager = DAPPlugin.getInstance();
+			CTPlugin ct = PluginRegistry.getInstance().getPlugin("CT");
+			
+			if (ct.isRunning())
+			{
+				Diag.error("Cannot run test: previous trace is still running");
+				return "Cannot run test: trace still running";
+			}
+
+			if (dapManager.specHasErrors())
+			{
+				Diag.error("Cannot run test: specification has errors");
+				return "Cannot run test: specification has errors";
+			}
+			
+			/**
+			 * If the specification has been modified since we last ran (or nothing has yet run),
+			 * we have to re-create the interpreter, otherwise the old interpreter (with the old tree)
+			 * is used to "generate" the trace names, so changes are not picked up. Note that a
+			 * new tree will have no breakpoints, so if you had any set via a launch, they will be
+			 * ignored.
+			 */
+			dapManager.refreshInterpreter();
+			dapManager.setNoDebug(false);	// Force debug on for runOneTrace
+
+			return display(ct.runOneTrace(Utils.stringToName(tracename), testNumber));
 		}
 		catch (LSPException e)
 		{
-			return "Cannot run trace: " + e.getMessage();
+			return "Cannot run test: " + e.getMessage();
 		}
 	}
 	

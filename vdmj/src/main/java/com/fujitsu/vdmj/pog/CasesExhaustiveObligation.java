@@ -24,18 +24,26 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.expressions.POCasesExpression;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 
 public class CasesExhaustiveObligation extends ProofObligation
 {
-	public CasesExhaustiveObligation(POCasesExpression exp, POContextStack ctxt)
+	private final boolean hasCorrelatedBinds;
+	public final POCasesExpression exp;
+	
+	private CasesExhaustiveObligation(POCasesExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.CASES_EXHAUSTIVE, ctxt);
+		this.exp = exp;
+		
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
+		boolean correlated = false;
 
 		for (POCaseAlternative alt: exp.cases)
 		{
@@ -49,23 +57,49 @@ public class CasesExhaustiveObligation extends ProofObligation
 			}
 			else
 			{
-				POPattern noIgnores = alt.pattern.removeIgnorePatterns();
-				POExpression matching = noIgnores.getMatchingExpression();
-				
+	    		PORemoveIgnoresVisitor.init();
 	    		sb.append("(exists ");
-	    		sb.append(noIgnores);
+	    		sb.append(alt.pattern.removeIgnorePatterns());
 	    		sb.append(":");
 	    		sb.append(explicitType(exp.expType, exp.location));
 	    		sb.append(" & ");
+	    		PORemoveIgnoresVisitor.init();
 	    		sb.append(exp.exp);
 	    		sb.append(" = ");
-	    		sb.append(matching);
+	    		sb.append(alt.pattern.removeIgnorePatterns());
 	    		sb.append(")");
+	    		
+	    		correlated = true;
 			}
 
 			prefix = " or ";
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		hasCorrelatedBinds = correlated;
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POCasesExpression exp, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new CasesExhaustiveObligation(exp, choice));
+		}
+		
+		return results;
+	}
+
+	@Override
+	public boolean hasCorrelatedBinds()
+	{
+		return hasCorrelatedBinds;
 	}
 }

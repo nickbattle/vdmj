@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.Value;
 
 /**
  * Class to process one debugger command.
@@ -131,8 +133,12 @@ public class ConsoleDebugExecutor implements DebugExecutor
 					result = doEvaluate(request);
 					break;
 					
+				case RESULT:
+					result = doResult();
+					break;
+					
 				default:
-					result = new DebugCommand(DebugType.ERROR, "Bad command. Try 'help'");
+					result = new DebugCommand(DebugType.ERROR, "Bad command. Try 'help'\n");
 					break;
 			}
 		}
@@ -142,6 +148,21 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		}
 
 		return result;
+	}
+
+	private DebugCommand doResult()
+	{
+		TCNameToken RESULT = ctxt.getResult();
+		
+		if (RESULT != null)
+		{
+			Value rv = ctxt.get(RESULT);
+			return new DebugCommand(DebugType.RESULT, RESULT + " = " + rv);
+		}
+		else
+		{
+			return new DebugCommand(DebugType.RESULT, null);
+		}
 	}
 
 	/**

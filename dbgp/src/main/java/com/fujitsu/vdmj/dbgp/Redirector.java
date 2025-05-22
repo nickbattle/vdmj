@@ -46,7 +46,7 @@ abstract public class Redirector implements ConsoleWriter
 
 	public static void initRedirectors()	// Note: dbgp doesn't use charset
 	{
-		Console.init(Charset.defaultCharset().name(),
+		Console.init(Charset.defaultCharset(),
 			new StdoutRedirector(new PrintWriter(new OutputStreamWriter(System.out))),
 			new StderrRedirector(new PrintWriter(new OutputStreamWriter(System.err))));
 	}

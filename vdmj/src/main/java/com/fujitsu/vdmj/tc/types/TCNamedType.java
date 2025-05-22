@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -48,25 +47,36 @@ public class TCNamedType extends TCInvariantType
 		this.typename = typename;
 		this.type = type;
 	}
-
+	
 	@Override
-	public TCType isType(String other, LexLocation from)
+	public TCNamedType copy(boolean maximal)
 	{
-		if (opaque && !from.module.equals(location.module)) return null;
-		return type.isType(other, location);
+		TCNamedType namedType = new TCNamedType(typename, type);
+		namedType.setInvariant(invdef);
+		namedType.setEquality(eqdef);
+		namedType.setOrder(orddef);
+		namedType.setMaximal(maximal);
+		return namedType;
 	}
 
 	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isType(typeclass, location);
+	}
+	
+	@Override
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		if (isOpaque(from)) return false;
+		return type.isAlways(typeclass, location);
 	}
 
 	@Override
 	public boolean isUnion(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isUnion(location);
 	}
 
@@ -78,13 +88,13 @@ public class TCNamedType extends TCInvariantType
 	}
 
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		if (resolved) return this; else resolved = true;
 
 		try
 		{
-			type = type.typeResolve(env, root);
+			type = type.typeResolve(env);
 			return this;
 		}
 		catch (TypeCheckException e)
@@ -97,28 +107,28 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public boolean isSeq(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isSeq(location);
 	}
 
 	@Override
 	public boolean isSet(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isSet(location);
 	}
 
 	@Override
 	public boolean isMap(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isMap(location);
 	}
 
 	@Override
 	public boolean isRecord(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isRecord(from);
 	}
 
@@ -131,23 +141,23 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public boolean isClass(Environment env)
 	{
-		if (opaque) return false;
+		if (isOpaque()) return false;
 		return type.isClass(env);
 	}
 
 	@Override
 	public boolean isNumeric(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isNumeric(location);
 	}
 
 	@Override
 	public boolean isOrdered(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		
-		if (orddef != null)
+		if (orddef != null && !maximal)
 		{
 			return true;
 		}
@@ -160,9 +170,9 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public boolean isEq(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		
-		if (eqdef != null)
+		if (eqdef != null && !maximal)
 		{
 			return true;
 		}
@@ -175,28 +185,28 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public boolean isProduct(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isProduct(location);
 	}
 
 	@Override
 	public boolean isProduct(int n, LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isProduct(n, location);
 	}
 
 	@Override
 	public boolean isFunction(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isFunction(location);
 	}
 
 	@Override
 	public boolean isOperation(LexLocation from)
 	{
-		if (opaque && !from.module.equals(location.module)) return false;
+		if (isOpaque(from)) return false;
 		return type.isOperation(location);
 	}
 
@@ -343,9 +353,9 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return typename.toString() + (opaque ? " /* opaque */" : "");
+		return typename.toString() + (maximal ? "!" : "") + (isOpaque() ? " /* opaque */" : "");
 	}
-
+	
 	@Override
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)
 	{

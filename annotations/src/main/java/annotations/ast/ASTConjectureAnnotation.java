@@ -43,9 +43,9 @@ abstract public class ASTConjectureAnnotation extends ASTAnnotation
 	}
 	
 	@Override
-	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
+	public void parse(LexTokenReader ltr) throws LexException, ParserException
 	{
-		ASTExpressionList args = new ASTExpressionList();
+		this.args = new ASTExpressionList();
 		
 		try
 		{
@@ -75,8 +75,5 @@ abstract public class ASTConjectureAnnotation extends ASTAnnotation
 			// cause this annotation to be ignored.
 			args.clear();
 		}
-		
-		return args;
 	}
-
 }

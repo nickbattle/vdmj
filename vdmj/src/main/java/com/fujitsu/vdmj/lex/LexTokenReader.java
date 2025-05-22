@@ -25,7 +25,7 @@
 package com.fujitsu.vdmj.lex;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
@@ -96,8 +96,7 @@ public class LexTokenReader extends BacktrackInputReader
     	/**
     	 * Create a Position from the outer class' current position details.
     	 */
-    	@SuppressWarnings("synthetic-access")
-		public Position()
+    	public Position()
 		{
 			lc = linecount;
 			cc = charpos;
@@ -113,7 +112,6 @@ public class LexTokenReader extends BacktrackInputReader
 		/**
 		 * Set the outer class position details to those contained in this.
 		 */
-		@SuppressWarnings("synthetic-access")
 		public void set()
 		{
 			linecount = lc;
@@ -140,27 +138,24 @@ public class LexTokenReader extends BacktrackInputReader
 
 	
 	/**
-	 * Create a LexTokenReader for the filename passed.
+	 * Create a LexTokenReader for the filename passed, using the default charset.
 	 *
 	 * @param file	The filename to parse.
 	 * @param dialect if VDM-SL or VDM++ tokens should be processed.
 	 */
 	public LexTokenReader(File file, Dialect dialect)
 	{
-		super(file);
-		this.file = file;
-		this.dialect = dialect;
-		init();
+		this(file, dialect, Charset.defaultCharset());
 	}
 
 	/**
-	 * Create a LexTokenReader for the filename and charset passed.
+	 * Create a LexTokenReader for the filename, dialect and charset passed.
 	 *
 	 * @param file	The filename to parse.
 	 * @param dialect if VDM-SL or VDM++ tokens should be processed.
 	 * @param charset The charset for the file.
 	 */
-	public LexTokenReader(File file, Dialect dialect, String charset)
+	public LexTokenReader(File file, Dialect dialect, Charset charset)
 	{
 		super(file, charset);
 		this.file = file;
@@ -169,45 +164,46 @@ public class LexTokenReader extends BacktrackInputReader
 	}
 
 	/**
-	 * Create a LexTokenReader for the string passed.
+	 * Create a LexTokenReader for the string and dialect passed.
 	 *
 	 * @param expression The string (expression) to parse.
 	 * @param dialect Parse VDM++ or VDM-SL tokens.
-	 * @throws UnsupportedEncodingException
 	 */
 	public LexTokenReader(String expression, Dialect dialect)
 	{
-		super(expression);
+		super(new File("console"), expression);
 		this.file = new File("console");
 		this.dialect = dialect;
 		init();
 	}
 
 	/**
-	 * Create a LexTokenReader for the string and charset passed.
+	 * Create a LexTokenReader for the string and dialect passed, starting
+	 * at a particular LexLocation.
 	 *
 	 * @param expression The string (expression) to parse.
 	 * @param dialect Parse VDM++ or VDM-SL tokens.
-	 * @param charset The charset to use.
-	 * @throws UnsupportedEncodingException
+	 * @param location The start location for the tokens returned.
 	 */
-	public LexTokenReader(String expression, Dialect dialect, String charset)
+	public LexTokenReader(String expression, Dialect dialect, LexLocation location)
 	{
-		super(expression, charset);
-		this.file = new File("console");
+		super(location.file, expression);
+		this.file = location.file;
 		this.dialect = dialect;
 		init();
+		this.linecount = location.startLine;
+		this.charpos = location.startPos;
 	}
 
 	/**
 	 * Create a LexTokenReader to read content which originates from a file
 	 * which is not yet saved and enable the source of the file to be set.
-	 * This is used in the IDE to provide outline and parse error
-	 * info while typing.
+	 * This is used in the IDE to provide outline and parse error info while
+	 * typing. The file is not read, but used for error reporting.
 	 */
-	public LexTokenReader(String content, Dialect dialect, File file, String charset)
+	public LexTokenReader(String content, Dialect dialect, File file)
 	{
-		super(content, charset);
+		super(file, content);
 		this.file = file;
 		this.dialect = dialect;
 		init();
@@ -215,10 +211,11 @@ public class LexTokenReader extends BacktrackInputReader
 
 	/**
 	 * Create a string based LexTokenReader, with the position details of another reader.
+	 * This is used to read annotations from within a comment.
 	 */
 	public LexTokenReader(String content, LexLocation location, LexTokenReader reader)
 	{
-		super(content);
+		super(location.file, content);
 		this.currentModule = reader.currentModule;
 		this.file = location.file;
 		this.dialect = reader.dialect;
@@ -596,7 +593,6 @@ public class LexTokenReader extends BacktrackInputReader
 				if (rdCh() == '-')
 				{
 					StringBuilder sb = new StringBuilder();
-					LexLocation here = location(linecount, charpos + 1);
 					
 					while (ch != '\n' && ch != EOF)
 					{
@@ -604,6 +600,7 @@ public class LexTokenReader extends BacktrackInputReader
 						rdCh();
 					}
 
+					LexLocation here = new LexLocation(file, currentModule, tokline, tokpos + 2, tokline, lasteol);
 					comments.add(here, sb.toString().substring(1), false);
 					return nextToken();
 				}
@@ -854,11 +851,11 @@ public class LexTokenReader extends BacktrackInputReader
     				}
     				while (Character.isLetter(ch));
 
-    				type = Token.lookup(tag.toString(), dialect);
+    				type = Token.lookup(tag.toString(), dialect);	// #req, #act, #fin
 
     				if (type == null)
     				{
-    					throwMessage(1007, "Unexpected tag after '#'");
+    					throwMessage(1007, tokline, tokpos, "Unexpected tag after '#'");
     				}
 
     				rdch = false;
@@ -958,6 +955,9 @@ public class LexTokenReader extends BacktrackInputReader
 
 			case ',':
 				type = Token.COMMA;
+				break;
+			case '!':
+				type = Token.PLING;
 				break;
 			case ';':
 				type = Token.SEMICOLON;

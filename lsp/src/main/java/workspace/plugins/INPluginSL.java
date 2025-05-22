@@ -31,10 +31,16 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
+
+import vdmj.commands.AnalysisCommand;
+import vdmj.commands.ModulesCommand;
+import vdmj.commands.StateCommand;
+import workspace.events.CheckPrepareEvent;
 
 public class INPluginSL extends INPlugin
 {
@@ -53,17 +59,36 @@ public class INPluginSL extends INPlugin
 	}
 
 	@Override
-	public void init()
-	{
-	}
-
-	@Override
-	public void preCheck()
+	protected void preCheck(CheckPrepareEvent ev)
 	{
 		inModuleList = new INModuleList();
 		tcModuleList = new TCModuleList();
 	}
+
+	@Override
+	public AnalysisCommand getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "modules":	return new ModulesCommand(line);
+			case "state":	return new StateCommand(line);
+			
+			default:
+				return super.getCommand(line);
+		}
+	}
 	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList(
+			super.getCommandHelp(),
+			ModulesCommand.HELP,
+			StateCommand.HELP);
+	}
+
 	@Override
 	public <T extends Mappable> boolean checkLoadedFiles(T tcModuleList) throws Exception
 	{

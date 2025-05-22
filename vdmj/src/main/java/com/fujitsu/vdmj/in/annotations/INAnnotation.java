@@ -49,10 +49,13 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 	public final INExpressionList args;
 	
 	private static final Set<Class<? extends INAnnotation>> declared = new HashSet<Class<? extends INAnnotation>>(); 
-	private static final List<INAnnotation> instances = new Vector<INAnnotation>(); 
+	private static final List<INAnnotation> instances = new Vector<INAnnotation>();
+	
+	public static boolean suspended = false;
 
 	public INAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
+		super(name.getLocation());
 		this.name = name;
 		this.args = args;
 
@@ -64,6 +67,11 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 	{
 		declared.clear();
 		instances.clear();
+	}
+	
+	public static void suspend(boolean flag)
+	{
+		suspended = flag;	// Used in INAnnotatedExpression and Statement
 	}
 
 	public static void init(Context ctxt)

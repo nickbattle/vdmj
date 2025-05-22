@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.junit;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -36,7 +37,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 public class CharsetTest extends VDMTestCase
 {
-	private void process(String resource, String charset) throws Exception
+	private void process(String resource, Charset charset) throws Exception
 	{
 		Console.out.println("Processing " + resource + "...");
 
@@ -63,16 +64,16 @@ public class CharsetTest extends VDMTestCase
 
 	public void test_Dvorak() throws Exception
 	{
-		process("Dvorak.vpp", "UTF-8");
+		process("Dvorak.vpp", Charset.forName("UTF-8"));
 	}
 
 	public void test_JapaneseUtf8() throws Exception
 	{
-		process("Japanese_UTF8.vpp", "UTF-8");
+		process("Japanese_UTF8.vpp", Charset.forName("UTF-8"));
 	}
 
 	public void test_Shift_JIS() throws Exception
 	{
-		process("Shift_JIS.vpp", "SJIS");
+		process("Shift_JIS.vpp", Charset.forName("SJIS"));
 	}
 }

@@ -27,7 +27,6 @@ package vdmj.commands;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 
 import dap.DAPMessageList;
@@ -35,14 +34,16 @@ import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class ModulesCommand extends Command
+public class ModulesCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: modules";
-	public static final String[] HELP =	{ "modules", "modules - list the modules in the specification" };
+	public static final String HELP = "modules - list the modules in the specification";
 	
 	public ModulesCommand(String line)
 	{
-		if (!line.trim().equals("modules"))
+		super(line);
+		
+		if (!argv[0].equals("modules"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -59,12 +60,14 @@ public class ModulesCommand extends Command
 						false, "Command only available for VDM-SL", null);			
 			}
 			
-			ModuleInterpreter  m = (ModuleInterpreter) Interpreter.getInstance();
+			ModuleInterpreter  m = ModuleInterpreter.getInstance();
+			String defname = m.getDefaultName();
 			StringBuilder sb = new StringBuilder();
 			
 			for (INModule module: m.getModules())
 			{
 				sb.append(module.name.toString());
+				if (module.name.toString().equals(defname)) sb.append(" (default)");
 				sb.append("\n");
 			}
 

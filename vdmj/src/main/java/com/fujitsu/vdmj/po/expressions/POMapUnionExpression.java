@@ -28,8 +28,10 @@ import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.MapCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapUnionExpression extends POBinaryExpression
@@ -43,10 +45,10 @@ public class POMapUnionExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = super.getProofObligations(ctxt, env);
-		obligations.add(new MapCompatibleObligation(left, right, ctxt));
+		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
+		obligations.addAll(MapCompatibleObligation.getAllPOs(left, right, ctxt));
 		return obligations;
 	}
 
@@ -54,5 +56,17 @@ public class POMapUnionExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseMapUnionExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getMapQualifier();
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getMapQualifier();
 	}
 }

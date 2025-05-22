@@ -24,13 +24,34 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class SetMemberObligation extends ProofObligation
 {
-	public SetMemberObligation(POExpression test, POExpression set, POContextStack ctxt)
+	private SetMemberObligation(POExpression test, POExpression set, POContextStack ctxt)
 	{
 		super(test.location, POType.SET_MEMBER, ctxt);
-		value = ctxt.getObligation(test + " in set " + set);
+		source = ctxt.getSource(test + " in set " + set);
+		setObligationVars(ctxt, test, set);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExpression test, POExpression set, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new SetMemberObligation(test, set, choice));
+		}
+		
+		return results;
 	}
 }

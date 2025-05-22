@@ -32,6 +32,9 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
+import workspace.EventHub;
+import workspace.events.DAPEvaluateEvent;
+
 public class RemoteControlExecutor extends AsyncExecutor
 {
 	private final String remoteControl;
@@ -81,10 +84,11 @@ public class RemoteControlExecutor extends AsyncExecutor
 		try
 		{
 			Class<RemoteControl> remoteClass = (Class<RemoteControl>) ClassLoader.getSystemClassLoader().loadClass(remoteControl);
-			RemoteControl remote = remoteClass.newInstance();
+			RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
 			Interpreter i = Interpreter.getInstance();
 
 			running = remoteControl;
+			EventHub.getInstance().publish(new DAPEvaluateEvent(running));
 			server.stdout("Starting " + remoteControl + "\n");
 			remote.run(new RemoteInterpreter(i));
 		}

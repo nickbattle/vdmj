@@ -29,11 +29,10 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServer;
 import json.JSONObject;
 import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class TerminateHandler extends DAPHandler
 {
@@ -45,7 +44,7 @@ public class TerminateHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		DAPDebugReader debugReader = manager.getDebugReader();
 		
 		if (debugReader != null)
@@ -66,8 +65,7 @@ public class TerminateHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			Boolean restart = arguments.get("restart");
-			DAPMessageList result = manager.terminate(request, restart);
-			DAPServer.getInstance().setRunning(false);
+			DAPMessageList result = manager.dapTerminate(request, restart);
 			return result;
 		}
 	}

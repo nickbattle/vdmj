@@ -47,7 +47,7 @@ public class RPCTest extends TestCase
 		StringReader ireader = new StringReader(json);
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
-		RPCDispatcher d = new RPCDispatcher();
+		RPCDispatcher d = RPCDispatcher.getInstance();
 
 		d.register(new RPCHandler()
 		{
@@ -73,7 +73,7 @@ public class RPCTest extends TestCase
 		writer.flush();
 		
 		System.out.println(out.toString());
-		assertEquals(new Long(19), responses.get(0).get("result"));
+		assertEquals(Long.valueOf(19), responses.get(0).get("result"));
 	}
 	
 	@Test
@@ -84,7 +84,7 @@ public class RPCTest extends TestCase
 		StringReader ireader = new StringReader(json);
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
-		RPCDispatcher d = new RPCDispatcher();
+		RPCDispatcher d = RPCDispatcher.getInstance();
 
 		d.register(new RPCHandler()
 		{
@@ -110,7 +110,7 @@ public class RPCTest extends TestCase
 		writer.flush();
 		
 		System.out.println(out.toString());
-		assertEquals(new Long(-19), responses.get(0).get("result"));
+		assertEquals(Long.valueOf(-19), responses.get(0).get("result"));
 	}
 	
 	@Test
@@ -121,7 +121,7 @@ public class RPCTest extends TestCase
 		StringReader ireader = new StringReader(json);
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
-		RPCDispatcher d = new RPCDispatcher();
+		RPCDispatcher d = RPCDispatcher.getInstance();
 		RPCMessageList responses = d.dispatch(RPCRequest.create(map));
 		StringWriter out = new StringWriter();
 		JSONWriter writer = new JSONWriter(new PrintWriter(out));
@@ -130,6 +130,6 @@ public class RPCTest extends TestCase
 		
 		System.out.println(out.toString());
 		JSONObject error = responses.get(0).get("error");
-		assertEquals(error.get("code"), new Long(-32601));
+		assertEquals(error.get("code"), Long.valueOf(-32601));
 	}
 }

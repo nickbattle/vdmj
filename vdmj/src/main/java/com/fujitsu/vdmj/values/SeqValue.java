@@ -91,16 +91,25 @@ public class SeqValue extends Value
 	{
 		String s = values.toString();
 
-		if ((flags & FormattableFlags.ALTERNATE) == 0 && s.charAt(0) == '"')
+		if ((flags & FormattableFlags.ALTERNATE) > 0)
 		{
-			s = s.substring(1, s.length()-1);
+			if (values.isEmpty())
+			{
+				s = "";
+			}
+			else
+			{
+				s = s.substring(1, s.length()-1);	// Without "quotes" or "[ ... ]"
+			}
+
+			flags = flags & ~FormattableFlags.ALTERNATE;
 		}
 
 		formatTo(s, formatter, flags, width, precision);
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		ValueList nseq = new ValueList();
 

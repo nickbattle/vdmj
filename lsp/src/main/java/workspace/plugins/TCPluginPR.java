@@ -45,7 +45,9 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
-import workspace.lenses.CodeLens;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckTypeEvent;
+import workspace.lenses.TCCodeLens;
 
 public class TCPluginPR extends TCPlugin
 {
@@ -63,19 +65,14 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	public void init()
+	protected void preCheck(CheckPrepareEvent ev)
 	{
-	}
-
-	@Override
-	public void preCheck()
-	{
-		super.preCheck();
+		super.preCheck(ev);
 		tcClassList = new TCClassList();
 	}
 	
 	@Override
-	public <T extends Mappable> boolean checkLoadedFiles(T astClassList) throws Exception
+	public <T extends Mappable> void checkLoadedFiles(T astClassList, CheckTypeEvent event) throws Exception
 	{
 		try
 		{
@@ -87,18 +84,20 @@ public class TCPluginPR extends TCPlugin
 		{
 			TypeChecker.report(3427, te.getMessage(), te.location);
 		}
+		catch (Throwable e)
+		{
+			TypeChecker.report(3430, e.toString(), LexLocation.ANY);
+		}
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
-			errs.addAll(TypeChecker.getErrors());
+			messagehub.addPluginMessages(this, TypeChecker.getErrors());
 		}
 		
 		if (TypeChecker.getWarningCount() > 0)
 		{
-			warns.addAll(TypeChecker.getWarnings());
+			messagehub.addPluginMessages(this, TypeChecker.getWarnings());
 		}
-		
-		return errs.isEmpty();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -147,7 +146,7 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	public TCDefinition findDefinition(File file, int zline, int zcol)
+	public TCDefinition findDefinition(File file, long zline, long zcol)
 	{
 		if (tcClassList != null && !tcClassList.isEmpty())
 		{
@@ -196,13 +195,14 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
+		ASTPlugin ast = registry.getPlugin("AST");
 		
 		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
-			List<CodeLens> lenses = getCodeLenses(dirty);
+			List<TCCodeLens> lenses = getTCCodeLenses(ast.isDirty());
 			
 			for (TCClassDefinition clazz: tcClassList)
 			{
@@ -212,7 +212,7 @@ public class TCPluginPR extends TCPlugin
 					{
 						if (def.location.file.equals(file))
 						{
-							for (CodeLens lens: lenses)
+							for (TCCodeLens lens: lenses)
 							{
 								results.addAll(lens.getDefinitionLenses(def, clazz));
 							}

@@ -55,6 +55,18 @@ public class TCVoidType extends TCType
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean isReturn()
+	{
+		return false;
+	}
+
+	@Override
+	public boolean hasReturn()
+	{
+		return false;
+	}
 
 	@Override
 	public String toDisplay()

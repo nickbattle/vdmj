@@ -25,6 +25,7 @@
 package annotations.in;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
@@ -37,12 +38,14 @@ import com.fujitsu.vdmj.values.Value;
 public class INOnFailAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private final String format;
+	protected final String format;
+	protected final INAnnotationList doclinks;	// INDocLinkAnnotations
 
-	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format)
+	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format, INAnnotationList doclinks)
 	{
 		super(name, args);
 		this.format = format;
+		this.doclinks = doclinks;
 	}
 	
 	@Override
@@ -79,6 +82,14 @@ public class INOnFailAnnotation extends INAnnotation
 				}
 							
 				Console.out.printf(errno + useformat + location + "\n", values);
+				
+				if (doclinks != null)
+				{
+					for (INAnnotation link: doclinks)
+					{
+						Console.out.printf(link.toString());
+					}
+				}
 			}
 		}
 		catch (ValueException e)

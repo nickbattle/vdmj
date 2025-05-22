@@ -54,7 +54,7 @@ public class TCExpressionPattern extends TCPattern
 
 		try
 		{
-			exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
+			exp.typeCheck(env, null, NameScope.NAMESANDANYSTATE, null);
 		}
 		catch (TypeCheckException e)
 		{

@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.statements;
 
 import java.util.Vector;
 
-public class ASTCaseStmtAlternativeList extends Vector<ASTCaseStmtAlternative>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTCaseStmtAlternativeList extends Vector<ASTCaseStmtAlternative> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

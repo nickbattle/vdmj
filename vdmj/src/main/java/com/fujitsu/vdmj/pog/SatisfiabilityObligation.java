@@ -66,7 +66,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(func.result.pattern);
 		sb.append(")");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public SatisfiabilityObligation(POImplicitOperationDefinition op,
@@ -92,6 +92,7 @@ public class SatisfiabilityObligation extends ProofObligation
 			separator = "";
 			appendResult(sb, op.result);
 			appendStatePatterns(sb, stateDefinition, false, true);
+			// appendStatePatterns(sb, stateDefinition, true, true);
 			sb.append(" & ");
 		}
 
@@ -104,12 +105,12 @@ public class SatisfiabilityObligation extends ProofObligation
 		appendStatePatterns(sb, stateDefinition, false, false);
 		sb.append(")");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
 	{
-		super(typedef.location, POType.INV_SATISFIABILITY, ctxt);
+		super(typedef.invPattern.location, POType.INV_SATISFIABILITY, ctxt);
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
@@ -130,12 +131,13 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(" & ");
 		sb.append(typedef.invExpression);
 		
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
 	{
-		super(statedef.location, POType.INV_SATISFIABILITY, ctxt);
+		super(statedef.invPattern.location, POType.INV_SATISFIABILITY, ctxt);
+		this.definition = statedef.invdef;
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
@@ -146,7 +148,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(" & ");
 		sb.append(statedef.invExpression);
 		
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	private void appendResult(StringBuilder sb, POPatternTypePair ptp)

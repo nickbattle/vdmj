@@ -30,9 +30,11 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.EquivRelationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StrictOrderObligation;
+import com.fujitsu.vdmj.pog.TotalOrderObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -101,27 +103,32 @@ public class POTypeDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		if (invdef != null)
 		{
-			list.addAll(invdef.getProofObligations(ctxt, env));
+			list.addAll(invdef.getProofObligations(ctxt, pogState, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 
 		if (eqdef != null)
 		{
-			list.addAll(eqdef.getProofObligations(ctxt, env));
+			list.addAll(eqdef.getProofObligations(ctxt, pogState, env));
 			list.add(new EquivRelationObligation(this, ctxt));
 		}
 
 		if (orddef != null)
 		{
-			list.addAll(orddef.getProofObligations(ctxt, env));
+			list.addAll(orddef.getProofObligations(ctxt, pogState, env));
 			list.add(new StrictOrderObligation(this, ctxt));
+		}
+		
+		if (orddef != null)
+		{
+			list.add(new TotalOrderObligation(this, ctxt));
 		}
 
 		if (annotations != null) annotations.poAfter(this, list, ctxt);

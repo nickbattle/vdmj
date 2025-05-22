@@ -55,7 +55,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class Breakpoint implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
+	
 	/** The location of the breakpoint. */
 	public final LexLocation location;
 	/** The number of the breakpoint. */
@@ -68,8 +68,12 @@ public class Breakpoint implements Serializable
 	/** The number of times this breakpoint has been reached. */
 	public long hits = 0;
 	
-	/** Set true by an external cancel or pause action */
-	private static int execInterrupt = 0;
+	/**
+	 * Set true by an external cancel or pause action. Note that this is
+	 * volatile, to enable the variable to be set by one thread and tested
+	 * by another (though the methods use synchronized too).
+	 */
+	private static volatile int execInterrupt = 0;
 	public static final int NONE = 0;
 	public static final int PAUSE = 1;
 	public static final int TERMINATE = 2;
@@ -77,7 +81,7 @@ public class Breakpoint implements Serializable
 	public int bpType = SOURCE;
 	public static final int SOURCE = 0;		// A file:line source breakpoint
 	public static final int FUNCTION = 1;	// A function or operation name breakpoint
-	
+
 	public Breakpoint(LexLocation location)
 	{
 		this.location = location;
@@ -132,10 +136,10 @@ public class Breakpoint implements Serializable
 					ExpressionReader reader = new ExpressionReader(ltr);
         			reader.setCurrentModule(location.module);
         			ASTExpression ast = reader.readExpression();
-        			TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+        			TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
         			Environment env = Interpreter.getInstance().getGlobalEnvironment();
         			tc.typeCheck(env, null, NameScope.GLOBAL, null);
-        			condition = ClassMapper.getInstance(INNode.MAPPINGS).convert(tc);
+        			condition = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tc);
         			break;
 			}
 		}
@@ -175,7 +179,7 @@ public class Breakpoint implements Serializable
 		execInterrupt = level;
 	}
 	
-	private static synchronized int execInterruptLevel()	// Needs sync for Java 11
+	public static synchronized int execInterruptLevel()	// Needs sync for Java 11
 	{
 		return execInterrupt;
 	}
@@ -214,7 +218,7 @@ public class Breakpoint implements Serializable
 			case PAUSE:
     			try
     			{
-    				execInterrupt = 0;
+    				setExecInterrupt(Breakpoint.NONE);
     				enterDebugger(ctxt);
     			}
     			catch (DebuggerException e)
@@ -224,8 +228,8 @@ public class Breakpoint implements Serializable
 				break;
 
 			case TERMINATE:
-				execInterrupt = 0;
-				throw new ContextException(4175, "Execution cancelled", location, ctxt);
+				setExecInterrupt(Breakpoint.NONE);
+				ContextException.throwUserCancel(location, ctxt);
 		}
 		
 		ThreadState state = ctxt.threadState;
@@ -266,13 +270,19 @@ public class Breakpoint implements Serializable
 	{
 		Thread current = Thread.currentThread();
 
+		/**
+		 * We can only debug expression breakpoints that occur from within SchedulableThreads,
+		 * usually MainThread or InitThread etc. But it is possible to perform very high
+		 * performance evaluations without creating extra SchedulableThreads, though these
+		 * cannot be debugged and they are responsible for handling their own ContextExceptions
+		 * and so on...
+		 */
 		if (current instanceof SchedulableThread)
 		{
 			SchedulableThread th = (SchedulableThread)current;
 			th.suspendOthers();
+			DebugLink.getInstance().breakpoint(ctxt, this);
 		}
-
-		DebugLink.getInstance().breakpoint(ctxt, this);
 	}
 	
 	/**

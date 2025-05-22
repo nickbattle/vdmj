@@ -24,14 +24,35 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class NonZeroObligation extends ProofObligation
 {
-	public NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
+	private NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
 	{
 		super(location, POType.NON_ZERO, ctxt);
-		value = ctxt.getObligation(right + " <> 0");
+		source = ctxt.getSource(right + " <> 0");
+		setObligationVars(ctxt, right);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(LexLocation location, POExpression right, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new NonZeroObligation(location, right, choice));
+		}
+		
+		return results;
 	}
 }

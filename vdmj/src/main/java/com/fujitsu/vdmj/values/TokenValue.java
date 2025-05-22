@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.util.FormattableFlags;
+import java.util.Formatter;
+
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
@@ -45,6 +48,20 @@ public class TokenValue extends Value
 	public String toString()
 	{
 		return "mk_token(" + value + ")";
+	}
+
+	@Override
+	public void formatTo(Formatter formatter, int flags, int width, int precision)
+	{
+		String s = toString();		// With 'mk_token(...)', by default
+
+		if ((flags & FormattableFlags.ALTERNATE) > 0)
+		{
+			s = value.toString();
+			flags = flags & ~FormattableFlags.ALTERNATE;
+		}
+
+		formatTo(s, formatter, flags, width, precision);
 	}
 
 	@Override

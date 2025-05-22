@@ -28,6 +28,7 @@ import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
 import workspace.PluginRegistry;
+import workspace.plugins.LSPPlugin;
 
 public class LSPInitializeResponse extends JSONObject
 {
@@ -35,13 +36,18 @@ public class LSPInitializeResponse extends JSONObject
 	
 	public LSPInitializeResponse()
 	{
-		put("serverInfo", new JSONObject("name", "VDMJ LSP Server", "version", "0.1"));
+		String version = com.fujitsu.vdmj.util.Utils.getVersion();
+		if (version == null) version = "unknown";
+		put("serverInfo", new JSONObject("name", "VDMJ LSP Server", "version", version));
 		put("capabilities", getServerCapabilities());
 	}
 
 	private JSONObject getServerCapabilities()
 	{
 		JSONObject cap = new JSONObject();
+		LSPPlugin manager = LSPPlugin.getInstance();
+		
+		
 		cap.put("definitionProvider", true);			// Go to definition for F12
 		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
 
@@ -50,10 +56,11 @@ public class LSPInitializeResponse extends JSONObject
 				"triggerCharacters", new JSONArray(".", "`"),
 				"resolveProvider", false));
 		
-		cap.put("textDocumentSync",						// Note: save covered by watched files
+		cap.put("textDocumentSync",
 			new JSONObject(
 				"openClose", true,
-				"change", 2		// incremental
+				"save", !manager.hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"),
+				"change", 2				// incremental
 			));
 		
 		cap.put("codeLensProvider",
@@ -67,16 +74,14 @@ public class LSPInitializeResponse extends JSONObject
 		 * Experimental responses are partly fixed, from the implicit Server functions, and
 		 * party added by registered plugins.
 		 */
-		JSONObject experimental = 
+		cap.put("experimental",
 				new JSONObject(
 						"translateProvider", new JSONObject(
 								"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
 								"workDoneProgress", false),
-						"dapServer", new JSONObject("port", DAPServerSocket.getPort()));
+						"dapServer", new JSONObject("port", DAPServerSocket.getPort())));
 		
-		experimental.putAll(PluginRegistry.getInstance().getExperimentalOptions(experimental));
-		
-		cap.put("experimental", experimental);
+		PluginRegistry.getInstance().setPluginCapabilities(cap);
 
 		return cap;
 	}

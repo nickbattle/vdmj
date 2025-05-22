@@ -29,8 +29,10 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.FuncIterationObligation;
 import com.fujitsu.vdmj.pog.MapIterationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POStarStarExpression extends POBinaryExpression
@@ -44,7 +46,7 @@ public class POStarStarExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -54,14 +56,13 @@ public class POStarStarExpression extends POBinaryExpression
 
 			if (prename == null || !prename.equals(""))
 			{
-				obligations.add(
-					new FuncIterationObligation(this, prename, ctxt));
+				obligations.addAll(FuncIterationObligation.getAllPOs(this, prename, ctxt));
 			}
 		}
 
 		if (ltype.isMap(location))
 		{
-			obligations.add(new MapIterationObligation(this, ctxt));
+			obligations.addAll(MapIterationObligation.getAllPOs(this, ctxt));
 		}
 
 		return obligations;
@@ -71,5 +72,24 @@ public class POStarStarExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseStarStarExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return new TCTypeQualifier()
+		{
+			@Override
+			public boolean matches(TCType member)
+			{
+				return member.isFunction(location) || member.isMap(location);
+			}
+		};
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getAnyQualifier();
 	}
 }

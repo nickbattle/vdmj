@@ -24,14 +24,12 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.POPatternListList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.po.types.POPatternListTypePairList;
 import com.fujitsu.vdmj.po.types.POPatternTypePair;
@@ -39,15 +37,18 @@ import com.fujitsu.vdmj.pog.FuncPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POFunctionResultContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
@@ -59,7 +60,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 {
 	private static final long serialVersionUID = 1L;
 	
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final POPatternListTypePairList parameterPatterns;
 	public final POPatternTypePair result;
 	public final POExpression body;
@@ -76,7 +77,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 	public POImplicitFunctionDefinition(POAnnotationList annotations,
 		TCNameToken name,
-		TCNameList typeParams,
+		TCTypeList typeParams,
 		POPatternListTypePairList parameterPatterns,
 		POPatternTypePair result,
 		POExpression body,
@@ -128,7 +129,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -155,11 +156,15 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(predef.getProofObligations(ctxt, env));
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			ctxt.pop();
 		}
 
 		if (postcondition != null)
 		{
+			ctxt.push(new PONameContext(new TCNameList(postdef.name)));
+
 			if (body != null)	// else satisfiability, below
 			{
 				ctxt.push(new POFunctionDefinitionContext(this, false));
@@ -167,18 +172,27 @@ public class POImplicitFunctionDefinition extends PODefinition
 				ctxt.pop();
 			}
 
-			ctxt.push(new POFunctionDefinitionContext(this, false));
-			ctxt.push(new POFunctionResultContext(this));
-			obligations.addAll(postcondition.getProofObligations(ctxt, env));
-			ctxt.pop();
-			ctxt.pop();
+			// if (!(body instanceof PONotYetSpecifiedExpression))
+			{
+				ctxt.push(new POFunctionDefinitionContext(this, false));
+				ctxt.push(new POFunctionResultContext(this));
+				obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
+				ctxt.pop();
+				ctxt.pop();
+
+				ctxt.push(new POFunctionDefinitionContext(postdef, true));
+				obligations.add(new TotalFunctionObligation(postdef, ctxt));
+				ctxt.pop();
+			}
+			
+			ctxt.pop();		// The NameContext
 		}
 
-		if (measureDef != null && measureName != null && measureName.getName().startsWith("measure_"))
+		if (measureDef != null && measureName != null && measureName.isMeasureName())
 		{
-			ctxt.push(new PONameContext(new TCNameList(measureName)));
-			obligations.addAll(measureDef.getProofObligations(ctxt, env));
-			ctxt.pop();
+			int popto = ctxt.pushAt(new PONameContext(new TCNameList(measureName)));
+			obligations.addAll(measureDef.getProofObligations(ctxt, pogState, env));
+			ctxt.popTo(popto);
 		}
 
 		if (body == null)
@@ -193,7 +207,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 		else
 		{
 			ctxt.push(new POFunctionDefinitionContext(this, true));
-    		obligations.addAll(body.getProofObligations(ctxt, env));
+    		obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 			if (isUndefined ||
 				!TypeComparator.isSubType(actualResult, type.result))
@@ -209,9 +223,9 @@ public class POImplicitFunctionDefinition extends PODefinition
 		return obligations;
 	}
 
-	public List<POPatternList> getParamPatternList()
+	public POPatternListList getParamPatternList()
 	{
-		List<POPatternList> list = new Vector<POPatternList>();
+		POPatternListList list = new POPatternListList();
 		POPatternList onelist = new POPatternList();
 		
 		for (POPatternListTypePair p: parameterPatterns)

@@ -53,17 +53,22 @@ public class INSubtractExpression extends INNumericBinaryExpression
 
 			if (NumericValue.areIntegers(l, r))
 			{
-				long lv = l.intValue(ctxt);
-				long rv = r.intValue(ctxt);
-				long diff = subtractExact(lv, rv, ctxt);
-				return NumericValue.valueOf(diff, ctxt);
+				try
+				{
+					long lv = l.intValue(ctxt);
+					long rv = r.intValue(ctxt);
+					long diff = subtractExact(lv, rv, ctxt);
+					return NumericValue.valueOf(diff, ctxt);
+				}
+				catch (ValueException e)
+				{
+					// Too big?? Try reals...
+				}
 			}
-			else
-			{
-				double lv = l.realValue(ctxt);
-				double rv = r.realValue(ctxt);
-	    		return NumericValue.valueOf(lv - rv, ctxt);
-			}
+
+			double lv = l.realValue(ctxt);
+			double rv = r.realValue(ctxt);
+	    	return NumericValue.valueOf(lv - rv, ctxt);
 		}
 		catch (ValueException e)
 		{

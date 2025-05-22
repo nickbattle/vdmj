@@ -151,7 +151,9 @@ public class INCallObjectStatement extends INStatement
 
     			if (endstop && !breakpoint.isContinue(ctxt))
            		{
+           			ctxt.addResult(location, this.toString(), rv);
            			breakpoint.enterDebugger(ctxt);
+           			ctxt.removeResult(location);
            		}
            		
     			return rv;
@@ -163,7 +165,9 @@ public class INCallObjectStatement extends INStatement
 
     			if (endstop && !breakpoint.isContinue(ctxt))
            		{
+           			ctxt.addResult(location, this.toString(), rv);
            			breakpoint.enterDebugger(ctxt);
+           			ctxt.removeResult(location);
            		}
            		
     			return rv;

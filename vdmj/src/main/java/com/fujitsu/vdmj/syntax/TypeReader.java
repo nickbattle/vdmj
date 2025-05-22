@@ -61,6 +61,7 @@ import com.fujitsu.vdmj.ast.types.ASTUnionType;
 import com.fujitsu.vdmj.ast.types.ASTUnknownType;
 import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
 import com.fujitsu.vdmj.ast.types.ASTVoidType;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -419,14 +420,29 @@ public class TypeReader extends SyntaxReader
 				break;
 
 			case IDENTIFIER:
-				LexIdentifierToken id = (LexIdentifierToken)token;
-				type = new ASTUnresolvedType(idToName(id));
 				nextToken();
+				
+				if (Properties.parser_maximal_types)
+				{
+					type = new ASTUnresolvedType(idToName((LexIdentifierToken)token), ignore(Token.PLING));
+				}
+				else
+				{
+					type = new ASTUnresolvedType(idToName((LexIdentifierToken)token), false);
+				}
 				break;
 
 			case NAME:
-				type = new ASTUnresolvedType((LexNameToken)token);
 				nextToken();
+				
+				if (Properties.parser_maximal_types)
+				{
+					type = new ASTUnresolvedType((LexNameToken)token, ignore(Token.PLING));
+				}
+				else
+				{
+					type = new ASTUnresolvedType((LexNameToken)token, false);
+				}
 				break;
 
 			case AT:
@@ -442,6 +458,11 @@ public class TypeReader extends SyntaxReader
 
 			default:
 				throwMessage(2074, "Unexpected token in type expression");
+		}
+		
+		if (lastToken().is(Token.PLING))
+		{
+			throwMessage(2335, "Maximal '!' not allowed here");
 		}
 
 		return type;

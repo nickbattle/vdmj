@@ -32,7 +32,9 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSelfExpression;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
+import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -78,6 +80,11 @@ public class TCReturnStatement extends TCStatement
 		if (expression == null)
 		{
 			return checkReturnType(constraint, new TCVoidReturnType(location), true);
+		}
+		else if (constraint instanceof TCVoidType)	// Shouldn't have a returned value for ()
+		{
+			report(3365, "Void operation cannot use 'return <exp>'");
+			return new TCUnknownType(location);
 		}
 		else
 		{

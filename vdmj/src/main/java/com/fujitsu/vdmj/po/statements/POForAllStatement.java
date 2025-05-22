@@ -25,11 +25,23 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.LoopInvariantObligation;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllSequenceContext;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.POLetBeStContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POForAllStatement extends POStatement
@@ -55,11 +67,62 @@ public class POForAllStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = set.getProofObligations(ctxt, env);
-		obligations.addAll(statement.getProofObligations(ctxt, env));
-		return obligations;
+		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
+
+		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
+		TCNameSet updates = statement.updatesState();
+		
+		if (annotation == null)		// No loop invariant defined
+		{
+			int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
+			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+			ctxt.popTo(popto);
+			
+			if (statement.getStmttype().hasReturn())
+			{
+				updates.add(TCNameToken.getResult(location));
+			}
+			
+			if (!updates.isEmpty())
+			{
+				ctxt.push(new POAmbiguousContext("for all loop", updates, location));
+			}
+			
+			obligations.addAll(loops);
+			return obligations;
+		}
+		else
+		{
+			TCSetType stype = set.getExptype().getSet();
+			PODefinitionList defs = pattern.getDefinitions(stype.setof);
+			POLocalDefinition first = (POLocalDefinition) defs.firstElement();
+			
+			ctxt.push(new POLetBeStContext(first.name, "in set", set, null));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check initial for-loop");
+			ctxt.pop();
+			
+			int popto = ctxt.size();
+			
+			ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check before for-loop");
+			
+			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+			
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check after for-loop");
+
+			ctxt.popTo(popto);
+			
+			// Leave implication for following POs
+			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			
+			return obligations;
+		}
 	}
 
 	@Override

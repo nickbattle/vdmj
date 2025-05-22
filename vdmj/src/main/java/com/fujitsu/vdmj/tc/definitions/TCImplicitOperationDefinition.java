@@ -124,7 +124,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return	(type.isPure() ? "pure " : "") + name +
+		return	accessSpecifier.ifSet(" ") + name +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(externals == null ? "" : "\n\text " + externals) +
@@ -167,8 +167,9 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeResolve(Environment base)
 	{
-		type = type.typeResolve(base, null);
-
+		type = type.typeResolve(base);
+		if (annotations != null) annotations.tcResolve(this, base);
+		
 		if (result != null)
 		{
 			result.typeResolve(base);
@@ -479,7 +480,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		if (!(body instanceof TCNotYetSpecifiedStatement) &&
 			!(body instanceof TCSubclassResponsibilityStatement))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();
 		}
 
 		if (possibleExceptions == null && body != null)
@@ -580,7 +581,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		if (state != null)
 		{
-			plist.add(new TCIdentifierPattern(state.name));
+			plist.add(new TCIdentifierPattern(state.name.getOldName()));
 		}
 		else if (base.isVDMPP() && !accessSpecifier.isStatic)
 		{

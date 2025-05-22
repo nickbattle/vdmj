@@ -38,20 +38,52 @@ public abstract class TCInvariantType extends TCType
 	public TCExplicitFunctionDefinition eqdef = null;
 	public TCExplicitFunctionDefinition orddef = null;
 
-	public boolean opaque = false;
+	private boolean opaque = false;
 	protected boolean inNarrower = false;
+	protected boolean maximal = false;
 
 	public TCInvariantType(LexLocation location)
 	{
 		super(location);
 	}
 
+	abstract public TCInvariantType copy(boolean maximal);
+
 	@Override
 	abstract protected String toDisplay();
+	
+	public void setMaximal(boolean maximal)
+	{
+		this.maximal = maximal;
+	}
 
 	public void setOpaque(boolean opaque)
 	{
 		this.opaque = opaque;
+	}
+	
+	/**
+	 * Is this opaque from here?
+	 */
+	public boolean isOpaque(LexLocation from)
+	{
+		return opaque && !from.module.equals(location.module);
+	}
+	
+	/**
+	 * Is this opaque from here?
+	 */
+	public boolean isOpaque(String from)
+	{
+		return opaque && !from.equals(location.module);
+	}
+
+	/**
+	 * Is opaque from anywhere?
+	 */
+	public boolean isOpaque()
+	{
+		return opaque;
 	}
 
 	public void setInvariant(TCExplicitFunctionDefinition invdef)
@@ -105,12 +137,18 @@ public abstract class TCInvariantType extends TCType
 	@Override
 	public boolean isOrdered(LexLocation from)
 	{
-		return orddef != null;
+		return orddef != null && !maximal;
 	}
 	
 	@Override
 	public boolean isEq(LexLocation from)
 	{
-		return eqdef != null;
+		return eqdef != null && !maximal;
+	}
+	
+	@Override
+	public boolean isMaximal()
+	{
+		return maximal;
 	}
 }

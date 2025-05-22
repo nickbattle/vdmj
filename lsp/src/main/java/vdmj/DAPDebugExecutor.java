@@ -84,8 +84,8 @@ public class DAPDebugExecutor implements DebugExecutor
 			this.location = frameLoc;
 		}
 		
-		public int frameId;
-		public LexLocation location;
+		public final int frameId;
+		public final LexLocation location;
 		public String title;
 		public List<Scope> scopes = new Vector<Scope>();
 		public int outerId = 0;
@@ -607,6 +607,12 @@ public class DAPDebugExecutor implements DebugExecutor
 		return DebugCommand.QUIT;
 	}
 	
+	/**
+	 * Build the ctxtFrames and scopes for the stack. VDMJ stacks contain Contexts for
+	 * local "let" variables etc, and RootContexts that contain any arguments. The
+	 * initial Frame is located at the break/stop location. Subsequent Frames are located
+	 * where that is called from, hence the nextLoc being passed back.
+	 */
 	private void buildCache()
 	{
 		LexLocation[] nextLoc = { breakloc };
@@ -616,7 +622,6 @@ public class DAPDebugExecutor implements DebugExecutor
 		while (c != null)
 		{
 			int frameId = nextFrameId.incrementAndGet();
-			Frame frame = new Frame(frameId, nextLoc[0]);
 			
 			if (prevFrame == null)
 			{
@@ -627,12 +632,22 @@ public class DAPDebugExecutor implements DebugExecutor
 				prevFrame.outerId = frameId;
 			}
 			
+			Frame frame = new Frame(frameId, nextLoc[0]);
 			ctxtFrames.put(frameId, frame);
-			c = buildScopes(c, frame, nextLoc);
 			prevFrame = frame;
+
+			c = buildScopes(c, frame, nextLoc);
 		}
 	}
 	
+	/**
+	 * Build Scopes for any guards, any local variables and any arguments passed.
+	 * The buildLocals and buildArguments return the next Context down the stack.
+	 * The location for the next frame is set to the LexLocation of the argument
+	 * frame (the RootContext), which is where this fn/op was called from. The
+	 * locations are "out by one" because the first frame location is the breakpoint.
+	 * See above. 
+	 */
 	private Context buildScopes(Context c, Frame frame, LexLocation[] nextLoc)
 	{
 		if (c.guardOp != null)
@@ -640,17 +655,21 @@ public class DAPDebugExecutor implements DebugExecutor
 			buildGuards(c, frame);
 		}
 		
-		Context arguments = buildLocals(c, frame);
+		RootContext arguments = buildLocals(c, frame);
 		
 		if (arguments != null)
 		{
+			Context nextFrame = buildArguments(arguments, frame);
 			nextLoc[0] = arguments.location;
-			arguments = buildArguments((RootContext)arguments, frame);
+			return nextFrame;
 		}
 		
-		return arguments;
+		return null;	// No further frames
 	}
 	
+	/**
+	 * Add any guards to the frame in a named scope
+	 */
 	private void buildGuards(Context c, Frame frame)
 	{
 		if (c instanceof ObjectContext)
@@ -667,7 +686,7 @@ public class DAPDebugExecutor implements DebugExecutor
 					try
 					{
 						TCPerSyncDefinition pdef = (TCPerSyncDefinition)d;
-						INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convert(pdef.guard);
+						INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(pdef.guard);
 
 						if (pdef.opname.getName().equals(opname) ||
 							pdef.location.startLine == line ||
@@ -723,14 +742,24 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 	}
 
+	/**
+	 * Add a "Locals" scope for "let" contexts that are not arguments in a RootContext.
+	 * Return the RootContext for argument processing, or null at the outer level.
+	 */
 	private RootContext buildLocals(Context c, Frame frame)
 	{
 		Context locals = new Context(frame.location, "Locals", null);
+		List<Context> lets = new Vector<Context>();
 
 		while (!(c instanceof RootContext) && c != null)
 		{
-			locals.putAll(c);
+			lets.add(0, c);		// Keep top level names last, to show correct "hiding"
 			c = c.outer;
+		}
+		
+		for (Context let: lets)
+		{
+			locals.putAll(let);
 		}
 
 		if (!locals.isEmpty())
@@ -743,32 +772,14 @@ public class DAPDebugExecutor implements DebugExecutor
 		return (RootContext) c;
 	}
 	
+	/**
+	 * Add a scope for any RootContext variables (arguments or globals).
+	 * Return the next Context or null at the outer level.
+	 */
 	private Context buildArguments(RootContext c, Frame frame)
 	{
-		String title = (c.outer == null ? "Globals" : "Arguments");
-		LexLocation loc = (c.outer == null ? c.location : frame.location);
-		
-		if (c == ctxt)	// Stopped in base context (init)
-		{
-			loc = breakloc;
-		}
-		else if (loc.file.getName().equals("?"))
-		{
-			// Flat SL specs have a default location of "?" for the outer context.
-			// That causes problems in the client, so we try to replace it with
-			// the start of an arbitrary definition's file.
-			
-			if (c.isEmpty())
-			{
-				loc = frame.location;
-			}
-			else
-			{
-				loc = locationFromCtxt(c);
-			}
-		}
-		
-		Context arguments = new Context(loc, title, null);
+		String scope = (c.outer == null ? "Globals" : "Arguments");
+		Context arguments = new Context(c.location, scope, null);
 		
 		for (Entry<TCNameToken, Value> nvp: c.entrySet())
 		{
@@ -835,36 +846,35 @@ public class DAPDebugExecutor implements DebugExecutor
 		{
 			int vref = nextVariablesReference.incrementAndGet();
 			variablesReferences.put(vref, arguments);
-			frame.scopes.add(new Scope(title, vref));
+			frame.scopes.add(new Scope(scope, vref));
 		}
 
-		frame.title = c.title;
-		frame.location = loc;
+		frame.title = c.title;	// Title comes from RootContext
 		return c.outer;
 	}
 	
-	private LexLocation locationFromCtxt(Context c)
-	{
-		LexLocation loc = c.location;
-		
-		for (Entry<TCNameToken, Value> entry: c.entrySet())
-		{
-			if (entry.getValue() instanceof OperationValue)
-			{
-				OperationValue op = (OperationValue)entry.getValue();
-				loc = op.name.getLocation();
-				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
-				break;
-			}
-			else if (entry.getValue() instanceof FunctionValue)
-			{
-				FunctionValue fn = (FunctionValue)entry.getValue();
-				loc = fn.location;
-				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
-				break;
-			}
-		}
-		
-		return loc;
-	}
+//	private LexLocation locationFromCtxt(Context c)
+//	{
+//		LexLocation loc = c.location;
+//		
+//		for (Entry<TCNameToken, Value> entry: c.entrySet())
+//		{
+//			if (entry.getValue() instanceof OperationValue)
+//			{
+//				OperationValue op = (OperationValue)entry.getValue();
+//				loc = op.name.getLocation();
+//				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+//				break;
+//			}
+//			else if (entry.getValue() instanceof FunctionValue)
+//			{
+//				FunctionValue fn = (FunctionValue)entry.getValue();
+//				loc = fn.location;
+//				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+//				break;
+//			}
+//		}
+//		
+//		return loc;
+//	}
 }

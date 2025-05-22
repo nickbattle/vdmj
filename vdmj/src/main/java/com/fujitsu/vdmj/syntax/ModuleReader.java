@@ -25,6 +25,8 @@
 package com.fujitsu.vdmj.syntax;
 
 import java.io.File;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
@@ -54,11 +56,14 @@ import com.fujitsu.vdmj.ast.modules.ASTModuleExports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleImports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.ast.types.ASTType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.LocatedException;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCImportAll;
@@ -165,6 +170,11 @@ public class ModuleReader extends SyntaxReader
 			checkFor(Token.MODULE, 2170, "Expecting 'module' at module start");
 			name = readIdToken("Expecting identifier after 'module'");
 			setCurrentModule(name.name);
+			
+			if (Settings.strict && name.name.equals("DEFAULT"))
+			{
+				warning(5043, "Strict: Should not use 'DEFAULT' as a module name", name.location);
+			}
 
 			if (lastToken().is(Token.IMPORTS))
 			{
@@ -371,10 +381,22 @@ public class ModuleReader extends SyntaxReader
 	{
 		LexToken token = lastToken();
 		LexNameList nameList = readIdList(true);
-		LexNameList typeParams = ignoreTypeParams();
+		ASTTypeList typeParams = ignoreTypeParams();
 		checkFor(Token.COLON, 2176, "Expecting ':' after export name");
-		ASTType type = getTypeReader().readType();
-		return new ASTExportedFunction(token.location, nameList, type, typeParams);
+		
+		// Allow maximal types for inv_T exports
+		boolean saved = Properties.parser_maximal_types;
+		
+		try
+		{
+			Properties.parser_maximal_types = true;
+			ASTType type = getTypeReader().readType();
+			return new ASTExportedFunction(token.location, nameList, type, typeParams);
+		}
+		finally
+		{
+			Properties.parser_maximal_types = saved;
+		}
 	}
 
 	private ASTExportList readExportedOperations()
@@ -626,14 +648,26 @@ public class ModuleReader extends SyntaxReader
 	{
 		LexNameToken name =	readNameToken("Expecting imported function name", true);
 		LexNameToken defname = getDefName(from, name);
-		LexNameList typeParams = ignoreTypeParams();
+		ASTTypeList typeParams = ignoreTypeParams();
 
 		ASTType type = null;
 
 		if (lastToken().is(Token.COLON))
 		{
 			nextToken();
-			type = getTypeReader().readType();
+			
+			// Allow maximal ! for inv_T functions
+			boolean saved = Properties.parser_maximal_types;
+			
+			try
+			{
+				Properties.parser_maximal_types = true;
+				type = getTypeReader().readType();
+			}
+			finally
+			{
+				Properties.parser_maximal_types = saved;
+			}
 		}
 
 		LexNameToken renamed = null;
@@ -716,7 +750,7 @@ public class ModuleReader extends SyntaxReader
     	return name;
 	}
 
-	private LexNameList ignoreTypeParams() throws LexException, ParserException
+	private ASTTypeList ignoreTypeParams() throws LexException, ParserException
 	{
 		if (lastToken().is(Token.SEQ_OPEN))
 		{
@@ -726,5 +760,19 @@ public class ModuleReader extends SyntaxReader
 		{
 			return null;
 		}
+	}
+	
+	@Override
+	public List<VDMError> getErrors()
+	{
+		List<VDMError> errs = new Vector<VDMError>(reader.getErrors());
+		errs.addAll(super.getErrors());
+		return errs;
+	}
+	
+	@Override
+	public int getErrorCount()
+	{
+		return reader.getErrorCount() + super.getErrorCount();
 	}
 }

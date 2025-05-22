@@ -479,7 +479,7 @@ public class TCClassDefinition extends TCDefinition
 
 		for (TCDefinition d: singles)
 		{
-			if (d.accessSpecifier.access != Token.PRIVATE)
+			if (d.accessSpecifier.access != Token.PRIVATE && !(d instanceof TCNamedTraceDefinition))
 			{
 				defs.add(d);
 			}

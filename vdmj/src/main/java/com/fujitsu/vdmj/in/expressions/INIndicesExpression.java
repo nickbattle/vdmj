@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.SetValue;
@@ -61,14 +62,18 @@ public class INIndicesExpression extends INUnaryExpression
 
     		for (int i=1; i<= seq.size(); i++)
     		{
-    			result.addNoCheck(new NaturalOneValue(i));
+    			result.addSorted(new NaturalOneValue(i));
     		}
 
-    		return new SetValue(result);
+    		return new SetValue(result, false);
         }
         catch (ValueException e)
         {
         	return abort(e);
+        }
+        catch (ContextException e)
+        {
+        	throw e;	// To avoid case below
         }
 		catch (Exception e)
 		{

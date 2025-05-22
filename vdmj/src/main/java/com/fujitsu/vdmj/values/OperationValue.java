@@ -116,6 +116,8 @@ public class OperationValue extends Value
 		this.state = state;
 		this.classdef = def.classDefinition;
 		this.isAsync = def.accessSpecifier.isAsync;
+		this.isStatic = def.accessSpecifier.isStatic;
+		this.isConstructor = def.isConstructor;
 
 		traceRT =
 			Settings.dialect == Dialect.VDM_RT &&
@@ -148,6 +150,8 @@ public class OperationValue extends Value
 		this.state = state;
 		this.classdef = def.classDefinition;
 		this.isAsync = def.accessSpecifier.isAsync;
+		this.isStatic = def.accessSpecifier.isStatic;
+		this.isConstructor = def.isConstructor;
 
 		traceRT =
 			Settings.dialect == Dialect.VDM_RT &&
@@ -235,7 +239,8 @@ public class OperationValue extends Value
 		}
 		catch (StackOverflowError e)
 		{
-			throw new ContextException(4174, "Stack overflow", from, ctxt);
+			ContextException.throwStackOverflow(from, ctxt);
+			return null;	// No reached
 		}
 	}
 

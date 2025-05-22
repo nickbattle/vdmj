@@ -73,7 +73,7 @@ public class TCNarrowExpression extends TCExpression
 
 		if (basictype != null)
 		{
-			basictype = basictype.typeResolve(env, null);
+			basictype = basictype.typeResolve(env);
 			result = basictype;
 			TypeComparator.checkImports(env, unresolved, location.module);
 			TypeComparator.checkComposeTypes(basictype, env, false);

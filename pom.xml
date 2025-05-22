@@ -15,41 +15,66 @@
         <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <revision>4.4.5</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>4.7.0-SNAPSHOT</revision>
+        <changelist></changelist>
         <sha1/>
     </properties>
 
     <!-- sub modules -->
     <modules>
+        <module>vdmj</module>
+        <module>lsp</module>
         <module>annotations</module>
         <module>annotations2</module>
-        <module>vdmj</module>
-        <module>vdmjunit</module>
-        <module>lsp</module>
+        <module>stdlib</module>
         <module>dbgp</module>
         <module>dbgpc</module>
-        <module>stdlib</module>
         <module>cmd-plugins</module>
+        <module>vdmjunit</module>
+        <module>quickcheck</module>
+        <module>packaging</module>
         <module>examples</module>
     </modules>
+
+	<dependencyManagement>
+	    <dependencies>
+	        <dependency>
+	         <groupId>junit</groupId>
+	         <artifactId>junit</artifactId>
+	         <version>4.13.1</version>
+	         <scope>test</scope>
+	     </dependency>
+	     <dependency>
+	         <groupId>dk.au.ece.vdmj</groupId>
+	         <artifactId>vdmj</artifactId>
+	         <version>${project.version}</version>
+	     </dependency>
+	     <dependency>
+	         <groupId>dk.au.ece.vdmj</groupId>
+	         <artifactId>lsp</artifactId>
+	         <version>${project.version}</version>
+	     </dependency>
+	 </dependencies>
+	</dependencyManagement>
 
     <build>
         <pluginManagement>
             <plugins>
-                <!-- Configure the compiler for all Overture Projects -->
+                <!-- Configure the compiler for all VDMJ Projects -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <release>11</release>
+                    </configuration>
                 </plugin>
-
 
                 <!-- Attatch sources to all installed jars -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -68,7 +93,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -79,22 +104,27 @@
                     </executions>
                     <configuration>
                         <failOnError>false</failOnError>
+                        <detectOfflineLinks>false</detectOfflineLinks>
                         <quiet>true</quiet>
+                        <source>8</source>
                     </configuration>
                 </plugin>
-
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.1</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M6</version>
-
+                    <version>3.0.0</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -106,27 +136,25 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.6.0</version>
                 </plugin>
-
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>3.1.1</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.0.0-M2</version>
+                    <version>3.1.1</version>
                 </plugin>
-
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.3.0</version>
                 </plugin>
 
                 <plugin>
@@ -134,7 +162,6 @@
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.2.0</version>
                 </plugin>
-
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -148,10 +175,30 @@
                     <version>3.0.1</version>
                 </plugin>
 
-
             </plugins>
         </pluginManagement>
+
+        <finalName>
+            ${project.artifactId}-${project.version}-${maven.build.timestamp}
+        </finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>com.outbrain.swinfra</groupId>
+                <artifactId>ci-friendly-flatten-maven-plugin</artifactId>
+                <version>1.0.17</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
     </build>
+    
 
     <scm>
         <url>https://github.com/nickbattle/vdmj

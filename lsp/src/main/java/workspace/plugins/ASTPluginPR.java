@@ -29,27 +29,31 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
+import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
+import com.fujitsu.vdmj.syntax.ParserException;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.Diag;
-import workspace.DiagUtils;
-import workspace.LSPWorkspaceManager;
-import workspace.lenses.CodeLens;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
+import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginPR extends ASTPlugin
 {
@@ -62,19 +66,19 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	public void preCheck()
+	protected void preCheck(CheckPrepareEvent ev)
 	{
-		super.preCheck();
+		super.preCheck(ev);
 		astClassList = new ASTClassList();
 	}
 	
 	@Override
-	public boolean checkLoadedFiles()
+	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
 		dirtyClassList = null;
 		
-		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
 		
 		if (Settings.dialect == Dialect.VDM_RT)
@@ -88,28 +92,51 @@ public class ASTPluginPR extends ASTPlugin
 			catch (Exception e)
 			{
 				Diag.error(e);
-				return false;
+				return;
 			}
 		}
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey(), "UTF-8");
+			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey());
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
 			
 			if (mr.getErrorCount() > 0)
 			{
-				errs.addAll(mr.getErrors());
+				messagehub.addPluginMessages(this, mr.getErrors());
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
-				warns.addAll(mr.getWarnings());
+				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
 		
-		return errs.isEmpty();
+		String remoteSimulation = System.getProperty("lsp.remoteSimulation");
+		
+		if (remoteSimulation != null)
+		{
+			RemoteSimulation simulation = RemoteSimulation.getInstance();
+			
+			if (simulation == null)
+			{
+				try
+				{
+					@SuppressWarnings("unchecked")
+					Class<RemoteSimulation> clazz = (Class<RemoteSimulation>) Class.forName(remoteSimulation);
+					simulation = clazz.getDeclaredConstructor().newInstance();
+				}
+				catch (Exception e)
+				{
+					Diag.error(e);
+					Diag.error("Error while creating %s", remoteSimulation);
+				}
+			}
+			
+			Diag.info("Calling remoteSimulation setup %s", remoteSimulation);
+			simulation.setup(astClassList);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -120,30 +147,43 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	public ASTExpression parseExpression(String line, String classname) throws Exception
+	{
+		LexTokenReader ltr = new LexTokenReader(line, Settings.dialect);
+		ExpressionReader reader = new ExpressionReader(ltr);
+		reader.setCurrentModule(classname);
+		ASTExpression ast = reader.readExpression();
+		LexToken end = ltr.getLast();
+		
+		if (!end.is(Token.EOF))
+		{
+			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
+		}
+		
+		return ast;
+	}
+	
+	@Override
+	protected void parseFile(File file)
 	{
 		dirty = true;	// Until saved.
 
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file, "UTF-8");
+		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ClassReader cr = new ClassReader(ltr);
 		dirtyClassList = cr.readClasses();
 		
 		if (cr.getErrorCount() > 0)
 		{
-			errs.addAll(cr.getErrors());
+			messagehub.addPluginMessages(this, cr.getErrors());
 		}
 		
 		if (cr.getWarningCount() > 0)
 		{
-			errs.addAll(cr.getWarnings());
+			messagehub.addPluginMessages(this, cr.getWarnings());
 		}
-
-		DiagUtils.dump(errs);
-		return errs;
 	}
 
 	@Override
@@ -191,13 +231,13 @@ public class ASTPluginPR extends ASTPlugin
 	}
 
 	@Override
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
 		
 		if (dirtyClassList != null && !dirtyClassList.isEmpty())	// May be syntax errors
 		{
-			List<CodeLens> lenses = getCodeLenses(dirty);
+			List<ASTCodeLens> lenses = getASTCodeLenses();
 			
 			for (ASTClassDefinition clazz: dirtyClassList)
 			{
@@ -207,7 +247,7 @@ public class ASTPluginPR extends ASTPlugin
 					{
 						if (def.location.file.equals(file))
 						{
-							for (CodeLens lens: lenses)
+							for (ASTCodeLens lens: lenses)
 							{
 								results.addAll(lens.getDefinitionLenses(def, clazz));
 							}

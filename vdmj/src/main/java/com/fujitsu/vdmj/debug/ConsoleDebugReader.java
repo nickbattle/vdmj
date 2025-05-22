@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import com.fujitsu.vdmj.commands.BreakpointReader;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -36,7 +35,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.Tracepoint;
-import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.values.OperationValue;
 
@@ -67,7 +65,22 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		{
 			lastThread = debuggedThread;
 			debuggedThread = link.getDebugThread();		// Initially bp thread
+			
+			displayResult();
 			while (doCommand());
+		}
+	}
+
+	/**
+	 * Displays the Context "RESULT", which may be the return value of a call.
+	 */
+	private void displayResult()
+	{
+		DebugCommand response = link.sendCommand(debuggedThread, DebugCommand.RESULT);
+		
+		if (response.getPayload() != null)
+		{
+			Console.out.println(response.toString());		// eg. RESULT f(x) = 123;
 		}
 	}
 
@@ -78,7 +91,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			Breakpoint bp = link.getBreakpoint(debuggedThread);
 			LexLocation loc = link.getLocation(debuggedThread);
 			
-			MainThread mainThread = SchedulableThread.getMainThread();
+			SchedulableThread mainThread = SchedulableThread.getMainThread();
 			Exception mainEx = mainThread != null ? mainThread.getException() : null;
 			
 			if (mainEx instanceof ContextException)
@@ -92,6 +105,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 				else
 				{
 					Console.out.println(mainEx.getMessage());
+				}
+
+				if (!loc.file.getName().equals("console"))
+				{
+					Console.out.println(Interpreter.getInstance().getSourceLine(cex.location));
 				}
 			}
 			else if (mainEx != null)
@@ -112,7 +130,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			{
 				if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
 				{
-					Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					if (!loc.file.getName().equals("console"))
+					{
+						Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					}
+					
 					lastLoc = loc;
 				}
 			}
@@ -143,6 +165,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 				case BREAKPOINT:
 					doBreakpoint(command);
 					return true;
+					
+				case ERROR:
+					Console.out.println(command.toString());
+					Console.out.println("--");
+					return true;
 
 				default:
 				{
@@ -155,7 +182,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 							return false;
 
 						default:
-							Console.out.print(response.toString());	// toString of commands are sensible
+							Console.out.print(response.toString());	// toStrings have newlines
 							Console.out.println("--");
 							return true;
 					}
@@ -246,6 +273,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		}
 
 		Console.out.println("No such thread Id - try 'threads'");
+		Console.out.println("--");
 	}
 	
 	@Override

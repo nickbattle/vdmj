@@ -31,8 +31,8 @@ import java.util.Set;
 import com.fujitsu.vdmj.in.INMappedList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -89,30 +89,30 @@ public class INModuleList extends INMappedList<TCModule, INModule>
    		return null;
 	}
 
-	public INStatement findStatement(File file, int lineno)
+	public INStatementList findStatements(File file, int lineno)
 	{
 		for (INModule m: this)
 		{
-			INStatement stmt = m.findStatement(file, lineno);
+			INStatementList stmts = m.findStatements(file, lineno);
 
-			if (stmt != null)
+			if (stmts != null && !stmts.isEmpty())
 			{
-				return stmt;
+				return stmts;
 			}
 		}
 
 		return null;
 	}
 
-	public INExpression findExpression(File file, int lineno)
+	public INExpressionList findExpressions(File file, int lineno)
 	{
 		for (INModule m: this)
 		{
-			INExpression exp = m.findExpression(file, lineno);
+			INExpressionList exps = m.findExpressions(file, lineno);
 
-			if (exp != null)
+			if (exps != null && !exps.isEmpty())
 			{
-				return exp;
+				return exps;
 			}
 		}
 

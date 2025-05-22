@@ -26,7 +26,16 @@ package com.fujitsu.vdmj.ast.patterns;
 
 import java.util.Vector;
 
-public class ASTTypeBindList extends Vector<ASTTypeBind>
+import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.util.Utils;
+
+public class ASTTypeBindList extends Vector<ASTTypeBind> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
+	
+	@Override
+	public String toString()
+	{
+		return Utils.listToString(this);
+	}
 }

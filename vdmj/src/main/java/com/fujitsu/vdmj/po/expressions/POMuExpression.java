@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCField;
@@ -62,14 +63,14 @@ public class POMuExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = record.getProofObligations(ctxt, env);
+		ProofObligationList list = record.getProofObligations(ctxt, pogState, env);
 		int i = 0;
 
 		for (PORecordModifier rm: modifiers)
 		{
-			list.addAll(rm.value.getProofObligations(ctxt, env));
+			list.addAll(rm.value.getProofObligations(ctxt, pogState, env));
 
 			TCField f = recordType.findField(rm.tag.getName());
 			TCType mtype = modTypes.get(i++);
@@ -78,7 +79,7 @@ public class POMuExpression extends POExpression
 			{
 				if (!TypeComparator.isSubType(mtype, f.type))
 				{
-					list.add(new SubTypeObligation(rm.value, f.type, mtype, ctxt));
+					list.addAll(SubTypeObligation.getAllPOs(rm.value, f.type, mtype, ctxt));
 				}
 			}
 		}

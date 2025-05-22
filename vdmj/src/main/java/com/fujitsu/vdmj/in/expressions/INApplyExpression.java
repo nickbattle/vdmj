@@ -60,12 +60,27 @@ public class INApplyExpression extends INExpression
 		if (root instanceof INVariableExpression)
 		{
 			INVariableExpression ve = (INVariableExpression)root;
-			return ve.name.getName() + "("+ Utils.listToString(args) + ")";
+			return ve.name.getName() + "(" + argsString() + ")";
 		}
 		else
 		{
-			return root + "("+ Utils.listToString(args) + ")";
+			return root + "(" + argsString() + ")";
 		}
+	}
+	
+	private String argsString()
+	{
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (INExpression arg: args)
+		{
+			sb.append(sep);
+			sb.append(Utils.deBracketed(arg.toString()));
+			sep = ", ";
+		}
+		
+		return sb.toString();
 	}
 
 	@Override
@@ -93,7 +108,9 @@ public class INApplyExpression extends INExpression
            		
            		if (endstop && !breakpoint.isContinue(ctxt))
            		{
+           			ctxt.addResult(location, this.toString(), rv);
            			breakpoint.enterDebugger(ctxt);
+           			ctxt.removeResult(location);
            		}
            		
            		return rv;
@@ -112,7 +129,9 @@ public class INApplyExpression extends INExpression
            		
            		if (endstop && !breakpoint.isContinue(ctxt))
            		{
+           			ctxt.addResult(location, this.toString(), rv);
            			breakpoint.enterDebugger(ctxt);
+           			ctxt.removeResult(location);
            		}
            		
            		return rv;

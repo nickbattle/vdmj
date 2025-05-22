@@ -30,7 +30,9 @@ import java.util.Vector;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSetBind extends POBind
@@ -61,9 +63,17 @@ public class POSetBind extends POBind
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return set.getProofObligations(ctxt, env);
+		return set.getProofObligations(ctxt, pogState, env);
+	}
+	
+	@Override
+	public TCNameSet getVariableNames()
+	{
+		TCNameSet names = set.getVariableNames();
+		names.addAll(pattern.getVariableNames());
+		return names;
 	}
 
 	@Override

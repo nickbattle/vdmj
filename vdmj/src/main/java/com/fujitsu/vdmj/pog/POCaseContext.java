@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POCaseContext extends POContext
@@ -40,9 +42,24 @@ public class POCaseContext extends POContext
 		this.type = type;
 		this.exp = exp;
 	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet result = new TCNameSet();
+		result.addAll(pattern.getVariableNames());
+		result.addAll(exp.getVariableNames());
+		return result;
+	}
+	
+	@Override
+	public boolean isExistential()
+	{
+		return !pattern.isSimple();
+	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -55,15 +72,14 @@ public class POCaseContext extends POContext
 		}
 		else
 		{
-			POPattern noIgnores = pattern.removeIgnorePatterns();
-			POExpression matching = noIgnores.getMatchingExpression();
-			
+			PORemoveIgnoresVisitor.init();
     		sb.append("exists ");
-    		sb.append(noIgnores);
+    		sb.append(pattern.removeIgnorePatterns());
     		sb.append(":");
-    		sb.append(type);
+    		sb.append(type.toExplicitString(pattern.location));
     		sb.append(" & ");
-    		sb.append(matching);
+    		PORemoveIgnoresVisitor.init();
+			sb.append(pattern.removeIgnorePatterns());
     		sb.append(" = ");
     		sb.append(exp);
 

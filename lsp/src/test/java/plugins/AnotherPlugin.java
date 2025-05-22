@@ -24,9 +24,17 @@
 
 package plugins;
 
+import dap.DAPMessageList;
+import rpc.RPCMessageList;
+import workspace.EventHub;
+import workspace.EventListener;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
+import workspace.events.UnknownCommandEvent;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.AnalysisPlugin;
 
-public class AnotherPlugin extends AnalysisPlugin
+public class AnotherPlugin extends AnalysisPlugin implements EventListener
 {
 	public AnotherPlugin()
 	{
@@ -42,12 +50,35 @@ public class AnotherPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
-		// Ignore
+		EventHub.getInstance().register(UnknownMethodEvent.class, this);
+		EventHub.getInstance().register(UnknownCommandEvent.class, this);
 	}
-	
+
 	@Override
-	public boolean supportsMethod(String method)
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		return method.equals("slsp/another");
+		if (event instanceof UnknownMethodEvent &&
+			event.request.getMethod().equals("slsp/another"))
+		{
+			return new RPCMessageList(event.request, "Handled LSP method");
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	@Override
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
+	{
+		if (event instanceof UnknownCommandEvent &&
+			event.request.getCommand().equals("sdap/another"))
+		{
+			return new DAPMessageList(event.request, true, "Handled DAP command", null);
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

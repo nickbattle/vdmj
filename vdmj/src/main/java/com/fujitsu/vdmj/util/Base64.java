@@ -237,7 +237,7 @@ public class Base64
 	public static void main(String[] args) throws Exception
 	{
 		BufferedReader bir = new BufferedReader(new InputStreamReader(System.in));
-		String charset = Charset.defaultCharset().name();
+		Charset charset = Charset.defaultCharset();
 		System.out.println("Default charset = " + charset);
 		Pattern pattern = Pattern.compile("(\\w+)\\s*?(.*)?$");
 
@@ -275,7 +275,7 @@ public class Base64
     		}
     		else if (cmd.equals("charset"))
     		{
-    			charset = data;
+    			charset = Charset.forName(data);
     			System.out.println("Charset now " + charset);
     		}
     		else if (cmd.equals("quit"))

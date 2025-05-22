@@ -1,0 +1,12 @@
+annotations.ast.ASTConjectureAnnotation
+annotations.ast.ASTDeadlineMetAnnotation
+annotations.ast.ASTNoPOGAnnotation
+annotations.ast.ASTOnFailAnnotation
+annotations.ast.ASTOverrideAnnotation
+annotations.ast.ASTPrintfAnnotation
+annotations.ast.ASTSeparateAnnotation
+annotations.ast.ASTSepRequireAnnotation
+annotations.ast.ASTTraceAnnotation
+annotations.ast.ASTWarningAnnotation
+annotations.ast.ASTDocLinkAnnotation
+annotations.ast.ASTTypeParamAnnotation

@@ -48,15 +48,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJ;
-import com.fujitsu.vdmj.VDMPP;
-import com.fujitsu.vdmj.VDMRT;
-import com.fujitsu.vdmj.VDMSL;
+import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -81,6 +77,9 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.analyses.INPlugin;
+import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -114,7 +113,10 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 
-public class DBGPReader extends DebugLink
+/**
+ * The DebugLink class for the DBGp protocol.
+ */
+public class DBGPReader extends DebugLink implements VDMJMain
 {
 	private static Map<String, DBGPReader> threadInstances = new HashMap<String, DBGPReader>();
 	private static DBGPReader mainInstance;
@@ -148,10 +150,17 @@ public class DBGPReader extends DebugLink
 	private boolean stopped = false;
 
 	private static final int SOURCE_LINES = 5;
+	
+	public static String getMainName()
+	{
+		return DBGP_MAIN;
+	}
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
+		Settings.mainClass = DBGPReader.class;
+		
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link_class", DBGPReader.class.getName());
 		
@@ -162,7 +171,6 @@ public class DBGPReader extends DebugLink
 		String expression = null;
 		List<File> files = new Vector<File>();
 		List<String> largs = Arrays.asList(args);
-		VDMJ controller = null;
 		boolean warnings = true;
 		boolean quiet = false;
 		String logfile = null;
@@ -181,16 +189,16 @@ public class DBGPReader extends DebugLink
 
     		if (arg.equals("-vdmsl"))
     		{
-    			controller = new VDMSL();
+    			Settings.dialect = Dialect.VDM_SL;
     		}
     		else if (arg.equals("-vdmpp"))
     		{
-    			controller = new VDMPP();
-    		}
+    			Settings.dialect = Dialect.VDM_PP;
+       		}
     		else if (arg.equals("-vdmrt"))
     		{
-    			controller = new VDMRT();
-    		}
+    			Settings.dialect = Dialect.VDM_RT;
+       		}
     		else if (arg.equals("-h"))
     		{
     			if (i.hasNext())
@@ -251,12 +259,7 @@ public class DBGPReader extends DebugLink
     		{
     			if (i.hasNext())
     			{
-    				if (controller == null)
-    				{
-    					usage("-c must come after <-vdmpp|-vdmsl|-vdmrt>");
-    				}
-
-    				controller.setCharset(validateCharset(i.next()));
+    				Settings.filecharset = validateCharset(i.next());
     			}
     			else
     			{
@@ -453,7 +456,7 @@ public class DBGPReader extends DebugLink
     		}
 		}
 
-		if (host == null || port == -1 || controller == null ||
+		if (host == null || port == -1 ||
 			ideKey == null || (expression == null && remoteName == null) || Settings.dialect == null ||
 			files.isEmpty())
 		{
@@ -474,7 +477,7 @@ public class DBGPReader extends DebugLink
 			try
 			{
 				byte[] bytes = Base64.decode(expression);
-				expression = new String(bytes, VDMJ.filecharset);
+				expression = new String(bytes, Settings.filecharset);
 			}
 			catch (Exception e)
 			{
@@ -487,7 +490,7 @@ public class DBGPReader extends DebugLink
 			try
 			{
 				byte[] bytes = Base64.decode(defaultName);
-				defaultName = new String(bytes, VDMJ.filecharset);
+				defaultName = new String(bytes, Settings.filecharset);
 			}
 			catch (Exception e)
 			{
@@ -508,72 +511,66 @@ public class DBGPReader extends DebugLink
 			}
 		}
 
-		controller.setWarnings(warnings);
-		controller.setQuiet(quiet);
-
-		if (controller.parse(files) == ExitStatus.EXIT_OK)
+		DBGPLifecycle lifecycle = new DBGPLifecycle(files, quiet, warnings);
+		lifecycle.loadPlugins();
+		
+		if (lifecycle.checkAndInitFiles())	// Only parse/checks, no init.
 		{
-    		if (controller.typeCheck() == ExitStatus.EXIT_OK)
-    		{
-				try
+			try
+			{
+				if (logfile != null)
 				{
-					if (logfile != null)
-					{
-		    			RTLogger.setLogfileName(new File(logfile));
-					}
-
-					Interpreter i = controller.getInterpreter();
-
-					if (defaultName != null)
-					{
-						i.setDefaultName(defaultName);
-					}
-
-					RemoteControl remote =
-						(remoteClass == null) ? null : remoteClass.newInstance();
-
-					mainInstance = new DBGPReader(host, port, ideKey, i, expression, null);
-					mainInstance.startup(remote);
-
-					if (coverage != null)
-					{
-						writeCoverage(i, coverage);
-					}
-
-					RTLogger.dump(true);
-	    			System.exit(0);
+	    			RTLogger.setLogfileName(new File(logfile));
 				}
-				catch (ContextException e)
+
+				INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+				Interpreter interpreter = in.getInterpreter();
+
+				if (defaultName != null)
 				{
-					System.out.println("Initialization: " + e);
-					
-					if (e.isStackOverflow())
-					{
-						e.ctxt.printStackFrames(Console.out);
-					}
-					else
-					{
-						e.ctxt.printStackTrace(Console.out, true);
-					}
+					interpreter.setDefaultName(defaultName);
+				}
 
-					RTLogger.dump(true);
-					System.exit(3);
-				}
-				catch (Exception e)
+				RemoteControl remote =
+					(remoteClass == null) ? null : remoteClass.getDeclaredConstructor().newInstance();
+
+				mainInstance = new DBGPReader(host, port, ideKey, interpreter, expression, null);
+				mainInstance.startup(remote);
+
+				if (coverage != null)
 				{
-					System.out.println("Initialization: " + e);
-					RTLogger.dump(true);
-					System.exit(3);
+					writeCoverage(interpreter, coverage);
 				}
-    		}
-    		else
-    		{
-    			System.exit(2);
-    		}
+
+				RTLogger.dump(true);
+    			System.exit(0);
+			}
+			catch (ContextException e)
+			{
+				System.out.println("Initialization: " + e);
+				
+				if (e.isStackOverflow())
+				{
+					e.ctxt.printStackFrames(Console.out);
+				}
+				else
+				{
+					e.ctxt.printStackTrace(Console.out, true);
+				}
+
+				RTLogger.dump(true);
+				System.exit(3);
+			}
+			catch (Exception e)
+			{
+				System.out.println("Initialization: " + e);
+				RTLogger.dump(true);
+				System.exit(3);
+			}
 		}
 		else
 		{
-			System.exit(1);
+			System.exit(2);
 		}
 	}
 	
@@ -609,7 +606,7 @@ public class DBGPReader extends DebugLink
 		System.exit(1);
 	}
 
-	private static String validateCharset(String cs)
+	private static Charset validateCharset(String cs)
 	{
 		if (!Charset.isSupported(cs))
 		{
@@ -627,7 +624,7 @@ public class DBGPReader extends DebugLink
 			usage("Charset " + cs + " is not supported");
 		}
 
-		return cs;
+		return Charset.forName(cs);
 	}
 
 	public DBGPReader(
@@ -2169,7 +2166,7 @@ public class DBGPReader extends DebugLink
 						if (d instanceof TCPerSyncDefinition)
 						{
 							TCPerSyncDefinition pdef = (TCPerSyncDefinition)d;
-							INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convert(pdef.guard);
+							INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(pdef.guard);
 
 							if (pdef.opname.getName().equals(opname) ||
 								pdef.location.startLine == line ||
@@ -2995,7 +2992,8 @@ public class DBGPReader extends DebugLink
 
 	private void processPOG(DBGPCommand c) throws Exception
 	{
-		ProofObligationList all = interpreter.getProofObligations();
+		POPlugin plugin = PluginRegistry.getInstance().getPlugin("PO");
+		ProofObligationList all = plugin.getProofObligations();
 		ProofObligationList list = null;
 
 		if (c.data.equals("*"))

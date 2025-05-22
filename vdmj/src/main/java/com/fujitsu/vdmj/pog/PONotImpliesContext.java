@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class PONotImpliesContext extends POContext
 {
@@ -36,7 +37,7 @@ public class PONotImpliesContext extends POContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -45,5 +46,11 @@ public class PONotImpliesContext extends POContext
 		sb.append(" =>");
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		return exp.getVariableNames();
 	}
 }

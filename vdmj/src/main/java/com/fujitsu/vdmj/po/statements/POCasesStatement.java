@@ -28,8 +28,11 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POCasesStatement extends POStatement
@@ -38,14 +41,16 @@ public class POCasesStatement extends POStatement
 	public final POExpression exp;
 	public final POCaseStmtAlternativeList cases;
 	public final POStatement others;
+	public final TCType expType;
 
 	public POCasesStatement(LexLocation location,
-		POExpression exp, POCaseStmtAlternativeList cases, POStatement others)
+		POExpression exp, POCaseStmtAlternativeList cases, POStatement others, TCType expType)
 	{
 		super(location);
 		this.exp = exp;
 		this.cases = cases;
 		this.others = others;
+		this.expType = expType;
 	}
 
 	@Override
@@ -71,10 +76,15 @@ public class POCasesStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
+		
+		POAltContext altContext = new POAltContext();
+		boolean hasEffect = false;
 		boolean hasIgnore = false;
+		
+		int base = ctxt.size();
 
 		for (POCaseStmtAlternative alt: cases)
 		{
@@ -83,12 +93,24 @@ public class POCasesStatement extends POStatement
 				hasIgnore = true;
 			}
 
-			obligations.addAll(alt.getProofObligations(ctxt, env));
+			// Pushes PONotCaseContext and altContext updated
+			obligations.addAll(alt.getProofObligations(ctxt, altContext, base, pogState, expType, env));
+			hasEffect = hasEffect || alt.hasEffect();
 		}
 
 		if (others != null && !hasIgnore)
 		{
-			obligations.addAll(others.getProofObligations(ctxt, env));
+			int before = ctxt.size();
+			obligations.addAll(others.getProofObligations(ctxt, pogState, env));
+			hasEffect = hasEffect || ctxt.size() > before;
+			ctxt.copyInto(base, altContext.add());
+		}
+
+		ctxt.popTo(base);
+
+		if (hasEffect)
+		{
+			ctxt.push(altContext);
 		}
 
 		return obligations;

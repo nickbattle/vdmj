@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.ast.statements;
 
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 
@@ -33,12 +34,14 @@ public class ASTCaseStmtAlternative extends ASTNode
 	private static final long serialVersionUID = 1L;
 
 	public final LexLocation location;
+	public final ASTExpression exp;
 	public final ASTPattern pattern;
 	public final ASTStatement statement;
 
-	public ASTCaseStmtAlternative(ASTPattern pattern, ASTStatement stmt)
+	public ASTCaseStmtAlternative(ASTExpression exp, ASTPattern pattern, ASTStatement stmt)
 	{
 		this.location = pattern.location;
+		this.exp = exp;
 		this.pattern = pattern;
 		this.statement = stmt;
 	}

@@ -34,16 +34,16 @@ public class ASTForPatternBindStatement extends ASTStatement
 	private static final long serialVersionUID = 1L;
 	public final ASTPatternBind patternBind;
 	public final boolean reverse;
-	public final ASTExpression exp;
+	public final ASTExpression seqexp;
 	public final ASTStatement statement;
 
 	public ASTForPatternBindStatement(LexLocation location,
-		ASTPatternBind patternBind, boolean reverse, ASTExpression exp, ASTStatement body)
+		ASTPatternBind patternBind, boolean reverse, ASTExpression seqexp, ASTStatement body)
 	{
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
-		this.exp = exp;
+		this.seqexp = seqexp;
 		this.statement = body;
 	}
 
@@ -51,7 +51,7 @@ public class ASTForPatternBindStatement extends ASTStatement
 	public String toString()
 	{
 		return "for " + patternBind + " in " +
-			(reverse ? " reverse " : "") + exp + " do\n" + statement;
+			(reverse ? " reverse " : "") + seqexp + " do\n" + statement;
 	}
 
 	@Override

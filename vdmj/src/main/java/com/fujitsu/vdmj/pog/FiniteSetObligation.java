@@ -24,14 +24,16 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 
 public class FiniteSetObligation extends ProofObligation
 {
-	public FiniteSetObligation(
-		POSetCompExpression exp, TCSetType settype, POContextStack ctxt)
+	private FiniteSetObligation(POSetCompExpression exp, TCSetType settype, POContextStack ctxt)
 	{
 		super(exp.location, POType.FINITE_SET, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -64,6 +66,24 @@ public class FiniteSetObligation extends ProofObligation
 			" & " + finmap + "(" + findex + ") = ");
 		sb.append(exp.first);
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POSetCompExpression exp, TCSetType settype, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new FiniteSetObligation(exp, settype, choice));
+		}
+		
+		return results;
 	}
 }

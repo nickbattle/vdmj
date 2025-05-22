@@ -24,23 +24,33 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.util.Utils;
 
 public class FunctionApplyObligation extends ProofObligation
 {
-	public FunctionApplyObligation(POExpression root, POExpressionList args, String prename, POContextStack ctxt)
+	public static final String UNKNOWN = "???";		// Use pre_(root, args) form
+
+	private FunctionApplyObligation(POExpression root, POExpressionList args, String prename, POContextStack ctxt)
 	{
 		super(root.location, POType.FUNC_APPLY, ctxt);
 		StringBuilder sb = new StringBuilder();
 
-		if (prename == null)
+		if (prename == UNKNOWN)
 		{
 			sb.append("pre_(");
 			sb.append(root);
-			sb.append(", ");
-			sb.append(Utils.listToString(args));
+			
+			if (!args.isEmpty())
+			{
+				sb.append(", ");
+				sb.append(Utils.listToString(args));
+			}
+			
 			sb.append(")");
 		}
 		else
@@ -49,6 +59,24 @@ public class FunctionApplyObligation extends ProofObligation
 			sb.append(Utils.listToString("(", args, ", ", ")"));
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, args);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExpression root, POExpressionList args, String prename, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new FunctionApplyObligation(root, args, prename, choice));
+		}
+		
+		return results;
 	}
 }

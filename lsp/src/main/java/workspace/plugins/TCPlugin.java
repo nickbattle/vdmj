@@ -31,10 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -43,23 +44,29 @@ import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
+import rpc.RPCMessageList;
 import workspace.Diag;
-import workspace.lenses.CodeLens;
+import workspace.EventListener;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckTypeEvent;
+import workspace.events.CodeLensEvent;
+import workspace.events.LSPEvent;
+import workspace.lenses.TCCodeLens;
 import workspace.lenses.TCLaunchDebugLens;
 
-abstract public class TCPlugin extends AnalysisPlugin
+abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 {
-	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
-	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
-	
 	public static TCPlugin factory(Dialect dialect)
 	{
 		switch (dialect)
@@ -72,8 +79,8 @@ abstract public class TCPlugin extends AnalysisPlugin
 				return new TCPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 
@@ -87,16 +94,58 @@ abstract public class TCPlugin extends AnalysisPlugin
 	{
 		return "TC";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return TC_PRIORITY;
+	}
 
 	@Override
 	public void init()
 	{
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckTypeEvent.class, this);
+		eventhub.register(CodeLensEvent.class, this);
 	}
 
 	@Override
-	protected List<CodeLens> getCodeLenses(boolean dirty)
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
+		if (event instanceof CheckPrepareEvent)
+		{
+			preCheck((CheckPrepareEvent)event);
+			return new RPCMessageList();
+		}
+		else if (event instanceof CheckTypeEvent)
+		{
+			ASTPlugin ast = registry.getPlugin("AST");
+			checkLoadedFiles(ast.getAST(), (CheckTypeEvent)event);
+			return new RPCMessageList();
+		}
+		else if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(le.request, getCodeLenses(le.file));
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+			return null;
+		}
+	}
+
+	protected void preCheck(CheckPrepareEvent ev)
+	{
+		messagehub.clearPluginMessages(this);
+	}
+	
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
+	protected List<TCCodeLens> getTCCodeLenses(boolean dirty)
+	{
+		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
 		
 		if (!dirty)
 		{
@@ -105,30 +154,23 @@ abstract public class TCPlugin extends AnalysisPlugin
 		
 		return lenses;
 	}
+	
+	public TCExpression checkExpression(ASTExpression ast, Environment env) throws Exception
+	{
+		TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
+		tc.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
+		return tc;
+	}
 
-	public void preCheck()
-	{
-		errs.clear();
-		warns.clear();
-	}
-	
-	public List<VDMMessage> getErrs()
-	{
-		return errs;
-	}
-	
-	public List<VDMMessage> getWarns()
-	{
-		return warns;
-	}
-	
+	abstract protected JSONArray getCodeLenses(File file);
+
 	abstract public <T extends Mappable> T getTC();
 	
-	abstract public <T extends Mappable> boolean checkLoadedFiles(T ast) throws Exception;
+	abstract public <T extends Mappable> void checkLoadedFiles(T ast, CheckTypeEvent event) throws Exception;
 
 	abstract public JSONArray documentSymbols(File file);
 
-	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
+	abstract public TCDefinition findDefinition(File file, long zline, long zcol);
 
 	abstract public TCDefinitionList lookupDefinition(String startsWith);
 	

@@ -145,7 +145,7 @@ public class TCDependencyStatementVisitor extends TCLeafStatementVisitor<TCNameT
 	@Override
 	public TCNameSet caseForPatternBindStatement(TCForPatternBindStatement node, EnvTriple arg)
 	{
-		return visitorSet.applyExpressionVisitor(node.exp, arg);
+		return visitorSet.applyExpressionVisitor(node.seqexp, arg);
 	}
 	
 	@Override
@@ -159,12 +159,7 @@ public class TCDependencyStatementVisitor extends TCLeafStatementVisitor<TCNameT
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = visitorSet.applyMultiBindVisitor(node.bind, new EnvTriple(arg.globals, local, arg.returns));
-		
-		if (node.suchThat != null)
-		{
-			names.addAll(visitorSet.applyExpressionVisitor(node.suchThat, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
+		names.addAll(visitorSet.applyExpressionVisitor(node.suchThat, new EnvTriple(arg.globals, local, arg.returns)));
 		names.addAll(node.statement.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
 		return names;
 	}
@@ -196,13 +191,7 @@ public class TCDependencyStatementVisitor extends TCLeafStatementVisitor<TCNameT
 	@Override
 	public TCNameSet caseReturnStatement(TCReturnStatement node, EnvTriple arg)
 	{
-		TCNameSet names = new TCNameSet();
-		
-		if (node.expression != null)
-		{
-			names.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
-		}
-		
+		TCNameSet names = visitorSet.applyExpressionVisitor(node.expression, arg);
 		arg.returns.set(true);		// So everything that follows is conditional
 		return names;
 	}

@@ -26,26 +26,16 @@ package dap;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 
-import dap.handlers.DebuggingHandler;
-import dap.handlers.DisconnectHandler;
-import dap.handlers.EvaluateHandler;
-import dap.handlers.InitializeHandler;
-import dap.handlers.LaunchHandler;
-import dap.handlers.PauseHandler;
-import dap.handlers.SetBreakpointsHandler;
-import dap.handlers.SourceHandler;
-import dap.handlers.StackTraceHandler;
-import dap.handlers.TerminateHandler;
-import dap.handlers.ThreadsHandler;
 import json.JSONObject;
 import json.JSONServer;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 public class DAPServer extends JSONServer
 {
@@ -58,9 +48,8 @@ public class DAPServer extends JSONServer
 		super("DAP", socket.getInputStream(), socket.getOutputStream());
 		
 		INSTANCE = this;
-		this.dispatcher = getDispatcher();
-		
-		DAPWorkspaceManager.getInstance();		// Just set up
+		DAPPlugin.getInstance();		// Sets up DAP dispatcher
+		this.dispatcher = DAPDispatcher.getInstance();
 	}
 	
 	public static DAPServer getInstance()
@@ -68,30 +57,6 @@ public class DAPServer extends JSONServer
 		return INSTANCE;
 	}
 	
-	private DAPDispatcher getDispatcher() throws IOException
-	{
-		DAPDispatcher dispatcher = new DAPDispatcher();
-		
-		dispatcher.register(new InitializeHandler(), "initialize");
-		dispatcher.register(new LaunchHandler(), "launch");
-		dispatcher.register(new InitializeHandler(), "configurationDone");
-		dispatcher.register(new ThreadsHandler(), "threads");
-		dispatcher.register(new SetBreakpointsHandler(), "setBreakpoints", "setExceptionBreakpoints", "setFunctionBreakpoints");
-		dispatcher.register(new EvaluateHandler(), "evaluate");
-		dispatcher.register(new StackTraceHandler(), "stackTrace");
-		dispatcher.register(new DisconnectHandler(), "disconnect");
-		dispatcher.register(new TerminateHandler(), "terminate");
-		dispatcher.register(new PauseHandler(), "pause");
-		dispatcher.register(new SourceHandler(), "source");
-		
-		dispatcher.register(new DebuggingHandler(),
-			"continue", "stepIn", "stepOut", "next", "scopes", "variables");
-
-		dispatcher.register(new UnknownHandler());
-		
-		return dispatcher;
-	}
-
 	public boolean isRunning()
 	{
 		return running;
@@ -105,7 +70,7 @@ public class DAPServer extends JSONServer
 	public void run() throws IOException
 	{
 		running = true;
-		Console.init("UTF-8", getOutConsoleWriter(), getErrConsoleWriter());
+		Console.init(Charset.forName("UTF-8"), getOutConsoleWriter(), getErrConsoleWriter());
 
 		while (running)
 		{
@@ -129,7 +94,7 @@ public class DAPServer extends JSONServer
 			}
 		}
 
-		Console.init("UTF-8");
+		Console.init(Charset.forName("UTF-8"));
 	}
 	
 	public void stdout(String message)

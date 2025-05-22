@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.util.Utils;
@@ -55,6 +56,31 @@ public class POPatternList extends POMappedList<TCPattern, POPattern>
 		for (POPattern p: this)
 		{
 			list.add(p.getMatchingExpression());
+		}
+
+		return list;
+	}
+	
+	
+	public TCNameSet getAllVariableNames()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (POPattern p: this)
+		{
+			names.addAll(p.getAllVariableNames());
+		}
+		
+		return names;
+	}
+
+	public POPatternList removeIgnorePatterns()
+	{
+		POPatternList list = new POPatternList();
+
+		for (POPattern p: this)
+		{
+			list.add(p.removeIgnorePatterns());
 		}
 
 		return list;

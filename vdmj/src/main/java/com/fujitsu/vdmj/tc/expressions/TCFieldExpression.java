@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
@@ -32,6 +34,7 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -39,6 +42,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 public class TCFieldExpression extends TCExpression
 {
@@ -68,7 +72,7 @@ public class TCFieldExpression extends TCExpression
 	{
 		root = object.typeCheck(env, null, scope, null);
 
-		if (root.isUnknown(location))
+		if (root instanceof TCUnknownType)
 		{
 			memberName = new TCNameToken(field.getLocation(), "?", "?", true);
 			return setType(root);
@@ -177,6 +181,30 @@ public class TCFieldExpression extends TCExpression
 				{
 					// warning(5005, "Should access member " + field + " from a static context");
 				}
+				
+				// If we're trying to access a state field - probably an instance variable - and
+				// the enclosing definition is not pure, we can only do this from non-functional
+				// environments, like regular statements and so on. Functional contexts are not
+				// allowed.
+				
+				if (fdef.nameScope.matches(NameScope.STATE) && Settings.release == Release.VDM_10)
+				{
+					TCDefinition encl = env.getEnclosingDefinition();
+					
+					if (!encl.isPure())
+					{
+						if (env.isFunctionalError())
+						{
+							TypeChecker.report(3366,
+								"Cannot access state field '" + field + "' from this context", field.getLocation());
+						}
+						else if (env.isFunctional())
+						{
+							TypeChecker.warning(3366,
+								"Should not access state field '" + field + "' from this context", field.getLocation());
+						}
+					}
+				}
 
    				results.add(fdef.getType());
    				// At runtime, type qualifiers must match exactly
@@ -193,9 +221,13 @@ public class TCFieldExpression extends TCExpression
 
 		if (results.isEmpty())
 		{
-    		if (!recOrClass)
+			if (root instanceof TCProductType)
+			{
+				object.report(3093, "Field '" + field.getName() + "' applied to tuple type (use #n)");
+			}
+			else if (!recOrClass)
     		{
-    			if (root instanceof TCRecordType && ((TCRecordType)root).opaque)
+    			if (root instanceof TCRecordType && ((TCRecordType)root).isOpaque(location))
     			{
     				object.report(3093, "Field '" + field.getName() + "' applied to non-struct export");
     			}

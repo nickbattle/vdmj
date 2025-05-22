@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.in.definitions;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 
 /**
@@ -47,5 +49,16 @@ public class INAccessSpecifier extends INNode implements Serializable
 		this.isAsync = isAsync;
 		this.access = access;
 		this.isPure = pure;
+	}
+
+	@Override
+	public String toString()
+	{
+		return (isPure? "pure " : "") + (isAsync? "async " : "") + (isStatic ? "static " : "") + access;
+	}
+
+	public String ifSet(String sep)
+	{
+		return (Settings.dialect == Dialect.VDM_SL) ? "" : (toString() + sep);
 	}
 }

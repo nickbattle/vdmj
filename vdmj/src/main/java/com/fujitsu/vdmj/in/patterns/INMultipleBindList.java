@@ -41,4 +41,29 @@ public class INMultipleBindList extends INMappedList<TCMultipleBind, INMultipleB
 	{
 		super(from);
 	}
+
+	/**
+	 * Note this method takes account of non-type binds, which in their nature
+	 * have all values (explicitly). This is used in forall and exists expressions
+	 * to set the INBindingGlobals "maybe" flag. 
+	 */
+	public boolean hasAllValues()
+	{
+		INBindingGlobals globals = INBindingGlobals.getInstance();
+		
+		if (globals.hasAllValues())
+		{
+			return true;
+		}
+		
+		for (INMultipleBind bind: this)
+		{
+			if (bind instanceof INMultipleTypeBind)
+			{
+				return false;
+			}
+		}
+		
+		return true;	// Note, pure set binds have all values
+	}
 }

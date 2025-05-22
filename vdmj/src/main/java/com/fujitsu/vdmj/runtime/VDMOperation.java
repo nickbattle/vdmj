@@ -26,13 +26,19 @@ package com.fujitsu.vdmj.runtime;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import com.fujitsu.vdmj.values.Value;
+
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.ElementType;
 
+/**
+ * Used to label VDM operations for access via the Delegate class.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface VDMOperation
 {
-	// Used to label VDM operations for access via the Delegate class.
+	public Class<? extends Value>[] params() default {};
 }
 

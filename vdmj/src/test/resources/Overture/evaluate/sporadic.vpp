@@ -1,7 +1,7 @@
 system SYS
 instance variables
 	static public obj1 : A := new A();
-	cpu1:CPU := new CPU(<FP>, 1E9);
+	cpu1:CPU := new CPU(<FP>, 1E6);
 
 operations
 	SYS: () ==> SYS
@@ -18,8 +18,8 @@ instance variables
 	last:nat := 0;
 
 values
-	MIN = 50;
-	MAX = 100;
+	public MIN = 50;
+	public MAX = 150;
 	
 operations
 	public op: () ==> ()
@@ -50,10 +50,10 @@ operations
 		SYS`obj1.run();
 		duration(10000) skip;
 		
-		if elems SYS`obj1.counts(1, ..., 49) <> {0}
+		if elems SYS`obj1.counts(1, ..., A`MIN-1) <> {0}
 		then exit "Sporadic has some short intervals";
 		
-		if elems SYS`obj1.counts(151, ..., 200) <> {0}
+		if elems SYS`obj1.counts(A`MAX+1, ..., 200) <> {0}
 		then exit "Sporadic has some long intervals";
 	)
 

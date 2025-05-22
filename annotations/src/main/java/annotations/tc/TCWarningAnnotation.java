@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -48,6 +49,7 @@ public class TCWarningAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private int warningCount = 0;
+	private String moduleName = null;
 	private Set<Long> suppressed;
 	
 	public TCWarningAnnotation(TCIdentifierToken name, TCExpressionList args)
@@ -56,32 +58,37 @@ public class TCWarningAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	public void tcBefore(TCModule module, ModuleEnvironment e)
 	{
-		preCheck();
-	}
-
-	@Override
-	public void tcBefore(TCModule module)
-	{
+		moduleName = module.name.getName();
 		preCheck();
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
+		moduleName = clazz.name.getName();
+		preCheck();
+	}
+
+	@Override
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		warningCount = TypeChecker.getWarningCount();
 		preCheck();
 	}
 
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
+		warningCount = TypeChecker.getWarningCount();
 		preCheck();
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
+		warningCount = TypeChecker.getWarningCount();
 		preCheck();
 	}
 	
@@ -92,7 +99,6 @@ public class TCWarningAnnotation extends TCAnnotation
 			name.report(6010, "@Warning must have one or more numeric arguments");
 		}
 		
-		warningCount = TypeChecker.getWarningCount();
 		suppressed = new HashSet<Long>();
 		
 		for (TCExpression arg: args)
@@ -122,6 +128,12 @@ public class TCWarningAnnotation extends TCAnnotation
 	}
 	
 	@Override
+	public void tcAfter(TCModule module, ModuleEnvironment e)
+	{
+		postCheck();
+	}
+	
+	@Override
 	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
 	{
 		postCheck();
@@ -143,14 +155,22 @@ public class TCWarningAnnotation extends TCAnnotation
 	{
 		Iterator<VDMWarning> witer = TypeChecker.getWarnings().iterator();
 		
-		for (int i=0; i < warningCount; i++)
+		if (moduleName == null)
 		{
-			witer.next();	// skip previous warnings
+			for (int i=0; i < warningCount; i++)
+			{
+				witer.next();	// skip previous warnings
+			}
 		}
 		
 		while (witer.hasNext())
 		{
 			VDMWarning w = witer.next();
+			
+			if (moduleName != null && !w.location.module.equals(moduleName))
+			{
+				continue;
+			}
 			
 			if (suppressed.contains((long)w.number))
 			{
@@ -159,16 +179,26 @@ public class TCWarningAnnotation extends TCAnnotation
 		}
 	}
 	
+	/**
+	 * We have to use a doClose because the final stage of unusedChecks in the
+	 * module typechecker are called after all the modules have been processed,
+	 * so warnings may be raised after all of the tcAfter cases above.
+	 */
 	@Override
 	public void doClose()
 	{
 		Iterator<VDMWarning> witer = TypeChecker.getWarnings().iterator();
-		int myLine = name.getLocation().startLine;
+		int myLine  = name.getLocation().startLine;
 		File myFile = name.getLocation().file;
 		
 		while (witer.hasNext())
 		{
 			VDMWarning w = witer.next();
+			
+			if (moduleName != null && !w.location.module.equals(moduleName))
+			{
+				continue;
+			}
 			
 			if (w.location.startLine == myLine + 1 &&
 				w.location.file.equals(myFile) &&

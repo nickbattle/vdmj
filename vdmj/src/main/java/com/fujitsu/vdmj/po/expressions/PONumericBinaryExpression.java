@@ -28,11 +28,12 @@ import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.OrderedObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
-import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -48,40 +49,10 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = getNonNilObligations(ctxt);
-
-		if (ltype.isUnion(location))
-		{
-			for (TCType type: ltype.getUnion().types)
-			{
-				if (!type.isNumeric(type.location))
-				{
-					obligations.add(
-						new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
-
-					break;
-				}
-			}
-		}
-
-		if (rtype.isUnion(location))
-		{
-			for (TCType type: rtype.getUnion().types)
-			{
-				if (!type.isNumeric(type.location))
-				{
-        			obligations.add(
-        				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
-        			
-        			break;
-				}
-			}
-		}
-
-		obligations.addAll(left.getProofObligations(ctxt, env));
-		obligations.addAll(right.getProofObligations(ctxt, env));
+		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
+		obligations.addAll(getNonNilObligations(ctxt));
 		return obligations;
 	}
 	
@@ -95,13 +66,13 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 		if (ltype instanceof TCOptionalType)
 		{
 			TCOptionalType op = (TCOptionalType)ltype;
-			obligations.add(new SubTypeObligation(left, op.type, ltype, ctxt));
+			obligations.addAll(SubTypeObligation.getAllPOs(left, op.type, ltype, ctxt));
 		}
 		
 		if (rtype instanceof TCOptionalType)
 		{
 			TCOptionalType op = (TCOptionalType)rtype;
-			obligations.add(new SubTypeObligation(right, op.type, rtype, ctxt));
+			obligations.addAll(SubTypeObligation.getAllPOs(right, op.type, rtype, ctxt));
 		}
 
 		return obligations;
@@ -110,11 +81,11 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	/**
 	 * Generate ordering obligations, as used by the comparison operators.
 	 */
-	protected ProofObligationList getOrderedObligations(POContextStack ctxt, Environment env)
+	protected ProofObligationList getOrderedObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = getCommonOrderedObligations(ctxt);
-		obligations.addAll(left.getProofObligations(ctxt, env));
-		obligations.addAll(right.getProofObligations(ctxt, env));
+		obligations.addAll(left.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(right.getProofObligations(ctxt, pogState, env));
 		return obligations;
 	}
 	
@@ -173,7 +144,7 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 		
 		if (poNeeded && !poTypes.isEmpty())
 		{
-			obligations.add(new OrderedObligation(left, right, poTypes, ctxt));
+			obligations.addAll(OrderedObligation.getAllPOs(left, right, poTypes, ctxt));
 		}
 		
 		return obligations;
@@ -183,5 +154,17 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseNumericBinaryExpression(this, arg);
+	}
+	
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
+	}
+	
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
 	}
 }

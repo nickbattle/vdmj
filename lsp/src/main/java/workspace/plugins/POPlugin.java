@@ -25,8 +25,11 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -35,9 +38,20 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import lsp.lspx.POGHandler;
+import rpc.RPCErrors;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.MessageHub;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CodeLensEvent;
+import workspace.events.LSPEvent;
+import workspace.lenses.POLaunchDebugLens;
 
-abstract public class POPlugin extends AnalysisPlugin
+abstract public class POPlugin extends AnalysisPlugin implements EventListener
 {
 	public static POPlugin factory(Dialect dialect)
 	{
@@ -51,14 +65,18 @@ abstract public class POPlugin extends AnalysisPlugin
 				return new POPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
+
+	private final Map<File, List<POLaunchDebugLens>> codeLenses;
 
 	protected POPlugin()
 	{
 		super();
+		
+		codeLenses = new HashMap<File, List<POLaunchDebugLens>>();
 	}
 	
 	@Override
@@ -66,25 +84,82 @@ abstract public class POPlugin extends AnalysisPlugin
 	{
 		return "PO";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return PO_PRIORITY;
+	}
 
 	@Override
 	public void init()
 	{
+		lspDispatcher.register(new POGHandler(), "slsp/POG/generate");
+
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(CodeLensEvent.class, this);
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return new JSONObject("proofObligationProvider", true);
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("proofObligationProvider", new JSONObject());
+		}
 	}
 
-	abstract public void preCheck();
+	@Override
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		if (event instanceof CheckPrepareEvent)
+		{
+			preCheck((CheckPrepareEvent)event);
+			return new RPCMessageList();
+		}
+		else if (event instanceof CheckCompleteEvent)
+		{
+			TCPlugin tc = registry.getPlugin("TC");
+			checkLoadedFiles(tc.getTC());
+			RPCMessageList results = new RPCMessageList();
+			results.add(RPCRequest.notification("slsp/POG/updated",
+					new JSONObject("successful", !messagehub.hasErrors())));
+			return results;
+		}
+		else if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(le.request, getCodeLenses(le.file));
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+			return null;
+		}
+	}
 
+	protected void preCheck(CheckPrepareEvent event)
+	{
+		messagehub.clearPluginMessages(this);
+		clearLenses();
+	}
+
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
+	
 	abstract public <T extends Mappable> T getPO();
 	
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
 	
-	abstract protected ProofObligationList getProofObligations();
+	abstract public ProofObligationList getProofObligations();
+	
+	abstract public JSONObject getCexLaunch(ProofObligation po);
+
+	abstract public JSONObject getWitnessLaunch(ProofObligation po);
 	
 	protected JSONArray splitPO(String value)
 	{
@@ -99,13 +174,29 @@ abstract public class POPlugin extends AnalysisPlugin
 		return array;
 	}
 
-	public JSONArray getObligations(File file)
+	public RPCMessageList pogGenerate(RPCRequest request, File file)
 	{
-		ProofObligationList poGeneratedList = getProofObligations();
-		poGeneratedList.renumber();
-		JSONArray results = new JSONArray();
+		try
+		{
+			if (messagehub.hasErrors())	// No clean tree
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
+			}
+			
+			return getJSONObligations(request, file);
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList getJSONObligations(RPCRequest request, File file)
+	{
+		JSONArray poList = new JSONArray();
 		
-		for (ProofObligation po: poGeneratedList)
+		for (ProofObligation po: getProofObligations())
 		{
 			if (file != null)
 			{
@@ -134,14 +225,52 @@ abstract public class POPlugin extends AnalysisPlugin
 				name.add(part);
 			}
 
-			results.add(
-				new JSONObject(
-					"id",		new Long(po.number),
+			JSONObject json = new JSONObject(
+					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
-					"source",	splitPO(po.value),
-					"status",	po.status.toString()));
+					"source",	splitPO(po.source),
+					"status",	po.status.toString());
+			
+			poList.add(json);
+		}
+
+
+		RPCMessageList response = new RPCMessageList(request, poList);
+		response.addAll(MessageHub.getInstance().getDiagnosticResponses());
+		
+		return response;
+	}
+
+	public void clearLenses()
+	{
+		codeLenses.clear();
+	}
+	
+	public void addCodeLens(ProofObligation po)
+	{
+		List<POLaunchDebugLens> array = codeLenses.get(po.location.file);
+		
+		if (array == null)
+		{
+			array = new Vector<POLaunchDebugLens>();
+			codeLenses.put(po.location.file, array);
+		}
+		
+		array.add(new POLaunchDebugLens(po));
+	}
+
+	private JSONArray getCodeLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (codeLenses.containsKey(file))
+		{
+			for (POLaunchDebugLens lens: codeLenses.get(file))
+			{
+				results.addAll(lens.getLaunchLens());
+			}
 		}
 		
 		return results;

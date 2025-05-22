@@ -31,7 +31,8 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
+import com.fujitsu.vdmj.tc.types.visitors.TCExplicitTypeVisitor;
+import com.fujitsu.vdmj.tc.types.visitors.TCInfiniteTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCRecursiveTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.tc.types.visitors.TCUnresolvedTypeFinder;
@@ -100,6 +101,15 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	{
 		return toString();
 	}
+	
+	/**
+	 * The type with its module/class(es) explicit, if it is not the same as the
+	 * location of this type value.
+	 */
+	public final String toExplicitString(LexLocation from)
+	{
+		return this.apply(new TCExplicitTypeVisitor(), from.module);
+	}
 
 	/**
 	 * Resolve the type. After syntax checking, all named type references are
@@ -110,9 +120,8 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 * type (eg. in the element types in a TCSetType).
 	 *
 	 * @param env The other type names defined in this scope.
-	 * @param root The outermost type definition being resolved.
 	 */
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		resolved = true;
 		return this;
@@ -147,6 +156,9 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return other;
 	}
 
+	/**
+	 * Check whether this type's accessSpecifier is more limited than the one given.
+	 */
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)
 	{
 		if (definitions != null)
@@ -167,19 +179,25 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * @param typename
-	 * @param from
-	 */
-	public TCType isType(String typename, LexLocation from)
-	{
-		return (toDisplay().equals(typename)) ? this : null;
-	}
-
-	/**
+	 * Test whether this type is POSSIBLY of the given type, accounting for optional types, named
+	 * types, bracketed types and unions.
+	 * 
 	 * @param typeclass
 	 * @param from
 	 */
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		return typeclass.isInstance(this);
+	}
+
+	/**
+	 * Test whether this type is DEFINITELY of the given type, accounting for named
+	 * types, bracketed types and unions.
+	 * 
+	 * @param typeclass
+	 * @param from
+	 */
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		return typeclass.isInstance(this);
 	}
@@ -199,15 +217,42 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	{
 		return false;	// Parameter types and type check errors are unknown.
 	}
+	
+	public boolean isMaximal()
+	{
+		return false;	// Only applies to record and named types (invariants)
+	}
 
+	/**
+	 * Test whether a type, including ALL of a union, are TCVoidType or TCVoidReturnType.
+	 */
 	public boolean isVoid()
 	{
 		return false;	// TCVoidType and TCVoidReturnType are void.
 	}
 
+	/**
+	 * Test whether a type, including ANY of a union, are TCVoidType or TCVoidReturnType.
+	 */
 	public boolean hasVoid()
 	{
 		return false;	// TCVoidType and TCVoidReturnType are void.
+	}
+
+	/**
+	 * Test whether this DOES cause a statement block to return.
+	 */
+	public boolean isReturn()
+	{
+		return true;
+	}
+
+	/**
+	 * Test whether this CAN cause a statement block to return.
+	 */
+	public boolean hasReturn()
+	{
+		return true;
 	}
 
 	/**
@@ -235,14 +280,19 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * @param from Where the test is being made from.
+	 * Test whether the type is ultimately a record type, including union members and
+	 * searching through names types.
 	 */
-	public boolean isRecord(LexLocation from)	// ie. does it contain fields (see isTag)
+	public boolean isRecord(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isTag()		// ie. can we call mk_T (see isRecord)
+	/**
+	 * Test whether this type can be instantiated via a mk_T(...), so stop searching at
+	 * a named type or a union.
+	 */
+	public boolean isTag()
 	{
 		return false;
 	}
@@ -290,8 +340,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * @param n
-	 * @param from
+	 * Test for a product of a specific cardinality.
 	 */
 	public boolean isProduct(int n, LexLocation from)
 	{
@@ -444,8 +493,16 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * Identify recursive types.
+	 * Identify recursive and infinite types. These are specifically to do with
+	 * named and record types that may contain themselves (ie. NOT about types
+	 * with infinite populations as such, like nat or real). Compare these
+	 * visitors with INTypeSizeVisitor.
 	 */
+	public boolean isInfinite()
+	{
+		return !this.apply(new TCInfiniteTypeFinder(), this).isEmpty();
+	}
+
 	public boolean isRecursive()
 	{
 		return !this.apply(new TCRecursiveTypeFinder(), this).isEmpty();
@@ -459,6 +516,18 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	public void warning(int number, String msg)
 	{
 		TypeChecker.warning(number, msg, location);
+	}
+
+	public void concern(boolean serious, int number, String msg)
+	{
+		if (serious)
+		{
+			TypeChecker.report(number, msg, location);
+		}
+		else
+		{
+			TypeChecker.warning(number, msg, location);
+		}
 	}
 
 	public void detail(String tag, Object obj)

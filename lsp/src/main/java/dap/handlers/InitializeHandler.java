@@ -30,8 +30,8 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 public class InitializeHandler extends DAPHandler
 {
@@ -60,7 +60,7 @@ public class InitializeHandler extends DAPHandler
 		try
 		{
 			JSONObject arguments = request.get("arguments");
-			return DAPWorkspaceManager.getInstance().dapInitialize(request, arguments);
+			return DAPPlugin.getInstance().dapInitialize(request, arguments);
 		}
 		catch (Exception e)
 		{
@@ -73,7 +73,7 @@ public class InitializeHandler extends DAPHandler
 	{
 		try
 		{
-			return DAPWorkspaceManager.getInstance().configurationDone(request);
+			return DAPPlugin.getInstance().dapConfigurationDone(request);
 		}
 		catch (Exception e)
 		{

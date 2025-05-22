@@ -198,8 +198,12 @@ public class ModuleTypeChecker extends TypeChecker
 			for (TCModule m: modules)
 			{
 				TypeComparator.setCurrentModule(m.name.getName());
-				
-				Environment e = new ModuleEnvironment(m);
+				ModuleEnvironment e = new ModuleEnvironment(m);
+
+				if (pass == Pass.DEFS && m.annotations != null)
+				{
+					m.annotations.tcBefore(m, e);
+				}
 
 				for (TCDefinition d: m.defs)
 				{
@@ -223,6 +227,28 @@ public class ModuleTypeChecker extends TypeChecker
 						}
 					}
 				}
+				
+				if (pass == Pass.DEFS && m.annotations != null)
+				{
+					m.annotations.tcAfter(m, e);
+				}
+			}
+			
+			// After the VALUES pass, ValueDefinitions will have replaced their TCUntypedDefinition "defs"
+			// with typed TCLocalDefinitions, so we refresh the export/importDefs to allow later passes
+			// to see the correct types of imported definitions.
+			
+			if (pass == Pass.VALUES)
+			{
+				for (TCModule m: modules)
+				{
+					m.processExports();				// Re-populate exports
+				}
+				
+				for (TCModule m: modules)
+				{
+					m.processImports(modules);		// Re-populate importDefs
+				}
 			}
 		}
 		
@@ -234,12 +260,12 @@ public class ModuleTypeChecker extends TypeChecker
 
 		for (TCModule m: modules)
 		{
-			m.processExports();				// Re-populate exports
+			m.processExports();				// Re-populate exports again
 		}
 		
 		for (TCModule m: modules)
 		{
-			m.processImports(modules);		// Re-populate importDefs
+			m.processImports(modules);		// Re-populate importDefs again
 
 			try
 			{

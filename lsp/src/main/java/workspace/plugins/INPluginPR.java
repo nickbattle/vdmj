@@ -31,10 +31,16 @@ import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+
+import vdmj.commands.ClassesCommand;
+import vdmj.commands.AnalysisCommand;
+import vdmj.commands.LogCommand;
+import workspace.events.CheckPrepareEvent;
 
 public class INPluginPR extends INPlugin
 {
@@ -53,15 +59,34 @@ public class INPluginPR extends INPlugin
 	}
 
 	@Override
-	public void init()
-	{
-	}
-
-	@Override
-	public void preCheck()
+	public void preCheck(CheckPrepareEvent ev)
 	{
 		inClassList = new INClassList();
 		tcClassList = new TCClassList();
+	}
+	
+	@Override
+	public AnalysisCommand getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "classes":	return new ClassesCommand(line);
+			case "log":		return new LogCommand(line);
+			
+			default:
+				return super.getCommand(line);
+		}
+	}
+	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList(
+			super.getCommandHelp(),
+			ClassesCommand.HELP,
+			LogCommand.HELP);
 	}
 	
 	@Override

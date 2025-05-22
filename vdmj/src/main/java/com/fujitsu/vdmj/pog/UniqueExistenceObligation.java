@@ -24,11 +24,14 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POIotaExpression;
 
 public class UniqueExistenceObligation extends ProofObligation
 {
-	public UniqueExistenceObligation(POIotaExpression poIotaExpression, POContextStack ctxt)
+	private UniqueExistenceObligation(POIotaExpression poIotaExpression, POContextStack ctxt)
 	{
 		super(poIotaExpression.location, POType.UNIQUE_EXISTENCE, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -38,6 +41,24 @@ public class UniqueExistenceObligation extends ProofObligation
 		sb.append(" & ");
 		sb.append(poIotaExpression.predicate);
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, poIotaExpression);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POIotaExpression poIotaExpression, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new UniqueExistenceObligation(poIotaExpression, choice));
+		}
+		
+		return results;
 	}
 }

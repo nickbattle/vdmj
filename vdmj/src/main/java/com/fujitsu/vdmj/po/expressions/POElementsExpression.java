@@ -27,30 +27,38 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class POElementsExpression extends POSetExpression
+public class POElementsExpression extends POUnaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	public final POExpression exp;
 
 	public POElementsExpression(LexLocation location, POExpression exp)
 	{
-		super(location);
-		this.exp = exp;
+		super(location, exp);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "(elems " + exp + ")";
+		return "(elems (" + exp + "))";
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return exp.getProofObligations(ctxt, env);
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
+		obligations.addAll(checkUnionQualifiers(exp, TCTypeQualifier.getSetQualifier(), ctxt));
+		return obligations;
+	}
+	
+	@Override
+	protected TCTypeQualifier getQualifier()
+	{
+		return TCTypeQualifier.getSetQualifier();
 	}
 
 	@Override

@@ -256,7 +256,7 @@ map TCExitStatement{location, expression} to INExitStatement(location, expressio
 map TCFieldDesignator{object, field, objectfield} to INFieldDesignator(object, field, objectfield);
 map TCForAllStatement{location, pattern, set, statement} to INForAllStatement(location, pattern, set, statement);
 map TCForIndexStatement{location, var, from, to, by, statement} to INForIndexStatement(location, var, from, to, by, statement);
-map TCForPatternBindStatement{location, patternBind, reverse, exp, statement} to INForPatternBindStatement(location, patternBind, reverse, exp, statement);
+map TCForPatternBindStatement{location, patternBind, reverse, seqexp, statement} to INForPatternBindStatement(location, patternBind, reverse, seqexp, statement);
 map TCIdentifierDesignator{name} to INIdentifierDesignator(name);
 map TCIfStatement{location, ifExp, thenStmt, elseList, elseStmt} to INIfStatement(location, ifExp, thenStmt, elseList, elseStmt);
 map TCLetBeStStatement{location, bind, suchThat, statement, def} to INLetBeStStatement(location, bind, suchThat, statement, def);
@@ -347,6 +347,10 @@ unmapped com.fujitsu.vdmj.tc.types.TCUnknownType;
 unmapped com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 unmapped com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
+
+# Annotations
+package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.in.annotations;
+map TCLoopInvariantAnnotation{name, args} to INLoopInvariantAnnotation(name, args);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;

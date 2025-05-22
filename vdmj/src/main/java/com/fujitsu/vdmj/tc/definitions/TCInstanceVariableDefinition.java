@@ -66,7 +66,8 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 	{
 		try
 		{
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
+			if (annotations != null) annotations.tcResolve(this, env);
 		}
 		catch (TypeCheckException e)
 		{

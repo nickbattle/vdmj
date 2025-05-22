@@ -27,28 +27,51 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POImpliesContext extends POContext
 {
 	public final String exp;
+	private final TCNameSet reasonsAbout;
 
-	public POImpliesContext(POExpression precondition)
+	public POImpliesContext(POExpression... preconditions)
 	{
-		this.exp = precondition.toString();
+		this.reasonsAbout = new TCNameSet();
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (POExpression precondition: preconditions)
+		{
+			sb.append(sep);
+			sb.append(precondition);
+			sep = " and ";
+
+			this.reasonsAbout.addAll(precondition.getVariableNames());
+		}
+		
+		this.exp = sb.toString();
 	}
 
 	public POImpliesContext(POExplicitOperationDefinition def)
 	{
-		this.exp = preconditionCall(def.name, def.getParamPatternList(), def.precondition);
+		this.exp = preconditionCall(def.name, null, def.predef.getParamPatternList(), def.precondition);
+		this.reasonsAbout = def.precondition.getVariableNames();
 	}
 
 	public POImpliesContext(POImplicitOperationDefinition def)
 	{
-		this.exp = preconditionCall(def.name, def.getParamPatternList(), def.precondition);
+		this.exp = preconditionCall(def.name, null, def.predef.getParamPatternList(), def.precondition);
+		this.reasonsAbout = def.precondition.getVariableNames();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		return reasonsAbout;
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 

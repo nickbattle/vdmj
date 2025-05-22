@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCFunctionCallFinder;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
@@ -63,7 +62,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class TCExplicitFunctionDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public TCFunctionType type;
 	public final TCTypeList unresolved;
 	public final TCPatternListList paramPatternList;
@@ -88,7 +87,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 	public TCExplicitFunctionDefinition(TCAnnotationList annotations,
 		TCAccessSpecifier accessSpecifier, TCNameToken name,
-		TCNameList typeParams, TCFunctionType type,
+		TCTypeList typeParams, TCFunctionType type,
 		TCPatternListList parameters, TCExpression body,
 		TCExpression precondition,
 		TCExpression postcondition, boolean typeInvariant, TCExpression measure)
@@ -123,7 +122,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		}
 
 		return accessSpecifier.ifSet(" ") + name +
-				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
+				(typeParams == null ? ": " : "[" + typeParams + "]: ") + Utils.deBracketed(type) +
 				"\n\t" + name + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition) +
@@ -180,11 +179,10 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 
-		for (TCNameToken pname: typeParams)
+		for (TCType ptype: typeParams)
 		{
-			TCDefinition p = new TCLocalDefinition(
-					pname.getLocation(), pname, new TCParameterType(pname));
-
+			TCParameterType param = (TCParameterType)ptype;
+			TCDefinition p = new TCLocalDefinition(param.location, param.name, param);
 			p.markUsed();
 			defs.add(p);
 		}
@@ -200,11 +198,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 				getTypeParamDefinitions(), base, NameScope.NAMES);
 
-			type = type.typeResolve(params, null);
+			type = type.typeResolve(params);
+			if (annotations != null) annotations.tcResolve(this, params);			
 		}
 		else
 		{
-			type = type.typeResolve(base, null);
+			type = type.typeResolve(base);
+			if (annotations != null) annotations.tcResolve(this, base);			
 		}
 
 		if (base.isVDMPP())
@@ -345,7 +345,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		if (measureExp instanceof TCVariableExpression)
 		{
 			TCVariableExpression exp = (TCVariableExpression)measureExp;
-			if (base.isVDMPP()) exp.name.setTypeQualifier(getMeasureParams());
+			if (base.isVDMPP()) exp.name.setTypeQualifier(type.parameters);
 			TCDefinition def = base.findName(exp.name, scope);
 			
 			if (def instanceof TCExplicitFunctionDefinition)
@@ -370,9 +370,9 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
 			!(body instanceof TCSubclassResponsibilityExpression) &&
-			!(name.getName().startsWith("measure_")))
+			!(name.isMeasureName()))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
@@ -383,29 +383,21 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		TCType mexpType = measureExp.typeCheck(local, null, NameScope.NAMES, null);
 		measureName = name.getMeasureName(measureExp.location);
-		checkMeasure(measureName, actual);
+		checkMeasure(measureName, mexpType);
 		
-		// Concatenate the parameter patterns into one list for curried measures
-		TCPatternList all = new TCPatternList();
-		
-		for (TCPatternList p: paramPatternList)
-		{
-			all.addAll(p);
-		}
-		
-		TCPatternListList cpll = new TCPatternListList();
-		cpll.add(all);
+		// Note that the measure_f has the precondition of the function it measures.
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(mexpType), paramPatternList, measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
+		def.implicitDefinitions(base);
 		def.typeResolve(base);
+		def.typeCheck(base, scope);
+
 		measureDef = def;
-		
-		measureDef.typeCheck(base, scope);
 	}
 
 	/**
@@ -413,7 +405,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureDef(TCNameToken mname, Environment base, NameScope scope)
 	{
-		if (base.isVDMPP()) mname.setTypeQualifier(getMeasureParams());
+		if (base.isVDMPP()) mname.setTypeQualifier(type.parameters);
 		measureDef = (TCExplicitFunctionDefinition) base.findName(mname, scope);
 
 		if (measureDef == this)
@@ -444,19 +436,32 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			
 			if (typeParams != null)		// Polymorphic, so compare "shape" of param signature
 			{
-				if (!mtype.parameters.toString().equals(getMeasureParams().toString()))
+				if (!mtype.parameters.toString().equals(type.parameters.toString()))
 				{
 					mname.report(3303, "Measure parameters different to function");
-					detail2(mname.getName(), mtype.parameters, "Expected", getMeasureParams());
+					detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result));
 				}
 			}
-			else if (!TypeComparator.compatible(mtype.parameters, getMeasureParams()))
+			else if (isCurried && !(mtype.result instanceof TCFunctionType))
 			{
 				mname.report(3303, "Measure parameters different to function");
-				detail2(mname.getName(), mtype.parameters, "Expected", getMeasureParams());
+				detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result));
 			}
-
-			checkMeasure(mname, mtype.result);
+			else if (!TypeComparator.compatible(mtype.parameters, type.parameters))
+			{
+				mname.report(3303, "Measure parameters different to function");
+				detail2(mname.getName(), mtype.parameters, "Expected", type.parameters);
+			}
+			
+			TCType result = mtype.result;
+			
+			while (result instanceof TCFunctionType)
+			{
+				TCFunctionType fr = (TCFunctionType)result;
+				result = fr.result;
+			}
+			
+			checkMeasure(mname, result);
 		}
 	}
 
@@ -493,26 +498,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public TCType getType()
 	{
 		return type;		// NB entire "->" type, not the result
-	}
-
-	private TCTypeList getMeasureParams()
-	{
-		TCTypeList params = new TCTypeList();
-		params.addAll(type.parameters);
-		
-		if (isCurried)
-		{
-			TCType rtype = type.result;
-
-			while (rtype instanceof TCFunctionType)
-			{
-				TCFunctionType ftype = (TCFunctionType)rtype;
-				params.addAll(ftype.parameters);
-				rtype = ftype.result;
-			}
-		}
-		
-		return params;
 	}
 
 	private TCType checkParams(ListIterator<TCPatternList> plists, TCFunctionType ftype)
@@ -622,9 +607,9 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			return postdef;
 		}
 		
-		if (measureDef != null && measureDef.findName(sought, scope) != null)
+		if (measureDef != null)
 		{
-			return measureDef;
+			return measureDef.findName(sought, scope);	// eg. pre_measure_f
 		}
 
 		return null;
@@ -645,7 +630,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			defs.add(postdef);
 		}
 		
-		if (measureName != null && measureName.getName().startsWith("measure_"))
+		if (measureDef != null && measureName.isMeasureName())
 		{
 			defs.add(measureDef);
 		}

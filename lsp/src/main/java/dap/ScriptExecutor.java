@@ -29,7 +29,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import json.JSONObject;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.ErrorCommand;
 import vdmj.commands.ScriptRunnable;
 import workspace.Diag;
@@ -65,10 +65,18 @@ public class ScriptExecutor extends AsyncExecutor
 				
 				if (line == null)
 				{
-					return;
+					return;		// End of file
 				}
 				
-				Command cmd = Command.parse(line);
+				line = line.trim();
+				
+				if (line.isEmpty() || line.startsWith("--"))
+				{
+					server.stdout(line + "\n");
+					continue;
+				}
+				
+				AnalysisCommand cmd = AnalysisCommand.parse(line);
 				Diag.info("Script running %s", line);
 				server.stdout(line + "\n");
 				
@@ -88,6 +96,8 @@ public class ScriptExecutor extends AsyncExecutor
 					if (cmd instanceof ErrorCommand)
 					{
 						Diag.info("Script aborted");
+						ErrorCommand ecmd = (ErrorCommand)cmd;
+						server.stderr(ecmd.getMessage() + "\n");
 						server.stderr("ABORTED " + filename + "\n");
 						server.writeMessage(new DAPResponse(request, false, null, null));
 						return;

@@ -28,9 +28,11 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POBind;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSeqCompExpression extends POSeqExpression
@@ -57,20 +59,21 @@ public class POSeqCompExpression extends POSeqExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(first.getProofObligations(ctxt, env));
+		obligations.addAll(first.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
-		obligations.addAll(bind.getProofObligations(ctxt, env));
+		obligations.addAll(bind.getProofObligations(ctxt, pogState, env));
 
 		if (predicate != null)
 		{
     		ctxt.push(new POForAllContext(this));
-    		obligations.addAll(predicate.getProofObligations(ctxt, env));
+    		obligations.addAll(predicate.getProofObligations(ctxt, pogState, env));
+    		obligations.addAll(checkUnionQualifiers(predicate, TCTypeQualifier.getBoolQualifier(), ctxt));
     		ctxt.pop();
 		}
 

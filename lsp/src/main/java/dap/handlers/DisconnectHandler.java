@@ -29,11 +29,12 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import dap.DAPServer;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class DisconnectHandler extends DAPHandler
 {
@@ -45,7 +46,7 @@ public class DisconnectHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		DAPDebugReader debugReader = manager.getDebugReader();
 		
 		if (debugReader != null)
@@ -65,7 +66,9 @@ public class DisconnectHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			Boolean terminateDebuggee = Utils.getBoolean(arguments, "terminateDebuggee");
-			return manager.disconnect(request, terminateDebuggee);
+			DAPMessageList result = manager.dapDisconnect(request, terminateDebuggee);
+			DAPServer.getInstance().setRunning(false);
+			return result;
 		}
 	}
 }

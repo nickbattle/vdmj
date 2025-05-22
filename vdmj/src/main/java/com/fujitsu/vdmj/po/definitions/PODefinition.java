@@ -25,17 +25,21 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.definitions.visitors.POGetVariableNamesVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * The abstract parent of all definitions. A definition can represent a data
@@ -50,11 +54,17 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	/** The name of the object being defined. */
 	public final TCNameToken name;
 	
+	/** The scope of the name */
+	public NameScope nameScope = null;
+	
 	/** A pointer to the enclosing class definition, if any. */
 	public POClassDefinition classDefinition = null;	// Set in subclass constructors.
 	
 	/** A list of annotations, if any */
 	public POAnnotationList annotations = null;
+
+	/** A public/private/protected/static specifier, if any. */
+	public POAccessSpecifier accessSpecifier = null;
 
 	/**
 	 * Create a new definition of a particular name and location.
@@ -64,10 +74,39 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 		super(location);
 		this.name = tcNameToken;
 	}
+	
+	public void setNameScope(NameScope scope)
+	{
+		this.nameScope = scope;
+	}
+	
+	public void setAccessSpecifier(POAccessSpecifier specifier)
+	{
+		this.accessSpecifier = specifier;
+	}
 
 	@Override
 	abstract public String toString();
 	
+	/**
+	 * For a state definition S, return a pattern like mk_S(a, b, ...) where the field patterns
+	 * are the names of the state fields. Similarly with objects, using "obj_C" patterns.
+	 * @param maximal TODO
+	 */
+	public String toPattern(boolean maximal)
+	{
+		return "?";		// Only defined for state and ClassDefinitions
+	}
+
+	/**
+	 * The definition with its types' module/class(es) explicit, if we are not the same as the
+	 * location of this definition.
+	 */
+	public String toExplicitString(LexLocation from)
+	{
+		return toString();		// Overridden in defs with types
+	}
+
 	@Override
 	public int compareTo(PODefinition o)
 	{
@@ -120,11 +159,20 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	 * Get a list of proof obligations for the definition.
 	 *
 	 * @param ctxt The call context.
+	 * @param pogState Tracks updates to state in operations.
 	 * @return A list of POs.
 	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();
+	}
+
+	/**
+	 * Get a set of possible exceptions raised from the definition (see operations)
+	 */
+	public TCTypeSet getPossibleExceptions()
+	{
+		return null;
 	}
 
 	/**

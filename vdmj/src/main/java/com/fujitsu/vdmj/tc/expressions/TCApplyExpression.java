@@ -61,7 +61,10 @@ public class TCApplyExpression extends TCExpression
 
 	public TCType type;
 	public TCTypeList argtypes;
-	public TCDefinitionListList recursiveCycles;	// Used by PO
+	
+	// Used by PO
+	public TCDefinitionListList recursiveCycles = null;
+	public TCDefinition opdef = null;
 
 	public TCApplyExpression(TCExpression root, TCExpressionList args)
 	{
@@ -137,7 +140,7 @@ public class TCApplyExpression extends TCExpression
 				root.report(3350, "Polymorphic function has not been instantiated");
 			}
 			
-			ft.typeResolve(env, null);
+			ft.typeResolve(env);
 			results.add(functionApply(isSimple, ft));
 		}
 
@@ -146,7 +149,7 @@ public class TCApplyExpression extends TCExpression
 			if (root instanceof TCVariableExpression)
 			{
 				TCVariableExpression exp = (TCVariableExpression)root;
-				TCDefinition opdef = env.findName(exp.name, scope);
+				opdef = env.findName(exp.name, scope);
 				
 				if (opdef != null && TCStatement.isConstructor(opdef) && !TCStatement.inConstructor(env))
 				{
@@ -156,7 +159,7 @@ public class TCApplyExpression extends TCExpression
 			}
 			
 			TCOperationType ot = type.getOperation();
-			ot.typeResolve(env, null);
+			ot.typeResolve(env);
 
 			if (inFunction && Settings.release == Release.VDM_10 && !ot.pure)
 			{

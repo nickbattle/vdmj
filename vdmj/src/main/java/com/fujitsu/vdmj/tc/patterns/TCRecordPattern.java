@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -52,6 +53,29 @@ public class TCRecordPattern extends TCPattern
 	{
 		return "mk_" + type + "(" + Utils.listToString(plist) + ")";
 	}
+	
+	@Override
+	public String toSource()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("mk_");
+		sb.append(typename);
+		sb.append("(");
+		
+		String sep = "";
+		
+		for (TCPattern p: plist)
+		{
+			sb.append(sep);
+			sb.append(p.toSource());
+			sep =", ";
+		}
+		
+		sb.append(")");
+		
+		return sb.toString();
+	}
 
 	@Override
 	public void unResolve()
@@ -68,7 +92,17 @@ public class TCRecordPattern extends TCPattern
 		try
 		{
 			plist.typeResolve(env);
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
+			
+			if (type instanceof TCRecordType)
+			{
+				TCRecordType recordType = (TCRecordType)type;
+				
+				if (recordType.isOpaque(location))
+				{
+					report(3127, "Type '" + typename + "' has no struct export");
+				}
+			}
 		}
 		catch (TypeCheckException e)
 		{

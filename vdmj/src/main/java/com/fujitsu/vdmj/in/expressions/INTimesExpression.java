@@ -53,17 +53,22 @@ public class INTimesExpression extends INNumericBinaryExpression
 
 			if (NumericValue.areIntegers(l, r))
 			{
-				long lv = l.intValue(ctxt);
-				long rv = r.intValue(ctxt);
-				long mult = multiplyExact(lv, rv, ctxt);
-				return NumericValue.valueOf(mult, ctxt);
+				try
+				{
+					long lv = l.intValue(ctxt);
+					long rv = r.intValue(ctxt);
+					long mult = multiplyExact(lv, rv, ctxt);
+					return NumericValue.valueOf(mult, ctxt);
+				}
+				catch (ValueException e)
+				{
+					// Too big? Let's try reals...
+				}
 			}
-			else
-			{
-				double lv = l.realValue(ctxt);
-				double rv = r.realValue(ctxt);
-	    		return NumericValue.valueOf(lv * rv, ctxt);
-			}
+
+			double lv = l.realValue(ctxt);
+			double rv = r.realValue(ctxt);
+    		return NumericValue.valueOf(lv * rv, ctxt);
 		}
 		catch (ValueException e)
 		{

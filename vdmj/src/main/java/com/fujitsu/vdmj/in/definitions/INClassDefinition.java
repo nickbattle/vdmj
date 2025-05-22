@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Delegate;
 import com.fujitsu.vdmj.runtime.ObjectContext;
+import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.scheduler.Lock;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -192,7 +193,7 @@ public class INClassDefinition extends INDefinition
 	/**
 	 * Force an initialization of the static functions/operations for the class.
 	 */
-	public void staticInit(Context ctxt)
+	public void forceStaticInit(Context ctxt)
 	{
 		staticInit = false;				// Forced initialization
 		staticValuesInit = false;		// Forced initialization
@@ -206,7 +207,7 @@ public class INClassDefinition extends INDefinition
 	/**
 	 * Force an initialization of the static values for the class.
 	 */
-	public void staticValuesInit(Context ctxt)
+	public void forceStaticValuesInit(Context ctxt)
 	{
 		staticValuesInit = false;		// Forced initialization
 		setStaticValues(ctxt);
@@ -232,11 +233,11 @@ public class INClassDefinition extends INDefinition
     		privateStaticValues = new NameValuePairMap();
     		publicStaticValues = new NameValuePairMap();
 
-    		// We initialize function and operation definitions first as these
-    		// can be called by variable initializations.
+    		// We initialize inherited definitions first, so that they can be
+    		// overridden by local definitions, cf. TCClassDefinition.getDefinitions()
 
-    		setStaticDefinitions(definitions, initCtxt);
     		setStaticDefinitions(localInheritedDefinitions, initCtxt);
+    		setStaticDefinitions(definitions, initCtxt);
     		
     		try
     		{
@@ -271,12 +272,12 @@ public class INClassDefinition extends INDefinition
 				{
 					case PRIVATE:
 					case PROTECTED:
-						privateStaticValues.putAllNew(nvl);
+						privateStaticValues.putAll(nvl);
 						initCtxt.putList(nvl);
 						break;
 
 					case PUBLIC:
-						publicStaticValues.putAllNew(nvl);
+						publicStaticValues.putAll(nvl);
 						initCtxt.putList(nvl);
 						break;
 						
@@ -297,6 +298,9 @@ public class INClassDefinition extends INDefinition
     		{
     			sdef.setStaticValues(initCtxt);
     		}
+
+    		// We initialize inherited definitions first, so that they can be
+    		// overridden by local definitions, cf. TCClassDefinition.getDefinitions()
 
     		setStaticValues(localInheritedDefinitions, initCtxt, true);
     		setStaticValues(definitions, initCtxt, false);
@@ -328,15 +332,24 @@ public class INClassDefinition extends INDefinition
 			}
 			else
 			{
+				// Create a root context to identify the init location for this defn.
+				Context ctxt = new StateContext(d.location, "<init> " + d, initCtxt, null); 
+				
 				if (d.isValueDefinition())
 				{
-					nvl = d.getNamedValues(initCtxt);
+					nvl = d.getNamedValues(ctxt);
 				}
 				else if (d.isStatic() && d.isInstanceVariable())
 				{
-					nvl = d.getNamedValues(initCtxt);
+					nvl = d.getNamedValues(ctxt);
 				}
 			}
+			
+			// The putAllNews (ie. only if the name doesn't already exist) is required
+			// here because we can get multiple calls to setStaticValues, one from the
+			// outer forceStaticValuesInit and one from a makeInstance. In that
+			// case, for statics, we have to use the existing named value rather than
+			// creating a new one - ie. the one static value.
 
 			if (d.isValueDefinition())
 			{
@@ -471,7 +484,7 @@ public class INClassDefinition extends INDefinition
 		setStaticDefinitions(ctxt.getGlobal());		// When static member := new X()
 		setStaticValues(ctxt.getGlobal());			// When static member := new X()
 
-		List<ObjectValue> inherited = new Vector<ObjectValue>();
+		List<ObjectValue> superObjects = new Vector<ObjectValue>();
 		NameValuePairMap members = new NameValuePairMap();
 
 		for (INClassDefinition sdef: superdefs)
@@ -485,7 +498,7 @@ public class INClassDefinition extends INDefinition
 				done.put(sdef.name, obj);
 			}
 
-			inherited.add(obj);
+			superObjects.add(obj);
 		}
 
 		// NB. we don't use localInheritedDefinitions because we're creating
@@ -494,7 +507,7 @@ public class INClassDefinition extends INDefinition
 		for (INDefinition idef: superInheritedDefinitions)
 		{
 			// Inherited definitions don't notice when their referenced
-			// definition names are updated with type qualifiers.
+			// definition names are updated with type qualifiers, so fix.
 
 			if (idef instanceof INInheritedDefinition)
 			{
@@ -502,13 +515,13 @@ public class INClassDefinition extends INDefinition
 				i.name.setTypeQualifier(i.superdef.name.getTypeQualifier());
 			}
 
-			if (idef.isRuntime() && !idef.isSubclassResponsibility())	// eg. TypeDefinitions aren't
+			if (idef.isRuntime())	// TypeDefinitions and abstract fn/ops aren't
 			{
 				Value v = null;
 
-				for (ObjectValue sobj: inherited)
+				for (ObjectValue superObject: superObjects)
 				{
-					v = sobj.get(idef.name, true);
+					v = superObject.get(idef.name, true);
 
 					if (v != null)
 					{
@@ -541,7 +554,7 @@ public class INClassDefinition extends INDefinition
 		// We create an ObjectContext here so that the member initializers can run in
 		// a "self" context that is sensible.
 
-		ObjectValue object = new ObjectValue((TCClassType)getType(), members, inherited, ctxt.threadState.CPU, this);
+		ObjectValue object = new ObjectValue((TCClassType)getType(), members, superObjects, ctxt.threadState.CPU, this);
 		Context initCtxt = new ObjectContext(location, "field initializers", ctxt, object);
 		
 		// We create an empty context to pass for function creation, so that

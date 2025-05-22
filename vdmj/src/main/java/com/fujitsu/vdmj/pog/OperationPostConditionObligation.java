@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
@@ -36,22 +37,54 @@ public class OperationPostConditionObligation extends ProofObligation
 	public OperationPostConditionObligation(
 		POExplicitOperationDefinition op, POContextStack ctxt)
 	{
-		super(op.location, POType.OP_POST_CONDITION, ctxt);
-		value = ctxt.getObligation(getExp(op.precondition, op.postcondition, null));
+		super(op.postcondition.location, POType.OP_POST_CONDITION, ctxt);
+		source = ctxt.getSource(getExp(op.precondition, op.postcondition, null));
+		setObligationVars(ctxt, op.postcondition);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public OperationPostConditionObligation(
 		POImplicitOperationDefinition op, POContextStack ctxt)
 	{
-		super(op.location, POType.OP_POST_CONDITION, ctxt);
-		value = ctxt.getObligation(getExp(op.precondition, op.postcondition, op.errors));
+		super(op.postcondition.location, POType.OP_POST_CONDITION, ctxt);
+		source = ctxt.getSource(getExp(op.precondition, op.postcondition, op.errors));
+		setObligationVars(ctxt, op.postcondition);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POExplicitOperationDefinition op, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives(false))	// NB! don't exclude returns
+		{
+			results.add(new OperationPostConditionObligation(op, choice));
+		}
+		
+		return results;
+	}
+
+	public static List<ProofObligation> getAllPOs(POImplicitOperationDefinition op, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives(false))	// NB! don't exclude returns
+		{
+			results.add(new OperationPostConditionObligation(op, choice));
+		}
+		
+		return results;
 	}
 
 	private String getExp(POExpression preexp, POExpression postexp, List<POErrorCase> errs)
 	{
 		if (errs == null)
 		{
-			return postexp.toString();
+			return postexp.toString().replaceAll("~", "\\$");
 		}
 		else
 		{
@@ -79,7 +112,7 @@ public class OperationPostConditionObligation extends ProofObligation
 				sb.append(")");
 			}
 
-			return sb.toString();
+			return sb.toString().replaceAll("~", "\\$");
 		}
 	}
 }

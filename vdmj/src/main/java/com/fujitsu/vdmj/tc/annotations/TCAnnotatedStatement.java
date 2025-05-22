@@ -43,6 +43,7 @@ public class TCAnnotatedStatement extends TCStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.statement = statement;
+		setType(statement.getType());
 	}
 
 	@Override

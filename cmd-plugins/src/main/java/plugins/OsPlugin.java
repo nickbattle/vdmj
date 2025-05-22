@@ -24,45 +24,57 @@
 
 package plugins;
 
-import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.messages.Console;
-import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
-public class OsPlugin extends CommandPlugin
+/**
+ * A simple AnalysisCommand to issue an operating system command.
+ */
+public class OsPlugin extends AnalysisCommand
 {
-	public OsPlugin(Interpreter interpreter)
+	private final static String CMD = "os <command> [<arguments>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - run an operating system command";
+	
+	
+	public OsPlugin(String line)
 	{
-		super(interpreter);
+		super(line);
+		
+		if (!argv[0].equals("os"))
+		{
+			throw new IllegalArgumentException(USAGE);
+		}
 	}
 
 	@Override
-	public boolean run(String[] argv) throws Exception
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
-			Console.out.println(help());
-			return true;
+			return USAGE;
 		}
 		
 		String[] cmd = new String[argv.length - 1];
 		System.arraycopy(argv, 1, cmd, 0, cmd.length);		
 		
-		ProcessBuilder pb = new ProcessBuilder(cmd);
-		pb.inheritIO();
-		Process p = pb.start();
-		p.waitFor();
-		
-		if (p.exitValue() != 0)
+		try
 		{
-			Console.err.println("Process exit code = " + p.exitValue());
+			ProcessBuilder pb = new ProcessBuilder(cmd);
+			pb.inheritIO();
+			Process p = pb.start();
+			p.waitFor();
+			
+			if (p.exitValue() != 0)
+			{
+				Console.err.println("Process exit code = " + p.exitValue());
+			}
+		}
+		catch (Exception e)
+		{
+			Console.err.println("Error: " + e);
 		}
 		
-		return true;	// Even if command failed
-	}
-
-	@Override
-	public String help()
-	{
-		return "os <command> [<args>] - run an operating system command";
+		return null;	// Even if command failed
 	}
 }

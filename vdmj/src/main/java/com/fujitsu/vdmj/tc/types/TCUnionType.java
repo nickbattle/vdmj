@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
@@ -69,6 +68,8 @@ public class TCUnionType extends TCType
 
 	private int prodCard = -1;
 	private boolean expanded = false;
+	
+	public static TCType MISSING_FIELD = new TCQuoteType(LexLocation.ANY, "?");
 
 	public TCUnionType(LexLocation location, TCType a, TCType b)
 	{
@@ -101,22 +102,6 @@ public class TCUnionType extends TCType
 	}
 
 	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		for (TCType t: types)
-		{
-			TCType rt = t.isType(typename, location);
-
-			if (rt != null)
-			{
-				return rt;
-			}
-		}
-
-		return null;
-	}
-
-	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		for (TCType t: types)
@@ -128,6 +113,20 @@ public class TCUnionType extends TCType
 		}
 
 		return false;
+	}
+	
+	@Override
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		for (TCType t: types)
+		{
+			if (!t.isAlways(typeclass, location))
+			{
+				return false;
+			}
+		}
+
+		return true;	// All of them pass
 	}
 
 	@Override
@@ -164,6 +163,34 @@ public class TCUnionType extends TCType
 		for (TCType t: types)
 		{
 			if (t.isVoid())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	@Override
+	public boolean isReturn()
+	{
+		for (TCType t: types)
+		{
+			if (!t.isReturn())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	@Override
+	public boolean hasReturn()
+	{
+		for (TCType t: types)
+		{
+			if (t.isReturn())
 			{
 				return true;
 			}
@@ -390,14 +417,11 @@ public class TCUnionType extends TCType
     		// fields' types...
 
     		Map<String, TCTypeList> common = new HashMap<String, TCTypeList>();
-    		int recordCount = 0;
 
     		for (TCType t: types)
     		{
     			if (t.isRecord(location))
     			{
-    				recordCount++;
-    				
     				for (TCField f: t.getRecord().fields)
     				{
     					TCTypeList current = common.get(f.tag);
@@ -418,18 +442,20 @@ public class TCUnionType extends TCType
     		// same size. But if not, the shorter ones have to have UnknownTypes added,
     		// because some of the records do not have that field.
     		
+    		// We no longer do this - see POFieldExpression logic.
+    		
     		Map<String, TCTypeSet> typesets = new HashMap<String, TCTypeSet>();
     		
     		for (String field: common.keySet())
     		{
     			TCTypeList list = common.get(field);
     			
-    			if (list.size() != recordCount)
-    			{
-    				// Both unknown and undefined types do not trigger isSubType, so we use
-    				// an illegal quote type, <?>.
-    				list.add(new TCQuoteType(location, "?"));
-    			}
+//    			if (list.size() != recordCount || nonrecs)
+//    			{
+//    				// Both unknown and undefined types do not trigger isSubType, so we use
+//    				// an illegal quote type, <?>.
+//    				list.add(MISSING_FIELD);
+//    			}
     			
     			TCTypeSet set = new TCTypeSet();
     			set.addAll(list);
@@ -805,6 +831,21 @@ public class TCUnionType extends TCType
 
 		return opType;
 	}
+	
+	public TCTypeSet getMatches(TCTypeQualifier qualifier)
+	{
+		TCTypeSet set = new TCTypeSet();
+		
+		for (TCType member: types)
+		{
+			if (qualifier.matches(member))
+			{
+				set.add(member);
+			}
+		}
+		
+		return set;
+	}
 
 	@Override
 	public boolean equals(Object other)
@@ -814,19 +855,10 @@ public class TCUnionType extends TCType
 		if (other instanceof TCUnionType)
 		{
 			TCUnionType uother = (TCUnionType)other;
-
-			for (TCType t: uother.types)
-			{
-				if (!types.contains(t))
-				{
-					return false;
-				}
-			}
-
-			return true;
+			return uother.types.equals(types);
 		}
 
-		return types.contains(other);
+		return false;
 	}
 
 	@Override
@@ -878,32 +910,18 @@ public class TCUnionType extends TCType
 		}
 	}
 
-	private boolean infinite = false;
-
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
-		if (resolved)
-		{
-			return this;
-		}
-		else
-		{
-			resolved = true;
-			infinite = true;
-		}
-
+		if (resolved) return this; else resolved = true;
 		TCTypeSet fixed = new TCTypeSet();
 		TypeCheckException problem = null;
 
 		for (TCType t: types)
 		{
-			if (root != null)
-				root.infinite = false;
-
 			try
 			{
-				fixed.add(t.typeResolve(env, root));
+				fixed.add(t.typeResolve(env));
 			}
 			catch (TypeCheckException e)
 			{
@@ -919,9 +937,6 @@ public class TCUnionType extends TCType
 
 				resolved = true;	// See bug #26
 			}
-
-			if (root != null)
-				infinite = infinite && root.infinite;
 		}
 		
 		if (problem != null)
@@ -931,7 +946,6 @@ public class TCUnionType extends TCType
 		}
 
 		types = fixed;
-		if (root != null) root.infinite = infinite;
 
 		// Resolved types may be unions, so force a re-expand
 		expanded = false;

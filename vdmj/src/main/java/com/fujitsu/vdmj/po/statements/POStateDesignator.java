@@ -26,8 +26,13 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * The root of the state designator hierarchy.
@@ -45,6 +50,30 @@ public abstract class POStateDesignator extends PONode
 
 	@Override
 	abstract public String toString();
+	
+	abstract public POExpression toExpression();
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	abstract public TCNameToken updatedVariableName();
+
+	/**
+	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the type of the variable "x".
+	 */
+	abstract public TCType updatedVariableType();
+	
+	/**
+	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	abstract public TCNameSet getVariableNames();
+	
+	/**
+	 * All expressions used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	abstract public POExpressionList getExpressions();
 
 	/**
 	 * @param ctxt

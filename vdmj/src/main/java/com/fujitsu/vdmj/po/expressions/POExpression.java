@@ -28,10 +28,20 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
@@ -98,10 +108,11 @@ public abstract class POExpression extends PONode implements Serializable
 	 * Get a list of proof obligations from the expression.
 	 *
 	 * @param ctxt The call context.
+	 * @param pogState TODO
 	 * @return The list of proof obligations.
 	 */
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();
 	}
@@ -112,13 +123,13 @@ public abstract class POExpression extends PONode implements Serializable
 	 * This is used during proof obligation generation. It is implemented in
 	 * the VariableExpression class.
 	 * 
-	 * null => expression is not a function.
-	 * "" => expression is a function without a precondition.
-	 * "pre_<name>" => expression is a function with a precondition.
+	 * null => expression is not a function or operation.
+	 * "" => expression is a fn/op without a precondition.
+	 * "pre_<name>" => expression is a fn/op with a precondition.
 	 */
 	public String getPreName()
 	{
-		return null;	// Not a function, by default
+		return null;	// Not a fn/op, by default
 	}
 	
 	/**
@@ -132,6 +143,49 @@ public abstract class POExpression extends PONode implements Serializable
 	public TCType getExptype()
 	{
 		return exptype;
+	}
+	
+	public TCNameSet getVariableNames()
+	{
+		POExpressionVariableFinder visitor = new POExpressionVariableFinder();
+		TCNameSet set = new TCNameSet();
+		set.addAll(this.apply(visitor, null));
+		return set;
+	}
+
+	/**
+	 * Get any obligations for unions that are qualified.
+	 */
+	public ProofObligationList checkUnionQualifiers(POExpression exp, TCTypeQualifier qualifier, POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (exp.getExptype() != null && exp.getExptype().isUnion(location))
+		{
+			TCUnionType ut = exp.getExptype().getUnion();
+			TCTypeSet sets = ut.getMatches(qualifier);
+			
+			if (sets.size() < ut.types.size() && sets.size() > 0)
+			{
+				obligations.addAll(SubTypeObligation.getAllPOs(exp, sets.getType(location), exp.getExptype(), ctxt));
+			}
+		}
+
+		return obligations;
+	}
+
+	public TCNameSet updatesState()
+	{
+		POStatementStateFinder finder = new POStatementStateFinder();
+		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		return vset.applyExpressionVisitor(this, true);
+	}
+
+	public TCNameSet readsState()
+	{
+		POStatementStateFinder finder = new POStatementStateFinder();
+		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		return vset.applyExpressionVisitor(this, false);
 	}
 
 	/**

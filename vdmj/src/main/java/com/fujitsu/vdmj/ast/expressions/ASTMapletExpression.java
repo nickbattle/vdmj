@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.ast.expressions;
 
 import com.fujitsu.vdmj.ast.ASTNode;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTMapletExpression extends ASTNode
@@ -36,9 +35,9 @@ public class ASTMapletExpression extends ASTNode
 	public final ASTExpression left;
 	public final ASTExpression right;
 
-	public ASTMapletExpression(ASTExpression left, LexToken op, ASTExpression right)
+	public ASTMapletExpression(ASTExpression left, LexLocation location, ASTExpression right)
 	{
-		this.location = op.location;
+		this.location = location;
 		this.left = left;
 		this.right = right;
 	}

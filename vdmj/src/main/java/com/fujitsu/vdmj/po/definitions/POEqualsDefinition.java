@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -107,7 +108,7 @@ public class POEqualsDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -137,7 +138,7 @@ public class POEqualsDefinition extends PODefinition
 	    				ctxt.checkType(test, expType), compatible))
 	    			{
 	    				list.add(new ValueBindingObligation(this, ctxt));
-	    				list.add(new SubTypeObligation(test, compatible, expType, ctxt));
+	    				list.addAll(SubTypeObligation.getAllPOs(test, compatible, expType, ctxt));
 	    			}
 				}
 			}
@@ -146,21 +147,21 @@ public class POEqualsDefinition extends PODefinition
 		{
 			if (!TypeComparator.isSubType(ctxt.checkType(test, expType), defType))
 			{
-				list.add(new SubTypeObligation(test, defType, expType, ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(test, defType, expType, ctxt));
 			}
 		}
 		else if (bind instanceof POSetBind)
 		{
-			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt, env));
-			list.add(new SetMemberObligation(test, ((POSetBind)bind).set, ctxt));
+			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt, pogState, env));
+			list.addAll(SetMemberObligation.getAllPOs(test, ((POSetBind)bind).set, ctxt));
 		}
 		else if (bind instanceof POSeqBind)
 		{
-			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt, env));
-			list.add(new SeqMemberObligation(test, ((POSeqBind)bind).sequence, ctxt));
+			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt, pogState, env));
+			list.addAll(SeqMemberObligation.getAllPOs(test, ((POSeqBind)bind).sequence, ctxt));
 		}
 
-		list.addAll(test.getProofObligations(ctxt, env));
+		list.addAll(test.getProofObligations(ctxt, pogState, env));
 		return list;
 	}
 

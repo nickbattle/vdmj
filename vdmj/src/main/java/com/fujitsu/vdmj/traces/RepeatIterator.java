@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 import com.fujitsu.vdmj.in.statements.INSkipStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.util.Permutor;
+import com.fujitsu.vdmj.util.Selector;
 
 public class RepeatIterator extends TraceIterator
 {
@@ -39,7 +39,7 @@ public class RepeatIterator extends TraceIterator
 	
 	private int repeatCount;
 	private Integer repeatValue;
-	private Permutor permutor;
+	private Selector permutor;
 	
 	public RepeatIterator(TraceIterator repeat, long from, long to)
 	{
@@ -67,7 +67,7 @@ public class RepeatIterator extends TraceIterator
 		{
 			int[] c = new int[repeatValue];
 			Arrays.fill(c, repeatCount);
-			permutor = new Permutor(c);
+			permutor = new Selector(c);
 		}
 		
 		CallSequence test = getVariables();

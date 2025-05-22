@@ -25,6 +25,8 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -79,12 +81,13 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class SubTypeObligation extends ProofObligation
 {
-	public SubTypeObligation(
+	private SubTypeObligation(
 		POExpression exp, TCType etype, TCType atype, POContextStack ctxt)
 	{
 		super(exp.location, POType.SUB_TYPE, ctxt);
-		value = ctxt.getObligation(oneType(false, exp, etype, atype));
-		return;
+		source = ctxt.getSource(oneTypeSafe(false, exp, etype, atype));
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public SubTypeObligation(
@@ -104,9 +107,9 @@ public class SubTypeObligation extends ProofObligation
 			{
 				TCTypeList actuals = new TCTypeList();
 				
-				for (TCNameToken p: func.typeParams)
+				for (TCType p: func.typeParams)
 				{
-					actuals.add(new TCUnknownType(p.getLocation()));	// "?"
+					actuals.add(new TCUnknownType(p.location));	// "?"
 				}
 				
 				root = new POFuncInstantiationExpression(root, actuals, func.type, func, null);
@@ -120,14 +123,17 @@ public class SubTypeObligation extends ProofObligation
 			}
 			
 			TCFunctionType type = (TCFunctionType)func.getType();
-			body = new POApplyExpression(root, args, type, type.parameters, null);
+			body = new POApplyExpression(root, args, type, type.parameters, null, null);
 		}
 		else
 		{
 			body = func.body;
 		}
 
-		value = ctxt.getObligation(oneType(false, body, etype, atype));
+		source = ctxt.getSource(oneTypeSafe(false, body, etype, atype));
+		setObligationVars(ctxt, body);
+		setReasonsAbout(ctxt.getReasonsAbout());
+		definition = func;
 	}
 
 	public SubTypeObligation(
@@ -154,14 +160,15 @@ public class SubTypeObligation extends ProofObligation
 			}
 
 			TCFunctionType type = (TCFunctionType)func.getType();
-			body = new POApplyExpression(root, args, type, type.parameters, null);
+			body = new POApplyExpression(root, args, type, type.parameters, null, null);
 		}
 		else
 		{
 			body = func.body;
 		}
 
-		value = ctxt.getObligation(oneType(false, body, etype, atype));
+		source = ctxt.getSource(oneTypeSafe(false, body, etype, atype));
+		definition = func;
 	}
 
 	public SubTypeObligation(
@@ -172,8 +179,8 @@ public class SubTypeObligation extends ProofObligation
 		POVariableExpression result = new POVariableExpression(
 			new TCNameToken(def.location, def.name.getModule(), "RESULT"), null);
 
-		value = ctxt.getObligation(
-			oneType(false, result, def.type.result, actualResult));
+		source = ctxt.getSource(oneTypeSafe(false, result, def.type.result, actualResult));
+		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
 	public SubTypeObligation(
@@ -201,10 +208,21 @@ public class SubTypeObligation extends ProofObligation
 			result = new POTupleExpression(def.location, args, null);
 		}
 
-		value = ctxt.getObligation(
-			oneType(false, result, def.type.result, actualResult));
+		source = ctxt.getSource(oneTypeSafe(false, result, def.type.result, actualResult));
 	}
 
+	// NOTE! The atype parameter used to allow null to mean "any type", but this
+	// also caused problems sometimes with POs. Currently atype is not null...
+	
+	private String oneTypeSafe(boolean rec, POExpression exp, TCType etype, TCType atype)
+	{
+		String tc = TypeComparator.getCurrentModule();
+		TypeComparator.setCurrentModule(exp.location.module);
+		String result = oneType(rec, exp, etype, atype);
+		TypeComparator.setCurrentModule(tc);
+		return result;
+	}
+	
 	private String oneType(boolean rec, POExpression exp, TCType etype, TCType atype)
 	{
 		if (atype != null && rec)
@@ -214,12 +232,11 @@ public class SubTypeObligation extends ProofObligation
 				return "";		// A sub comparison is OK without checks
 			}
 		}
-
+		
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
-
 		etype = etype.deBracket();
-
+		
 		if (etype instanceof TCUnionType)
 		{
 			TCUnionType ut = (TCUnionType)etype;
@@ -237,14 +254,13 @@ public class SubTypeObligation extends ProofObligation
 
 			for (TCType poss: possibles)
 			{
-				String s = oneType(true, exp, poss, null);
+				String s = oneType(true, exp, poss, atype);
 
 				sb.append(prefix);
 				sb.append("(");
 				addIs(sb, exp, poss);
 
-				if (s.length() > 0 &&
-					!s.startsWith("is_(") && !s.startsWith("(is_("))
+				if (s.length() > 0 && !s.startsWith("is_("))
 				{
 					sb.append(" and ");
 					sb.append(s);
@@ -259,28 +275,26 @@ public class SubTypeObligation extends ProofObligation
 			TCInvariantType et = (TCInvariantType)etype;
 			prefix = "";
 
-			if (et.invdef != null)
+			if (et.invdef != null && !et.isMaximal())
 			{
-    			sb.append(et.invdef.name.getName());
-    			sb.append("(");
-
-//				This needs to be put back if/when we change the inv_R signature to take
-//    			the record fields as arguments, rather than one R value.
-//				if (exp instanceof POMkTypeExpression)
-//				{
-//					POMkTypeExpression mk = (POMkTypeExpression)exp;
-//					sb.append(Utils.listToString(mk.args));
-//				}
-//				else
+				TCNameToken invname = et.invdef.name;
+				
+				if (invname.getModule().equals(location.module))
 				{
-					sb.append(exp);
+	    			sb.append(invname.getName());	// inv_T
 				}
-
+				else
+				{
+					sb.append(invname.getModule());
+					sb.append("`");
+					sb.append(invname.getName());	// Module`inv_T
+				}
+				
+    			sb.append("(");
+				sb.append(exp);
     			sb.append(")");
-    			prefix = " and ";
 			}
-
-			if (etype instanceof TCNamedType)
+			else if (etype instanceof TCNamedType)
 			{
 				TCNamedType nt = (TCNamedType)etype;
 
@@ -290,7 +304,7 @@ public class SubTypeObligation extends ProofObligation
 				}
 				else
 				{
-					atype = null;
+					// atype = null;
 				}
 
 				String s = oneType(true, exp, nt.type, atype);
@@ -301,6 +315,11 @@ public class SubTypeObligation extends ProofObligation
 					sb.append("(");
 					sb.append(s);
 					sb.append(")");
+				}
+				else
+				{
+					sb.append(prefix);
+					addIs(sb, exp, etype);
 				}
 			}
 			else if (etype instanceof TCRecordType)
@@ -346,7 +365,7 @@ public class SubTypeObligation extends ProofObligation
 		{
 			prefix = "";
 
-			if (etype instanceof TCSeq1Type)
+			if (etype instanceof TCSeq1Type && atype != null && !(atype.getSeq() instanceof TCSeq1Type))
 			{
     			sb.append(exp);
     			sb.append(" <> []");
@@ -381,6 +400,7 @@ public class SubTypeObligation extends ProofObligation
 
 				if (s.length() > 0)
 				{
+					sb.append(prefix);
 					sb.append("(");
 					sb.append(s);
 					sb.append(")");
@@ -445,16 +465,15 @@ public class SubTypeObligation extends ProofObligation
 					}
 				}
 			}
-			else
-			{
-				addIs(sb, exp, etype);
-			}
+
+			sb.append(prefix);
+			addIs(sb, exp, etype);	// eg. is injective as well as the above
 		}
 		else if (etype instanceof TCSetType)
 		{
 			prefix = "";
 
-			if (etype instanceof TCSet1Type)
+			if (etype instanceof TCSet1Type && atype != null && !(atype.getSet() instanceof TCSet1Type))
 			{
     			sb.append(exp);
     			sb.append(" <> {}");
@@ -480,8 +499,6 @@ public class SubTypeObligation extends ProofObligation
 						prefix = "\nand ";
 					}
 				}
-
-				sb.append("\nand ");
 			}
 			else if (exp instanceof POSetRangeExpression)
 			{
@@ -643,5 +660,22 @@ public class SubTypeObligation extends ProofObligation
 		sb.append(", ");
 		sb.append(explicitType(type, exp.location));
 		sb.append(")");
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(
+			POExpression exp, TCType etype, TCType atype, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new SubTypeObligation(exp, etype, atype, choice));
+		}
+		
+		return results;
 	}
 }

@@ -35,8 +35,11 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
-import workspace.LSPXWorkspaceManager;
+import workspace.EventHub;
+import workspace.MessageHub;
+import workspace.events.UnknownTranslationEvent;
+import workspace.plugins.LSPPlugin;
+import workspace.plugins.TRPlugin;
 
 public class TranslateHandler extends LSPHandler
 {
@@ -48,7 +51,7 @@ public class TranslateHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		if (!LSPWorkspaceManager.getInstance().hasClientCapability("experimental.translateProvider"))
+		if (!LSPPlugin.getInstance().hasClientCapability("experimental.translateProvider"))
 		{
 			return new RPCMessageList(request, RPCErrors.MethodNotFound, "Translate capability is not enabled by client");
 		}
@@ -92,25 +95,37 @@ public class TranslateHandler extends LSPHandler
 				return new RPCMessageList(request, RPCErrors.InvalidParams, "saveUri does not exist");
 			}
 			
+			TRPlugin tr = registry.getPlugin("TR");
+			
 			switch (language)
 			{
 				case "latex":
-					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri, options);
+					return tr.translateLaTeX(request, file, saveUri, options);
 				
 				case "word":
-					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri, options);
+					return tr.translateWord(request, file, saveUri, options);
 				
 				case "coverage":
-					return LSPXWorkspaceManager.getInstance().translateCoverage(request, file, saveUri, options);
+					return tr.translateCoverage(request, file, saveUri, options);
 				
 				case "graphviz":
-					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri, options);
-				
-				case "isabelle":
-					return LSPXWorkspaceManager.getInstance().translateIsabelle(request, file, saveUri, options);
+					return tr.translateGraphviz(request, file, saveUri, options);
 				
 				default:
-					return new RPCMessageList(request, RPCErrors.InvalidParams, "Unsupported language");
+					RPCMessageList result = EventHub.getInstance().publish(new UnknownTranslationEvent(request, language));
+					
+					if (result.isEmpty())	// Not handled
+					{
+						Diag.error("No external plugin registered for " + language);
+						return new RPCMessageList(request, RPCErrors.MethodNotFound, language);
+					}
+					else
+					{
+						// Allow translations to raise errors
+						result.addAll(MessageHub.getInstance().getDiagnosticResponses());
+					}
+					
+					return result;
 			}
 			
 		}

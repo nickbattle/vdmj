@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.values;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -44,6 +45,11 @@ abstract public class ReferenceValue extends Value
 	public ReferenceValue()
 	{
 		this.value = new UndefinedValue();
+	}
+	
+	public Value getValue()
+	{
+		return value;
 	}
 
 	@Override
@@ -232,6 +238,12 @@ abstract public class ReferenceValue extends Value
 	public String toString()
 	{
 		return value.toString();
+	}
+	
+	@Override
+	public String toExplicitString(LexLocation from)
+	{
+		return value.toExplicitString(from);
 	}
 
 	@Override

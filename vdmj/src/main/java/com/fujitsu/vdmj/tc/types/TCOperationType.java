@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -148,7 +147,7 @@ public class TCOperationType extends TCType
 	}
 
 	@Override
-	public TCOperationType typeResolve(Environment env, TCTypeDefinition root)
+	public TCOperationType typeResolve(Environment env)
 	{
 		if (resolved) return this; else { resolved = true; }
 
@@ -159,7 +158,7 @@ public class TCOperationType extends TCType
 		{
 			try
 			{
-				fixed.add(type.typeResolve(env, root));
+				fixed.add(type.typeResolve(env));
 			}
 			catch (TypeCheckException e)
 			{
@@ -181,7 +180,7 @@ public class TCOperationType extends TCType
 		try
 		{
 			parameters = fixed;
-			result = result.typeResolve(env, root);
+			result = result.typeResolve(env);
 		}
 		catch (TypeCheckException e)
 		{

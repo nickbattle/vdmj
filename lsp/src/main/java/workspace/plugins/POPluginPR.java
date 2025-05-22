@@ -27,12 +27,18 @@ package workspace.plugins;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+
+import json.JSONObject;
+import workspace.events.CheckPrepareEvent;
 
 public class POPluginPR extends POPlugin
 {
 	private POClassList poClassList;
+	private ProofObligationList obligationList;
 
 	public POPluginPR()
 	{
@@ -40,9 +46,11 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	public void preCheck()
+	protected void preCheck(CheckPrepareEvent ev)
 	{
+		super.preCheck(ev);
 		poClassList = null;
+		obligationList = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -60,8 +68,28 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	protected ProofObligationList getProofObligations()
+	public ProofObligationList getProofObligations()
 	{
-		return poClassList.getProofObligations();
+		if (obligationList == null)
+		{
+			POAnnotation.init();
+			obligationList = poClassList.getProofObligations();
+			POAnnotation.close();
+			obligationList.renumber();
+		}
+
+		return obligationList;
+	}
+
+	@Override
+	public JSONObject getCexLaunch(ProofObligation po)
+	{
+		return null;	// Needs to create new object?
+	}
+
+	@Override
+	public JSONObject getWitnessLaunch(ProofObligation po)
+	{
+		return null;	// Needs to create new object?
 	}
 }

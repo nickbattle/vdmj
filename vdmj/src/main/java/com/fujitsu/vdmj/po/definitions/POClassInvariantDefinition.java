@@ -27,7 +27,8 @@ package com.fujitsu.vdmj.po.definitions;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.PONoCheckContext;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -63,15 +64,13 @@ public class POClassInvariantDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
 		if (!classDefinition.hasConstructors)
 		{
-			ctxt.push(new PONoCheckContext());
-			list.add(new StateInvariantObligation(this, ctxt));
-			ctxt.pop();
+			list.add(new StateInvariantObligation(this, ctxt).markUnchecked(ProofObligation.UNCHECKED_VDMPP));
 		}
 
 		return list;

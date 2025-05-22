@@ -28,12 +28,19 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 
 /**
@@ -87,14 +94,122 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment publicEnv)
+	public String toPattern(boolean maximal)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("obj_");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (TCDefinition def: tcdef.localInheritedDefinitions)
+		{
+			if (def instanceof TCInheritedDefinition)
+			{
+				TCInheritedDefinition idef = (TCInheritedDefinition)def;
+
+				if (idef.superdef instanceof TCInstanceVariableDefinition)
+				{
+					sb.append(sep);
+					sb.append(idef.superdef.name.getName());
+					sb.append(" |-> ");
+					sb.append(idef.superdef.name.getName());
+					sep = ", ";
+				}
+			}
+		}
+
+		for (PODefinition def: definitions)
+		{
+			if (def instanceof POInstanceVariableDefinition)
+			{
+				sb.append(sep);
+				sb.append(def.name.getName());
+				sb.append(" |-> ");
+				sb.append(def.name.getName());
+				sep = ", ";
+			}
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
+	
+	public String toNew()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("new ");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				sb.append(sep);
+				sb.append(field.name.getName());
+				sep = ", ";
+			}
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
+	
+	/**
+	 * True if the class has a constructor that has one parameter for each variable.
+	 * This is used in POs that need to call "new X(a, b, c)".
+	 */
+	public boolean hasNew()
+	{
+		TCTypeList allvars = new TCTypeList();
+		
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				POInstanceVariableDefinition iv = (POInstanceVariableDefinition)field;
+				allvars.add(iv.type);
+			}
+		}
+
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition op = (POExplicitOperationDefinition)field;
+				
+				if (op.isConstructor)
+				{
+					if (op.type.parameters.equals(allvars))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment publicEnv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 		
 		Environment env = new PrivateClassEnvironment(tcdef, publicEnv);
-		list.addAll(definitions.getProofObligations(ctxt, env));
-		list.typeCheck(tcdef.name, env);
+		Environment local = new FlatEnvironment(tcdef.getSelfDefinition(), env);
+
+		for (PODefinition def: definitions)
+		{
+			ctxt.push(new PONameContext(def.getVariableNames()));
+			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
+			ctxt.clear();
+		}
+		
+		list.typeCheck(tcdef.name, local);
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;

@@ -31,8 +31,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.2</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -41,24 +39,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<includes>
-						<include>**/*Test.java</include>
-					</includes>
-				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -69,14 +57,11 @@
                         <configuration>
 							<archive>
 								<manifestEntries>
-									<Main-Class>com.fujitsu.vdmj.VDMJ</Main-Class>
+									<Main-Class>com.fujitsu.vdmj.plugins.VDMJ</Main-Class>
 									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
 						</configuration>
 					</execution>
                     <execution>
@@ -94,30 +79,19 @@
                                 <include>src/main/scripts/vdmsl.sh</include>
                             </includes>
                             <classifier>docs</classifier>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
                         </configuration>
                     </execution>
 				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
-						</configuration>
-					</execution>
-				</executions>
+				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
-		</plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+            </plugin>
+ 		</plugins>
 	</build>
 
 </project>

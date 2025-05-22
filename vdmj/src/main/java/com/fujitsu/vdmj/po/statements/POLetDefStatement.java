@@ -28,7 +28,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POScopeContext;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -52,13 +53,18 @@ public class POLetDefStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = localDefs.getProofObligations(ctxt, env);
+		ProofObligationList obligations = localDefs.getDefProofObligations(ctxt, pogState, env);
 
-		ctxt.push(new POScopeContext());
-		obligations.addAll(statement.getProofObligations(ctxt, env));
-		ctxt.pop();
+		int popto = ctxt.pushAt(new POLetDefContext(this.localDefs));
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		
+		if (ctxt.size() == popto + 1)
+		{
+			// Nothing left on the stack by the body, so remove this context
+			ctxt.popTo(popto);
+		}
 
 		return obligations;
 	}

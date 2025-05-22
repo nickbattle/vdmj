@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.ast.expressions.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.ast.ASTVisitorSet;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTEqualsDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
@@ -101,8 +102,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseApplyExpression(ASTApplyExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.root.apply(this, arg));
+		C all = node.root.apply(this, arg);
 		
 		for (ASTExpression a: node.args)
 		{
@@ -111,12 +111,25 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C caseAnnotatedExpression(ASTAnnotatedExpression node, S arg)
+ 	{
+ 		C all = newCollection();
+ 		
+ 		for (ASTExpression exp: node.annotation.args)
+ 		{
+ 			all.addAll(exp.apply(this, arg));
+ 		}
+ 		
+ 		all.addAll(node.expression.apply(this, arg));
+ 		return all;
+ 	}
 
  	@Override
 	public C caseBinaryExpression(ASTBinaryExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.left.apply(this, arg));
+		C all = node.left.apply(this, arg);
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
@@ -128,14 +141,11 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		
 		for (ASTCaseAlternative a: node.cases)
 		{
+			all.addAll(visitorSet.applyPatternVisitor(a.pattern, arg));
 			all.addAll(a.result.apply(this, arg));
 		}
 		
-		if (node.others != null)
-		{
-			all.addAll(node.others.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.others, arg));
 		return all;
 	}
 
@@ -166,8 +176,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseElseIfExpression(ASTElseIfExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.elseIfExp.apply(this, arg));
+		C all = node.elseIfExp.apply(this, arg);
 		all.addAll(node.thenExp.apply(this, arg));
 		return all;
 	}
@@ -176,12 +185,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 	public C caseExists1Expression(ASTExists1Expression node, S arg)
 	{
 		C all = visitorSet.applyBindVisitor(node.bind, arg);
-		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -195,11 +199,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -225,11 +225,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -242,8 +238,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseIfExpression(ASTIfExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.ifExp.apply(this, arg));
+		C all = node.ifExp.apply(this, arg);
 		all.addAll(node.thenExp.apply(this, arg));
 		
 		for (ASTElseIfExpression elseif: node.elseList)
@@ -259,12 +254,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 	public C caseIotaExpression(ASTIotaExpression node, S arg)
 	{
 		C all = visitorSet.applyBindVisitor(node.bind, arg);
-		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -304,12 +294,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 	public C caseLetBeStExpression(ASTLetBeStExpression node, S arg)
 	{
 		C all = visitorSet.applyMultiBindVisitor(node.bind, arg);
-		
-		if (node.suchThat != null)
-		{
-			all.addAll(node.suchThat.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
 		all.addAll(node.value.apply(this, arg));
 		return all;
 	}
@@ -335,8 +320,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseMapCompExpression(ASTMapCompExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.first.left.apply(this, arg));
+		C all = node.first.left.apply(this, arg);
 		all.addAll(node.first.right.apply(this, arg));
 		
 		for (ASTMultipleBind mbind: node.bindings)
@@ -344,11 +328,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -446,8 +426,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseSameBaseClassExpression(ASTSameBaseClassExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.left.apply(this, arg));
+		C all = node.left.apply(this, arg);
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
@@ -455,8 +434,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseSameClassExpression(ASTSameClassExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.left.apply(this, arg));
+		C all = node.left.apply(this, arg);
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
@@ -464,15 +442,9 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseSeqCompExpression(ASTSeqCompExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.first.apply(this, arg));	
+		C all = node.first.apply(this, arg);	
 		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
-		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -499,11 +471,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, arg));
 		return all;
 	}
 
@@ -523,8 +491,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseSetRangeExpression(ASTSetRangeExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.first.apply(this, arg));
+		C all = node.first.apply(this, arg);
 		all.addAll(node.last.apply(this, arg));
 		return all;
 	}
@@ -554,9 +521,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseUnaryExpression(ASTUnaryExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.exp.apply(this, arg));
-		return all;
+		return node.exp.apply(this, arg);
 	}
 
 	abstract protected C newCollection();

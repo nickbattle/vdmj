@@ -27,22 +27,61 @@ package com.fujitsu.vdmj.pog;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 abstract public class POContext
 {
-	abstract public String getContext();
 	private Map<POExpression, TCType> knownTypes = new HashMap<POExpression, TCType>();
+
+	/**
+	 * Generate the VDM source of the context.
+	 */
+	abstract public String getSource();
 
 	public String getName()
 	{
 		return "";		// Overridden in PONameContext
+	}
+
+	public POAnnotationList getAnnotations()
+	{
+		return null;
+	}
+	
+	public boolean isExistential()
+	{
+		return false;
+	}
+
+	public TCTypeList getTypeParams()
+	{
+		return null;
+	}
+
+	public TCNameSet reasonsAbout()
+	{
+		return null;
+	}
+
+	public TCNameSet ambiguousVariables()
+	{
+		return new TCNameSet();
+	}
+
+	public TCNameSet resolvedVariables()
+	{
+		return new TCNameSet();
 	}
 
 	public boolean isScopeBoundary()
@@ -59,15 +98,11 @@ abstract public class POContext
 	{
 		return knownTypes.get(exp);
 	}
-	
-	protected String preconditionCall(TCNameToken name, POPatternList paramPatternList, POExpression body)
-	{
-		List<POPatternList> pplist = new Vector<POPatternList>();
-		pplist.add(paramPatternList);
-		return preconditionCall(name, pplist, body);
-	}
-	
-	protected String preconditionCall(TCNameToken name, List<POPatternList> paramPatternList, POExpression body)
+
+	/**
+	 * Generate a precondition check for a function, possibly with type parameters.
+	 */
+	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, List<POPatternList> paramPatternList, POExpression body)
 	{
 		if (body == null)
 		{
@@ -76,12 +111,68 @@ abstract public class POContext
 		
 		StringBuilder call = new StringBuilder();
 		call.append(name.getPreName(name.getLocation()));
+		
+		if (typeParams != null && !typeParams.isEmpty())
+		{
+			call.append("[");
+			String sep = "";
+			
+			for (TCType param: typeParams)
+			{
+				call.append(sep);
+				call.append(param);
+				sep = ", ";
+			}
+			
+			call.append("]");
+		}
 
 		for (POPatternList plist: paramPatternList)
 		{
-			call.append("(" + Utils.listToString(plist) + ")");
+			call.append("(" + plist.removeIgnorePatterns() + ")");
 		}
 
 		return call.toString();
+	}
+	
+	/**
+	 * Generate a precondition call for an operation, passing the state (ie. a StateDefinition or ClassDefinition).
+	 */
+	protected String preconditionCall(TCNameToken name, POPatternList paramPatternList, PODefinition state)
+	{
+		StringBuilder call = new StringBuilder();
+		call.append(name.getPreName(name.getLocation()));
+		call.append("(");
+		String sep = "";
+		
+		for (POPattern param: paramPatternList)
+		{
+			call.append(sep);
+			call.append(param.removeIgnorePatterns());
+			sep = ", ";
+		}
+
+		if (state instanceof POStateDefinition)
+		{
+			call.append(sep);
+			call.append(state.toPattern(false));
+		}
+		else if (state instanceof POClassDefinition)
+		{
+			POClassDefinition cdef = (POClassDefinition)state;
+			call.append(sep);
+			call.append(cdef.toNew());
+		}
+		
+		call.append(")");
+		return call.toString();
+	}
+
+	/**
+	 * Return the PODefinition of the enclosing definition (eg. func or operation).
+	 */
+	public PODefinition getDefinition()
+	{
+		return null;	// See fn/op definition contexts
 	}
 }

@@ -94,6 +94,11 @@ public class ValueFactory
 		return new SeqValue(new ValueList(args));
 	}
 	
+	public static SeqValue mkSeq(String arg)
+	{
+		return new SeqValue(arg);
+	}
+	
 	public static SetValue mkSet(Value ...args)
 	{
 		return new SetValue(new ValueSet(args));

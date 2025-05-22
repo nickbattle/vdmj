@@ -232,11 +232,7 @@ public class TCDependencyExpressionVisitor extends TCLeafExpressionVisitor<TCNam
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
-		
-		if (node.predicate != null)
-		{
-			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
-		}
+		names.addAll(visitorSet.applyExpressionVisitor(node.predicate, new EnvTriple(arg.globals, local, null)));
 		
 		for (TCMultipleBind mb: node.bindings)
 		{
@@ -298,12 +294,7 @@ public class TCDependencyExpressionVisitor extends TCLeafExpressionVisitor<TCNam
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
-		
-		if (node.predicate != null)
-		{
-			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
-		}
-		
+		names.addAll(visitorSet.applyExpressionVisitor(node.predicate, new EnvTriple(arg.globals, local, null)));
 		names.addAll(visitorSet.applyBindVisitor(node.bind, new EnvTriple(arg.globals, local, null)));
 		return names;
 	}
@@ -313,11 +304,7 @@ public class TCDependencyExpressionVisitor extends TCLeafExpressionVisitor<TCNam
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
-		
-		if (node.predicate != null)
-		{
-			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
-		}
+		names.addAll(visitorSet.applyExpressionVisitor(node.predicate, new EnvTriple(arg.globals, local, null)));
 		
 		for (TCMultipleBind mb: node.bindings)
 		{

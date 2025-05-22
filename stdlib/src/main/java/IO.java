@@ -29,7 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -70,11 +70,11 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
-	@VDMFunction
+	@VDMFunction(params = {SeqValue.class, Value.class, Value.class})
 	public static Value fwriteval(Value fval, Value tval, Value dval)
 	{
 		String filename = stringOf(fval);
-		String text = tval.toString();// stringOf(tval);
+		String text = tval.toString();	// stringOf(tval);
 		String fdir = dval.toString();	// <start>|<append>
 
 		try
@@ -94,13 +94,10 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
-	// Note that this method is not callable via the native interface, since it
-	// need access to the Context to call any type invariants involved while
-	// reading the data.
-	//
-	// See the INNotYetSpecifiedExpression class.
+	// Note that this method needs access to the Context to call any type invariants involved while
+	// reading the data. This is handled by the Delegate class.
 	
-	@VDMFunction
+	@VDMFunction(params = {SeqValue.class})
 	public static Value freadval(Value fval, Context ctxt)
 	{
 		ValueList result = new ValueList();
@@ -114,14 +111,14 @@ public class IO implements Serializable
 				file = new File(new File(".").getParentFile(), file.getAbsolutePath());
 			}
 
-			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_PP, VDMJ.filecharset);
+			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_PP, Settings.filecharset);
 			ExpressionReader reader = new ExpressionReader(ltr);
 			reader.setCurrentModule("IO");
 			ASTExpression exp = reader.readExpression();
-			TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(exp);
+			TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(exp);
 			Interpreter ip = Interpreter.getInstance();
 			ip.typeCheck(tcexp);
-			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
 			
 			result.add(new BooleanValue(true));
 			result.add(inexp.eval(ctxt));
@@ -137,7 +134,7 @@ public class IO implements Serializable
 		return new TupleValue(result);
 	}
 
-	@VDMOperation
+	@VDMOperation(params = {SeqValue.class, SeqValue.class, Value.class})
 	public static Value fecho(Value fval, Value tval, Value dval)
 	{
 		String text = stringOf(tval);
@@ -224,7 +221,7 @@ public class IO implements Serializable
 		return new VoidValue();
 	}
 
-	@VDMOperation
+	@VDMOperation(params = {SeqValue.class, SeqValue.class})
 	public static Value printf(Value fv, Value vs)
 		throws ValueException
 	{

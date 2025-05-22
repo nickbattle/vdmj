@@ -28,8 +28,10 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.InvariantObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapInverseExpression extends POUnaryExpression
@@ -50,13 +52,13 @@ public class POMapInverseExpression extends POUnaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = super.getProofObligations(ctxt, env);
+		ProofObligationList list = super.getProofObligations(ctxt, pogState, env);
 
 		if (!type.empty)
 		{
-			list.add(new InvariantObligation(this, ctxt));
+			list.addAll(InvariantObligation.getAllPOs(this, ctxt));
 		}
 
 		return list;
@@ -66,5 +68,11 @@ public class POMapInverseExpression extends POUnaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseMapInverseExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getQualifier()
+	{
+		return TCTypeQualifier.getMapQualifier();
 	}
 }

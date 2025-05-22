@@ -24,93 +24,101 @@
 
 package workspace.plugins;
 
-import java.io.File;
-import java.util.List;
-import java.util.Vector;
+import com.fujitsu.vdmj.plugins.HelpList;
 
+import dap.DAPDispatcher;
 import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
+import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
-import rpc.RPCRequest;
-import vdmj.commands.Command;
-import workspace.lenses.CodeLens;
+import vdmj.commands.AnalysisCommand;
+import workspace.EventHub;
+import workspace.EventListener;
+import workspace.MessageHub;
+import workspace.PluginRegistry;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
 
 abstract public class AnalysisPlugin
 {
+	protected final RPCDispatcher lspDispatcher;
+	protected final DAPDispatcher dapDispatcher;
 	protected final LSPMessageUtils messages;
+	protected final PluginRegistry registry;
+	protected final EventHub eventhub;
+	protected final MessageHub messagehub;
 	
 	public AnalysisPlugin()
 	{
+		lspDispatcher = RPCDispatcher.getInstance();
+		dapDispatcher = DAPDispatcher.getInstance();
 		messages = new LSPMessageUtils();
+		registry = PluginRegistry.getInstance();
+		eventhub = EventHub.getInstance();
+		messagehub = MessageHub.getInstance();
 	}
 	
-	protected RPCMessageList errorResult()
-	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
-	}
-
 	abstract public String getName();
 	
 	abstract public void init();
 	
 	/**
-	 * External plugins claim to support specific LSP messages. This method
-	 * identifies whether the plugin supports the name passed.
+	 * The priority affects the order that plugins are sent events via the EventHub.
+	 * Lower priorities are sent first. The system plugin priorities are fixed multiples
+	 * of 100. User plugins are typically later, but can be earlier. If a plugin does
+	 * not define a priority, they get the default, which effectively means classpath
+	 * order.
 	 */
-	public boolean supportsMethod(String method)
+	public int getPriority()
 	{
-		return false;
+		return EventListener.USER_PRIORITY;
+	}
+	
+	/**
+	 * This is printed by the "plugins" command.
+	 */
+	public Object getDescription()
+	{
+		return getClass().getName() + ", priority " + getPriority();
 	}
 
 	/**
-	 * External plugins override these methods to implement their functionality.
+	 * These methods are used to dispatch LSP/DAP events. These default methods just return an
+	 * error, usually indicating that an event has been registered with the EventHub, but
+	 * no handler provided.
 	 */
-	public RPCMessageList analyse(RPCRequest request)
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		return new RPCMessageList(request, RPCErrors.InternalError, "Plugin does not support analysis");
+		return new RPCMessageList(event.request, RPCErrors.InternalError, "Plugin does not handle LSP events");
 	}
 
-	public DAPMessageList analyse(DAPRequest request)
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
-		return new DAPMessageList(request, false, "Plugin does not support analysis", null);
+		return new DAPMessageList(event.request, false, "Plugin does not handle DAP events", null);
 	}
 
 	/**
 	 * All plugins can register experimental options that are sent back to the Client
-	 * in the experimental section of the initialize response.
-	 * @param standard 
+	 * in the experimental section of the initialize response. They can also set regular
+	 * server capabilities, though this should be done with care!
 	 */
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return new JSONObject();
-	}
-	
-	/**
-	 * Plugins can define code lenses here.
-	 * @param dirty 
-	 */
-	protected List<CodeLens> getCodeLenses(boolean dirty)
-	{
-		return new Vector<CodeLens>();
+		return;		// LSP capabilities
 	}
 
-	/**
-	 * Plugins can apply their code lenses by overriding this method.
-	 */
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public void setDAPCapabilities(JSONObject capabilities)
 	{
-		return new JSONArray();
+		return;		// DAP capabilities
 	}
 
 	/**
 	 * Plugins can return Commands to execute in the console. They are passed
 	 * the whole command line, so that they can process arguments.
 	 */
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
 		return null;
 	}
@@ -119,8 +127,8 @@ abstract public class AnalysisPlugin
 	 * Returns an array of String arrays for Command help. The first string is the
 	 * simple name of the command, the 2nd is the detail of the usage. 
 	 */
-	public String[][] getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		return new String[0][0];
+		return new HelpList();
 	}
 }

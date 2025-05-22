@@ -34,7 +34,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
 
 public class DefinitionHandler extends LSPHandler
 {
@@ -56,7 +56,7 @@ public class DefinitionHandler extends LSPHandler
 			Long line = position.get("line");
 			Long col = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().findDefinition(request, file, line.intValue(), col.intValue());
+			return LSPPlugin.getInstance().lspDefinition(request, file, line, col);
 		}
 		catch (URISyntaxException e)
 		{

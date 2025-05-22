@@ -35,6 +35,7 @@ public class PORecordPattern extends POPattern
 	public final TCNameToken typename;
 	public final POPatternList plist;
 	public final TCType type;
+	private boolean maximal = false;
 
 	public PORecordPattern(TCNameToken typename, POPatternList list, TCType type)
 	{
@@ -47,7 +48,7 @@ public class PORecordPattern extends POPattern
 	@Override
 	public String toString()
 	{
-		return "mk_" + type + "(" + Utils.listToString(plist) + ")";
+		return "mk_" + type.toExplicitString(location) + (maximal ? "!(" : "(") + Utils.listToString(plist) + ")";
 	}
 
 	@Override
@@ -60,6 +61,12 @@ public class PORecordPattern extends POPattern
 	public boolean alwaysMatches()
 	{
 		return plist.alwaysMatches();
+	}
+	
+	@Override
+	public void setMaximal(boolean maximal)
+	{
+		this.maximal = maximal;
 	}
 
 	@Override

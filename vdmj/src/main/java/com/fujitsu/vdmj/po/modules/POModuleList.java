@@ -47,13 +47,13 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 	public ProofObligationList getProofObligations()
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
 		
 		for (POModule m: this)
 		{
-			obligations.addAll(m.getProofObligations());
+			obligations.addAll(m.getProofObligations(menv));
 		}
 
-		obligations.trivialCheck();
 		return obligations;
 	}
 }

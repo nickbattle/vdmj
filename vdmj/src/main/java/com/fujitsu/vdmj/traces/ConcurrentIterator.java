@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.traces;
 
-import com.fujitsu.vdmj.util.Permutor;
+import com.fujitsu.vdmj.util.Selector;
 
 
 public class ConcurrentIterator extends TraceIterator
@@ -33,7 +33,7 @@ public class ConcurrentIterator extends TraceIterator
 	
 	private PermuteArray permutations = null;	// Of the node orderings
 	private int[] permutation = null;			// The current ordering
-	private Permutor selector = null;			// Of the alternatives from each node
+	private Selector selector = null;			// Of the alternatives from each node
 
 	public ConcurrentIterator(TraceIteratorList nodes)
 	{
@@ -85,7 +85,7 @@ public class ConcurrentIterator extends TraceIterator
 				c[i] = nodes.get(i).count();
 			}
 			
-			selector = new Permutor(c);
+			selector = new Selector(c);
 		}
 
 		CallSequence test = getVariables();
@@ -139,5 +139,6 @@ public class ConcurrentIterator extends TraceIterator
 	public void reset()
 	{
 		nodes.reset();
+		permutations = null;
 	}
 }

@@ -27,11 +27,11 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.pog.TupleSelectObligation;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POFieldNumberExpression extends POExpression
@@ -56,28 +56,28 @@ public class POFieldNumberExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = tuple.getProofObligations(ctxt, env);
+		ProofObligationList list = tuple.getProofObligations(ctxt, pogState, env);
 
-		if (type instanceof TCUnionType)
+		TCTypeQualifier qualifier = new TCTypeQualifier()
 		{
-			TCUnionType union = (TCUnionType)type;
-
-			for (TCType t: union.types)
+			@Override
+			public boolean matches(TCType member)
 			{
-				if (t.isProduct(location))
+				if (member.isProduct(location))
 				{
-					TCProductType pt = t.getProduct();
-
-					if (pt.types.size() < field.value)
-					{
-						list.add(new TupleSelectObligation(this, pt, ctxt));
-					}
+					TCProductType pt = member.getProduct();
+					return (pt.types.size() >= field.value);
+				}
+				else
+				{
+					return false;
 				}
 			}
-		}
+		};
 
+		list.addAll(checkUnionQualifiers(tuple, qualifier, ctxt));
 		return list;
 	}
 

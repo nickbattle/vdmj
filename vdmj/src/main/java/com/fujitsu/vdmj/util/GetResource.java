@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,12 +31,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
 
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.Settings;
 
 /**
  * A utility class to find and load a file from the classpath into a
- * temporary or given location.
+ * temporary or given location, or read from resource files.
  */
 public class GetResource
 {
@@ -60,7 +66,7 @@ public class GetResource
 		InputStream in = GetResource.class.getResourceAsStream("/" + file.getName());
 		InputStreamReader isr = new InputStreamReader(in, "UTF8");
 		OutputStream out = new FileOutputStream(dest);
-		OutputStreamWriter osr = new OutputStreamWriter(out, VDMJ.filecharset);
+		OutputStreamWriter osr = new OutputStreamWriter(out, Settings.filecharset);
 		
 		char[] buf = new char[8192];
 	    int length;
@@ -74,5 +80,46 @@ public class GetResource
 		osr.close();
 		
 		return dest;
+	}
+	
+	public static List<String> readResource(String resourceName) throws Exception
+	{
+		return readResource(resourceName, resourceName);
+	}
+	
+	public static List<String> readResource(String resourceName, String propertyName) throws Exception
+	{
+		String property = System.getProperty(propertyName);
+		List<String> results = new Vector<String>();
+		
+		if (property != null)	// Overrides the resources
+		{
+			if (!property.isEmpty())
+			{
+				results.addAll(Arrays.asList(property.split("\\s*[,;]\\s*")));
+			}
+			
+			return results;
+		}
+		else
+		{
+			
+			Enumeration<URL> urls = GetResource.class.getClassLoader().getResources(resourceName);
+	
+			while (urls.hasMoreElements())
+			{
+				URL url = urls.nextElement();
+				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+				
+				for (String line = br.readLine(); line != null; line = br.readLine())
+				{
+					results.add(line);
+				}
+				
+				br.close();
+			}
+			
+			return results;
+		}
 	}
 }

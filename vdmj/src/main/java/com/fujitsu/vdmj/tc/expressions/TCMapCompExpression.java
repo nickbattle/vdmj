@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
@@ -34,6 +35,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -84,6 +86,16 @@ public class TCMapCompExpression extends TCMapExpression
 		{
 			domConstraint = constraint.getMap().from;
 			rngConstraint = constraint.getMap().to;
+		}
+
+		if (predicate != null)
+		{
+			TCDefinitionList qualified = predicate.getQualifiedDefs(local);
+			
+			if (!qualified.isEmpty())
+			{
+				local = new FlatEnvironment(qualified, local);
+			}
 		}
 
 		maptype = first.typeCheck(local, scope, domConstraint, rngConstraint);	// The map from/to type

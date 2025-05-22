@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -41,6 +42,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold a value definition.
@@ -52,6 +54,7 @@ public class TCValueDefinition extends TCDefinition
 	public TCType type;
 	public final TCTypeList unresolved;
 	public final TCExpression exp;
+	private final TCType originalType;
 
 	private TCDefinitionList defs = null;
 	protected TCType expType = null;
@@ -64,6 +67,7 @@ public class TCValueDefinition extends TCDefinition
 		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
+		this.originalType = type;
 		this.unresolved = type != null ? type.unresolvedTypes() : new TCTypeList();
 		this.exp = exp;
 
@@ -150,10 +154,12 @@ public class TCValueDefinition extends TCDefinition
 	{
 		if (type != null)
 		{
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
 			pattern.typeResolve(env);
 			updateDefs();
 		}
+
+		if (annotations != null) annotations.tcResolve(this, env);
 	}
 	
 	@Override
@@ -162,7 +168,7 @@ public class TCValueDefinition extends TCDefinition
 		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		getDefinitions().setExcluded(true);
-		expType = exp.typeCheck(base, null, scope, type);
+		expType = explicitFix(exp.typeCheck(base, null, scope, type));
 		getDefinitions().setExcluded(false);
 		
 		if (expType instanceof TCUnknownType)
@@ -208,7 +214,40 @@ public class TCValueDefinition extends TCDefinition
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
-	
+
+	/**
+	 * For named types, if the type is not defined within the module, we have
+	 * to make it explicit, like x:M`T rather than just x:T. This is so that
+	 * toStrings (with POG) can be correctly typechecked.
+	 */
+	private TCType explicitFix(TCType tofix)
+	{
+		if (tofix instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)tofix;
+			
+			if (!nt.typename.getLex().module.equals(location.module))
+			{
+				TCNamedType fixed = new TCNamedType(nt.typename.getExplicit(true), nt.type);
+				fixed.setOpaque(nt.isOpaque());
+				return fixed;
+			}
+		}
+		else if (tofix instanceof TCRecordType)
+		{
+			TCRecordType rt = (TCRecordType)tofix;
+			
+			if (!rt.name.getLex().module.equals(location.module))
+			{
+				TCRecordType fixed = new TCRecordType(rt.name.getExplicit(true), rt.fields, rt.composed);
+				fixed.setOpaque(rt.isOpaque());
+				return fixed;
+			}
+		}
+		
+		return tofix;
+	}
+
 	private void updateDefs()
 	{
 		TCDefinitionList newdefs = pattern.getDefinitions(type, nameScope);
@@ -222,14 +261,23 @@ public class TCValueDefinition extends TCDefinition
 		{
 			for (TCDefinition u: defs)
 			{
-				if (u.name.equals(d.name))
+				if (u.name.equals(d.name) && u.isUsed())
 				{
-					if (u.isUsed())
+					d.markUsed();
+				}
+				
+				if (u instanceof TCUntypedDefinition)
+				{
+					TCUntypedDefinition ud = (TCUntypedDefinition)u;
+					
+					// If this untyped definition has already been referenced (TCUntypedDefinition.findName),
+					// we suggest the explicit typing to allow a forward reference to get the right type.
+					// This can give better error reporting in some cases.
+					
+					if (ud.untypedReferenced && originalType == null && !type.isUnknown(location))
 					{
-						d.markUsed();
+						warning(5041, "Add explicit type '" + pattern + " : "+ Utils.deBracketed(type) + "' here");
 					}
-
-					break;
 				}
 			}
 
@@ -253,6 +301,11 @@ public class TCValueDefinition extends TCDefinition
 	{
 		return type != null ? type :
 				(expType != null ? expType : new TCUnknownType(location));
+	}
+	
+	public TCType getExpType()
+	{
+		return expType;		// NB. Not the declared type, necessarily
 	}
 
 	@Override

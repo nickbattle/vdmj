@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
-import com.fujitsu.vdmj.util.Permutor;
+import com.fujitsu.vdmj.util.Selector;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.FieldValue;
@@ -106,7 +106,7 @@ public class INRecordPattern extends INPattern
 			counts[i++] = pnvps.size();
 		}
 
-		Permutor permutor = new Permutor(counts);
+		Selector permutor = new Selector(counts);
 		List<NameValuePairList> finalResults = new Vector<NameValuePairList>();
 
 		if (plist.isEmpty())

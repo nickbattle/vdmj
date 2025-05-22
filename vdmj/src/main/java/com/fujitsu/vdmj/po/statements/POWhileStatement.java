@@ -25,11 +25,18 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.LoopInvariantObligation;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.pog.WhileLoopObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
@@ -52,13 +59,62 @@ public class POWhileStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.add(new WhileLoopObligation(this, ctxt));
-		obligations.addAll(exp.getProofObligations(ctxt, env));
-		obligations.addAll(statement.getProofObligations(ctxt, env));
-		return obligations;
+		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+
+		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
+		TCNameSet updates = statement.updatesState();
+		
+		if (annotation == null)		// No loop invariant defined
+		{
+			obligations.add(new LoopInvariantObligation(location, ctxt));
+			
+			int popto = ctxt.size();
+			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
+			ctxt.popTo(popto);
+
+			if (statement.getStmttype().hasReturn())
+			{
+				updates.add(TCNameToken.getResult(location));
+			}
+			
+			if (!updates.isEmpty())
+			{
+				ctxt.push(new POAmbiguousContext("while loop", updates, location));
+			}
+
+			obligations.addAll(loops);
+			return obligations;
+		}
+		else
+		{
+			// Note: location of first loop check is the @LoopInvariant itself.
+			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check before while condition");
+			
+			int popto = ctxt.size();
+			
+			ctxt.push(new POImpliesContext(this.exp));	// while C => ...
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check before while body");
+			ctxt.pop();
+			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));	// invariant && while C => ...
+			
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+			
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check after while body");
+
+			ctxt.popTo(popto);
+			
+			// Leave implication for following POs
+			POExpression negated = new PONotExpression(location, this.exp);
+			ctxt.push(new POImpliesContext(annotation.invariant, negated));	// invariant && not C => ...
+			
+			return obligations;
+		}
 	}
 
 	@Override

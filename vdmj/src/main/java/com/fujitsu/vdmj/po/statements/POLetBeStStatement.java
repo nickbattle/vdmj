@@ -29,8 +29,11 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LetBeExistsObligation;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POScopeContext;
+import com.fujitsu.vdmj.pog.POForAllContext;
+import com.fujitsu.vdmj.pog.POForAllPredicateContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -58,20 +61,36 @@ public class POLetBeStStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.add(new LetBeExistsObligation(this, ctxt));
-		obligations.addAll(bind.getProofObligations(ctxt, env));
+		obligations.addAll(LetBeExistsObligation.getAllPOs(this, ctxt));
+		
+		pogState.setAmbiguous(false);
+		obligations.addAll(bind.getProofObligations(ctxt, pogState, env));
 
 		if (suchThat != null)
 		{
-			obligations.addAll(suchThat.getProofObligations(ctxt, env));
+			ctxt.push(new POForAllContext(this));
+			ProofObligationList oblist = suchThat.getProofObligations(ctxt, pogState, env);
+			obligations.addAll(oblist);
+			ctxt.pop();
 		}
 
-		ctxt.push(new POScopeContext());
-		obligations.addAll(statement.getProofObligations(ctxt, env));
-		ctxt.pop();
+		if (pogState.isAmbiguous())		// Definition defined with ambiguous values
+		{
+			ctxt.push(new POAmbiguousContext("definition", bind.plist.getAllVariableNames(), bind.location));
+			pogState.setAmbiguous(false);
+		}
+
+		int popto = ctxt.pushAt(new POForAllPredicateContext(this));
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		
+		if (ctxt.size() == popto + 1)
+		{
+			// Nothing left on the stack by the body, so remove this context
+			ctxt.popTo(popto);
+		}
 
 		return obligations;
 	}

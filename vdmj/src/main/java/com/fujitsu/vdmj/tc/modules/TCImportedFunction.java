@@ -29,11 +29,11 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -43,10 +43,10 @@ public class TCImportedFunction extends TCImportedValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 
 	public TCImportedFunction(
-		TCNameToken name, TCType type, TCNameList typeParams, TCNameToken renamed)
+		TCNameToken name, TCType type, TCTypeList typeParams, TCNameToken renamed)
 	{
 		super(name, type, renamed);
 		this.typeParams = typeParams;
@@ -73,17 +73,16 @@ public class TCImportedFunction extends TCImportedValue
 			{
 	    		TCDefinitionList defs = new TCDefinitionList();
 
-	    		for (TCNameToken pname: typeParams)
+	    		for (TCType ptype: typeParams)
 	    		{
-	    			TCDefinition p = new TCLocalDefinition(pname.getLocation(),
-	    				pname, new TCParameterType(pname));
-
+	    			TCParameterType param = (TCParameterType)ptype;
+	    			TCDefinition p = new TCLocalDefinition(param.location, param.name, param);
 	    			p.markUsed();
 	    			defs.add(p);
 	    		}
 
 	    		FlatCheckedEnvironment params =	new FlatCheckedEnvironment(defs, env, NameScope.NAMES);
-				type = type.typeResolve(params, null);
+				type = type.typeResolve(params);
 				TypeComparator.checkComposeTypes(type, params, false);
 				
 				if (expdef != null)

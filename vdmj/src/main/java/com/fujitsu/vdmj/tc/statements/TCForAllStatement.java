@@ -46,7 +46,7 @@ public class TCForAllStatement extends TCStatement
 	public final TCExpression set;
 	public final TCStatement statement;
 
-	private TCType setType;
+	public TCType setType;
 
 	public TCForAllStatement(LexLocation location,
 		TCPattern pattern, TCExpression set, TCStatement stmt)

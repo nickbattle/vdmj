@@ -29,7 +29,10 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
@@ -61,12 +64,13 @@ public class POCasesExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
 
-		int count = 0;
 		boolean hasIgnore = false;
+		TCNameList hidden = new TCNameList();
+		ProofObligationList _obligations = new ProofObligationList();
 
 		for (POCaseAlternative alt: cases)
 		{
@@ -74,27 +78,34 @@ public class POCasesExpression extends POExpression
 			{
 				hasIgnore = true;
 			}
-
+			
+			hidden.addAll(alt.pattern.getHiddenVariables());	// cumulative
+			
 			// PONotCaseContext pushed by the POCaseAlternative...
-			obligations.addAll(alt.getProofObligations(ctxt, expType, env));
-			count++;
+			_obligations.addAll(alt.getProofObligations(ctxt, pogState, expType, env));
 		}
-
+		
 		if (others != null)
 		{
-			obligations.addAll(others.getProofObligations(ctxt, env));
+			_obligations.addAll(others.getProofObligations(ctxt, pogState, env));
 		}
 
-		for (int i=0; i<count; i++)
+		for (int i=0; i<cases.size(); i++)
 		{
 			ctxt.pop();
 		}
 
 		if (others == null && !hasIgnore)
 		{
-			obligations.add(new CasesExhaustiveObligation(this, ctxt));
+			_obligations.addAll(CasesExhaustiveObligation.getAllPOs(this, ctxt));
 		}
 
+		if (!hidden.isEmpty())
+		{
+			_obligations.markUnchecked(ProofObligation.HIDDEN_VARIABLES + ": " + hidden);
+		}
+
+		obligations.addAll(_obligations);
 		return obligations;
 	}
 

@@ -30,7 +30,9 @@ import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleBindList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -54,17 +56,18 @@ public class POForAllExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POMultipleBind mb: bindList)
 		{
-			obligations.addAll(mb.getProofObligations(ctxt, env));
+			obligations.addAll(mb.getProofObligations(ctxt, pogState, env));
 		}
 
 		ctxt.push(new POForAllContext(this));
-		obligations.addAll(predicate.getProofObligations(ctxt, env));
+		obligations.addAll(predicate.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(checkUnionQualifiers(predicate, TCTypeQualifier.getBoolQualifier(), ctxt));
 		ctxt.pop();
 
 		return obligations;

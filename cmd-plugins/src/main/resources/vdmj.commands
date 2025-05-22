@@ -1,0 +1,3 @@
+git=plugins.GitPlugin
+order=plugins.OrderPlugin
+os=plugins.OsPlugin

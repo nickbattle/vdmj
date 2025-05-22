@@ -26,17 +26,31 @@ package dap;
 
 import java.io.IOException;
 
+import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.typechecker.Environment;
+
 import json.JSONObject;
 
 public class ExpressionExecutor extends AsyncExecutor
 {
 	private final String expression;
+	private final boolean maximal;
+
+	private Environment env = null;
 	private String answer;
 
-	public ExpressionExecutor(String id, DAPRequest request, String expression)
+	public ExpressionExecutor(String id, DAPRequest request, String expression, boolean maximal, Environment env)
 	{
 		super(id, request);
 		this.expression = expression;
+		this.maximal = maximal;
+		this.env = env;
+	}
+
+	public ExpressionExecutor(String id, DAPRequest request, String expression)
+	{
+		this(id, request, expression, false, null);
 	}
 
 	@Override
@@ -48,7 +62,20 @@ public class ExpressionExecutor extends AsyncExecutor
 	@Override
 	protected void exec() throws Exception
 	{
-		answer = manager.getInterpreter().execute(expression).toString();
+		boolean saved = Properties.parser_maximal_types;	// Used by qcrun
+		Interpreter interpreter = manager.getInterpreter();
+		
+		if (env == null) env = interpreter.getGlobalEnvironment();
+		
+		try
+		{
+			Properties.parser_maximal_types = maximal;
+			answer = interpreter.execute(expression, env).toString();
+		}
+		finally
+		{
+			Properties.parser_maximal_types = saved;
+		}
 	}
 
 	@Override

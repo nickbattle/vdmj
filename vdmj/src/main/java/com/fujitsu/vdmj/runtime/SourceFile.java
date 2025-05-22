@@ -34,13 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.lex.LexNameList;
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
-import com.fujitsu.vdmj.ast.lex.LexNameList;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
 
 /**
  * A class to hold a source file for source debug output.
@@ -59,7 +59,7 @@ public class SourceFile
 	{
 		this.filename = filename;
 		
-		BacktrackInputReader bir = new BacktrackInputReader(filename, VDMJ.filecharset);
+		BacktrackInputReader bir = new BacktrackInputReader(filename, Settings.filecharset);
 		BufferedReader br = new BufferedReader(new StringReader(new String(bir.getText())));
 		String line = br.readLine();
 		boolean vdm_al = false;
@@ -92,6 +92,19 @@ public class SourceFile
 	public int getCount()
 	{
 		return lines.size();
+	}
+	
+	public boolean hasContent()
+	{
+		for (String line: lines)
+		{
+			if (!line.trim().isEmpty())		// File has SOME text!
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	public void printSource(PrintWriter out)
@@ -338,7 +351,7 @@ public class SourceFile
 
 		out.println("<html>");
 		out.println("<head>");
-		out.println("<meta http-equiv=Content-Type content=\"text/html; charset=" + VDMJ.filecharset + "\">");
+		out.println("<meta http-equiv=Content-Type content=\"text/html; charset=" + Settings.filecharset + "\">");
 		out.println("<meta name=Generator content=\"Microsoft Word 11 (filtered)\">");
 		out.println("<title>" + filename.getName() + "</title>");
 		out.println("<style>");

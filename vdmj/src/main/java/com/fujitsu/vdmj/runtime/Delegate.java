@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +101,7 @@ public class Delegate implements Serializable
 	{
 		try
 		{
-			return delegateClass.newInstance();
+			return delegateClass.getDeclaredConstructor().newInstance();
 		}
 		catch (NullPointerException e)
 		{
@@ -108,6 +109,16 @@ public class Delegate implements Serializable
 				"No delegate class found: " + name);
 		}
 		catch (InstantiationException e)
+		{
+			throw new InternalException(54,
+				"Cannot instantiate native object: " + e.getMessage());
+		}
+		catch (InvocationTargetException e)
+		{
+			throw new InternalException(54,
+				"Cannot instantiate native object: " + e.getTargetException().toString());
+		}
+		catch (NoSuchMethodException e)
 		{
 			throw new InternalException(54,
 				"Cannot instantiate native object: " + e.getMessage());
@@ -197,13 +208,32 @@ public class Delegate implements Serializable
 
 			try
 			{
-				Class<?>[] array = new Class<?>[0];
-				m = delegateClass.getMethod(mname, ptypes.toArray(array));
-
-				if (!m.getReturnType().equals(Value.class))
+				try
 				{
-					throw new InternalException(58,
-						"Native method does not return Value: " + m);
+					// First try to find a method with a final Context parameter
+					
+					List<Class<?>> ptypes2 = new Vector<Class<?>>(ptypes);
+					ptypes2.add(Context.class);
+					Class<?>[] array2 = new Class<?>[0];
+					
+					m = delegateClass.getMethod(mname, ptypes2.toArray(array2));
+	
+					if (!m.getReturnType().equals(Value.class))
+					{
+						throw new InternalException(58,
+							"Native method does not return Value: " + m);
+					}
+				}
+				catch (Throwable t)
+				{
+					Class<?>[] array = new Class<?>[0];
+					m = delegateClass.getMethod(mname, ptypes.toArray(array));
+	
+					if (!m.getReturnType().equals(Value.class))
+					{
+						throw new InternalException(58,
+							"Native method does not return Value: " + m);
+					}					
 				}
 			}
 			catch (SecurityException e)
@@ -234,24 +264,67 @@ public class Delegate implements Serializable
 				"Native method should be static: " + m.getName());
 		}
 		
-		if (section == Token.FUNCTIONS && m.getAnnotation(VDMOperation.class) != null)
+		Class<? extends Value> paramTypes[] = null;
+		
+		if (section == Token.FUNCTIONS)
 		{
-			throw new InternalException(72,
+			if (m.getAnnotation(VDMOperation.class) != null)
+			{
+				throw new InternalException(72,
 					"Native method marked as @VDMOperation: " + m.getName());
+			}
+			
+			VDMFunction annotation = m.getAnnotation(VDMFunction.class);
+			paramTypes = annotation.params();
 		}
-		else if (section == Token.OPERATIONS && m.getAnnotation(VDMFunction.class) != null)
+		else if (section == Token.OPERATIONS)
 		{
-			throw new InternalException(71,
+			if (m.getAnnotation(VDMFunction.class) != null)
+			{
+				throw new InternalException(71,
 					"Native method marked as @VDMFunction: " + m.getName());
+			}
+			
+			VDMOperation annotation = m.getAnnotation(VDMOperation.class);
+			paramTypes = annotation.params();
 		}
 
 		TCNameList anames = delegateArgs.get(ctxt.title);
-		Object[] avals = new Object[anames.size()];
+		boolean hasCtxt = m.getParameterCount() > anames.size();
+		Object[] avals = new Object[anames.size() + (hasCtxt ? 1 : 0)];
 		int a = 0;
 
 		for (TCNameToken arg: anames)
 		{
 			avals[a++] = ctxt.get(arg);
+		}
+		
+		if (paramTypes.length > 0)	// Only check if provided
+		{
+			if (anames.size() == paramTypes.length)
+			{
+				for (int p = 0; p < anames.size(); p++)
+				{
+					if (!paramTypes[p].isAssignableFrom(avals[p].getClass()))
+					{
+						Parameter jp = m.getParameters()[p];
+						
+						throw new InternalException(76,
+								"Native method parameter " + m.getName() + "." + jp.getName() +
+								" should be type " + paramTypes[p].getSimpleName());
+					}
+				}
+			}
+			else
+			{
+				throw new InternalException(77,
+					"Native method " + m.getName() + " expects " + paramTypes.length + " Value arguments");
+			}
+		}
+		
+		if (hasCtxt)
+		{
+			avals[a] = ctxt;	// Not included in check above
 		}
 
 		try
@@ -281,7 +354,7 @@ public class Delegate implements Serializable
 			else
 			{
 				throw new InternalException(59,
-					"Failed in native method: " + e.getTargetException().getMessage());
+					"Failed in native method: " + e.getTargetException().toString());
 			}
 		}
 	}

@@ -29,24 +29,27 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ModuleReader;
+import com.fujitsu.vdmj.syntax.ParserException;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
-import workspace.DiagUtils;
-import workspace.LSPWorkspaceManager;
-import workspace.lenses.CodeLens;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
+import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginSL extends ASTPlugin
 {
@@ -59,37 +62,35 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	public void preCheck()
+	protected void preCheck(CheckPrepareEvent ev)
 	{
-		super.preCheck();
+		super.preCheck(ev);
 		astModuleList = new ASTModuleList();
 	}
 	
 	@Override
-	public boolean checkLoadedFiles()
+	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
-		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Dialect.VDM_SL, entry.getKey(), "UTF-8");
+			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Dialect.VDM_SL, entry.getKey());
 			ModuleReader mr = new ModuleReader(ltr);
 			astModuleList.addAll(mr.readModules());
 			
 			if (mr.getErrorCount() > 0)
 			{
-				errs.addAll(mr.getErrors());
+				messagehub.addPluginMessages(this, mr.getErrors());
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
-				warns.addAll(mr.getWarnings());
+				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
-		
-		return errs.isEmpty();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -100,31 +101,44 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	public ASTExpression parseExpression(String line, String module) throws Exception
+	{
+		LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL);
+		ExpressionReader reader = new ExpressionReader(ltr);
+		reader.setCurrentModule(module);
+		ASTExpression ast = reader.readExpression();
+		LexToken end = ltr.getLast();
+		
+		if (!end.is(Token.EOF))
+		{
+			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
+		}
+		
+		return ast;
+	}
+
+	@Override
+	protected void parseFile(File file)
 	{
 		dirty = true;	// Until saved.
 		dirtyModuleList = null;
 
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file, "UTF-8");
+		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ModuleReader mr = new ModuleReader(ltr);
 		dirtyModuleList = mr.readModules();
 		
 		if (mr.getErrorCount() > 0)
 		{
-			errs.addAll(mr.getErrors());
+			messagehub.addPluginMessages(this, mr.getErrors());
 		}
 		
 		if (mr.getWarningCount() > 0)
 		{
-			errs.addAll(mr.getWarnings());
+			messagehub.addPluginMessages(this, mr.getWarnings());
 		}
-
-		DiagUtils.dump(errs);
-		return errs;
 	}
 	
 	@Override
@@ -165,13 +179,13 @@ public class ASTPluginSL extends ASTPlugin
 	}
 
 	@Override
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
 		
 		if (dirtyModuleList != null && !dirtyModuleList.isEmpty())
 		{
-			List<CodeLens> lenses = getCodeLenses(dirty);
+			List<ASTCodeLens> lenses = getASTCodeLenses();
 			
 			for (ASTModule module: dirtyModuleList)
 			{
@@ -179,9 +193,9 @@ public class ASTPluginSL extends ASTPlugin
 				{
 					if (def.location.file.equals(file))
 					{
-						for (CodeLens lens: lenses)
+						for (ASTCodeLens lens: lenses)
 						{
-							results.addAll(lens.getDefinitionLenses(def, null));
+							results.addAll(lens.getDefinitionLenses(def, module));
 						}
 					}
 				}

@@ -28,11 +28,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * A class to allow arbitrary checkpoints and backtracking while
@@ -41,10 +43,10 @@ import com.fujitsu.vdmj.messages.InternalException;
 public class BacktrackInputReader
 {
 	/** A stack of position markers for popping. */
-	private Stack<Integer> stack = new Stack<Integer>();
+	private final Stack<Integer> stack = new Stack<Integer>();
 
 	/** The characters from the file. */
-	private char[] data;
+	private final char[] data;
 
 	/** The current read position. */
 	private int pos = 0;
@@ -52,61 +54,52 @@ public class BacktrackInputReader
 	/** External readers */
 	private static Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
 	
+	/** Ifdef processing */
+	private final IfdefProcessor ifdefProcessor;
+	
 	/**
 	 * Create an object to read the file name passed with the given charset.
 	 *
 	 * @param file	The filename to open
+	 * @param charset The encoding of the file.
 	 */
-	public BacktrackInputReader(File file, String charset)
+	public BacktrackInputReader(File file, Charset charset)
 	{
 		try
 		{
-			ExternalFormatReader efr = readerFactory(file, charset);
-			data = efr.getText(file, charset);
+			ifdefProcessor = new IfdefProcessor(file);
+			ExternalFormatReader efr = readerFactory(file);
+			char[] source = efr.getText(file, charset);
+			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			throw new InternalException(0, "Cannot read file: " + e.getMessage());
 		}
-	}
-
-	/**
-	 * Create an object to read the file name passed with the default charset.
-	 *
-	 * @param file	The filename to open
-	 */
-	public BacktrackInputReader(File file)
-	{
-		this(file, Charset.defaultCharset().name());
 	}
 
 	/**
 	 * Create an object to read the string passed. This is used in the
 	 * interpreter to parse expressions typed in.
 	 *
-	 * @param expression
+	 * @param file The filename of the content, for errors
+	 * @param content The actual content.
 	 */
-	public BacktrackInputReader(String expression, String charset)
+	public BacktrackInputReader(File file, String content)
 	{
 		try
 		{
+			ifdefProcessor = new IfdefProcessor(file);
 			LatexStreamReader lsr = new LatexStreamReader();
-			data = lsr.getText(expression);
+			char[] source = lsr.getText(content);
+			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
 		catch (IOException e)
 		{
 			throw new InternalException(0, "Cannot read file: " + e.getMessage());
 		}
-	}
-	
-	/**
-	 * Create an object to read the string passed with the default charset.
-	 */
-	public BacktrackInputReader(String expression)
-	{
-		this(expression, Charset.defaultCharset().name());
 	}
 
 	/**
@@ -121,9 +114,9 @@ public class BacktrackInputReader
 	 * Create an ExternalFormatReader from a File, depending on the filename.
 	 * @throws IOException 
 	 */
-	private ExternalFormatReader readerFactory(File file, String charset) throws IOException
+	public static ExternalFormatReader readerFactory(File file) throws Exception
 	{
-		String name = file.getName();
+		String lowerName = file.getName().toLowerCase();		// NB! lower case matched
 		
 		if (externalReaders == null)
 		{
@@ -132,12 +125,12 @@ public class BacktrackInputReader
 		
 		for (String suffix: externalReaders.keySet())
 		{
-			if (name.endsWith(suffix))
+			if (lowerName.endsWith(suffix))
 			{
 				try
 				{
 					Class<? extends ExternalFormatReader> clazz = externalReaders.get(suffix);
-					return clazz.newInstance();
+					return clazz.getDeclaredConstructor().newInstance();
 				}
 				catch (Exception e)
 				{
@@ -153,27 +146,25 @@ public class BacktrackInputReader
 	 * Property format is "<suffix>=<class>,<suffix>=<class>,..."
 	 */
 	@SuppressWarnings("unchecked")
-	private static synchronized void buildExternalReaders() throws IOException
+	private static synchronized void buildExternalReaders() throws Exception
 	{
 		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
 		
 		// Add the standard readers first
+		externalReaders.put(".tex", LatexStreamReader.class);	// To allow *.tex files
+		externalReaders.put(".latex", LatexStreamReader.class);	// To allow *.latex files
 		externalReaders.put(".doc", DocStreamReader.class);
-		externalReaders.put(".DOC", DocStreamReader.class);
 		externalReaders.put(".docx", DocxStreamReader.class);
-		externalReaders.put(".DOCX", DocxStreamReader.class);
 		externalReaders.put(".odt", ODFStreamReader.class);
-		externalReaders.put(".ODT", ODFStreamReader.class);
 		externalReaders.put(".adoc", AsciiDocStreamReader.class);
-		externalReaders.put(".ADOC", AsciiDocStreamReader.class);
 		externalReaders.put(".md", MarkdownStreamReader.class);
 		externalReaders.put(".markdown", MarkdownStreamReader.class);
 		
-		if (Properties.parser_external_readers != null)
+		List<String> userExtReaders = GetResource.readResource("vdmj.readers");
+		
+		if (!userExtReaders.isEmpty())
 		{
-			String[] readers = Properties.parser_external_readers.split("\\s*,\\s*");
-			
-			for (String readerPair: readers)
+			for (String readerPair: userExtReaders)
 			{
 				try
 				{
@@ -182,11 +173,11 @@ public class BacktrackInputReader
 					if (parts.length == 2)
 					{
 						Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
-						externalReaders.put(parts[0], clazz);
+						externalReaders.put(parts[0].toLowerCase(), clazz);
 					}
 					else
 					{
-						System.err.printf("Malformed external readers: %s\n", Properties.parser_external_readers);
+						System.err.printf("Malformed external readers resource?\n");
 					}
 				}
 				catch (Exception e)
@@ -208,7 +199,7 @@ public class BacktrackInputReader
 			{
 				buildExternalReaders();
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				return false;
 			}
@@ -216,7 +207,7 @@ public class BacktrackInputReader
 		
 		for (String key: externalReaders.keySet())
 		{
-			if (file.getName().endsWith(key))
+			if (file.getName().toLowerCase().endsWith(key))
 			{
 				return true;
 			}
@@ -261,5 +252,18 @@ public class BacktrackInputReader
 	public char readCh()
 	{
 		return (pos == data.length) ? (char)-1 : data[pos++];
+	}
+	
+	/**
+	 * Get any IfdefProcessor errors.
+	 */
+	public List<VDMError> getErrors()
+	{
+		return ifdefProcessor.getErrors();
+	}
+	
+	public int getErrorCount()
+	{
+		return ifdefProcessor.getErrorCount();
 	}
 }

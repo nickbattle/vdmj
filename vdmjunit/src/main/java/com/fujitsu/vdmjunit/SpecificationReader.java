@@ -24,28 +24,27 @@
 
 package com.fujitsu.vdmjunit;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URL;
+import static org.junit.Assert.fail;
+
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.plugins.EventHub;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * The abstract parent class of all specification readers.
  */
 abstract public class SpecificationReader
 {
-	protected List<VDMError> errors = new Vector<VDMError>();
-	protected List<VDMWarning> warnings = new Vector<VDMWarning>();
+	private VDMJUnitLifecycle lifecycle = null;
 
 	/**
 	 * Construct a SpecificationReader for a particular VDM dialect.
@@ -54,7 +53,14 @@ abstract public class SpecificationReader
 	 */
 	public SpecificationReader(Dialect dialect)
 	{
+		Properties.init();
 		Settings.dialect = dialect;
+		PluginRegistry.reset();
+		EventHub.reset();
+		
+		lifecycle = new VDMJUnitLifecycle("-i");	// Because we want an interpreter
+		lifecycle.loadPlugins();
+		lifecycle.processArgs();
 	}
 	
 	/**
@@ -82,56 +88,15 @@ abstract public class SpecificationReader
 	 */
 	public Interpreter readSpecification(Charset charset, String... filenames) throws Exception
 	{
-		List<File> list = new Vector<File>(filenames.length);
+		lifecycle.findFiles(charset, filenames);
 		
-		for (String filename: filenames)
+		if (!lifecycle.checkAndInitFiles())
 		{
-			URL url = getClass().getResource("/" + filename);
-			
-			if (url == null)
-			{
-				throw new FileNotFoundException(filename);
-			}
-			
-			File file = null;
-			
-			if (url.getProtocol().equals("jar"))
-			{
-				file = GetResource.load(new File("/" + filename));
-			}
-			else
-			{
-				file = new File(url.toURI());
-			}
-			
-			if (file.isDirectory())
-			{
-				for (File subfile: file.listFiles(Settings.dialect.getFilter()))
-				{
-					if (subfile.isFile())
-					{
-						list.add(subfile);
-					}
-				}
-			}
-			else
-			{
-				list.add(file);
-			}
+			fail("Type errors (see stdout)");
 		}
-		
-		return readSpecification(charset, list);
-	}
 
-	/**
-	 * Parse and type check the supplied list of Files, and return an interpreter.
-	 * 
-	 * @param charset The character encoding for the files.
-	 * @param list A list of Files.
-	 * @return An Interpreter instance
-	 * @throws Exception
-	 */
-	protected abstract Interpreter readSpecification(Charset charset, List<File> list) throws Exception;
+		return Interpreter.getInstance();
+	}
 
 	/**
 	 * Return the syntax and type checking errors from the last readSpecification
@@ -139,7 +104,7 @@ abstract public class SpecificationReader
 	 */
 	public List<VDMError> getErrors()
 	{
-		return errors;
+		return lifecycle.errors;
 	}
 
 	/**
@@ -148,6 +113,6 @@ abstract public class SpecificationReader
 	 */
 	public List<VDMWarning> getWarnings()
 	{
-		return warnings;
+		return lifecycle.warnings;
 	}
 }

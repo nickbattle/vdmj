@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -59,15 +60,33 @@ public class INPowerSetExpression extends INUnaryExpression
 		try
 		{
     		ValueSet values = exp.eval(ctxt).setValue(ctxt);
-    		List<ValueSet> psets = values.powerSet();
-    		ValueSet rs = new ValueSet(psets.size());
+    		List<ValueSet> psets = values.powerSet(breakpoint, ctxt);
+			ValueSet rs = new ValueSet(psets.size());
 
     		for (ValueSet v: psets)
     		{
-    			rs.addNoCheck(new SetValue(v));
+    			rs.addSorted(new SetValue(v, false));	// Already sorted
     		}
 
-    		return new SetValue(rs);
+    		// The additions above can take a while, because all of the SetValues are
+    		// sorted. So we check the interrupt flag afterwards to try to respond.
+    		
+			if (Breakpoint.execInterruptLevel() > 0)
+			{
+				breakpoint.enterDebugger(ctxt);
+			}
+
+			Value ps = new SetValue(rs, false);		// Already sorted
+			
+			// And again here, the sort above can take a while, so we re-check the
+			// interrupt flag to try to respond while within the power expression.
+			
+			if (Breakpoint.execInterruptLevel() > 0)
+			{
+				breakpoint.enterDebugger(ctxt);
+			}
+
+			return ps;
 		}
 		catch (ValueException e)
 		{

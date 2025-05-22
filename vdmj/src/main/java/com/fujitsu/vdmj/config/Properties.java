@@ -47,6 +47,9 @@ public class Properties
 	/** Merge adjacent single line comments into a block */
 	public static boolean parser_merge_comments = false;
 	
+	/** Allow T! and mk_R! types */
+	public static boolean parser_maximal_types = false;
+	
 	/** The package list for annotation classes to load. */
 	public static String annotations_packages = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
 	
@@ -105,15 +108,21 @@ public class Properties
 	public static boolean rt_diags_timestep = false;
 
 	
-	/** The packages for command plugins to load from. */
-	public static String cmd_plugin_packages = "plugins";
-	
 	/** The class name for the DebugLink */
 	public static String debug_link_class = null;
 	
 	/** The size limit for power set expressions */
 	public static int in_powerset_limit = 30;
 	
+	/** The size limit for type bind expansions */
+	public static long in_typebind_limit = 100000;
+	
+	/** The maximum stack to dump via println(Throwable) */
+	public static int diag_max_stack = 1;
+
+	/** Whether to do checks during initialization */
+	public static boolean in_init_checks = true;
+
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
 	 * properties, to set the static fields above.
@@ -171,8 +180,8 @@ public class Properties
 	{
 		parser_tabstop = get(vdmj, "vdmj.parser.tabstop", 4);
 		parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", 3);
-		parser_external_readers = get(vdmj, "vdmj.parser.external_readers", null);
 		parser_merge_comments = get(vdmj, "vdmj.parser.merge_comments", false);
+		parser_maximal_types = get(vdmj, "vdmj.parser.maximal_types", false);
 
 		annotations_packages = get(vdmj, "vdmj.annotations.packages", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
 		annotations_debug = get(vdmj, "vdmj.annotations.debug", false);
@@ -199,9 +208,11 @@ public class Properties
 		rt_diags_timestep = get(vdmj, "vdmj.rt.diags_timestep", false);
 		
 		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
+		in_typebind_limit = get(vdmj, "vdmj.in.typebind_limit", 100000);
+		in_init_checks = get (vdmj, "vdmj.in.init_checks", true);
 
-		cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", "plugins");
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
+		diag_max_stack = get(vdmj, "vdmj.diag.max_stack", 1);
 	}
 	
 	private static int get(java.util.Properties local, String key, int def)
@@ -252,7 +263,6 @@ public class Properties
 		return value;
 	}
 	
-	@SuppressWarnings("unused")
 	private static String get(java.util.Properties local, String key, String def)
 	{
 		String value = System.getProperty(key);

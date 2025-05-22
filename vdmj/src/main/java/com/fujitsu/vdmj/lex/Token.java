@@ -140,6 +140,7 @@ public enum Token implements Serializable
 	PIPEPIPE(null, "||", VDM_SL, VDM_PP, VDM_RT),
 	HASH(null, "#", VDM_SL, VDM_PP, VDM_RT),
 	AT(null, "@", VDM_SL, VDM_PP, VDM_RT),
+	PLING(null, "!", VDM_SL, VDM_PP, VDM_RT),
 	SET_OPEN(null, "{", VDM_SL, VDM_PP, VDM_RT),
 	SET_CLOSE(null, "}", VDM_SL, VDM_PP, VDM_RT),
 	SEQ_OPEN(null, "[", VDM_SL, VDM_PP, VDM_RT),

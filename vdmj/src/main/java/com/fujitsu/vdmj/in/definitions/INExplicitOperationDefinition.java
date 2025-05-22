@@ -83,7 +83,7 @@ public class INExplicitOperationDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return  (type.isPure() ? "pure " : "") + name + ": " + type +
+		return  accessSpecifier.ifSet(" ") + name + ": " + type +
 				"\n\t" + name + "(" + Utils.listToString(parameterPatterns) + ")" +
 				(body == null ? "" : " ==\n" + body) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
@@ -102,29 +102,31 @@ public class INExplicitOperationDefinition extends INDefinition
 		NameValuePairList nvl = new NameValuePairList();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null, null);
 
 		OperationValue op = new OperationValue(this, prefunc, postfunc, statedef);
-		op.isConstructor = isConstructor;
-		op.isStatic = accessSpecifier.isStatic;
 		nvl.add(new NameValuePair(name, op));
 
 		if (predef != null)
 		{
-			prefunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(predef.name, prefunc));
 		}
 
 		if (postdef != null)
 		{
-			postfunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(postdef.name, postfunc));
 		}
 
 		return nvl;
+	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
 	}
 
 	@Override

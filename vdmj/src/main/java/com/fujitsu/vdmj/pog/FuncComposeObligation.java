@@ -24,23 +24,26 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POCompExpression;
 
 public class FuncComposeObligation extends ProofObligation
 {
-	public FuncComposeObligation(
+	private FuncComposeObligation(
 		POCompExpression exp, String pref1, String pref2, POContextStack ctxt)
 	{
 		super(exp.location, POType.FUNC_COMPOSE, ctxt);
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("forall arg:");
-		sb.append(explicitType(exp.ltype.getFunction().parameters.get(0), exp.location));
+		sb.append(explicitType(exp.rtype.getFunction().parameters.get(0), exp.location));
 		sb.append(" & ");
 
 		if (pref2 == null || !pref2.equals(""))
 		{
-    		if (pref2 != null)
+    		if (pref2 != null && pref2 != FunctionApplyObligation.UNKNOWN)
     		{
         		sb.append(pref2);
         		sb.append("(arg) => ");
@@ -53,7 +56,7 @@ public class FuncComposeObligation extends ProofObligation
     		}
 		}
 
-		if (pref1 != null)
+		if (pref1 != FunctionApplyObligation.UNKNOWN && pref1 != null)
 		{
     		sb.append(pref1);
     		sb.append("(");
@@ -69,6 +72,24 @@ public class FuncComposeObligation extends ProofObligation
     		sb.append("(arg))");
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POCompExpression exp, String pref1, String pref2, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new FuncComposeObligation(exp, pref1, pref2, choice));
+		}
+		
+		return results;
 	}
 }

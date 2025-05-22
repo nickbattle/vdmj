@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.values.visitors.ExplicitValueVisitor;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
@@ -65,15 +66,15 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	{
 		StringBuilder sb = new StringBuilder("%");
 
-		switch (flags)
+		if ((flags & FormattableFlags.LEFT_JUSTIFY) > 0)
 		{
-			case FormattableFlags.LEFT_JUSTIFY:
-				sb.append('-');
-				break;
-
-			case FormattableFlags.ALTERNATE:
-				sb.append('#');
-				break;
+			sb.append('-');
+		}
+		
+		if ((flags & FormattableFlags.ALTERNATE) > 0)
+		{
+			// Alternates should be dealt with in subclasses. Ignored otherwise.
+			// sb.append('#');
 		}
 
 		if (width > 0)
@@ -87,7 +88,14 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 			sb.append(precision);
 		}
 
-		sb.append('s');
+		if ((flags & FormattableFlags.UPPERCASE) > 0)
+		{
+			sb.append('S');
+		}
+		else
+		{
+			sb.append('s');
+		}
 
 		formatter.format(sb.toString(), value);
 	}
@@ -131,6 +139,11 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		}
 
 		return value;
+	}
+	
+	public String toExplicitString(LexLocation from)
+	{
+		return this.apply(new ExplicitValueVisitor(), from);
 	}
 
 	/**
@@ -347,7 +360,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 * @param listeners The listener to inform of updates to the value.
 	 * @return An UpdatableValue for this one.
 	 */
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		return UpdatableValue.factory(this, listeners);
 	}

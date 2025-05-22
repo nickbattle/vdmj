@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.tc.types.visitors.TCExplicitTypeVisitor;
 
 /**
  * A class to hold a local variable definition.
@@ -47,7 +48,13 @@ public class POLocalDefinition extends PODefinition
 	@Override
 	public String toString()
 	{
-		return name.getName() + " = " + type;
+		return toExplicitString(location);
+	}
+
+	@Override
+	public String toExplicitString(LexLocation from)
+	{
+		return name.getName() + " : " + type.apply(new TCExplicitTypeVisitor(), from.module);
 	}
 
 	@Override

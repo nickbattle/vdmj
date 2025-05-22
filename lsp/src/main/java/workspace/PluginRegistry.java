@@ -24,25 +24,38 @@
 
 package workspace;
 
-import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import json.JSONArray;
+import com.fujitsu.vdmj.plugins.HelpList;
+
 import json.JSONObject;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
+import vdmj.commands.ErrorCommand;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
 {
 	private static PluginRegistry INSTANCE = null;
 	private final Map<String, AnalysisPlugin> plugins;
+	
+	private static class PluginComparator implements Comparator<AnalysisPlugin>
+	{
+		@Override
+		public int compare(AnalysisPlugin left, AnalysisPlugin right)
+		{
+			return left.getPriority() - right.getPriority();
+		}
+	}
 
 	private PluginRegistry()
 	{
-		plugins = new HashMap<String, AnalysisPlugin>();
+		plugins = new LinkedHashMap<String, AnalysisPlugin>();
+		Diag.info("Created PluginRegistry");
 	}
 
 	public static synchronized PluginRegistry getInstance()
@@ -55,9 +68,6 @@ public class PluginRegistry
 		return INSTANCE;
 	}
 	
-	/**
-	 * This is only used by unit testing.
-	 */
 	public static void reset()
 	{
 		if (INSTANCE != null)
@@ -80,84 +90,59 @@ public class PluginRegistry
 		return (T)plugins.get(name);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> T getPluginForMethod(String method)
+	public Map<String, AnalysisPlugin> getPluginMap()
 	{
-		T result = null;
-		
-		for (AnalysisPlugin plugin: plugins.values())
-		{
-			try
-			{
-				if (plugin.supportsMethod(method))
-				{
-					if (result != null)
-					{
-						Diag.error("Multiple plugins support %s", method);
-					}
-					
-					result = (T)plugin;
-				}
-			}
-			catch (Throwable e)
-			{
-				Diag.error("Exception in %s supportsMethod", plugin.getName());
-				Diag.error(e);
-			}
-		}
-		
-		return result;
-	}
-
-	public JSONObject getExperimentalOptions(JSONObject standard)
-	{
-		JSONObject options = new JSONObject();
-		
-		for (AnalysisPlugin plugin: plugins.values())
-		{
-			try
-			{
-				options.putAll(plugin.getExperimentalOptions(standard));
-			}
-			catch (Throwable e)
-			{
-				Diag.error("Exception in %s getExperimentalOptions", plugin.getName());
-				Diag.error(e);
-			}
-		}
-		
-		return options;
+		return plugins;
 	}
 	
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public List<AnalysisPlugin> getPlugins()
 	{
-		JSONArray commands = new JSONArray();
-		
+		List<AnalysisPlugin> sorted = new Vector<AnalysisPlugin>(plugins.values());
+		Collections.sort(sorted, new PluginComparator());
+		return sorted;
+	}
+	
+	public void setPluginCapabilities(JSONObject capabilities)
+	{
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				commands.addAll(plugin.applyCodeLenses(file, dirty));
+				plugin.setServerCapabilities(capabilities);
 			}
 			catch (Throwable e)
 			{
-				Diag.error("Exception in %s applyCodeLenses", plugin.getName());
+				Diag.error("Exception in %s setServerCapabilities", plugin.getName());
 				Diag.error(e);
 			}
 		}
-		
-		return commands;
 	}
 	
-	public Command getCommand(String line)
+	public void setDAPCapabilities(JSONObject capabilities)
 	{
-		Command result = null;
-		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				Command c = plugin.getCommand(line);
+				plugin.setDAPCapabilities(capabilities);
+			}
+			catch (Throwable e)
+			{
+				Diag.error("Exception in %s setServerCapabilities", plugin.getName());
+				Diag.error(e);
+			}
+		}
+	}
+	
+	public AnalysisCommand getCommand(String line)
+	{
+		AnalysisCommand result = null;
+		
+		for (AnalysisPlugin plugin: getPlugins())	// Priority ordered
+		{
+			try
+			{
+				AnalysisCommand c = plugin.getCommand(line);
 				
 				if (c != null)
 				{
@@ -169,6 +154,11 @@ public class PluginRegistry
 					result = c;
 				}
 			}
+			catch (IllegalArgumentException e)	// Usage failed
+			{
+				Diag.error(e.getMessage());
+				return new ErrorCommand(e.getMessage()); 
+			}
 			catch (Throwable e)
 			{
 				Diag.error("Exception in %s getCommand", plugin.getName());
@@ -179,15 +169,15 @@ public class PluginRegistry
 		return result;
 	}
 	
-	public List<String[][]> getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		List<String[][]> result = new Vector<String[][]>();
+		HelpList result = new HelpList();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				String[][] messages = plugin.getCommandHelp();
+				HelpList messages = plugin.getCommandHelp();
 				result.add(messages);
 			}
 			catch (Throwable e)

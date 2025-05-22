@@ -24,26 +24,14 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POMapInverseExpression;
-import com.fujitsu.vdmj.tc.types.TCInvariantType;
 
 public class InvariantObligation extends ProofObligation
 {
-	public InvariantObligation(POExpression arg, TCInvariantType inv, POContextStack ctxt)
-	{
-		super(arg.location, POType.INVARIANT, ctxt);
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(inv.invdef.name.getName());
-		sb.append("(");
-		sb.append(arg);
-		sb.append(")");
-
-		value = ctxt.getObligation(sb.toString());
-	}
-
-	public InvariantObligation(POMapInverseExpression exp, POContextStack ctxt)
+	private InvariantObligation(POMapInverseExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -56,6 +44,24 @@ public class InvariantObligation extends ProofObligation
 		sb.append(explicitType(exp.type.to, exp.location));
 		sb.append(")");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POMapInverseExpression exp, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new InvariantObligation(exp, choice));
+		}
+		
+		return results;
 	}
 }

@@ -26,11 +26,11 @@ package com.fujitsu.vdmj.ast.definitions;
 
 import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternListList;
 import com.fujitsu.vdmj.ast.types.ASTFunctionType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.util.Utils;
 
 /**
@@ -39,7 +39,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class ASTExplicitFunctionDefinition extends ASTDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final LexNameList typeParams;
+	public final ASTTypeList typeParams;
 	public final ASTFunctionType type;
 	public final ASTPatternListList paramPatternList;
 	public final ASTExpression precondition;
@@ -48,7 +48,7 @@ public class ASTExplicitFunctionDefinition extends ASTDefinition
 	public final boolean isTypeInvariant;
 	public final ASTExpression measure;
 
-	public ASTExplicitFunctionDefinition(LexNameToken name, LexNameList typeParams,
+	public ASTExplicitFunctionDefinition(LexNameToken name, ASTTypeList typeParams,
 		ASTFunctionType type, ASTPatternListList parameters,
 		ASTExpression body,
 		ASTExpression precondition, ASTExpression postcondition, boolean typeInvariant,
@@ -77,7 +77,7 @@ public class ASTExplicitFunctionDefinition extends ASTDefinition
 		}
 
 		return accessSpecifier.ifSet(" ") + name.name +
-				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
+				(typeParams == null ? ": " : "[" + typeParams + "]: ") + Utils.deBracketed(type) +
 				"\n\t" + name.name + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition);

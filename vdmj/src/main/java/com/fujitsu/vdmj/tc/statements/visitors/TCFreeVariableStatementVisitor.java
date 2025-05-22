@@ -30,12 +30,16 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
+import com.fujitsu.vdmj.tc.statements.TCCaseStmtAlternative;
+import com.fujitsu.vdmj.tc.statements.TCCasesStatement;
+import com.fujitsu.vdmj.tc.statements.TCDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetBeStStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCSpecificationStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Environment>
 {
@@ -70,17 +74,51 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 		return caseSimpleBlockStatement(node, local);
 	}
 	
+ 	@Override
+	public TCNameSet caseCasesStatement(TCCasesStatement node, Environment arg)
+	{
+ 		TCNameSet all = visitorSet.applyExpressionVisitor(node.exp, arg);
+		
+		for (TCCaseStmtAlternative a: node.cases)
+		{
+			Environment local = new FlatEnvironment(a.pattern.getDefinitions(node.expType, NameScope.LOCAL), arg);
+			all.addAll(visitorSet.applyPatternVisitor(a.pattern, local));
+			all.addAll(a.statement.apply(this, local));
+		}
+		
+		all.addAll(visitorSet.applyStatementVisitor(node.others, arg));
+		return all;
+	}
+ 	
+ 	@Override
+ 	public TCNameSet caseDefStatement(TCDefStatement node, Environment arg)
+ 	{
+		Environment local = arg;
+		TCNameSet names = new TCNameSet();
+
+		for (TCDefinition d: node.equalsDefs)
+		{
+			if (d instanceof TCExplicitFunctionDefinition)
+			{
+				// ignore
+			}
+			else
+			{
+				local = new FlatEnvironment(d, local);
+				names.addAll(visitorSet.applyDefinitionVisitor(d, local));
+			}
+		}
+
+		names.addAll(node.statement.apply(this, local));
+		return names;
+ 	}
+	
 	@Override
 	public TCNameSet caseLetBeStStatement(TCLetBeStStatement node, Environment arg)
 	{
 		TCNameSet names = visitorSet.applyMultiBindVisitor(node.bind, arg);
 		Environment local = new FlatEnvironment(node.def, arg);
-		
-		if (node.suchThat != null)
-		{
-			names.addAll(visitorSet.applyExpressionVisitor(node.suchThat, local));
-		}
-		
+		names.addAll(visitorSet.applyExpressionVisitor(node.suchThat, local));
 		names.addAll(node.statement.apply(this, local));
 		return names;
 	}
@@ -100,8 +138,7 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 			else
 			{
 				local = new FlatEnvironment(d, local);
-				names.addAll(visitorSet.applyDefinitionVisitor(d,
-						local));
+				names.addAll(visitorSet.applyDefinitionVisitor(d, local));
 			}
 		}
 

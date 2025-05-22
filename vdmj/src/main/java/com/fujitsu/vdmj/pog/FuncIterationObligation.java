@@ -24,12 +24,14 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POStarStarExpression;
 
 public class FuncIterationObligation extends ProofObligation
 {
-	public FuncIterationObligation(
-		POStarStarExpression exp, String prename, POContextStack ctxt)
+	private FuncIterationObligation(POStarStarExpression exp, String prename, POContextStack ctxt)
 	{
 		super(exp.location, POType.FUNC_ITERATION, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -38,7 +40,7 @@ public class FuncIterationObligation extends ProofObligation
 		sb.append(" > 1 => forall arg:");
 		sb.append(exp.rtype.getNumeric());
 
-		if (prename != null)
+		if (prename != FunctionApplyObligation.UNKNOWN && prename != null)
 		{
     		sb.append(" & ");
     		sb.append(prename);
@@ -59,6 +61,24 @@ public class FuncIterationObligation extends ProofObligation
     		sb.append("(arg))");
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POStarStarExpression exp, String prename, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new FuncIterationObligation(exp, prename, choice));
+		}
+		
+		return results;
 	}
 }

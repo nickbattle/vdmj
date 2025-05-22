@@ -1,3 +1,4 @@
+-- @NoPOG - do not generate obligations for this class
 class IO
 
 -- 	VDMTools STANDARD LIBRARY: INPUT/OUTPUT

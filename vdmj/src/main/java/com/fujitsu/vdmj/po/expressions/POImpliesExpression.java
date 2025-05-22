@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -45,24 +46,24 @@ public class POImpliesExpression extends POBooleanBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = left.getProofObligations(ctxt, env);
+		ProofObligationList obligations = left.getProofObligations(ctxt, pogState, env);
 
 		if (ltype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(left, new TCBooleanType(left.location), ltype, ctxt));
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(left, new TCBooleanType(left.location), ltype, ctxt));
 		}
 
 		if (rtype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(right, new TCBooleanType(right.location), rtype, ctxt));
+			obligations.addAll(
+				SubTypeObligation.getAllPOs(right, new TCBooleanType(right.location), rtype, ctxt));
 		}
 
 		ctxt.push(new POImpliesContext(left));
-		obligations.addAll(right.getProofObligations(ctxt, env));
+		obligations.addAll(right.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		return obligations;

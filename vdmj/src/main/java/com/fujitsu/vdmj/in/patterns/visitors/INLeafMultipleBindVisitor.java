@@ -53,7 +53,7 @@ public abstract class INLeafMultipleBindVisitor<E, C extends Collection<E>, S> e
 		}
 	};
 
- 	@Override
+	@Override
 	public C caseMultipleSeqBind(INMultipleSeqBind node, S arg)
 	{
  		C all = visitorSet.applyExpressionVisitor(node.sequence, arg);

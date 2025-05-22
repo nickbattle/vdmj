@@ -129,9 +129,15 @@ public class ClassTypeChecker extends TypeChecker
 		{
         	for (TCClassDefinition c: classes)
     		{
+				PrivateClassEnvironment self = new PrivateClassEnvironment(c, allClasses);
+				
+				if (pass == Pass.DEFS && c.annotations != null)
+				{
+					c.annotations.tcBefore(c, self);
+				}
+				
 				try
 				{
-					Environment self = new PrivateClassEnvironment(c, allClasses);
 	         		c.typeCheckPass(pass, self);
 				}
 				catch (TypeCheckException te)
@@ -145,6 +151,11 @@ public class ClassTypeChecker extends TypeChecker
     						report(3427, e.getMessage(), e.location);
     					}
     				}
+				}
+				
+				if (pass == Pass.DEFS && c.annotations != null)
+				{
+					c.annotations.tcAfter(c, self);
 				}
     		}
 		}

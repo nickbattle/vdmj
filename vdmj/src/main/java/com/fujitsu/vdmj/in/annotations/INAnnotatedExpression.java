@@ -54,9 +54,9 @@ public class INAnnotatedExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		annotation.inBefore(this, ctxt);
+		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
 		Value rv = expression.eval(ctxt);
-		annotation.inAfter(this, rv, ctxt);
+		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
 		return rv;
 	}
 

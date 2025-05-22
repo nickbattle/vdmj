@@ -26,10 +26,10 @@ package com.fujitsu.vdmj.ast.definitions;
 
 import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePairList;
 import com.fujitsu.vdmj.ast.types.ASTPatternTypePair;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.util.Utils;
 
 /**
@@ -38,7 +38,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class ASTImplicitFunctionDefinition extends ASTDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final LexNameList typeParams;
+	public final ASTTypeList typeParams;
 	public final ASTPatternListTypePairList parameterPatterns;
 	public final ASTPatternTypePair result;
 	public final ASTExpression body;
@@ -47,7 +47,7 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 	public final ASTExpression measureExp;
 
 	public ASTImplicitFunctionDefinition(LexNameToken name,
-		LexNameList typeParams, ASTPatternListTypePairList parameterPatterns,
+		ASTTypeList typeParams, ASTPatternListTypePairList parameterPatterns,
 		ASTPatternTypePair result,
 		ASTExpression body,
 		ASTExpression precondition,
@@ -68,7 +68,7 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 	@Override
 	public String toString()
 	{
-		return	accessSpecifier + " " +	name.name +
+		return	accessSpecifier.ifSet(" ") + name.name +
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +

@@ -59,19 +59,25 @@ public abstract class ASTLeafBindVisitor<E, C extends Collection<E>, S> extends 
  	@Override
 	public C caseSeqBind(ASTSeqBind node, S arg)
 	{
-		return caseBind(node, arg);
+ 		C all = visitorSet.applyPatternVisitor(node.pattern, arg);
+ 		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+		return all;
 	}
 
  	@Override
 	public C caseSetBind(ASTSetBind node, S arg)
 	{
-		return caseBind(node, arg);
+ 		C all = visitorSet.applyPatternVisitor(node.pattern, arg);
+ 		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+		return all;
 	}
 
  	@Override
 	public C caseTypeBind(ASTTypeBind node, S arg)
 	{
-		return caseBind(node, arg);
+ 		C all = visitorSet.applyPatternVisitor(node.pattern, arg);
+ 		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		return all;
 	}
 
  	abstract protected C newCollection();

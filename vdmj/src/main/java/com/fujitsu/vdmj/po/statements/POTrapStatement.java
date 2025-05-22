@@ -30,7 +30,10 @@ import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -59,7 +62,7 @@ public class POTrapStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -74,20 +77,28 @@ public class POTrapStatement extends POStatement
 		else if (patternBind.bind instanceof POSetBind)
 		{
 			POSetBind bind = (POSetBind)patternBind.bind;
-			list.addAll(bind.set.getProofObligations(ctxt, env));
+			list.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 
-			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
+			list.addAll(SetMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
-			list.addAll(bind.sequence.getProofObligations(ctxt, env));
+			list.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 
-			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+			list.addAll(SeqMemberObligation.getAllPOs(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
+		
+		// The "with" clause sees the "body" state updates, so this comes first
+		list.addAll(body.getProofObligations(ctxt, pogState, env));
+		
+		// We don't know the exception type to match against the trap pattern/bind, so unchecked
+		int popto = ctxt.size();
+		list.addAll(with.getProofObligations(ctxt, pogState, env).markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+		ctxt.popTo(popto);
+		
+		ctxt.push(new POAmbiguousContext("trap statement", ctxt.getStateVariables(), location));
 
-		list.addAll(with.getProofObligations(ctxt, env));
-		list.addAll(body.getProofObligations(ctxt, env));
 		return list;
 	}
 

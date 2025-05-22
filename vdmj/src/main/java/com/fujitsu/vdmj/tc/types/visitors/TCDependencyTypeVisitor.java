@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.tc.types.visitors;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -35,9 +34,9 @@ import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCDependencyTypeVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	public TCDependencyTypeVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyTypeVisitor()
 	{
-		visitorSet = visitors;
+		// No visitor set
 	}
 
 	@Override

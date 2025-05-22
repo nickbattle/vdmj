@@ -24,15 +24,20 @@
 
 package plugins;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
 import json.JSONObject;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.EventHub;
+import workspace.EventListener;
+import workspace.events.LSPEvent;
+import workspace.events.UnknownTranslationEvent;
 import workspace.plugins.AnalysisPlugin;
 
-public abstract class ISAPlugin extends AnalysisPlugin
+public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 {
 	public static ISAPlugin factory(Dialect dialect)
 	{
@@ -42,8 +47,8 @@ public abstract class ISAPlugin extends AnalysisPlugin
 				return new ISAPluginSL();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 
@@ -61,24 +66,45 @@ public abstract class ISAPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
-		// Ignore
+		EventHub.getInstance().register(UnknownTranslationEvent.class, this);
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		JSONObject provider = standard.get("translateProvider");
-		
-		if (provider != null)
+		if (event instanceof UnknownTranslationEvent)
 		{
-			JSONArray ids = provider.get("languageId");
+			UnknownTranslationEvent ute = (UnknownTranslationEvent)event;
 			
-			if (ids != null)
+			if (ute.languageId.equals("isabelle"))
 			{
-				ids.add("isabelle");	// Edit the standard response to include isabelle
+				return analyse(event.request);
 			}
 		}
 		
-		return new JSONObject();
+		return null;	// Not handled
+	}
+	
+	abstract public RPCMessageList analyse(RPCRequest request);
+
+	@Override
+	public void setServerCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			JSONObject provider = experimental.get("translateProvider");
+			
+			if (provider != null)
+			{
+				JSONArray ids = provider.get("languageId");
+				
+				if (ids != null)
+				{
+					ids.add("isabelle");	// Edit the standard response to include isabelle
+				}
+			}
+		}
 	}
 }

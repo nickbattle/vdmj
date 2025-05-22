@@ -30,14 +30,13 @@ import java.net.URL;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
-import com.fujitsu.vdmj.commands.CommandReader;
-import com.fujitsu.vdmj.commands.ModuleCommandReader;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.plugins.commands.AssertCommand;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -99,9 +98,8 @@ public class ExecutionTest extends TestCase
 		INModuleList runnable = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checked);
 		ModuleInterpreter interpreter = new ModuleInterpreter(runnable, checked);
 		interpreter.init();
-		CommandReader reader = new ModuleCommandReader(interpreter, "");
-		boolean OK = reader.assertFile(new File(assertions));
-		assertEquals("Execution errors", true, OK);
+		AssertCommand cmd = new AssertCommand("assert " + assertions);
+		assertEquals("Execution errors", true, !cmd.errors());
 	}
 
 	private void interpret(String resource) throws Exception
@@ -111,9 +109,8 @@ public class ExecutionTest extends TestCase
 
 		ModuleInterpreter interpreter = new ModuleInterpreter(new INModuleList(), new TCModuleList());
 		interpreter.init();
-		CommandReader reader = new ModuleCommandReader(interpreter, "");
-		boolean OK = reader.assertFile(new File(file));
-		assertEquals("Execution errors", true, OK);
+		AssertCommand cmd = new AssertCommand("assert " + file);
+		assertEquals("Execution errors", true, !cmd.errors());
 	}
 
 	public void testExpressions() throws Exception

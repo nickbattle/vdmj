@@ -28,12 +28,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
 import workspace.Diag;
 
-public class LSPServerDebug implements Runnable
+public class LSPServerDebug implements Runnable, VDMJMain
 {
 	private Dialect dialect;
 	private int port;
@@ -43,9 +45,15 @@ public class LSPServerDebug implements Runnable
 		this.dialect = dialect;
 		this.port = port;
 	}
+	
+	public static String getMainName()
+	{
+		return LSP_MAIN;
+	}
 
 	public static void main(String[] args)
 	{
+		Settings.mainClass = LSPServerDebug.class;
 		Dialect dialect = Dialect.VDM_SL;
 		int dapPort = -1;
 		int lspPort = -1;
@@ -121,6 +129,7 @@ public class LSPServerDebug implements Runnable
 				catch (IOException e)
 				{
 					Diag.severe("LSP Server stopped: %s", e.getMessage());
+					Diag.error(e);
 				}
 				
 				Diag.info("LSP %s Server closing port %d", dialect, socket.getLocalPort());

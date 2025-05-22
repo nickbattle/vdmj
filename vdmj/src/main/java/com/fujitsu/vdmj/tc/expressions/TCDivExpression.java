@@ -45,6 +45,26 @@ public class TCDivExpression extends TCNumericBinaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		checkNumeric(env, scope);
+		
+		if (right instanceof TCIntegerLiteralExpression)
+		{
+			TCIntegerLiteralExpression exp = (TCIntegerLiteralExpression)right;
+			
+			if (exp.value.value == 0)
+			{
+				right.report(3367, "Cannot divide by zero literal");
+			}
+		}
+		else if (right instanceof TCRealLiteralExpression)
+		{
+			TCRealLiteralExpression exp = (TCRealLiteralExpression)right;
+			
+			if (exp.value.value == 0)
+			{
+				right.report(3367, "Cannot divide by zero literal");
+			}
+		}
+
 		return setType(new TCIntegerType(location));
 	}
 

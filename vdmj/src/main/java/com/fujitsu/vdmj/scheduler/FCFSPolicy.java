@@ -143,7 +143,7 @@ public class FCFSPolicy extends SchedulingPolicy
 	{
 		long slice = 0;
 
-		if (bestThread.isVirtual())
+		if (bestThread.isVirtualResource())
 		{
 			slice = Properties.scheduler_virtual_timeslice;
 		}

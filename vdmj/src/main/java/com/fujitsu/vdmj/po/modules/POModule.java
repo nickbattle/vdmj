@@ -25,16 +25,17 @@
 package com.fujitsu.vdmj.po.modules;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 
 /**
  * A class holding all the details for one module.
@@ -84,14 +85,19 @@ public class POModule extends PONode implements Serializable
 		return sb.toString();
 	}
 
-	public ProofObligationList getProofObligations()
+	public ProofObligationList getProofObligations(MultiModuleEnvironment menv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 		
-		Environment env = new ModuleEnvironment(tcmodule);
-		list.addAll(defs.getProofObligations(new POContextStack(), env));
-		list.typeCheck(tcmodule);
+		for (PODefinition def: defs)
+		{
+			POContextStack ctxt = new POContextStack();
+			ctxt.push(new PONameContext(def.getVariableNames()));
+			list.addAll(def.getProofObligations(ctxt, new POGState(), menv));
+		}
+		
+		list.typeCheck(tcmodule, menv);
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;

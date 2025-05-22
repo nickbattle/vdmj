@@ -27,6 +27,10 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class PODurationStatement extends POStatement
 {
@@ -45,6 +49,14 @@ public class PODurationStatement extends POStatement
 	public String toString()
 	{
 		return "duration (" + duration + ") " + statement;
+	}
+	
+	@Override
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
+	{
+		ProofObligationList obligations = duration.getProofObligations(ctxt, pogState, env);
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		return obligations;
 	}
 
 	@Override

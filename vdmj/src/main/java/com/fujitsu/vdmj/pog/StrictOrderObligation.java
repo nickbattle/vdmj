@@ -34,9 +34,9 @@ public class StrictOrderObligation extends ProofObligation
 		super(def.ordPattern1.location, POType.STRICT_ORDER, ctxt);
 		TCNameToken ordT = def.name.getOrdName(location);
 		String po = "(forall x:%T & not %N(x, x)) and\n"
-			+ "(forall x, y, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
+			+ "(forall x:%T, y:%T, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
 		po = po.replaceAll("%N", ordT.getName());
 		po = po.replaceAll("%T", def.name.getName());
-		value = ctxt.getObligation(po);
+		source = ctxt.getSource(po);
 	}
 }

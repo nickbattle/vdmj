@@ -25,6 +25,7 @@
 package annotations.po;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
@@ -63,6 +64,12 @@ public class PONoPOGAnnotation extends POAnnotation
 
 	@Override
 	public void poAfter(POModule module, ProofObligationList obligations)
+	{
+		obligations.clear();
+	}
+	
+	@Override
+	public void poAfter(POClassDefinition clazz, ProofObligationList obligations)
 	{
 		obligations.clear();
 	}

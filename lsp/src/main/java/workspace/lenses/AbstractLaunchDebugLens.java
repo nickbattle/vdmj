@@ -31,15 +31,12 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 {
 	protected final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
 
-	@Override
-	abstract public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS module);
-
 	/**
 	 * Generate the command arguments for a code lens. This is used as the "arguments" passed to
 	 * the makeLens methods to create the response to the Client.
 	 */
 	protected JSONArray launchArgs(String launchName, String defaultName,
-			boolean debug, JSONArray constructors, String applyName, JSONArray applyArgs)
+			boolean debug, JSONArray constructors, String applyName, JSONArray applyTypes, JSONArray applyArgs)
 	{
 		JSONObject launchArgs = new JSONObject();
 		
@@ -56,6 +53,12 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 		}
 		
 		launchArgs.put("applyName", applyName);
+		
+		if (applyTypes != null)
+		{
+			launchArgs.put("applyTypes", applyTypes);
+		}
+		
 		launchArgs.put("applyArgs", applyArgs);
 
     	return new JSONArray(launchArgs);	// Array with one object

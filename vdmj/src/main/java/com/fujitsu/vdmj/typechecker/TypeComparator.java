@@ -133,6 +133,11 @@ public class TypeComparator
 		currentModule = module;
 	}
 	
+	public static String getCurrentModule()
+	{
+		return currentModule;
+	}
+	
 	/**
 	 * Test whether the two types are compatible. This means that, at runtime,
 	 * it is possible that the two types are the same, or sufficiently similar
@@ -142,11 +147,26 @@ public class TypeComparator
 	 * @param from
 	 * @return True if types "a" and "b" are compatible.
 	 */
-
 	public synchronized static boolean compatible(TCType to, TCType from)
 	{
 		done.clear();
 		return searchCompatible(to, from, false) == Result.Yes;
+	}
+
+	public synchronized static boolean compatible(String module, TCType to, TCType from)
+	{
+		String old = currentModule;
+		
+		try
+		{
+			setCurrentModule(module);
+			done.clear();
+			return searchCompatible(to, from, false) == Result.Yes;
+		}
+		finally
+		{
+			setCurrentModule(old);
+		}
 	}
 
 	public synchronized static boolean compatible(TCType to, TCType from, boolean paramOnly)
@@ -285,6 +305,30 @@ public class TypeComparator
 		{
 			return Result.Yes;	// Not defined "yet"...?
 		}
+		
+		// Check (possibly opaque) invariant types early. These are always compatible,
+		// even allowing for opacity.
+		
+		if (from instanceof TCNamedType && to instanceof TCNamedType)
+		{
+			TCNamedType nfrom = (TCNamedType)from;
+			TCNamedType nto = (TCNamedType)to;
+			
+			if (nfrom.typename.equals(nto.typename))
+			{
+				return Result.Yes;
+			}
+		}
+		else if (from instanceof TCRecordType && to instanceof TCRecordType)
+		{
+			TCRecordType rfrom = (TCRecordType)from;
+			TCRecordType rto = (TCRecordType)to;
+			
+			if (rfrom.name.equals(rto.name))
+			{
+				return Result.Yes;
+			}
+		}
 
 		// Obtain the fundamental type of BracketTypes, NamedTypes and
 		// OptionalTypes.
@@ -309,8 +353,7 @@ public class TypeComparator
     		{
     			TCInvariantType ito =(TCInvariantType)to;
     			
-	    		if (to instanceof TCNamedType &&
-	    			(!ito.opaque || ito.location.module.equals(currentModule)))
+	    		if (to instanceof TCNamedType && !ito.isOpaque(currentModule))
 	    		{
 	    			to = ((TCNamedType)to).type;
 	    			continue;
@@ -321,8 +364,7 @@ public class TypeComparator
     		{
     			TCInvariantType ifrom =(TCInvariantType)from;
     			
-	    		if (from instanceof TCNamedType &&
-	    			(!ifrom.opaque || ifrom.location.module.equals(currentModule)))
+	    		if (from instanceof TCNamedType && !ifrom.isOpaque(currentModule))
 	    		{
 	    			from = ((TCNamedType)from).type;
 	    			continue;
@@ -359,15 +401,22 @@ public class TypeComparator
 
 		if (from instanceof TCParameterType)
 		{
-			String fstr = from.apply(new TCParameterCollector(), null).get(0);
-			List<String> tstr = to.apply(new TCParameterCollector(), null);
+			TCParameterType fstr = from.apply(new TCParameterCollector(), null).get(0);
+			List<TCParameterType> tstr = to.apply(new TCParameterCollector(), null);
 			
 			if (tstr.contains(fstr) && !(to instanceof TCParameterType))
 			{
 				from.warning(5031, "Type " + from + " must be a union");	// See bug #562
 			}
 			
-			return Result.Yes;	// Runtime checked...
+			TCParameterType ptype = (TCParameterType)from;
+			
+			if (ptype.paramPattern instanceof TCUndefinedType)
+			{
+				return Result.Yes;	// Runtime checked...
+			}
+
+			from = ptype.paramPattern;
 		}
 
 		// OK... so we have fully resolved the basic types...
@@ -555,8 +604,8 @@ public class TypeComparator
 			}
 			else if (to instanceof TCParameterType)
 			{
-				String tstr = to.apply(new TCParameterCollector(), null).get(0);
-				List<String> fstr = from.apply(new TCParameterCollector(), null);
+				TCParameterType tstr = to.apply(new TCParameterCollector(), null).get(0);
+				List<TCParameterType> fstr = from.apply(new TCParameterCollector(), null);
 				
 				if (fstr.contains(tstr) && !(from instanceof TCParameterType))
 				{
@@ -812,7 +861,7 @@ public class TypeComparator
 				if (sup instanceof TCNamedType)
 				{
 					// both have an invariant and we're not ignoring them, so check for equality
-					return sub.equals(sup) ? Result.Yes : Result.No;
+					return sub.equals(sup) && !sub.isMaximal() ? Result.Yes : Result.No;
 				}
 				else
 				{
@@ -985,7 +1034,7 @@ public class TypeComparator
 				TCRecordType subr = (TCRecordType)sub;
 				TCRecordType supr = (TCRecordType)sup;
 
-				return subr.equals(supr) ? Result.Yes : Result.No;
+				return subr.equals(supr) && !(sub.isMaximal() && !sup.isMaximal()) ? Result.Yes : Result.No;
 			}
 			else if (sub instanceof TCClassType)
 			{

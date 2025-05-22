@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj;
 
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+
 import com.fujitsu.vdmj.lex.Dialect;
 
 /**
@@ -31,8 +34,11 @@ import com.fujitsu.vdmj.lex.Dialect;
  */
 public class Settings
 {
+	public static Class<? extends VDMJMain> mainClass = null;
 	public static Release release = Release.DEFAULT;
 	public static Dialect dialect = null;
+	public static Charset filecharset = Charset.defaultCharset();
+
 	public static boolean prechecks = true;
 	public static boolean postchecks = true;
 	public static boolean invchecks = true;
@@ -42,6 +48,24 @@ public class Settings
 	public static boolean annotations = false;
 	public static boolean verbose = false;
 	public static boolean strict = false;
-
-	public static boolean usingCmdLine = false;
+	
+	public static String getMainName()
+	{
+		if (mainClass != null)
+		{
+			try
+			{
+				Method m = mainClass.getMethod("getMainName");
+				return (String) m.invoke(null, (Object[])null);
+			}
+			catch (Throwable e)
+			{
+				return VDMJMain.UNDEFINED;
+			}
+		}
+		else
+		{
+			return VDMJMain.UNDEFINED;
+		}
+	}
 }

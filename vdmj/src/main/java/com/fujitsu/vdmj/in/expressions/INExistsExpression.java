@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  *
  *	Copyright (c) 2016 Fujitsu Services Ltd.
@@ -25,6 +24,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -44,6 +44,9 @@ public class INExistsExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
+	
+	/** Result information for QuickCheck */
+	public INBindingGlobals globals = null;
 
 	public INExistsExpression(LexLocation location, INMultipleBindList bindList, INExpression predicate)
 	{
@@ -108,6 +111,12 @@ public class INExistsExpression extends INExpression
 				{
 					if (matches && predicate.eval(evalContext).boolValue(ctxt))
 					{
+						if (globals != null)
+						{
+							globals.setWitness(evalContext);
+							globals.setMaybe(false);
+						}
+						
 						return new BooleanValue(true);
 					}
 				}
@@ -122,6 +131,11 @@ public class INExistsExpression extends INExpression
 	    	abort(e);
 	    }
 
+		if (globals != null)
+		{
+			globals.setMaybe(!bindList.hasAllValues());
+		}
+		
 		return new BooleanValue(false);
 	}
 

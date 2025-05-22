@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -72,10 +73,9 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 		
 		for (POClassDefinition c: this)
 		{
-			obligations.addAll(c.getProofObligations(new POContextStack(), new PublicClassEnvironment(tcclasses)));
+			obligations.addAll(c.getProofObligations(new POContextStack(), new POGState(), new PublicClassEnvironment(tcclasses)));
 		}
 
-		obligations.trivialCheck();
 		return obligations;
 	}
 }

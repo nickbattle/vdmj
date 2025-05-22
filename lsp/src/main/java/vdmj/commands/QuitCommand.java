@@ -24,21 +24,22 @@
 
 package vdmj.commands;
 
-import dap.AsyncExecutor;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
 import lsp.CancellableThread;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
-public class QuitCommand extends Command
+public class QuitCommand extends AnalysisCommand
 {
-	public static final String[] HELP = { "quit", "quit - end the debugging session" };
+	public static final String HELP = "quit - end the debugging session";
 	public static final String USAGE = "Usage: quit";
 	
 	public QuitCommand(String line)
 	{
-		if (!line.equals("quit") && !line.equals("q"))
+		super(line);
+		
+		if (!argv[0].equals("quit") && !argv[0].equals("q"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -47,16 +48,16 @@ public class QuitCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 
-		if (AsyncExecutor.currentlyRunning() != null)
+		if (CancellableThread.currentlyRunning() != null)
 		{
 			CancellableThread.cancelAll();
 			manager.stopDebugReader();
 		}
 		
 		DAPServer.getInstance().setRunning(false);
-		return manager.terminate(request, false);
+		return manager.dapTerminate(request, false);
 	}
 	
 	@Override

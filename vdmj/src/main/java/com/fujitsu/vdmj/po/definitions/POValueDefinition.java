@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -31,12 +32,14 @@ import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.ValueBindingObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.tc.types.visitors.TCExplicitTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
@@ -50,8 +53,9 @@ public class POValueDefinition extends PODefinition
 	public final TCType type;
 	public final POExpression exp;
 	public final TCType expType;
+	public final PODefinitionList defs;
 
-	public POValueDefinition(POAnnotationList annotations, POPattern p, TCType type, POExpression exp, TCType expType)
+	public POValueDefinition(POAnnotationList annotations, POPattern p, TCType type, POExpression exp, TCType expType, PODefinitionList defs)
 	{
 		super(p.location, null);
 		
@@ -60,12 +64,19 @@ public class POValueDefinition extends PODefinition
 		this.type = type;
 		this.exp = exp;
 		this.expType = expType;
+		this.defs = defs;
 	}
 
 	@Override
 	public String toString()
 	{
-		return pattern + (type == null ? "" : ":" + type) + " = " + exp;
+		return toExplicitString(location);
+	}
+	
+	@Override
+	public String toExplicitString(LexLocation from)
+	{
+		return pattern + (type == null ? "" : " : " + type.apply(new TCExplicitTypeVisitor(), from.module)) + " = " + exp;
 	}
 
 	@Override
@@ -93,12 +104,12 @@ public class POValueDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		list.addAll(exp.getProofObligations(ctxt, env));
+		list.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&
@@ -123,16 +134,16 @@ public class POValueDefinition extends PODefinition
     			if (!TypeComparator.isSubType(type, compatible))
     			{
     				list.add(new ValueBindingObligation(this, ctxt));
-    				list.add(new SubTypeObligation(exp, compatible, type, ctxt));
+    				list.addAll(SubTypeObligation.getAllPOs(exp, compatible, type, ctxt));
     			}
 			}
 		}
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), type))
 		{
-			list.add(new SubTypeObligation(exp, type, expType, ctxt));
+			list.addAll(SubTypeObligation.getAllPOs(exp, type, expType, ctxt));
 		}
-
+		
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}

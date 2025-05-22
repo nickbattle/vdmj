@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
@@ -43,6 +44,7 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	private final LexNameToken lexname;
 
 	private TCTypeList parameters = null;
+	private TCDefinition hides = null;
 	
 	public TCNameToken(LexNameToken name)
 	{
@@ -72,6 +74,16 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	public TCTypeList getTypeQualifier()
 	{
 		return parameters;
+	}
+	
+	public void setHides(TCDefinition def)
+	{
+		this.hides = def;
+	}
+	
+	public TCDefinition getHides()
+	{
+		return hides;
 	}
 
 	@Override
@@ -134,6 +146,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	public String toString()
 	{
 		return  lexname.toString() + (parameters == null ? "" : parameters);
+	}
+	
+	public final String toExplicitString(LexLocation from)
+	{
+		return (from.module.equals(lexname.location.module)) ? getName() : getModule() + "`" + getName(); 
 	}
 
 	public String getName()		// Simple name, never explicit
@@ -212,9 +229,19 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 		return new TCNameToken(l, getModule(), "measure_" + getName(), false, false);
 	}
 	
+	public boolean isMeasureName()
+	{
+		return lexname.name.startsWith("measure_");		// True, if a generated measure function
+	}
+	
 	public TCNameToken getResultName(LexLocation l)
 	{
 		return new TCNameToken(l, getModule(), "RESULT", false, false);
+	}
+	
+	public static TCNameToken getResult(LexLocation l)
+	{
+		return new TCNameToken(l, l.module, "RESULT", false, false);
 	}
 	
 	public boolean isReserved()

@@ -33,7 +33,12 @@ import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * Explore the tree of a type and indicate whether it is recursive, by returning a
- * non-empty set of bools.
+ * non-empty set of bools. This is used by TCType.isRecursive(). Types are recursive
+ * when a named or record type T contains T, even if this is hidden behind an optional
+ * type or something that can be empty, like a set/seq/map.
+ * 
+ * Recursive types are therefore "okay". Compare with TCInfiniteTypeFinder,
+ * and INTypeSizeVisitor.
  */
 public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean>, TCType>
 {
@@ -48,15 +53,13 @@ public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolea
 	{
 		return newCollection();
 	}
-	
+
 	@Override
 	public Set<Boolean> caseNamedType(TCNamedType node, TCType arg)
 	{
 		if (done.contains(node) && node.equals(arg))
 		{
-			Set<Boolean> result = newCollection();
-			result.add(true);
-			return result;
+			return trueSet();
 		}
 		else
 		{
@@ -69,13 +72,18 @@ public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolea
 	{
 		if (done.contains(node) && node.equals(arg))
 		{
-			Set<Boolean> result = newCollection();
-			result.add(true);
-			return result;
+			return trueSet();
 		}
 		else
 		{
 			return super.caseRecordType(node, arg);
 		}
+	}
+
+	private Set<Boolean> trueSet()
+	{
+		Set<Boolean> result = newCollection();
+		result.add(true);
+		return result;
 	}
 }

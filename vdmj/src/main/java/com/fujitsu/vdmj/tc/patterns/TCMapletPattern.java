@@ -24,12 +24,11 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
-public class TCMapletPattern extends TCNode
+public class TCMapletPattern extends TCPattern
 {
 	private static final long serialVersionUID = 1L;
 	public final TCPattern from;
@@ -38,10 +37,12 @@ public class TCMapletPattern extends TCNode
 
 	public TCMapletPattern(TCPattern from, TCPattern to)
 	{
+		super(from.location);
 		this.from = from;
 		this.to = to;
 	}
 
+	@Override
 	public void unResolve()
 	{
 		from.unResolve();
@@ -49,6 +50,7 @@ public class TCMapletPattern extends TCNode
 		resolved = false;
 	}
 
+	@Override
 	public void typeResolve(Environment env)
 	{
 		if (resolved) return; else { resolved = true; }
@@ -71,13 +73,9 @@ public class TCMapletPattern extends TCNode
 		return from + " |-> " + to;
 	}
 
-	public TCNameList getVariableNames()
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(from.getVariableNames());
-		list.addAll(to.getVariableNames());
-
-		return list;
+		return visitor.caseMapletPattern(this, arg);
 	}
 }

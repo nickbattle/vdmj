@@ -24,27 +24,23 @@
 
 package vdmj.commands;
 
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.util.Utils;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class VersionCommand extends Command
+public class VersionCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: version";
-	public static final String[] HELP =	{ "version", "version - show the VDMJ version and build" };
+	public static final String HELP = "version - show the VDMJ version and build";
 	
 	public VersionCommand(String line)
 	{
-		if (!line.trim().equals("version"))
+		super(line);
+		
+		if (!argv[0].equals("version"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -53,21 +49,16 @@ public class VersionCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		try
-		{
-			String path = VDMJ.class.getName().replaceAll("\\.", "/");
-			URL url = VDMJ.class.getResource("/" + path + ".class");
-			JarURLConnection conn = (JarURLConnection)url.openConnection();
-		    JarFile jar = conn.getJarFile();
-			Manifest mf = jar.getManifest();
-			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
+		String version = Utils.getVersion();
 
+		if (version != null)
+		{
 			return new DAPMessageList(request,
 					new JSONObject("result", "VDMJ version " + version));
 		}
-		catch (Exception e)
+		else
 		{
-			Diag.error(e);
+			Diag.error("Cannot determine VDMJ version");
 			return new DAPMessageList(request, false, "Cannot determine VDMJ version", null);
 		}
 	}

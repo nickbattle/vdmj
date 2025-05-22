@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
+import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
 import com.fujitsu.vdmj.tc.statements.TCObjectApplyDesignator;
@@ -214,6 +215,19 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 				
 				all.addAll(ext.unresolved.matchUnresolved(sought));
 			}
+		}
+		
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseForIndexStatement(TCForIndexStatement node, LexLocation sought)
+	{
+		Set<TCNode> all = super.caseForIndexStatement(node, sought);
+		
+		if (sought.touches(node.var.getLocation()))
+		{
+			all.add(node.vardef);
 		}
 		
 		return all;

@@ -30,9 +30,11 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.InitRunnable;
 import workspace.Diag;
+import workspace.EventHub;
+import workspace.events.DAPEvaluateEvent;
 
 public class InitExecutor extends AsyncExecutor
 {
@@ -80,14 +82,19 @@ public class InitExecutor extends AsyncExecutor
 
 		if (launchCommand != null)
 		{
-			Command command = Command.parse(launchCommand);
+			AnalysisCommand command = AnalysisCommand.parse(launchCommand);
 			
 			if (command instanceof InitRunnable)
 			{
+				EventHub.getInstance().publish(new DAPEvaluateEvent(launchCommand));
+				server.stdout(launchCommand + "\n");	// So we see what it's doing
 				InitRunnable initcmd = (InitRunnable)command;
 				running = initcmd.getExpression();
+				long before = System.currentTimeMillis();
 				String launchResult = initcmd.initRun(request);
-				server.stdout(initcmd.format(launchResult) + "\n");
+				long after = System.currentTimeMillis();
+				time = (double)(after-before)/1000;
+				server.stdout(initcmd.format(launchResult) + "\nExecuted in " + time + " secs.\n");
 			}
 			else
 			{
@@ -103,7 +110,6 @@ public class InitExecutor extends AsyncExecutor
 		{
 			server.stderr(e.getMessage());
 			server.stdout("Init terminated.\n");
-			manager.clearInterpreter();
 			server.writeMessage(new DAPResponse("terminated", null));
 		}
 		catch (Throwable e1)

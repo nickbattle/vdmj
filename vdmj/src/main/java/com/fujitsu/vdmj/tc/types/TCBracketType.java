@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -44,12 +43,6 @@ public class TCBracketType extends TCType
 	}
 
 	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		return type.isType(typename, location);
-	}
-
-	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		return type.isType(typeclass, location);
@@ -63,7 +56,7 @@ public class TCBracketType extends TCType
 	}
 
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		if (resolved) return type; else { resolved = true; }
 
@@ -71,11 +64,11 @@ public class TCBracketType extends TCType
 		{
 			do
 			{
-				type = type.typeResolve(env, root);
+				type = type.typeResolve(env);
 			}
 			while (type instanceof TCBracketType);
 
-			type = type.typeResolve(env, root);
+			type = type.typeResolve(env);
 			return type;
 		}
 		catch (TypeCheckException e)

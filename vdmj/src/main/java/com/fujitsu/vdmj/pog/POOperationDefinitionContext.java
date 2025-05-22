@@ -28,10 +28,13 @@ import java.util.Iterator;
 
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -43,25 +46,71 @@ public class POOperationDefinitionContext extends POContext
 	public final POPatternList paramPatternList;
 	public final boolean addPrecond;
 	public final String precondition;
-	public final PODefinition stateDefinition;
+	public final PODefinition definition;
+	public final PODefinition stateDefinition;	// Can be POClassDefinition
+	public final boolean expandState;
+	public final POExpression preExp;
+	
+	public POOperationDefinitionContext(POExplicitOperationDefinition definition,
+		boolean precond, PODefinition stateDefinition, boolean expandState)
+	{
+		this.name = definition.name;
+		this.deftype = definition.type;
+		this.addPrecond = precond;
+		this.paramPatternList = definition.parameterPatterns;
+		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
+		this.stateDefinition = stateDefinition;
+		this.definition = definition;
+		this.expandState = expandState;
+		this.preExp = definition.precondition;
+	}
 
 	public POOperationDefinitionContext(POImplicitOperationDefinition definition,
-		boolean precond, PODefinition stateDefinition)
+		boolean precond, PODefinition stateDefinition, boolean expandState)
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
 		this.stateDefinition = stateDefinition;
+		this.definition = definition;
+		this.expandState = expandState;
+		this.preExp = definition.precondition;
+	}
+	
+	@Override
+	public PODefinition getDefinition()
+	{
+		return definition;
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		if (addPrecond && preExp != null)
+		{
+			TCNameSet used = preExp.getVariableNames();
+			
+			// Add the names of the parameters, since these are effective "used"
+			
+			for (POPattern p: paramPatternList)
+			{
+				used.addAll(p.getVariableNames());
+			}
+    		
+    		return used;
+		}
+		
+		return super.reasonsAbout();
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 
-		if (!deftype.parameters.isEmpty())
+		if (!deftype.parameters.isEmpty() || stateDefinition != null)
 		{
     		sb.append("forall ");
     		String sep = "";
@@ -70,14 +119,15 @@ public class POOperationDefinitionContext extends POContext
 			for (POPattern p: paramPatternList)
 			{
 				sb.append(sep);
-				sb.append(p.getMatchingExpression());	// Expands anys
+				sb.append(p.removeIgnorePatterns());
 				sb.append(":");
-				sb.append(types.next());
+				sb.append(types.next().toExplicitString(name.getLocation()));
 				sep = ", ";
 			}
 
 			if (stateDefinition != null)
 			{
+				sb.append(sep);
 				appendStatePatterns(sb);
 			}
 
@@ -103,14 +153,34 @@ public class POOperationDefinitionContext extends POContext
 		else if (stateDefinition instanceof POStateDefinition)
 		{
 			POStateDefinition def = (POStateDefinition)stateDefinition;
-			sb.append(", oldstate:");
-			sb.append(def.name.getName());
+			
+			if (expandState)
+			{
+				sb.append(def.toPattern(false));
+				sb.append(":");
+				sb.append(def.name.getName());
+			}
+			else
+			{
+				sb.append("oldstate:");
+				sb.append(def.name.getName());
+			}
 		}
 		else
 		{
 			POClassDefinition def = (POClassDefinition)stateDefinition;
-			sb.append(", oldself:");
-			sb.append(def.name.getName());
+
+			if (expandState)
+			{
+				sb.append(def.toPattern(false));
+				sb.append(":");
+				sb.append(def.name.getName());
+			}
+			else
+			{
+				sb.append("oldself:");
+				sb.append(def.name.getName());
+			}
 		}
 	}
 }

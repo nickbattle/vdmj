@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -60,21 +59,6 @@ public class INDefinitionList extends INMappedList<TCDefinition, INDefinition>
 			if (d instanceof INStateDefinition)
 			{
 				return (INStateDefinition)d;
-			}
-		}
-
-   		return null;
-	}
-
-	public INExpression findExpression(int lineno)
-	{
-   		for (INDefinition d: this)
-		{
-			INExpression found = d.findExpression(lineno);
-
-			if (found != null)
-			{
-				return found;
 			}
 		}
 

@@ -24,21 +24,28 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.List;
-import java.util.Vector;
-
+import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.POPatternListList;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
-import com.fujitsu.vdmj.pog.PONoCheckContext;
+import com.fujitsu.vdmj.pog.POLetDefContext;
+import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -47,6 +54,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
@@ -65,9 +73,10 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final POExplicitFunctionDefinition predef;
 	public final POExplicitFunctionDefinition postdef;
 	public final PODefinitionList paramDefinitions;
-	public final POStateDefinition state;
+	public final POStateDefinition stateDefinition;
 	public final TCType actualResult;
 	public final boolean isConstructor;
+	public final TCTypeSet possibleExceptions;
 
 	public POExplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name, TCOperationType type,
@@ -77,7 +86,9 @@ public class POExplicitOperationDefinition extends PODefinition
 		POExplicitFunctionDefinition postdef,
 		PODefinitionList paramDefinitions,
 		POStateDefinition state,
-		TCType actualResult, boolean isConstructor)
+		POClassDefinition classDefinition,
+		TCType actualResult, boolean isConstructor,
+		TCTypeSet possibleExceptions)
 	{
 		super(name.getLocation(), name);
 
@@ -90,9 +101,11 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.predef = predef;
 		this.postdef = postdef;
 		this.paramDefinitions = paramDefinitions;
-		this.state = state;
+		this.stateDefinition = state;
+		this.classDefinition = classDefinition;
 		this.actualResult = actualResult;
 		this.isConstructor = isConstructor;
+		this.possibleExceptions = possibleExceptions;
 	}
 
 	@Override
@@ -112,14 +125,12 @@ public class POExplicitOperationDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 
-		ctxt.push(new PONoCheckContext());		// Don't typecheck operation POs yet
-		
 		for (POPattern p: parameterPatterns)
 		{
 			pids.addAll(p.getVariableNames());
@@ -130,13 +141,22 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new ParameterPatternObligation(this, ctxt));
 		}
 
-		if (precondition != null)
+		/**
+		 * Pre- and postconditions for OO dialects are not clearly defined, and obligations
+		 * generated from them are generally not type-checkable. So we conditionally
+		 * exclude them, depending on the dialect.
+		 */
+		if (precondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
-			obligations.addAll(predef.getProofObligations(ctxt, env));
+			ctxt.push(new PONameContext(new TCNameList(predef.name)));
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			ctxt.pop();
 		}
 
-		if (postcondition != null)
+		if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
+			ctxt.push(new PONameContext(new TCNameList(postdef.name)));
+
 			if (precondition != null)
 			{
 				ctxt.push(new POFunctionDefinitionContext(postdef, true));
@@ -147,13 +167,56 @@ public class POExplicitOperationDefinition extends PODefinition
 			}
 			else
 			{
-				obligations.addAll(postdef.getProofObligations(ctxt, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, pogState, env));
 			}
 
-			obligations.add(new OperationPostConditionObligation(this, ctxt));
+			ctxt.pop();
 		}
+		
+		pogState.setResult(null);	// Indicate "RESULT" should be used
+		
+		if (stateDefinition != null)
+		{
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+			addOldContext(ctxt);
+			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
-		obligations.addAll(body.getProofObligations(ctxt, env));
+			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
+			{
+				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
+			}
+			
+			ctxt.popTo(popto);
+		}
+		else if (classDefinition != null)
+		{
+			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
+			ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
+			ctxt.pop();
+			
+			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
+			{
+				oblist.markUnchecked(ProofObligation.REQUIRES_VDM10);
+			}
+			else if (precondition != null)				// pre_op undefined in VDM++
+			{
+				oblist.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+			}
+				
+			obligations.addAll(oblist);
+		}
+		else	// Flat spec with no state defined
+		{
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), null, true));
+			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
+
+			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
+			{
+				obligations.add(new OperationPostConditionObligation(this, ctxt));
+			}
+			
+			ctxt.popTo(popto);
+		}
 
 		if (isConstructor &&
 			classDefinition != null &&
@@ -168,17 +231,45 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 		}
 		
-		ctxt.pop();
-
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
 
-	public List<POPatternList> getParamPatternList()
+	private void addOldContext(POContextStack ctxt)
 	{
-		List<POPatternList> list = new Vector<POPatternList>();
+		if (postcondition != null)
+		{
+			PODefinitionList olddefs = new PODefinitionList();
+			
+			for (TCNameToken name: postcondition.getVariableNames())
+			{
+				if (name.isOld())
+				{
+					TCNameToken varname = new TCNameToken(name.getLocation(), name.getModule(), name.getName() + "$");
+					
+					olddefs.add(new POValueDefinition(null, new POIdentifierPattern(varname), null,
+							new POVariableExpression(name.getNewName(), null), null, null));
+				}
+			}
+			
+			if (!olddefs.isEmpty())
+			{
+				ctxt.push(new POLetDefContext(olddefs));
+			}
+		}
+	}
+
+	public POPatternListList getParamPatternList()
+	{
+		POPatternListList list = new POPatternListList();
 		list.add(parameterPatterns);
 		return list;
+	}
+	
+	@Override
+	public TCTypeSet getPossibleExceptions()
+	{
+		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
 	}
 
 	@Override

@@ -75,12 +75,11 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POGetMatchingExpressionVisitor extends POPatternVisitor<POExpression, Object>
 {
-	private static int var = 1;		// Used in caseIgnorePattern()
-	private TCNameToken anyName = null;
+	private static int var = 0;		// Used in caseIgnorePattern()
 
 	public static void init()
 	{
-		var = 1;	// reset on each getProofObligations run.
+		var = 0;	// reset on each getProofObligations run.
 	}
 
 	@Override
@@ -127,10 +126,8 @@ public class POGetMatchingExpressionVisitor extends POPatternVisitor<POExpressio
 		// Generate a new "any" name for use during PO generation. The name
 		// must be unique for the pattern instance.
 		
-		if (anyName == null)
-		{
-			anyName = new TCNameToken(node.location, "", "$any" + var++);
-		}
+		var++;
+		TCNameToken anyName = new TCNameToken(node.location, node.location.module, "$any" + var);
 		
 		return new POVariableExpression(anyName, null);
 	}
@@ -205,7 +202,9 @@ public class POGetMatchingExpressionVisitor extends POPatternVisitor<POExpressio
 			list.add(p.apply(this, arg));
 		}
 
-		return new POMkTypeExpression(node.typename, list, null, null);
+		// If the type is not within the pattern's module, be explicit
+		boolean explicit = !node.location.module.equals(node.typename.getModule());
+		return new POMkTypeExpression(node.typename.getExplicit(explicit), list, null, null);
 	}
 	
 	@Override

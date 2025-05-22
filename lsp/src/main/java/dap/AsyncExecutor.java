@@ -30,16 +30,14 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
 
 import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 public abstract class AsyncExecutor extends CancellableThread
 {
 	protected final DAPServer server = DAPServer.getInstance();
-	protected final DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+	protected final DAPPlugin manager = DAPPlugin.getInstance();
 	protected final DAPRequest request;
-
-	protected static String running = null;
 
 	public AsyncExecutor(String id, DAPRequest request)
 	{
@@ -113,10 +111,6 @@ public abstract class AsyncExecutor extends CancellableThread
 	{
 		super.setCancelled();
 		Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
-	}
-	
-	public static String currentlyRunning()
-	{
-		return running;
+		Diag.info("Set the exec interrupt value to TERMINATE");
 	}
 }

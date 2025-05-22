@@ -32,7 +32,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import com.fujitsu.vdmj.VDMJ;
+
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
@@ -41,26 +41,22 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.modules.POModuleList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
 import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -69,6 +65,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.traces.CallSequence;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -86,8 +83,6 @@ public class ModuleInterpreter extends Interpreter
 	public INModule defaultModule;
 	/** The default module's environment */
 	private Environment defaultEnvironment;
-	/** The PO analysis tree */
-	private POModuleList pogModules;
 
 	/**
 	 * Create an Interpreter from the list of executableModules passed.
@@ -112,6 +107,11 @@ public class ModuleInterpreter extends Interpreter
 		}
 	}
 
+	public static ModuleInterpreter getInstance()
+	{
+		return (ModuleInterpreter) instance;
+	}
+
 	/**
 	 * Set the default module to the name given.
 	 *
@@ -127,6 +127,7 @@ public class ModuleInterpreter extends Interpreter
 			executableModules.add(defaultModule);
 			checkedModules.add(new TCModule());
 			defaultEnvironment = new ModuleEnvironment(checkedModules.get(0));
+			TypeComparator.setCurrentModule(getDefaultName());
 		}
 		else
 		{
@@ -135,6 +136,7 @@ public class ModuleInterpreter extends Interpreter
 				if (m.name.getName().equals(mname))
 				{
 					defaultModule = m;
+					TypeComparator.setCurrentModule(getDefaultName());
 					break;
 				}
 			}
@@ -168,6 +170,11 @@ public class ModuleInterpreter extends Interpreter
 	public String getDefaultName()
 	{
 		return defaultModule.name.getName();
+	}
+	
+	public INModule getDefaultModule()
+	{
+		return defaultModule;
 	}
 
 	/**
@@ -247,7 +254,7 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	protected TCExpression parseExpression(String line, String module) throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL, Console.charset);
+		LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression ast = reader.readExpression();
@@ -258,7 +265,7 @@ public class ModuleInterpreter extends Interpreter
 			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
 		}
 		
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 	}
 
 	/**
@@ -272,8 +279,14 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public Value execute(String line) throws Exception
 	{
+		return execute(line, getGlobalEnvironment());
+	}
+	
+	@Override
+	public Value execute(String line, Environment env) throws Exception
+	{
 		TCExpression expr = parseExpression(line, getDefaultName());
-		typeCheck(expr);
+		typeCheck(expr, env);
 
 		Context mainContext = new StateContext(defaultModule.name.getLocation(),
 				"module scope",	null, defaultModule.getStateContext());
@@ -283,7 +296,7 @@ public class ModuleInterpreter extends Interpreter
 		clearBreakpointHits();
 
 		// scheduler.reset();
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(expr);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);
 		MainThread main = new MainThread(inex, mainContext);
 		main.start();
 		scheduler.start(main);
@@ -316,7 +329,7 @@ public class ModuleInterpreter extends Interpreter
 		}
 
 		ctxt.threadState.init();
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(tc);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tc);
 		return inex.eval(ctxt);
 	}
 
@@ -344,7 +357,14 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public INStatement findStatement(File file, int lineno)
 	{
-		return executableModules.findStatement(file, lineno);
+		INStatementList list = findStatements(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INStatementList findStatements(File file, int lineno)
+	{
+		return executableModules.findStatements(file, lineno);
 	}
 
 	/**
@@ -358,24 +378,14 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public INExpression findExpression(File file, int lineno)
 	{
-		return executableModules.findExpression(file, lineno);
+		INExpressionList list = findExpressions(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
 	}
 
 	@Override
-	public ProofObligationList getProofObligations() throws Exception
+	public INExpressionList findExpressions(File file, int lineno)
 	{
-		if (pogModules == null)
-		{
-			long now = System.currentTimeMillis();
-			pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
-			ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
-			VDMJ.mapperStats(now, PONode.MAPPINGS);
-		}
-		
-		POAnnotation.init();
-		ProofObligationList list = pogModules.getProofObligations();
-		POAnnotation.close();
-		return list;
+		return executableModules.findExpressions(file, lineno);
 	}
 
 	@Override
@@ -419,22 +429,8 @@ public class ModuleInterpreter extends Interpreter
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends List<?>> T getTC()
-	{
-		return (T)checkedModules;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends List<?>> T getIN()
+	public <T> T getIN()
 	{
 		return (T)executableModules;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends List<?>> T getPO()
-	{
-		return (T)pogModules;
 	}
 }

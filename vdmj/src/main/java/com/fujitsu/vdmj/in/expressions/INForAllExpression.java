@@ -25,11 +25,13 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -45,6 +47,9 @@ public class INForAllExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
+	
+	/** Result information for QuickCheck */
+	public INBindingGlobals globals = null;
 
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
@@ -109,8 +114,24 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
+						if (globals != null)
+						{
+							globals.setCounterexample(evalContext);
+							globals.setMaybe(false);
+						}
+						
 						return new BooleanValue(false);
 					}
+				}
+				catch (ContextException e)
+				{
+					if (globals != null)
+					{
+						globals.setCounterexample(evalContext);
+						globals.setMaybe(false);
+					}
+					
+					throw e;
 				}
 				catch (ValueException e)
 				{
@@ -123,6 +144,11 @@ public class INForAllExpression extends INExpression
 	    	return abort(e);
 	    }
 
+		if (globals != null)
+		{
+			globals.setMaybe(!bindList.hasAllValues());
+		}
+		
 		return new BooleanValue(true);
 	}
 

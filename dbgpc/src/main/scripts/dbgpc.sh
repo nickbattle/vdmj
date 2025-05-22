@@ -4,11 +4,11 @@
 #####################################################################################
 
 # Change these to flip version
-MVERSION="4.4.5"
-PVERSION="4.4.5-P"
+MVERSION="4.7.0-SNAPSHOT"
+PVERSION="4.7.0-P-SNAPSHOT"
 
 # The Maven repository directory containing jars
-MAVENREPO=~/.m2/repository/com/fujitsu
+MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 
 # Details for 64-bit Java
 JAVA64="/usr/bin/java"

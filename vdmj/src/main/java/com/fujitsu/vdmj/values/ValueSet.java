@@ -31,9 +31,11 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.traces.PermuteArray;
+import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.Utils;
-
 
 /**
  * A set of values. Note that although this class implements a set (no duplicates)
@@ -61,6 +63,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 	public ValueSet(ValueSet from)
 	{
+		super(from.size());
 		addAll(from);
 		isSorted = from.isSorted;
 	}
@@ -73,10 +76,17 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 	public ValueSet(Value ...values)
 	{
+		super(values.length);
+		
 		for (Value v: values)
 		{
 			add(v);
 		}
+	}
+	
+	public boolean isSorted()
+	{
+		return isSorted;
 	}
 
 	@Override
@@ -85,7 +95,27 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		if (other instanceof ValueSet)
 		{
 			ValueSet os = (ValueSet)other;
-			return os.size() == size() && os.containsAll(this);
+			
+			if (os.size() != size())
+			{
+				return false;
+			}
+			else if (isSorted && os.isSorted)
+			{
+				for (int i=0; i<size(); i++)	// Faster than containsAll
+				{
+					if (!this.get(i).equals(os.get(i)))
+					{
+						return false;
+					}
+				}
+				
+				return true;
+			}
+			else
+			{
+				return os.containsAll(this);	// Lookup for every element...
+			}
 		}
 
 		return false;
@@ -117,11 +147,27 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 			return super.add(v);
 		}
 	}
+	
+	/**
+	 * Add an item, given we know it is already sorted after the add and that the item
+	 * does not already exist in the set. This is used by powersets, for efficiency.
+	 */
+	public boolean addSorted(Value v)
+	{
+		isSorted = true;
+		return super.add(v);
+	}
 
-	public boolean addNoCheck(Value v)
+	public boolean addUnsorted(Value v)
 	{
 		isSorted = false;
-		return super.add(v);	// Used by power set function
+		return super.add(v);
+	}
+	
+	public boolean addSorted(Value v, boolean sorted)
+	{
+		isSorted = sorted;
+		return super.add(v);
 	}
 
 	@Override
@@ -168,12 +214,12 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
     		while (p.hasNext())
     		{
-    			ValueSet m = new ValueSet();
+    			ValueSet m = new ValueSet(size);
     			int[] perm = p.next();
 
     			for (int i=0; i<size; i++)
     			{
-    				m.add(get(perm[i]));
+    				m.add(get(perm[i]));	// Note, unsorted
     			}
 
     			results.add(m);
@@ -183,13 +229,17 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		return results;
 	}
 
-	public List<ValueSet> powerSet()
+	public List<ValueSet> powerSet(Breakpoint breakpoint, Context ctxt)
 	{
    		if (size() > Properties.in_powerset_limit)
 		{
-			throw new InternalException(4176, "Cannot evaluate power set of size " + size());
+			throw new InternalException(0073, "Cannot evaluate power set of size " + size());
 		}
-		
+   		
+   		// The generation below depends on a sorted set to start with. This is
+   		// normally the case, which doesn't cost us, so we sort here anyway.
+   		sort();
+   		
 		List<ValueSet> sets = new Vector<ValueSet>(2^size());
 
 		if (isEmpty())
@@ -198,43 +248,105 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		}
 		else
 		{
-			powerGenerate(sets, new boolean[size()], 0);
+			/**
+			 * The KCombinator below produces combinations in order (eg. [1,2] before [1,3]).
+			 * And we loop the combination sizes from large to small, which is also the
+			 * natural ordering for sets. This means we can use addNoSort and (in power itself)
+			 * we can construct the final SetValue without sorting, which is much more efficient.
+			 */
+			int size = size();
+			long check = 0;
+			
+			for (int ss=size; ss>0; ss--)
+			{
+				for (int[] kc: new KCombinator(size, ss))
+				{
+					ValueSet ns = new ValueSet(ss);
+
+					for (int i=0; i<ss; i++)
+					{
+						ns.addSorted(get(kc[i]));	// set is still sorted
+					}
+					
+					if (++check >= 100)
+					{
+						checkBreakpoint(breakpoint, ctxt);
+						check = 0;
+					}
+					
+					sets.add(ns);
+				}
+			}
+
+			sets.add(new ValueSet());	// Add {}
 		}
 
 		return sets;
 	}
 
-	private void powerGenerate(List<ValueSet> result, boolean[] flags, int n)
+	/**
+	 * This is the (old) recursive power set algorithm.
+	 */
+//	private void powerGenerate(List<ValueSet> result, boolean[] flags, int n)
+//	{
+//		for (int i=0; i <= 1; ++i)
+//		{
+//			flags[n] = (i == 1);
+//
+//			if (n < flags.length - 1)
+//			{
+//				powerGenerate(result, flags, n+1);
+//			}
+//			else
+//			{
+//				ValueSet newset = new ValueSet(flags.length);
+//
+//				for (int f=0; f<flags.length; f++)
+//				{
+//					if (flags[f])
+//					{
+//						newset.addNoCheck(get(f));
+//					}
+//				}
+//
+//				result.add(newset);
+//
+//				checkBreakpoint(breakpoint, ctxt);
+//			}
+//		}
+//	}
+
+	/**
+	 * Check whether we should drop into the debugger for long expansions.
+	 */
+	private void checkBreakpoint(Breakpoint breakpoint, Context ctxt)
 	{
-		for (int i=0; i <= 1; ++i)
+		// We check the interrupt level here, rather than letting the check
+		// method do it, to avoid incrementing the hit count for the breakpoint
+		// too many times.
+
+		switch (Breakpoint.execInterruptLevel())
 		{
-			flags[n] = (i == 1);
-
-			if (n < flags.length - 1)
-			{
-				powerGenerate(result, flags, n+1);
-			}
-			else
-			{
-				ValueSet newset = new ValueSet(flags.length);
-
-				for (int f=0; f<flags.length; f++)
+			case Breakpoint.TERMINATE:
+				throw new InternalException(4176, "Interrupted power set size " + size());
+		
+			case Breakpoint.PAUSE:
+				if (breakpoint != null)
 				{
-					if (flags[f])
-					{
-						newset.addNoCheck(get(f));
-					}
+					breakpoint.enterDebugger(ctxt);
 				}
-
-				result.add(newset);
-			}
+				break;
+			
+			case Breakpoint.NONE:
+			default:
+				break;	// carry on
 		}
 	}
 
 	@Override
 	public Object clone()
 	{
-		ValueSet copy = new ValueSet();
+		ValueSet copy = new ValueSet(size());
 
 		for (Value v: this)
 		{

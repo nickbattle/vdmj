@@ -34,7 +34,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
 
 public class DidOpenHandler extends LSPHandler
 {
@@ -53,7 +53,7 @@ public class DidOpenHandler extends LSPHandler
 			File file = Utils.uriToFile(textDoc.get("uri"));
 			String text = textDoc.get("text");
 			
-			return LSPWorkspaceManager.getInstance().openFile(request, file, text);
+			return LSPPlugin.getInstance().lspDidOpen(request, file, text);
 		}
 		catch (URISyntaxException e)
 		{

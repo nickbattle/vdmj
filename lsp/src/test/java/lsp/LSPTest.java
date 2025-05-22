@@ -37,18 +37,14 @@ import json.JSONObject;
 import json.JSONWriter;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.DAPWorkspaceManager;
-import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
-import workspace.LSPXWorkspaceManager;
+import workspace.plugins.DAPPlugin;
+import workspace.plugins.LSPPlugin;
 
 abstract public class LSPTest
 {
-	protected LSPWorkspaceManager lspManager = null;
-	protected LSPXWorkspaceManager lspxManager = null;
-	protected DAPWorkspaceManager dapManager = null;
-	protected DAPXWorkspaceManager dapxManager = null;
+	protected LSPPlugin lspManager = null;
+	protected DAPPlugin dapManager = null;
 	
 	static
 	{
@@ -58,13 +54,9 @@ abstract public class LSPTest
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
-		LSPWorkspaceManager.reset();
-		LSPXWorkspaceManager.reset();
-		DAPWorkspaceManager.reset();
-		lspManager = LSPWorkspaceManager.getInstance();
-		lspxManager = LSPXWorkspaceManager.getInstance();
-		dapManager = DAPWorkspaceManager.getInstance();
-		dapxManager = DAPXWorkspaceManager.getInstance();
+		LSPPlugin.reset();	// resets other managers, registry and hubs
+		lspManager = LSPPlugin.getInstance();
+		dapManager = DAPPlugin.getInstance();
 	}
 	
 	protected RPCMessageList initialize(File root, JSONObject capabilities) throws Exception
@@ -73,7 +65,7 @@ abstract public class LSPTest
 				new JSONObject(), root.getAbsoluteFile(), capabilities);
 		assertEquals("init result", (Object)null, result.get(0).get("error"));		
 		
-		return lspManager.afterChangeWatchedFiles(null, 1);	// Cause parse and typecheck
+		return lspManager.afterChangeWatchedFiles(null, 1, null);	// Cause parse and typecheck
 	}
 	
 	protected void dump(JSONObject obj) throws IOException

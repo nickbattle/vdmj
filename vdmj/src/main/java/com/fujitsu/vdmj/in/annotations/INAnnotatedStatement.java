@@ -42,6 +42,7 @@ public class INAnnotatedStatement extends INStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.statement = statement;
+		this.statement.addAnnotation(annotation);
 	}
 
 	@Override
@@ -54,9 +55,9 @@ public class INAnnotatedStatement extends INStatement
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		annotation.inBefore(this, ctxt);
+		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
 		Value rv = statement.eval(ctxt);
-		annotation.inAfter(this, rv, ctxt);
+		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
 		return rv;
 	}
 	

@@ -24,53 +24,38 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
-import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class RecursiveObligation extends ProofObligation
 {
-	public RecursiveObligation(
-		POExplicitFunctionDefinition def, POApplyExpression apply, POContextStack ctxt)
-	{
-		super(apply.location, POType.RECURSIVE, ctxt);
-		int measureLexical = getLex(def.measureDef);
-
-		String lhs = getLHS(def);
-		String rhs = apply.getMeasureApply(def.measureName);
-
-		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
-	}
-
-	public RecursiveObligation(
-		POImplicitFunctionDefinition def, POApplyExpression apply, POContextStack ctxt)
-	{
-		super(def.location, POType.RECURSIVE, ctxt);
-		int measureLexical = getLex(def.measureDef);
-		
-		String lhs = getLHS(def);
-		String rhs = def.measureName.getName() + "(" + apply.args + ")";
-
-		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
-	}
+	public final boolean mutuallyRecursive;
 	
-	public RecursiveObligation(PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	private RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
-		super(defs.get(0).location, POType.RECURSIVE, ctxt);
+		super(location, POType.RECURSIVE, ctxt);
+		
+		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
+		
 		int measureLexical = getLex(getMeasureDef(defs.get(0)));
 		
 		String lhs = getLHS(defs.get(0));
-		String rhs = getMeasureName(defs.get(1)) + "(" + apply.args + ")";
+		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
-		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
+		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 	}
 	
 	private String getLHS(PODefinition def)
@@ -84,28 +69,33 @@ public class RecursiveObligation extends ProofObligation
 			
 			if (edef.typeParams != null)
 			{
+				String sep = "";
 				sb.append("[");
 				
-				for (TCNameToken type: edef.typeParams)
+				for (TCType type: edef.typeParams)
 				{
-					sb.append("@");
+					sb.append(sep);
 					sb.append(type);
+					sep = ", ";
 				}
 				
 				sb.append("]");
 			}
 			
-			String sep = "";
-			sb.append("(");
-			
 			for (POPatternList plist: edef.paramPatternList)
 			{
-				 sb.append(sep);
-				 sb.append(Utils.listToString(plist));
-				 sep = ", ";
-			}
+				String sep = "";
+				sb.append("(");
 
-			sb.append(")");
+				for (POPattern p: plist)
+				{
+					sb.append(sep);
+					sb.append(p.removeIgnorePatterns());
+					sep = ", ";
+				}
+
+				sb.append(")");
+			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
@@ -115,7 +105,14 @@ public class RecursiveObligation extends ProofObligation
 
 			for (POPatternListTypePair pltp: idef.parameterPatterns)
 			{
-				sb.append(pltp.patterns);
+				String sep = "";
+				
+				for (POPattern p: pltp.patterns)
+				{
+					sb.append(sep);
+					sb.append(p.removeIgnorePatterns());
+					sep = ", ";
+				}
 			}
 
 			sb.append(")");
@@ -185,6 +182,11 @@ public class RecursiveObligation extends ProofObligation
 		
 		TCFunctionType ftype = (TCFunctionType) mdef.getType();
 		
+		while (ftype.result instanceof TCFunctionType)	// Skip curries
+		{
+			ftype = (TCFunctionType)ftype.result;
+		}
+		
 		if (ftype.result instanceof TCProductType)
 		{
 			TCProductType type = (TCProductType)ftype.result;
@@ -224,5 +226,21 @@ public class RecursiveObligation extends ProofObligation
 		{
 			return lhs + " > " + rhs;
 		}
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new RecursiveObligation(location, defs, apply, choice));
+		}
+		
+		return results;
 	}
 }

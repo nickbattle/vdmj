@@ -28,21 +28,22 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
-import com.fujitsu.vdmj.runtime.Interpreter;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class ClassesCommand extends Command
+public class ClassesCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: classes";
-	public static final String[] HELP =	{ "classes", "classes - list the classes in the specification" };
+	public static final String HELP = "classes - list the classes in the specification";
 	
 	public ClassesCommand(String line)
 	{
-		if (!line.trim().equals("classes"))
+		super (line);
+		
+		if (!argv[0].equals("classes"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -59,12 +60,14 @@ public class ClassesCommand extends Command
 						false, "Command not available for VDM-SL", null);			
 			}
 			
-			ClassInterpreter  m = (ClassInterpreter) Interpreter.getInstance();
+			ClassInterpreter  m = ClassInterpreter.getInstance();
+			String defname = m.getDefaultName();
 			StringBuilder sb = new StringBuilder();
 			
 			for (INClassDefinition module: m.getClasses())
 			{
 				sb.append(module.name.toString());
+				if (module.name.toString().equals(defname)) sb.append(" (default)");
 				sb.append("\n");
 			}
 

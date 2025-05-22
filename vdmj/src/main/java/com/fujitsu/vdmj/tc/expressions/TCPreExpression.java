@@ -55,12 +55,14 @@ public class TCPreExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		function.typeCheck(env, null, scope, null);
-
+		TCTypeList argtypes = new TCTypeList();
+		
 		for (TCExpression a: args)
 		{
-			a.typeCheck(env, null, scope, null);
+			argtypes.add(a.typeCheck(env, null, scope, null));
 		}
+		
+		function.typeCheck(env, argtypes, scope, null);
 
 		return setType(new TCBooleanType(location));
 	}

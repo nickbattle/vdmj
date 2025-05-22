@@ -31,7 +31,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
@@ -57,8 +59,11 @@ public abstract class POBind extends PONode implements Serializable
 	abstract public List<POMultipleBind> getMultipleBindList();
 
 	/** Return a list of POs. */
-	abstract public ProofObligationList getProofObligations(POContextStack ctxt, Environment env);
+	abstract public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env);
 
+	/** Return a list of variables used */
+	abstract public TCNameSet getVariableNames();
+	
 	/**
 	 * Implemented by all binds to allow visitor processing.
 	 */

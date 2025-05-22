@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCFunctionCallFinder;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -60,7 +59,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class TCImplicitFunctionDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final TCPatternListTypePairList parameterPatterns;
 	public final TCPatternTypePair result;
 	public final TCExpression body;
@@ -84,7 +83,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 	public TCImplicitFunctionDefinition(TCAnnotationList annotations,
 		TCAccessSpecifier accessSpecifier, TCNameToken name,
-		TCNameList typeParams, TCPatternListTypePairList parameterPatterns,
+		TCTypeList typeParams, TCPatternListTypePairList parameterPatterns,
 		TCPatternTypePair result,
 		TCExpression body,
 		TCExpression precondition,
@@ -120,7 +119,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return	accessSpecifier + " " +	name.getName() +
+		return	accessSpecifier.ifSet(" ") + name.getName() +
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +
@@ -169,11 +168,10 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 
-		for (TCNameToken pname: typeParams)
+		for (TCType ptype: typeParams)
 		{
-			TCDefinition p = new TCLocalDefinition(pname.getLocation(),
-				pname, new TCParameterType(pname));
-
+			TCParameterType param = (TCParameterType)ptype;
+			TCDefinition p = new TCLocalDefinition(param.location, param.name,param);
 			p.markUsed();
 			defs.add(p);
 		}
@@ -189,11 +187,13 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 				getTypeParamDefinitions(), base, NameScope.NAMES);
 
-			type = type.typeResolve(params, null);
+			type = type.typeResolve(params);
+			if (annotations != null) annotations.tcResolve(this, params);
 		}
 		else
 		{
-			type = type.typeResolve(base, null);
+			type = type.typeResolve(base);
+			if (annotations != null) annotations.tcResolve(this, base);
 		}
 
 		if (result != null)
@@ -366,7 +366,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
 			!(body instanceof TCSubclassResponsibilityExpression))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
@@ -378,16 +378,18 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		TCType mexpType = measureExp.typeCheck(local, null, NameScope.NAMES, null);
 		measureName = name.getMeasureName(measureExp.location);
-		checkMeasure(measureName, actual);
+		checkMeasure(measureName, mexpType);
 		
+		// Note that the measure_f has the precondition of the function it measures.
+
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(mexpType), getParamPatternList(), measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
+		def.implicitDefinitions(base);
 		def.typeResolve(base);
-		
 		def.typeCheck(base, scope);
 		
 		measureDef = def;
@@ -433,6 +435,14 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 				detail2(mname.getName(), mtype.parameters, mname.getName(), type.parameters);
 			}
 
+			TCType result = mtype.result;
+			
+			while (result instanceof TCFunctionType)
+			{
+				TCFunctionType fr = (TCFunctionType)result;
+				result = fr.result;
+			}
+			
 			checkMeasure(mname, mtype.result);
 		}
 	}
@@ -492,7 +502,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		
 		if (measureDef != null && measureDef.findName(sought, scope) != null)
 		{
-			return measureDef;
+			return measureDef.findName(sought, scope);	// eg. pre_measure_f
 		}
 
 		return null;
@@ -513,7 +523,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			defs.add(postdef);
 		}
 		
-		if (measureName != null && measureName.getName().startsWith("measure_"))
+		if (measureDef != null && measureName.isMeasureName())
 		{
 			defs.add(measureDef);
 		}

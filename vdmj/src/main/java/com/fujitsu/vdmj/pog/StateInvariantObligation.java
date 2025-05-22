@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POClassInvariantDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -31,36 +34,66 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class StateInvariantObligation extends ProofObligation
 {
-	public StateInvariantObligation(POAssignmentStatement ass, POContextStack ctxt)
+	private StateInvariantObligation(POAssignmentStatement ass, POContextStack ctxt)
 	{
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("After ");
-		sb.append(ass);
-		sb.append("\n");
-
 		if (ass.classDefinition != null)
 		{
-			sb.append(invDefs(ass.classDefinition));
+			PODefinitionList invdefs = ass.classDefinition.getInvDefs();
+			POExpressionList vars = new POExpressionList();
+			String sep = "";
+
+			for (PODefinition d: invdefs)
+			{
+				POClassInvariantDefinition cid = (POClassInvariantDefinition)d;
+				
+				if (cid.location.module.equals(ass.location.module))
+				{
+					sb.append(sep);
+					sb.append(cid.expression);
+					vars.add(cid.expression);
+					sep = " and ";
+				}
+			}
+
+			// Obligation should cover the variables in its invariant
+			setObligationVars(ctxt, vars);
+			setReasonsAbout(ctxt.getReasonsAbout());
 		}
 		else	// must be because we have a module state invariant
 		{
-			POStateDefinition def = ass.stateDefinition;
+			POStateDefinition sdef = ass.stateDefinition;
 
 			sb.append("let ");
-			sb.append(def.invPattern);
+			sb.append(sdef.invPattern);
 			sb.append(" = ");
-			sb.append(def.name);
-			sb.append(" in ");
-			sb.append(def.invExpression);
+			sb.append(sdef.toPattern(true));	// maximal
+			sb.append(" in\n");
+			sb.append(sdef.invExpression);
+			
+			// Obligation should cover all state variables
+			POExpressionList vars = new POExpressionList();
+			vars.add(sdef.invExpression);
+			
+			for (TCNameToken svar: sdef.getVariableNames())
+			{
+				vars.add(new POVariableExpression(svar, null));
+			}
+
+			setObligationVars(ctxt, vars);
+			setReasonsAbout(ctxt.getReasonsAbout());
 		}
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
 	}
 
 	public StateInvariantObligation(
@@ -72,7 +105,8 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append("After instance variable initializers\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getSource(sb.toString());
+    	markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 	}
 
 	public StateInvariantObligation(
@@ -86,7 +120,8 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getSource(sb.toString());
+    	markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 	}
 
 	public StateInvariantObligation(
@@ -100,7 +135,8 @@ public class StateInvariantObligation extends ProofObligation
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
 
-    	value = ctxt.getObligation(sb.toString());
+    	source = ctxt.getSource(sb.toString());
+    	markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 	}
 
 	private String invDefs(POClassDefinition def)
@@ -118,5 +154,21 @@ public class StateInvariantObligation extends ProofObligation
 		}
 
     	return sb.toString();
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POAssignmentStatement ass, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new StateInvariantObligation(ass, choice));
+		}
+		
+		return results;
 	}
 }

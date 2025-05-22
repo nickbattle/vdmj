@@ -35,30 +35,30 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 
-public class LogCommand extends Command
+public class LogCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: log [<file> | off]";
-	public static final String[] HELP =	{ "log", "log [<file> | off] - control RT logging" };
+	public static final String HELP = "log [<file> | off] - control RT logging";
 	
 	private String logfile = null;
 	
 	public LogCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
 		if (line.equals("log"))
 		{
 			logfile = "";
 		}
-		else if (parts.length == 2)
+		else if (argv.length == 2)
 		{
-			if (parts[1].equals("off"))
+			if (argv[1].equals("off"))
 			{
 				logfile = null;
 			}
 			else
 			{
-				logfile = parts[1];
+				logfile = argv[1];
 			}
 		}
 		else

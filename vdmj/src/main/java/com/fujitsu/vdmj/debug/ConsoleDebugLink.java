@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -117,6 +118,14 @@ public class ConsoleDebugLink extends DebugLink
 		
 		return true;
 	}
+	
+	/**
+	 * Return the debugging flag
+	 */
+	public synchronized boolean isDebugging()
+	{
+		return debugging;
+	}
 
 	/**
 	 * Return the current set of stopped threads.
@@ -175,13 +184,17 @@ public class ConsoleDebugLink extends DebugLink
 	{
 		Breakpoint bp = getBreakpoint();
 		
-		if (bp == null)
+		if (bp == null && !stopped.isEmpty())
 		{
 			return stopped.get(0);	// First stopped thread
 		}
-		else
+		else if (!breakpoints.isEmpty())
 		{
 			return breakpoints.keySet().iterator().next();
+		}
+		else
+		{
+			throw new IllegalStateException("No threads to debug");
 		}
 	}
 	
@@ -380,7 +393,7 @@ public class ConsoleDebugLink extends DebugLink
 			
 			if (thread.getSignal() == Signal.TERMINATE)
 			{
-				throw new ThreadDeath();	// Just die, as we're not continuing.
+				throw new VDMThreadDeath();	// Just die, as we're not continuing.
 			}
 		}
 	}

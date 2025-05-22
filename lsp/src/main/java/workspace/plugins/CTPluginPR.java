@@ -34,15 +34,17 @@ import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 
+import workspace.events.CheckPrepareEvent;
+
 public class CTPluginPR extends CTPlugin
 {
 	private INClassList inClassList = null;
 	
 	@Override
-	public void preCheck()
+	protected void preCheck(CheckPrepareEvent ev)
 	{
+		super.preCheck(ev);
 		inClassList = null;
-		super.preCheck();
 	}
 
 	@Override

@@ -119,6 +119,7 @@ public class TCThreadDefinition extends TCDefinition
 	public void typeCheck(Environment base, NameScope scope)
 	{
 		FlatEnvironment local = new FlatEnvironment(getSelfDefinition(), base);
+		local.setEnclosingDefinition(this);
 		TCType rt = statement.typeCheck(local, NameScope.NAMESANDSTATE, null, false);
 
 		if (!(rt instanceof TCVoidType) && !(rt instanceof TCUnknownType))

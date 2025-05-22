@@ -33,7 +33,7 @@ public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList
 {
 	public TCUnresolvedTypeFinder()
 	{
-		// default visitorSet
+		// No visitorSet
 	}
 
 	@Override

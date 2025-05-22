@@ -24,9 +24,11 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POLetDefContext extends POContext
 {
@@ -50,17 +52,63 @@ public class POLetDefContext extends POContext
 	}
 
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
 
 		if (!localDefs.isEmpty())
 		{
 			sb.append("let ");
-			sb.append(Utils.listToString(localDefs));
+			String sep = "";
+			
+			for (PODefinition def: localDefs)
+			{
+				sb.append(sep);
+
+				if (def instanceof POAssignmentDefinition)
+				{
+					POAssignmentDefinition ass = (POAssignmentDefinition)def;
+					sb.append(ass.name);
+					sb.append(" : ");
+					sb.append(ass.expType);
+					sb.append(" = ");
+					sb.append(ass.expression);
+				}
+				else	// POValueDefinition
+				{
+					sb.append(def.toExplicitString(def.location));
+				}
+				
+				sep = ", ";
+			}
+			
 			sb.append(" in");
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (PODefinition def: localDefs)
+		{
+			if (def instanceof POAssignmentDefinition)
+			{
+				POAssignmentDefinition ass = (POAssignmentDefinition)def;
+				names.add(ass.name);
+				names.addAll(ass.expression.getVariableNames());
+			}
+			else if (def instanceof POValueDefinition)
+			{
+				POValueDefinition vdef = (POValueDefinition)def;
+				names.addAll(vdef.pattern.getVariableNames());
+				names.addAll(vdef.exp.getVariableNames());
+			}
+		}
+		
+		return names;
 	}
 }

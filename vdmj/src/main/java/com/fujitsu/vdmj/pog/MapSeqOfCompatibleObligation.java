@@ -24,12 +24,15 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpression;
 
 public class MapSeqOfCompatibleObligation extends ProofObligation
 {
-	public MapSeqOfCompatibleObligation(POMapEnumExpression exp, POContextStack ctxt)
+	private MapSeqOfCompatibleObligation(POMapEnumExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.MAP_SEQ_OF_COMPATIBLE, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -55,6 +58,24 @@ public class MapSeqOfCompatibleObligation extends ProofObligation
 		sb.append("} &\n  forall " + d1 + " in set dom " + m1 + ", " + d2 + " in set dom " + m2 + " &\n");
 		sb.append("    " + d1 + " = " + d2 + " => " + m1 + "(" + d1 + ") = " + m2 + "(" + d2 + ")");
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
+	}
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POMapEnumExpression exp, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new MapSeqOfCompatibleObligation(exp, choice));
+		}
+		
+		return results;
 	}
 }

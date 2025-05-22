@@ -35,8 +35,13 @@ public class PONameContext extends POContext
 		this.names = names;
 	}
 
+	public PONameContext()
+	{
+		names = new TCNameList();
+	}
+
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		return "";
 	}

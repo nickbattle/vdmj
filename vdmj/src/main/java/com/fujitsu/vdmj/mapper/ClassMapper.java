@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.mapper;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +43,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * A class to map classes and extend trees of objects. 
@@ -50,6 +52,9 @@ public class ClassMapper
 {
 	/** The mappers that have already been loaded, indexed by resource name */
 	private final static Map<String, ClassMapper> mappers = new HashMap<String, ClassMapper>();
+
+	/** Resource name for mapping search extensions */
+	private static final String MAPPINGS = "vdmj.mappings";
 	
 	/**
 	 * These caches hold the object references converted so far, and keep a stack of
@@ -65,18 +70,25 @@ public class ClassMapper
 
 	/**
 	 * Get an instance of a mapper, defined by the mapspec file name (resource).
+	 * The error stream can be passed too, with a default getInstance that
+	 * uses System.err.
 	 */
-	public static ClassMapper getInstance(String config)
+	public static ClassMapper getInstance(String config, PrintStream err)
 	{
 		ClassMapper mapper = mappers.get(config);
 		
 		if (mapper == null)
 		{
-			mapper = new ClassMapper(config);
+			mapper = new ClassMapper(config, err);
 			mappers.put(config, mapper);
 		}
 
 		return mapper;
+	}
+
+	public static ClassMapper getInstance(String config)
+	{
+		return getInstance(config, System.err);
 	}
 	
 	/**
@@ -106,6 +118,7 @@ public class ClassMapper
 	/**
 	 * Fields used during the processing of the configuration file
 	 */
+	private final PrintStream errorStream;
 	private final String configFile;
 	private Field SELF;
 	private String srcPackage = "";
@@ -116,8 +129,9 @@ public class ClassMapper
 	/**
 	 * The private constructor, passed the resource name of the mapping file.
 	 */
-	private ClassMapper(String config)
+	private ClassMapper(String config, PrintStream err)
 	{
+		errorStream = err;
 		configFile = config;
 		long before = System.currentTimeMillis();
 
@@ -136,8 +150,8 @@ public class ClassMapper
 		
 		if (errorCount > 0)
 		{
-			System.err.println("Aborting with " + errorCount + " errors");
-			System.exit(1);
+			errorStream.println("Aborting with " + errorCount + " errors");
+			throw new ClassMapperException(config);
 		}
 	}
 
@@ -146,6 +160,9 @@ public class ClassMapper
 	
 	/** A list of methods to call in the init() processing */
 	private final List<Method> initializers = new Vector<Method>();
+
+	/** If the mark() method has been called, but not restore(), holds converted IDs */
+	private Map<Long, List<Long>> marked = new HashMap<Long, List<Long>>();
 
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
@@ -232,7 +249,7 @@ public class ClassMapper
 	
 	private void error(String message)
 	{
-		System.err.println(configFile + " line " + lineNo + ": " + message);
+		errorStream.println(configFile + " line " + lineNo + ": " + message);
 		errorCount++;
 	}
 
@@ -250,23 +267,36 @@ public class ClassMapper
 		}
 		
 		/**
-		 * You can add extra file locations by setting the vdmj.mappingpath property.
-		 * This allows more than one mapping file of the same name to be included within
-		 * one jar file.
+		 * You can add extra file locations by setting the vdmj.mapping.search_path property,
+		 * or by putting resource folders in "vdmj.mappings". This allows more than one mapping
+		 * file of the same name to be included within one jar file.
 		 */
+		List <String> alternativePaths = new Vector<String>();
+		
 		String mappingPath = Properties.mapping_search_path;
 		
 		if (mappingPath != null)
 		{
 			for (String classpath: mappingPath.split(File.pathSeparator))
 			{
-				String filename = classpath + "/" + configFile;		// NB. Use slash here!
-				InputStream is = getClass().getResourceAsStream(filename);
-				
-				if (is != null)
-				{
-					readMapping(filename, is);
-				}
+				alternativePaths.add(classpath + "/" + configFile);	// NB. Use slash here!
+			}
+		}
+		else
+		{
+			for (String classpath: GetResource.readResource(MAPPINGS))
+			{
+				alternativePaths.add(classpath + "/" + configFile);	// NB. Use slash here!
+			}
+		}
+		
+		for (String resourceName: alternativePaths)
+		{
+			InputStream is = getClass().getResourceAsStream(resourceName);
+			
+			if (is != null)
+			{
+				readMapping(resourceName, is);
 			}
 		}
 	}
@@ -367,9 +397,9 @@ public class ClassMapper
 			
 			if (mappings.containsKey(toIgnore))
 			{
-				error("Class is already mapped: " + toIgnore.getName());
+				errorStream.println("Class is already mapped: " + toIgnore.getName());
 			}
-			else
+			// else
 			{
 				mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
 			}
@@ -472,9 +502,9 @@ public class ClassMapper
 
 			if (mappings.containsKey(srcClass))
 			{
-				error("Class is already mapped: " + srcClass.getName());
+				errorStream.println("Class is already mapped: " + srcClass.getName());
 			}
-			else
+			// else
 			{
 				mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
 			}
@@ -577,21 +607,21 @@ public class ClassMapper
 				{
 					error("No such constructor: " + mp.destClass.getSimpleName() + "(" + typeString(paramTypes) + ")");
 					
-					System.err.println("Fields available from " + entry.getSimpleName() + ":");
+					errorStream.println("Fields available from " + entry.getSimpleName() + ":");
 					
 					for (Field f: getAllFields(entry))
 					{
-						System.err.println("    " + f.getType().getSimpleName() + " " + f.getName());
+						errorStream.println("    " + f.getType().getSimpleName() + " " + f.getName());
 					}
 					
-					System.err.println("Constructors available for " + mp.destClass.getSimpleName() + ":");
+					errorStream.println("Constructors available for " + mp.destClass.getSimpleName() + ":");
 					
 					for (Constructor<?> ctor: mp.destClass.getConstructors())
 					{
-						System.err.println("    " + mp.destClass.getSimpleName() + "(" + typeString(ctor.getParameterTypes()) + ")");
+						errorStream.println("    " + mp.destClass.getSimpleName() + "(" + typeString(ctor.getParameterTypes()) + ")");
 					}
 					
-					System.err.println();
+					errorStream.println();
 				}
 				
 				mp.setters = new Method[mp.setterFields.size()];
@@ -746,6 +776,25 @@ public class ClassMapper
 		}
 		
 		return convert(source, message);
+	}
+	
+	/**
+	 * Perform a recursive mapping, but clean up the converted objects. This is
+	 * so that callers can convert small AST trees for local purposes and then
+	 * remove them afterwards, without the accumulation of "old" entries in the
+	 * converted map that will never be needed.
+	 */
+	public <T> T convertLocal(Object source) throws Exception
+	{
+		try
+		{
+			mark();
+			return convert(source);
+		}
+		finally
+		{
+			restore();
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -915,34 +964,79 @@ public class ClassMapper
 			{
 				MappedObject mo = (MappedObject)source;
 				converted.put(mo.getMappedId(), result);
+				
+				List<Long> list = marked.get(Thread.currentThread().getId());
+				
+				if (list != null)
+				{
+					list.add(mo.getMappedId());
+				}
 			}
 		}
 		
 		return result;
 	}
+	
+	
+	/**
+	 * Save the "converted" map, so that we can later remove conversions
+	 * using restore().
+	 */
+	private void mark()
+	{
+		List<Long> list = marked.get(Thread.currentThread().getId());
+		
+		if (list != null)
+		{
+			errorStream.println("WARNING: Nested call to convertLocal?");
+		}
+		
+		marked.put(Thread.currentThread().getId(), new Vector<Long>());
+	}
+	
+	private void restore()
+	{
+		// Remove "converted" mappings from the low tide set by mark() to the
+		// current level.
 
+		List<Long> list = marked.get(Thread.currentThread().getId());
+
+		if (list != null)
+		{
+			for (Long id: list)
+			{
+				converted.remove(id);
+			}
+		}
+		
+		marked.remove(Thread.currentThread().getId());
+	}
+
+	/**
+	 * Dump the progress stack on an exception. Used in debugging.
+	 */
 	private void dumpProgress(Throwable throwable)
 	{
 		if (!dumpedProgress)
 		{
 			if (!inProgress.isEmpty())
 			{
-				System.err.println("ClassMapper conversion stack...");
+				errorStream.println("ClassMapper conversion stack...");
 				Progress top = inProgress.peek();
 				MapParams target = mappings.get(top.source.getClass());
 				
 				for (Progress item: inProgress)
 				{
-					System.err.println(item.toString());
+					errorStream.println(item.toString());
 				}
 				
 				if (target != null)
 				{
-					System.err.println(target.toString());
+					errorStream.println(target.toString());
 				}
 			}
 			
-			System.err.println("FAILED: " + throwable.toString());
+			errorStream.println("FAILED: " + throwable.toString());
 			dumpedProgress = true;
 		}
 	}

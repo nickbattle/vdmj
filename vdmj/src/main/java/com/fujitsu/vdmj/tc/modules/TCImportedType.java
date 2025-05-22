@@ -86,28 +86,36 @@ public class TCImportedType extends TCImport
 	@Override
 	public void typeCheck(Environment env)
 	{
-		TCDefinition expdef = null;
+		TCTypeDefinition expdef = null;
 
 		if (from != null)
 		{
-			expdef = from.exportdefs.findType(name, null);
-			checkKind(expdef);			
+			TCDefinition edef = from.exportdefs.findType(name, null);
+			checkKind(edef);
+			
+			if (edef instanceof TCTypeDefinition)
+			{
+				expdef = (TCTypeDefinition)edef;
+			}
 		}
 		
 		if (def != null)
 		{
-			def.type = (TCInvariantType)def.type.typeResolve(env, null);
+			def.type = (TCInvariantType)def.type.typeResolve(env);
 			TypeComparator.checkComposeTypes(def.type, env, false);
 
 			if (expdef != null)
 			{
-				TCType exptype = expdef.getType().typeResolve(env, null);
+				TCType exptype = expdef.getType().typeResolve(env);
 
 				// TypeComparator.compatible(def.type, exptype))
-				if (!def.type.toDetailedString().equals(exptype.toDetailedString()))
+				if (!def.type.toDetailedString().equals(exptype.toDetailedString()) ||
+					!String.valueOf(def.invExpression).equals(String.valueOf(expdef.invExpression)) ||
+					!String.valueOf(def.ordExpression).equals(String.valueOf(expdef.ordExpression)) ||
+					!String.valueOf(def.eqExpression).equals(String.valueOf(expdef.eqExpression)))
 				{
 					report(3192, "Type import of " + name + " does not match export from " + from.name);
-					detail2("Import", def.type.toDetailedString(), "Export", exptype.toDetailedString());
+					detail2("Import", def.toString(), "Export", expdef.toString());
 				}
 			}
 		}

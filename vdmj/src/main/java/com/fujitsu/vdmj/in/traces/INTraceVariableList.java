@@ -51,7 +51,7 @@ public class INTraceVariableList extends LinkedList<INTraceVariable>
 			INDefinition d = defs.findName(key);
 			boolean clone = false;
 			
-			if (value.isType(ObjectValue.class))
+			if (value.deref() instanceof ObjectValue)
 			{
 				ObjectValue obj = (ObjectValue)value.deref();
 				ObjectValue self = ctxt.getSelf();

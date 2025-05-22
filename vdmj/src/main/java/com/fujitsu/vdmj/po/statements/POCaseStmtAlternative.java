@@ -26,9 +26,15 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.pog.POAltContext;
+import com.fujitsu.vdmj.pog.POCaseContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.PONotCaseContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POCaseStmtAlternative extends PONode
@@ -36,12 +42,16 @@ public class POCaseStmtAlternative extends PONode
 	private static final long serialVersionUID = 1L;
 
 	public final LexLocation location;
+	public final POExpression cexp;
 	public final POPattern pattern;
 	public final POStatement statement;
+	
+	private boolean hasEffect = false;
 
-	public POCaseStmtAlternative(POPattern pattern, POStatement stmt)
+	public POCaseStmtAlternative(POExpression cexp, POPattern pattern, POStatement stmt)
 	{
 		this.location = pattern.location;
+		this.cexp = cexp;
 		this.pattern = pattern;
 		this.statement = stmt;
 	}
@@ -52,10 +62,22 @@ public class POCaseStmtAlternative extends PONode
 		return "case " + pattern + " -> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POAltContext alt, int base, POGState pogState, TCType type, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.addAll(statement.getProofObligations(ctxt, env));
+
+		int popto = ctxt.pushAt(new POCaseContext(pattern, type, cexp));
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		hasEffect = ctxt.size() > popto + 1;
+		ctxt.copyInto(base, alt.add());
+		ctxt.popTo(popto);
+		
+		ctxt.push(new PONotCaseContext(pattern, type, cexp));
 		return obligations;
+	}
+
+	public boolean hasEffect()
+	{
+		return hasEffect;
 	}
 }

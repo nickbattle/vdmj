@@ -40,12 +40,6 @@ public class TCUnknownType extends TCType
 	}
 
 	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		return null;	// Isn't any particular type?
-	}
-
-	@Override
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)
 	{
 		return false;
@@ -53,6 +47,12 @@ public class TCUnknownType extends TCType
 
 	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		return true;
 	}

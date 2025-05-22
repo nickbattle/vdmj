@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.patterns.TCIgnorePattern;
 import com.fujitsu.vdmj.tc.patterns.TCIntegerPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMapPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMapUnionPattern;
+import com.fujitsu.vdmj.tc.patterns.TCMapletPattern;
 import com.fujitsu.vdmj.tc.patterns.TCNilPattern;
 import com.fujitsu.vdmj.tc.patterns.TCObjectPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -90,6 +91,11 @@ public abstract class TCPatternVisitor<R, S>
 	}
 
  	public R caseMapPattern(TCMapPattern node, S arg)
+	{
+		return casePattern(node, arg);
+	}
+
+ 	public R caseMapletPattern(TCMapletPattern node, S arg)
 	{
 		return casePattern(node, arg);
 	}

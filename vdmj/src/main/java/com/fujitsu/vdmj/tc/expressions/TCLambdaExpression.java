@@ -49,7 +49,7 @@ public class TCLambdaExpression extends TCExpression
 	private TCFunctionType type;
 	private TCPatternList paramPatterns;
 	private TCDefinitionList paramDefinitions;
-	private TCDefinition def = null;
+	public TCDefinition def = null;
 
 	public TCLambdaExpression(LexLocation location, TCTypeBindList bindList, TCExpression expression)
 	{

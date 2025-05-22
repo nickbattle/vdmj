@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetAllDefinitionsVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POHiddenVariablesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -153,15 +154,30 @@ public abstract class POPattern extends PONode implements Serializable
 	}
 	
 	/**
-	 * A pattern with "any" variables substituted for ignore patterns. This
-	 * is used in POs where a pattern with an any clause is subsequently
-	 * used to create a value of the same type.
-	 * 
-	 * @return A pattern without ignore patterns.
+	 * Convert a pattern's ignore patterns into "any" identifier patterns.
+	 * This is used in PO generation.
 	 */
 	public final POPattern removeIgnorePatterns()
 	{
 		return apply(new PORemoveIgnoresVisitor(), null);
+	}
+
+	/**
+	 * Indicates that the pattern is associated with a maximal type, which may
+	 * affect the string representation - eg. mk_R!(...).
+	 */
+	public void setMaximal(boolean maximal)
+	{
+		return;		// Only used in PORecordPattern
+	}
+	
+	/**
+	 * Search the pattern for identifiers that hide other definitions. This is
+	 * used during PO generation to avoid TC errors.
+	 */
+	public TCNameList getHiddenVariables()
+	{
+		return apply(new POHiddenVariablesVisitor(), null);
 	}
 
 	/**

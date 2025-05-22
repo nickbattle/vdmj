@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.POPatternListList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -54,7 +55,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.FUNC_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getSource(
 			generate(def.paramPatternList, def.type.parameters, def.type.result));
 	}
 
@@ -63,7 +64,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.FUNC_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getSource(
 			generate(def.getParamPatternList(), def.type.parameters, def.type.result));
 	}
 
@@ -72,7 +73,7 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.OPERATION_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getSource(
 			generate(def.getParamPatternList(), def.type.parameters, def.type.result));
 	}
 
@@ -81,11 +82,11 @@ public class ParameterPatternObligation extends ProofObligation
 	{
 		super(def.location, POType.OPERATION_PATTERNS, ctxt);
 		this.predef = def.predef;
-		value = ctxt.getObligation(
+		source = ctxt.getSource(
 			generate(def.getListParamPatternList(), def.type.parameters, def.type.result));
 	}
 
-	private String generate(List<POPatternList> plist, TCTypeList params, TCType result)
+	private String generate(POPatternListList plist, TCTypeList params, TCType result)
 	{
 		StringBuilder foralls = new StringBuilder();
 		StringBuilder argnames = new StringBuilder();
@@ -136,7 +137,7 @@ public class ParameterPatternObligation extends ProofObligation
 					foralls.append(fprefix);
 					foralls.append(aname);
 					foralls.append(":");
-					foralls.append(atype);
+					foralls.append(atype.toExplicitString(location));
 	
 					argnames.append(aprefix);
 					argnames.append(aname);
@@ -145,7 +146,7 @@ public class ParameterPatternObligation extends ProofObligation
 					aprefix = ", ";
 					ebindings.append(bname);
 					ebindings.append(":");
-					ebindings.append(atype);
+					ebindings.append(atype.toExplicitString(location));
 	
 					for (PODefinition def: dlist)
 					{
@@ -154,7 +155,7 @@ public class ParameterPatternObligation extends ProofObligation
 							ebindings.append(aprefix);
 							ebindings.append(def.name.getName());
 							ebindings.append(":");
-							ebindings.append(def.getType());
+							ebindings.append(def.getType().toExplicitString(location));
 							existingBindings.add(def.name.getName());
 						}
 					}

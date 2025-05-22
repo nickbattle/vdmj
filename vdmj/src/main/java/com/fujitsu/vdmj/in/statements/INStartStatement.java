@@ -56,6 +56,8 @@ public class INStartStatement extends INStatement
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
+		
+		assertNotInit(ctxt);
 
 		try
 		{

@@ -48,6 +48,11 @@ as the expected and actual values.
 0070, "Definition <name> not found"
 0071, "Native method marked as @VDMOperation: <name>"
 0072, "Native method marked as @VDMFunction: <name>"
+0073, "Cannot evaluate power set of size <size>"
+0074, "Cannot evaluate type bind of size <size>"
+0075, "Maplet getAllNamedValues called"
+0076, "Native method parameter <method>.<param> should be type <type>"
+0077, "Native methods expects <n> Value arguments"
 
 
 1000, "Malformed quoted character"
@@ -65,6 +70,15 @@ as the expected and actual values.
 1012, "Deprecated nested block comment"
 1013, "Illegal nested block comment"
 1014, "Cannot convert <string> in base <n>"
+
+1500, "Unexpected #<directive>"
+1501, "Unexpected end of preprocessor stream"
+1502, "Expecting #ifdef <property>"
+1503, "Expecting #ifndef <property>"
+1504, "Expecting #define <property> [value]"
+1505, "Expecting #undef <property>"
+1506, "Expecting #elseif <property>"
+1507, "Expecting #endif after #else"
 
 
 2000, "Expecting 'in set' or 'in seq' after pattern in set binding"
@@ -388,11 +402,14 @@ as the expected and actual values.
 2327, "Type set1 is not available in classic"
 2328, "Sequence binds are not available in classic"
 2329, "Duplicate <keyword> keyword"
-2330, "Tokens found after expression at <token>"
+2330, "POG: Tokens found after obligation at <token>"
 2331, "Expecting inv, eq or ord clause"
 2332, "Duplicate inv clause"
 2333, "Type eq/ord clauses not available in classic"
 2334, "Failed to instantiate AST<name>Annotation"
+2335, "Maximal '!' not allowed here"
+2336, "POG: Obligation is not boolean?"
+2337, "POG Obligation has type errors?"
 
 
 3000, "Expression does not match declared type"
@@ -760,7 +777,10 @@ as the expected and actual values.
 3361, "@<name> has no arguments"
 3362, "@<name> only applies to functions or operations"
 3363, "Definition does not @Override superclass"
-3364, "Recursive cycle measures return different types" 
+3364, "Recursive cycle measures return different types"
+3365, "Void operation cannot use 'return <exp>'"
+3366, "Cannot access state field '<name>' from this context"
+3367, "Cannot divide by zero literal"
 
 
 4000, "Cannot instantiate abstract class <class>"
@@ -932,9 +952,14 @@ as the expected and actual values.
 4171, "Cannot convert <function> to <function>"
 4172, "Values cannot be compared: <first>, <second>"
 4173, "Unknown annotation @<name>"
-4174, "Stack overflow"
-4175, "Execution cancelled"
+4174, -
+4175, -
 4176, "Cannot evaluate power set of size <n>"
+4177, "Not permitted during initialization"
+4178, "Loop invariant violated"
+...
+4998, "Stack overflow"
+4999, "Execution cancelled"
 
 
 5000, "Definition <name> not used"
@@ -976,3 +1001,9 @@ as the expected and actual values.
 5036, "Cannot use 'time' in a functional context"
 5037, "Function equality cannot be reliably computed"
 5038, "Trailing annotation ignored"
+5039, "Cannot evaluate type bind of size <n>"
+5040, "Cannot evaluate type bind, size exceeds long"
+5041, "Add explicit type <pattern : type> here");
+5042, "Missing type import for <name>";
+5043, "Strict: Should not use 'DEFAULT' as a module name"
+5044, "Annotations: <syntax error>"

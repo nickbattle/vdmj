@@ -52,10 +52,11 @@ public class ASTGhostAnnotation extends ASTAnnotation
 	 * Override the default parse, and look for @Ghost <name> = <exp>;
 	 */
 	@Override
-	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
+	public void parse(LexTokenReader ltr) throws LexException, ParserException
 	{
+		this.args = new ASTExpressionList();
+
 		ltr.nextToken();
-		ASTExpressionList args = new ASTExpressionList();
 		ExpressionReader er = new ExpressionReader(ltr);
 		ASTExpression exp = er.readExpression();
 		
@@ -82,7 +83,5 @@ public class ASTGhostAnnotation extends ASTAnnotation
 		{
 			parseException("missing ;", ltr.getLast().location);
 		}
-		
-		return args;
 	}
 }

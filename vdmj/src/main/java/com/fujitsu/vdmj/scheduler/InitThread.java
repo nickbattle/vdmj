@@ -37,6 +37,8 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.StateContext;
@@ -98,6 +100,7 @@ public class InitThread extends SchedulableThread
 	public void body()
 	{
 		DebugLink link = DebugLink.getInstance();
+		Breakpoint.setExecInterrupt(Breakpoint.NONE);
 
 		try
 		{
@@ -126,7 +129,7 @@ public class InitThread extends SchedulableThread
 			setException(e);
 			suspendOthers();
 		}
-		catch (ThreadDeath th)
+		catch (VDMThreadDeath th)
 		{
 			// Fine
 		}
@@ -239,7 +242,7 @@ public class InitThread extends SchedulableThread
 
 		for (INClassDefinition cdef: classes)
 		{
-			cdef.staticInit(globalContext);
+			cdef.forceStaticInit(globalContext);
 		}
 
 		// Values can forward reference each other, which means that we don't
@@ -272,7 +275,7 @@ public class InitThread extends SchedulableThread
 
     			try
     			{
-            		cdef.staticValuesInit(globalContext);
+            		cdef.forceStaticValuesInit(globalContext);
     				passed.add(cdef.name);
     			}
     			catch (ContextException e)
@@ -354,6 +357,7 @@ public class InitThread extends SchedulableThread
 		exception = e;
 	}
 	
+	@Override
 	public Exception getException()
 	{
 		return exception;

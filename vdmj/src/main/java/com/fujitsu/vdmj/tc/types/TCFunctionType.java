@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -67,27 +66,23 @@ public class TCFunctionType extends TCType
 		return type;
 	}
 
-	public TCFunctionType getMeasureType(boolean isCurried, TCType actual)
+	public TCFunctionType getMeasureType(TCType actual)
 	{
+		if (result instanceof TCFunctionType)	// Curried
+		{
+			TCFunctionType fresult = (TCFunctionType)result;
+			return new TCFunctionType(location, parameters, false, fresult.getMeasureType(actual));
+		}
+		
 		TCTypeList cparams = new TCTypeList();
 		cparams.addAll(parameters);
 		
-		if (isCurried)
-		{
-			TCFunctionType ft = this;
-			
-			while (ft.result instanceof TCFunctionType)
-			{
-				ft = (TCFunctionType)result;
-				cparams.addAll(ft.parameters);
-			}
-		}
-		
-		// Clean the return types to be precisely nat or nat-tuple.
+		// Clean the return types to be a nat or nat-tuple.
+		TCType mreturn = null;
 		
 		if (actual.isNumeric(location))
 		{
-			actual = new TCNaturalType(location);
+			mreturn = new TCNaturalType(location);
 		}
 		else if (actual.isProduct(location))
 		{
@@ -99,10 +94,14 @@ public class TCFunctionType extends TCType
 				nats.add(new TCNaturalType(location));
 			}
 			
-			actual = new TCProductType(location, nats);
+			mreturn = new TCProductType(location, nats);
+		}
+		else
+		{
+			mreturn = new TCUnknownType(location);
 		}
 
-		TCFunctionType type = new TCFunctionType(location, cparams, false, actual);
+		TCFunctionType type = new TCFunctionType(location, cparams, false, mreturn);
 		type.definitions = definitions;
 		return type;
 	}
@@ -173,7 +172,7 @@ public class TCFunctionType extends TCType
 	}
 
 	@Override
-	public TCFunctionType typeResolve(Environment env, TCTypeDefinition root)
+	public TCFunctionType typeResolve(Environment env)
 	{
 		if (resolved) return this; else { resolved = true; }
 
@@ -184,7 +183,7 @@ public class TCFunctionType extends TCType
 		{
 			try
 			{
-				fixed.add(type.typeResolve(env, null));
+				fixed.add(type.typeResolve(env));
 			}
 			catch (TypeCheckException e)
 			{
@@ -206,7 +205,7 @@ public class TCFunctionType extends TCType
 		try
 		{
 			parameters = fixed;
-			result = result.typeResolve(env, null);
+			result = result.typeResolve(env);
 		}
 		catch (TypeCheckException e)
 		{

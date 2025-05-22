@@ -39,8 +39,11 @@ import com.fujitsu.vdmj.lex.Dialect;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.lspx.TranslateHandler;
+import plugins.ISAPluginSL;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.PluginRegistry;
 
 public class TranslateTest extends LSPTest
 {
@@ -79,7 +82,7 @@ public class TranslateTest extends LSPTest
 
 		dump(response.get(0));
 		assertEquals("saveUri is not empty", response.get(0).getPath("error.message"));
-		assertEquals(new Long(-32602), response.get(0).getPath("error.code"));
+		assertEquals(Long.valueOf(-32602), response.get(0).getPath("error.code"));
 
 		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
@@ -92,7 +95,7 @@ public class TranslateTest extends LSPTest
 
 		dump(response.get(0));
 		assertEquals("saveUri is not a folder", response.get(0).getPath("error.message"));
-		assertEquals(new Long(-32602), response.get(0).getPath("error.code"));
+		assertEquals(Long.valueOf(-32602), response.get(0).getPath("error.code"));
 
 		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
@@ -105,7 +108,7 @@ public class TranslateTest extends LSPTest
 
 		dump(response.get(0));
 		assertEquals("saveUri does not exist", response.get(0).getPath("error.message"));
-		assertEquals(new Long(-32602), response.get(0).getPath("error.code"));
+		assertEquals(Long.valueOf(-32602), response.get(0).getPath("error.code"));
 		
 		Path empty = Files.createTempDirectory("test");
 
@@ -115,13 +118,14 @@ public class TranslateTest extends LSPTest
 					"languageId", "Chinese",
 					"saveUri",	empty.toUri().toString()));
 		
+		PluginRegistry.getInstance().registerPlugin(new ISAPluginSL());
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		empty.toFile().delete();
 
 		dump(response.get(0));
-		assertEquals("Unsupported language", response.get(0).getPath("error.message"));
-		assertEquals(new Long(-32602), response.get(0).getPath("error.code"));
+		assertEquals("Chinese", response.get(0).getPath("error.message"));
+		assertEquals((Long)RPCErrors.MethodNotFound.getValue(), response.get(0).getPath("error.code"));
 	}
 
 	@Test
@@ -289,7 +293,7 @@ public class TranslateTest extends LSPTest
 					"saveUri",	empty.toURI().toString()));
 
 		RPCMessageList response = handler.request(request);
-		assertEquals(1, response.size());
+		assertEquals(2, response.size());
 		dump(response.get(0));
 		assertEquals(empty.toURI().toString(), response.get(0).getPath("result.uri"));
 
@@ -327,14 +331,13 @@ public class TranslateTest extends LSPTest
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		assertEquals("slsp/unknown", response.get(0).getPath("error.message"));
-		assertEquals(new Long(-32601), response.get(0).getPath("error.code"));
+		assertEquals(Long.valueOf(-32601), response.get(0).getPath("error.code"));
 
 		request = RPCRequest.create(123L, "slsp/another", new JSONObject());
 
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals("Plugin does not support analysis", response.get(0).getPath("error.message"));
-		assertEquals(new Long(-32603), response.get(0).getPath("error.code"));
+		assertEquals("Handled LSP method", response.get(0).getPath("result"));
 	}
 }

@@ -30,25 +30,13 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
-import lsp.lspx.CTHandler;
-import lsp.lspx.POGHandler;
-import lsp.lspx.TranslateHandler;
-import lsp.textdocument.CodeLensHandler;
-import lsp.textdocument.CompletionHandler;
-import lsp.textdocument.DefinitionHandler;
-import lsp.textdocument.DidChangeHandler;
-import lsp.textdocument.DidCloseHandler;
-import lsp.textdocument.DidOpenHandler;
-import lsp.textdocument.DidSaveHandler;
-import lsp.textdocument.DocumentSymbolHandler;
-import lsp.textdocument.ReferencesHandler;
-import lsp.textdocument.TypeHierarchyHandler;
-import lsp.workspace.DidChangeWSHandler;
 import rpc.RPCDispatcher;
 import rpc.RPCHandler;
 import rpc.RPCMessageList;
@@ -56,8 +44,9 @@ import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
 import workspace.Diag;
+import workspace.plugins.LSPPlugin;
 
-public class LSPServer extends JSONServer
+public class LSPServer extends JSONServer implements VDMJMain
 {
 	private static LSPServer INSTANCE = null;
 
@@ -65,12 +54,17 @@ public class LSPServer extends JSONServer
 	private final Map<Long, RPCHandler> responseHandlers;
 	private boolean initialized = false;
 	
+	public static String getMainName()
+	{
+		return LSP_MAIN;
+	}
+	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
 		super("LSP", inStream, outStream);
 		
 		INSTANCE = this;
-		this.dispatcher = getDispatcher();
+		this.dispatcher = RPCDispatcher.getInstance();
 		this.responseHandlers = new HashMap<Long, RPCHandler>();
 
 		// Identify this class as the debug link - See DebugLink
@@ -80,43 +74,14 @@ public class LSPServer extends JSONServer
 		Settings.dialect = dialect;
 		Settings.strict = Boolean.getBoolean("vdmj.strict");
 		Settings.verbose = Boolean.getBoolean("vdmj.verbose");
+		Settings.release = Release.lookup(System.getProperty("vdmj.release", "vdm10"));
+		
+		LSPPlugin.getInstance();	// Creates all plugins
 	}
 	
 	public static LSPServer getInstance()
 	{
 		return INSTANCE;
-	}
-	
-	private RPCDispatcher getDispatcher() throws IOException
-	{
-		RPCDispatcher dispatcher = new RPCDispatcher();
-		
-		dispatcher.register(new InitializeHandler(), "initialize", "initialized", "client/registerCapability");
-		dispatcher.register(new ShutdownHandler(), "shutdown");
-		dispatcher.register(new ExitHandler(), "exit");
-		dispatcher.register(new CancelHandler(), "$/cancelRequest");
-		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
-
-		dispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
-		dispatcher.register(new DidCloseHandler(), "textDocument/didClose");
-		dispatcher.register(new DidChangeHandler(), "textDocument/didChange");
-		dispatcher.register(new DidSaveHandler(), "textDocument/didSave");
-		dispatcher.register(new DefinitionHandler(), "textDocument/definition");
-		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
-		dispatcher.register(new CompletionHandler(), "textDocument/completion");
-		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
-		dispatcher.register(new ReferencesHandler(), "textDocument/references");
-		dispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
-
-		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
-
-		dispatcher.register(new POGHandler(), "slsp/POG/generate");
-		dispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
-		dispatcher.register(new TranslateHandler(), "slsp/TR/translate");
-
-		dispatcher.register(new UnknownHandler());	// Called for unknown methods
-		
-		return dispatcher;
 	}
 	
 	public void run() throws IOException
@@ -159,16 +124,22 @@ public class LSPServer extends JSONServer
 					for (JSONObject response: responses)
 					{
 						writeMessage(response);
-						
-						if (response.get("method") != null && response.get("id") != null)	// A request
-						{
-							RPCRequest req = RPCRequest.create(response);
-							responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
-						}
 					}
 				}
 			}
 		}
+	}
+	
+	@Override
+	public synchronized void writeMessage(JSONObject response) throws IOException
+	{
+		if (response.get("method") != null && response.get("id") != null)	// A request
+		{
+			RPCRequest req = RPCRequest.create(response);
+			responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
+		}
+
+		super.writeMessage(response);
 	}
 
 	public boolean isInitialized()

@@ -24,16 +24,9 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
-import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCHistoryExpression;
-import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -172,27 +165,6 @@ public class TCMutexSyncDefinition extends TCDefinition
 		}
 
 		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
-	}
-
-	public TCExpression getExpression(TCNameToken excluding)
-	{
-		TCNameList list = null;
-
-		if (operations.size() == 1)
-		{
-			list = operations;
-		}
-		else
-		{
-			list = new TCNameList();
-			list.addAll(operations);
-			list.remove(excluding);
-		}
-
-		return new TCEqualsExpression(
-			new TCHistoryExpression(location, Token.ACTIVE, list),
-    		new LexKeywordToken(Token.EQUALS, location),
-    		new TCIntegerLiteralExpression(new LexIntegerToken(0, location)));
 	}
 
 	@Override

@@ -62,14 +62,11 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
 		}
 	};
 	
- 	@Override
+	@Override
 	public C caseConcatenationPattern(INConcatenationPattern node, S arg)
 	{
- 		C all = newCollection();
- 		
- 		all.addAll(node.left.apply(this, arg));
+ 		C all = node.left.apply(this, arg);
  		all.addAll(node.right.apply(this, arg));
- 		
  		return all;
 	}
 
@@ -86,21 +83,25 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
  		
  		for (INMapletPattern maplet: node.maplets)
  		{
- 			all.addAll(maplet.from.apply(this, arg));
- 			all.addAll(maplet.to.apply(this, arg));
+ 			all.addAll(maplet.apply(this, arg));
  		}
  		
  		return all;
 	}
+ 	
+ 	@Override
+ 	public C caseMapletPattern(INMapletPattern node, S arg)
+ 	{
+ 		C all = node.from.apply(this, arg);
+		all.addAll(node.to.apply(this, arg));
+		return all;
+ 	}
 
  	@Override
 	public C caseMapUnionPattern(INMapUnionPattern node, S arg)
 	{
- 		C all = newCollection();
- 		
- 		all.addAll(node.left.apply(this, arg));
+ 		C all = node.left.apply(this, arg);
  		all.addAll(node.right.apply(this, arg));
- 		
  		return all;
 	}
 
@@ -172,11 +173,8 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseUnionPattern(INUnionPattern node, S arg)
 	{
- 		C all = newCollection();
- 		
- 		all.addAll(node.left.apply(this, arg));
+ 		C all = node.left.apply(this, arg);
  		all.addAll(node.right.apply(this, arg));
- 		
  		return all;
 	}
 

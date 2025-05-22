@@ -34,7 +34,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
 
 public class CompletionHandler extends LSPHandler
 {
@@ -52,13 +52,15 @@ public class CompletionHandler extends LSPHandler
 			JSONObject text = params.get("textDocument");
 			JSONObject position = params.get("position");
 			JSONObject context = params.get("context");
-			CompletionTriggerKind triggerKind = CompletionTriggerKind.kindOf(context.get("triggerKind"));
+			CompletionTriggerKind triggerKind =
+					context == null ? CompletionTriggerKind.INVOKED :
+					CompletionTriggerKind.kindOf(context.get("triggerKind"));
 			
 			File file = Utils.uriToFile(text.get("uri"));
 			Long line = position.get("line");
 			Long character = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().completion(request, triggerKind, file, line.intValue(), character.intValue());
+			return LSPPlugin.getInstance().lspCompletion(request, triggerKind, file, line, character);
 		}
 		catch (URISyntaxException e)
 		{

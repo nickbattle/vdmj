@@ -30,14 +30,17 @@ import java.util.Vector;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TotalFunctionObligation extends ProofObligation
 {
 	public TotalFunctionObligation(POExplicitFunctionDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.TOTAL, ctxt);
-		value = ctxt.getObligation(getContext(def.name.getName(), def));
+		super(def.location, POType.TOTAL_FUNCTION, ctxt);
+		source = ctxt.getSource(getContext(def.name.getName(), def));
+		definition = def;
 	}
 
 	private String getContext(String name, POExplicitFunctionDefinition def)
@@ -54,10 +57,10 @@ public class TotalFunctionObligation extends ProofObligation
 		{
 			fapply.append("[");
 			
-			for (int p=0; p < def.typeParams.size(); p++)
+			for (TCType ptype: def.typeParams)
 			{
 				fapply.append(sep);
-				fapply.append("?");
+				fapply.append(ptype.toString());
 				sep = ", ";
 			}
 			
@@ -69,14 +72,20 @@ public class TotalFunctionObligation extends ProofObligation
 		if (!ftype.parameters.isEmpty())
 		{
 			sep = "";
+			PORemoveIgnoresVisitor.init();
 			
     		for (POPatternList pl: def.paramPatternList)
     		{
+    			int param = 0;
+    			
     			for (POPattern p: pl)
     			{
     				fapply.append(sep);
-    				fapply.append(p.getMatchingExpression());	// Expands anys
+    				POPattern p2 = p.removeIgnorePatterns();
+   					p2.setMaximal(ftype.parameters.get(param).isMaximal());
+    				fapply.append(p2);
 					sep = ", ";
+					param++;
     			}
 
     			if (ftype.result instanceof TCFunctionType)

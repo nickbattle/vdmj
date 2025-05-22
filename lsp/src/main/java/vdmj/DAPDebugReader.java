@@ -46,8 +46,8 @@ import dap.DAPServer;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 /**
  * A class to listen for and interact with multiple threads that are being debugged.
@@ -147,7 +147,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				JSONObject source = arguments.get("source");
 				File file = Utils.pathToFile(source.get("path"));
 				JSONArray lines = arguments.get("breakpoints");
-				DAPMessageList responses = DAPWorkspaceManager.getInstance().setBreakpoints(dapRequest, file, lines);
+				DAPMessageList responses = DAPPlugin.getInstance().dapSetBreakpoints(dapRequest, file, lines);
 
 				for (JSONObject response: responses)
 				{
@@ -162,7 +162,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			{
 				JSONObject arguments = dapRequest.get("arguments");
 				JSONArray names = arguments.get("breakpoints");
-				DAPMessageList responses = DAPWorkspaceManager.getInstance().setFunctionBreakpoints(dapRequest, names);
+				DAPMessageList responses = DAPPlugin.getInstance().dapSetFunctionBreakpoints(dapRequest, names);
 
 				for (JSONObject response: responses)
 				{
@@ -177,7 +177,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			{
 				JSONObject arguments = dapRequest.get("arguments");
 				JSONArray filterOptions = arguments.get("filterOptions");
-				DAPMessageList responses = DAPWorkspaceManager.getInstance().setExceptionBreakpoints(dapRequest, filterOptions);
+				DAPMessageList responses = DAPPlugin.getInstance().dapSetExceptionBreakpoints(dapRequest, filterOptions);
 
 				for (JSONObject response: responses)
 				{

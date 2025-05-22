@@ -45,6 +45,7 @@ public class DebugCommand
 	public static final DebugCommand RESUME		= new DebugCommand(DebugType.RESUME);
 	public static final DebugCommand TERMINATE	= new DebugCommand(DebugType.TERMINATE);
 	public static final DebugCommand HELP		= new DebugCommand(DebugType.HELP);
+	public static final DebugCommand RESULT		= new DebugCommand(DebugType.RESULT);
 	
 	private final DebugType type;
 	private final Object payload;

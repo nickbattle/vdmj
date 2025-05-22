@@ -33,8 +33,10 @@ import com.fujitsu.vdmj.pog.FiniteMapObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -65,19 +67,19 @@ public class POMapCompExpression extends POMapExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(first.getProofObligations(ctxt, env));
+		obligations.addAll(first.getProofObligations(ctxt, pogState, env));
 		ctxt.pop();
 
 		boolean finiteTest = false;
 
 		for (POMultipleBind mb: bindings)
 		{
-			obligations.addAll(mb.getProofObligations(ctxt, env));
+			obligations.addAll(mb.getProofObligations(ctxt, pogState, env));
 
 			if (mb instanceof POMultipleTypeBind)
 			{
@@ -87,13 +89,14 @@ public class POMapCompExpression extends POMapExpression
 
 		if (finiteTest)
 		{
-			obligations.add(new FiniteMapObligation(this, maptype, ctxt));
+			obligations.addAll(FiniteMapObligation.getAllPOs(this, maptype, ctxt));
 		}
 
 		if (predicate != null)
 		{
     		ctxt.push(new POForAllContext(this));
-    		obligations.addAll(predicate.getProofObligations(ctxt, env));
+    		obligations.addAll(predicate.getProofObligations(ctxt, pogState, env));
+    		obligations.addAll(checkUnionQualifiers(predicate, TCTypeQualifier.getBoolQualifier(), ctxt));
     		ctxt.pop();
 		}
 

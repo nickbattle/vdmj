@@ -45,10 +45,10 @@ public class TCExportedFunction extends TCExport
 	private static final long serialVersionUID = 1L;
 	public final TCNameList nameList;
 	public TCType type;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final TCTypeList unresolved;
 
-	public TCExportedFunction(LexLocation location, TCNameList nameList, TCType type, TCNameList typeParams)
+	public TCExportedFunction(LexLocation location, TCNameList nameList, TCType type, TCTypeList typeParams)
 	{
 		super(location);
 		this.nameList = nameList;
@@ -117,7 +117,7 @@ public class TCExportedFunction extends TCExport
 						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 							efd.getTypeParamDefinitions(), env, NameScope.NAMES);
 
-						type = type.typeResolve(params, null);
+						type = type.typeResolve(params);
 						
 						if (efd.typeParams == null)
 						{
@@ -141,7 +141,7 @@ public class TCExportedFunction extends TCExport
 						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 							ifd.getTypeParamDefinitions(), env, NameScope.NAMES);
 
-						type = type.typeResolve(params, null);
+						type = type.typeResolve(params);
 						
 						if (ifd.typeParams == null)
 						{
@@ -162,7 +162,7 @@ public class TCExportedFunction extends TCExport
 				}
 				else
 				{
-					type = type.typeResolve(env, null);
+					type = type.typeResolve(env);
 					
 					// if (actualType != null && !TypeComparator.compatible(resolved, actualType))
 					if (actualType != null && !actualType.equals(type))

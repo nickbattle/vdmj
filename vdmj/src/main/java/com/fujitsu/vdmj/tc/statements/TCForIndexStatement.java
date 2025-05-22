@@ -43,6 +43,8 @@ public class TCForIndexStatement extends TCStatement
 	public final TCExpression to;
 	public final TCExpression by;
 	public final TCStatement statement;
+	
+	public TCDefinition vardef = null;
 
 	public TCForIndexStatement(LexLocation location,
 		TCNameToken var, TCExpression from, TCExpression to, TCExpression by, TCStatement body)
@@ -88,7 +90,7 @@ public class TCForIndexStatement extends TCStatement
 			}
 		}
 
-		TCDefinition vardef = new TCLocalDefinition(var.getLocation(), var, ft);
+		vardef = new TCLocalDefinition(var.getLocation(), var, ft);
 		Environment local = new FlatCheckedEnvironment(vardef, env, scope);
 		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();

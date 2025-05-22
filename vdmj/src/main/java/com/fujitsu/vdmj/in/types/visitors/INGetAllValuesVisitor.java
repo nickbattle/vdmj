@@ -30,6 +30,7 @@ import java.util.List;
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -68,6 +69,9 @@ import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
+import com.fujitsu.vdmj.util.DuplicateKPermutor;
+import com.fujitsu.vdmj.util.KCombinator;
+import com.fujitsu.vdmj.util.KPermutor;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
@@ -112,49 +116,79 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 	@Override
 	public ValueList caseInMapType(TCInMapType type, Context ctxt)
 	{
-		ValueList maps = caseMapType(type, ctxt);
-		ValueList result = new ValueList();
+		ValueList fromValues = type.from.apply(this, ctxt);
+		ValueList toValues = type.to.apply(this, ctxt);
+		ValueList results = new ValueList();
 		
-		for (Value map: maps)
+		int fromSize = fromValues.size();
+		int toSize = toValues.size();
+		long check = 0;
+		
+		for (int ds=1; ds<=fromSize && ds<=toSize; ds++)		// map domain sizes
 		{
-			MapValue vm = (MapValue)map;
-			
-			if (vm.values.isInjective())
+			for (int[] domain: new KCombinator(fromSize, ds))
 			{
-				result.add(vm);
+				for (int[] range: new KPermutor(toSize, ds))
+				{
+					ValueMap m = new ValueMap();
+
+					for (int i=0; i<ds; i++)
+					{
+						m.put(fromValues.get(domain[i]), toValues.get(range[i]));
+					}
+					
+					results.add(new MapValue(m));
+					
+					if (++check >= 100)
+					{
+						checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
+						check = 0;
+					}
+				}				
 			}
 		}
 		
-		return result;
+		results.add(new MapValue());	// empty map
+		return results;
 	}
 
 	@Override
 	public ValueList caseMapType(TCMapType type, Context ctxt)
 	{
-		TCTypeList tuple = new TCTypeList();
-		tuple.add(type.from);
-		tuple.add(type.to);
-		
+		ValueList fromValues = type.from.apply(this, ctxt);
+		ValueList toValues = type.to.apply(this, ctxt);
 		ValueList results = new ValueList();
-		ValueList tuples = ofTypeList(tuple, ctxt);
-		ValueSet set = new ValueSet();
-		set.addAll(tuples);
-		List<ValueSet> psets = set.powerSet();
-
-		for (ValueSet map: psets)
+		
+		int fromSize = fromValues.size();
+		int toSize = toValues.size();
+		long check = 0;
+		
+		for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
 		{
-			ValueMap result = new ValueMap();
-			
-			for (Value v: map)
+			for (int[] domain: new KCombinator(fromSize, ds))
 			{
-				TupleValue tv = (TupleValue)v;
-				result.put(tv.values.get(0), tv.values.get(1));
+				for (int[] range: new DuplicateKPermutor(toSize, ds))
+				{
+					ValueMap m = new ValueMap();
+
+					for (int i=0; i<ds; i++)
+					{
+						m.put(fromValues.get(domain[i]), toValues.get(range[i]));
+					}
+					
+					results.add(new MapValue(m));
+
+					if (++check >= 100)
+					{
+						checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
+						check = 0;
+					}
+				}
 			}
-			
-			results.add(new MapValue(result));
 		}
 		
-		return results; 
+		results.add(new MapValue());	// empty map
+		return results;
 	}
 
 	@Override
@@ -262,7 +296,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		ValueList list = type.setof.apply(this, ctxt);
 		ValueSet set = new ValueSet(list.size());
 		set.addAll(list);
-		List<ValueSet> psets = set.powerSet();
+		List<ValueSet> psets = set.powerSet(new Breakpoint(ctxt.location), ctxt);
 		list.clear();
 
 		for (ValueSet v: psets)
@@ -436,5 +470,40 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		}
 		
 		return results;
+	}
+	
+	/**
+	 * Check whether we should drop into the debugger for long expansions.
+	 */
+	private void checkBreakpoint(TCType type, Breakpoint breakpoint, Context ctxt)
+	{
+		// We check the interrupt level here, rather than letting the check
+		// method do it, to avoid incrementing the hit count for the breakpoint
+		// too many times.
+
+		switch (Breakpoint.execInterruptLevel())
+		{
+			case Breakpoint.TERMINATE:
+				try
+				{
+					long size = type.apply(new INTypeSizeVisitor(), ctxt);
+					throw new InternalException(4176, "Interrupted type expansion size " + size);
+				}
+				catch (ArithmeticException e)
+				{
+					throw new InternalException(4176, "Interrupted type expansion, exceeds long");
+				}
+		
+			case Breakpoint.PAUSE:
+				if (breakpoint != null)
+				{
+					breakpoint.enterDebugger(ctxt);
+				}
+				break;
+			
+			case Breakpoint.NONE:
+			default:
+				break;	// carry on
+		}
 	}
 }

@@ -55,6 +55,7 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 
 	public POAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
+		super(name.getLocation());
 		this.name = name;
 		this.args = args;
 		

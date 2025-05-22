@@ -138,7 +138,7 @@ public class RecordValue extends Value
 
 	public void checkInvariant(Context ctxt) throws ValueException
 	{
-		if (invariant != null && Settings.invchecks)
+		if (invariant != null && Settings.invchecks && !type.isMaximal())
 		{
 			// In VDM++ and VDM-RT, we do not want to do thread swaps half way
 			// through an invariant check, so we set the atomic flag around the
@@ -169,7 +169,7 @@ public class RecordValue extends Value
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		InvariantValueListener invl = null;
 
@@ -197,7 +197,8 @@ public class RecordValue extends Value
 			nm.add(fv.name, uv, fv.comparable);
 		}
 
-		UpdatableValue uval = UpdatableValue.factory(new RecordValue(type, nm, invariant, equality, ordering), listeners);
+		RecordValue rval = new RecordValue(type, nm, invariant, equality, ordering);
+		UpdatableValue uval = UpdatableValue.factory(rval, listeners);
 		
 		if (invl != null)
 		{
@@ -371,7 +372,7 @@ public class RecordValue extends Value
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("mk_" + type.name + "(");
+		sb.append("mk_" + type + "(");
 
 		Iterator<TCField> fi = type.fields.iterator();
 
@@ -408,7 +409,15 @@ public class RecordValue extends Value
 	{
 		if (to.equals(type))
 		{
-			return this;
+			if (type.isMaximal() && !to.isMaximal())
+			{
+				TCRecordType rto = (TCRecordType)to;
+				return new RecordValue(rto, fieldmap, ctxt);
+			}
+			else
+			{
+				return this;
+			}
 		}
 		else
 		{

@@ -44,7 +44,7 @@ public class TCTypeBind extends TCBind
 
 	public void typeResolve(Environment env)
 	{
-		type = type.typeResolve(env, null);
+		type = type.typeResolve(env);
 		pattern.typeResolve(env);
 	}
 

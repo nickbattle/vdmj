@@ -87,14 +87,14 @@ public class TCObjectApplyDesignator extends TCObjectDesignator
 		if (type.isFunction(location))
 		{
 			TCFunctionType ft = type.getFunction();
-			ft.typeResolve(env, null);
+			ft.typeResolve(env);
 			result.add(functionApply(ft, env, NameScope.NAMESANDSTATE, unique));
 		}
 
 		if (type.isOperation(location))
 		{
 			TCOperationType ot = type.getOperation();
-			ot.typeResolve(env, null);
+			ot.typeResolve(env);
 			result.add(operationApply(ot, env, NameScope.NAMESANDSTATE, unique));
 		}
 

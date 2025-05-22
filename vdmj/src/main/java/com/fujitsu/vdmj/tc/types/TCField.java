@@ -28,7 +28,6 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -56,10 +55,10 @@ public class TCField extends TCNode implements Serializable
 		type.unResolve();
 	}
 
-	public void typeResolve(Environment env, TCTypeDefinition root)
+	public void typeResolve(Environment env)
 	{
 		// Recursion defence done by the type
-		type = type.typeResolve(env, root);
+		type = type.typeResolve(env);
 
 		if (env.isVDMPP())
 		{

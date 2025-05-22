@@ -10,4 +10,5 @@ map TCNoPOGAnnotation{name, args} to PONoPOGAnnotation(name, args);
 map TCPrintfAnnotation{name, args} to PONullAnnotation(name, args);
 map TCWarningAnnotation{name, args} to PONullAnnotation(name, args);
 map TCOnFailAnnotation{name, args} to PONullAnnotation(name, args);
-
+map TCDocLinkAnnotation{name, args} to PONullAnnotation(name, args);
+map TCTypeParamAnnotation{name, qcParam, qcType} to POTypeParamAnnotation(name, qcParam, qcType);

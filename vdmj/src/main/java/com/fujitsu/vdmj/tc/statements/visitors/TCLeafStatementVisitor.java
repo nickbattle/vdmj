@@ -45,12 +45,22 @@ import com.fujitsu.vdmj.tc.statements.TCElseIfStatement;
 import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCErrorStatement;
 import com.fujitsu.vdmj.tc.statements.TCExitStatement;
+import com.fujitsu.vdmj.tc.statements.TCExternalClause;
+import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
 import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
+import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIfStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetBeStStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetDefStatement;
+import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectApplyDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectFieldDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectIdentifierDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectNewDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectSelfDesignator;
 import com.fujitsu.vdmj.tc.statements.TCPeriodicStatement;
 import com.fujitsu.vdmj.tc.statements.TCReturnStatement;
 import com.fujitsu.vdmj.tc.statements.TCSimpleBlockStatement;
@@ -58,6 +68,7 @@ import com.fujitsu.vdmj.tc.statements.TCSkipStatement;
 import com.fujitsu.vdmj.tc.statements.TCSpecificationStatement;
 import com.fujitsu.vdmj.tc.statements.TCSporadicStatement;
 import com.fujitsu.vdmj.tc.statements.TCStartStatement;
+import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCStopStatement;
 import com.fujitsu.vdmj.tc.statements.TCSubclassResponsibilityStatement;
@@ -88,6 +99,11 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		}
 	};
 	
+	public TCVisitorSet<E, C, S> getVistorSet()
+	{
+		return visitorSet;
+	}
+	
 	@Override
 	public C caseAnnotatedStatement(TCAnnotatedStatement node, S arg)
 	{
@@ -105,8 +121,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	@Override
 	public C caseAlwaysStatement(TCAlwaysStatement node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.always.apply(this, arg));
+		C all = node.always.apply(this, arg);
 		all.addAll(node.body.apply(this, arg));
 		return all;
 	}
@@ -114,7 +129,9 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseAssignmentStatement(TCAssignmentStatement node, S arg)
 	{
-		return visitorSet.applyExpressionVisitor(node.exp, arg);
+ 		C all = caseStateDesignator(node.target, arg);
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
+		return all;
 	}
 
 	@Override
@@ -151,7 +168,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	@Override
 	public C caseCallObjectStatement(TCCallObjectStatement node, S arg)
 	{
-		C all = newCollection();
+		C all = caseObjectDesignator(node.designator, arg);
 		
 		for (TCExpression a: node.args)
 		{
@@ -177,7 +194,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseCasesStatement(TCCasesStatement node, S arg)
 	{
-		C all = newCollection();
+		C all = visitorSet.applyExpressionVisitor(node.exp, arg);
 		
 		for (TCCaseStmtAlternative alternative: node.cases)
 		{
@@ -220,20 +237,14 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseExitStatement(TCExitStatement node, S arg)
 	{
- 		if (node.expression != null)
- 		{
-			return visitorSet.applyExpressionVisitor(node.expression, arg);
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
 	public C caseForAllStatement(TCForAllStatement node, S arg)
 	{
-		C all = visitorSet.applyExpressionVisitor(node.set, arg);
+		C all = visitorSet.applyPatternVisitor(node.pattern, arg);
+		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -243,12 +254,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	{
 		C all = visitorSet.applyExpressionVisitor(node.from, arg);
 		all.addAll(visitorSet.applyExpressionVisitor(node.to, arg));
-		
-		if (node.by != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -256,14 +262,9 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseForPatternBindStatement(TCForPatternBindStatement node, S arg)
 	{
-		C all = newCollection();
-		
-		if (node.patternBind.bind != null)
-		{
-			visitorSet.applyBindVisitor(node.patternBind.bind, arg);
-		}
-		
-		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
+ 		C all = visitorSet.applyBindVisitor(node.patternBind.bind, arg);
+ 		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.seqexp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -284,7 +285,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
 		if (node.elseStmt != null)
 		{
-			all.addAll(node.elseStmt.apply(this, arg));
+			all.addAll(visitorSet.applyStatementVisitor(node.elseStmt, arg));
 		}
 		
 		return all;
@@ -294,12 +295,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseLetBeStStatement(TCLetBeStStatement node, S arg)
 	{
 		C all = visitorSet.applyMultiBindVisitor(node.bind, arg);
-		
-		if (node.suchThat != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -348,14 +344,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseReturnStatement(TCReturnStatement node, S arg)
 	{
- 		if (node.expression != null)
- 		{
-			return visitorSet.applyExpressionVisitor(node.expression, arg);
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
@@ -380,16 +369,15 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseSpecificationStatement(TCSpecificationStatement node, S arg)
 	{
-		C all = newCollection();
+		C all = visitorSet.applyExpressionVisitor(node.precondition, arg);
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
 		
-		if (node.precondition != null)
+		if (node.externals != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
-		}
-		
-		if (node.postcondition != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+			for (TCExternalClause ex: node.externals)
+			{
+				all.addAll(visitorSet.applyTypeVisitor(ex.type, arg));
+			}
 		}
 		
 		if (node.errors != null)
@@ -442,6 +430,8 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
 		for (TCTixeStmtAlternative alternative: node.traps)
 		{
+			all.addAll(visitorSet.applyPatternVisitor(alternative.patternBind.pattern, arg));
+			all.addAll(visitorSet.applyBindVisitor(alternative.patternBind.bind, arg));
 			all.addAll(alternative.statement.apply(this, arg));
 		}
 		
@@ -452,13 +442,8 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseTrapStatement(TCTrapStatement node, S arg)
 	{
-		C all = newCollection();
-		
-		if (node.patternBind.bind != null)
-		{
-			visitorSet.applyBindVisitor(node.patternBind.bind, arg);
-		}
-		
+		C all = visitorSet.applyPatternVisitor(node.patternBind.pattern, arg);
+		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(node.with.apply(this, arg));
 		all.addAll(node.body.apply(this, arg));
 		return all;
@@ -476,6 +461,68 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseTraceVariableStatement(TCTraceVariableStatement node, S arg)
 	{
 		return newCollection();
+	}
+
+	private C caseStateDesignator(TCStateDesignator designator, S arg)
+	{
+		if (designator instanceof TCFieldDesignator)
+		{
+			TCFieldDesignator fd = (TCFieldDesignator)designator;
+			return caseStateDesignator(fd.object, arg);
+		}
+		else if (designator instanceof TCIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof TCMapSeqDesignator)
+		{
+			TCMapSeqDesignator msd = (TCMapSeqDesignator)designator;
+			C all = caseStateDesignator(msd.mapseq, arg);
+			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, arg));
+			return all;
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseStateDesignator");
+		}
+	}
+
+	private C caseObjectDesignator(TCObjectDesignator designator, S arg)
+	{
+		if (designator instanceof TCObjectApplyDesignator)
+		{
+			TCObjectApplyDesignator ad = (TCObjectApplyDesignator)designator;
+			C all = caseObjectDesignator(ad.object, arg);
+			
+			for (TCExpression exp: ad.args)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(exp, arg));
+			}
+			
+			return all;
+		}
+		else if (designator instanceof TCObjectFieldDesignator)
+		{
+			TCObjectFieldDesignator fd = (TCObjectFieldDesignator)designator;
+			return caseObjectDesignator(fd.object, arg);
+		}
+		else if (designator instanceof TCObjectNewDesignator)
+		{
+			TCObjectNewDesignator nd = (TCObjectNewDesignator)designator;
+			return visitorSet.applyExpressionVisitor(nd.expression, arg);
+		}
+		else if (designator instanceof TCObjectIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof TCObjectSelfDesignator)
+		{
+			return newCollection();
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseObjectDesignator");
+		}
 	}
 
 	abstract protected C newCollection();

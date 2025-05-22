@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.definitions.POEqualsDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 
 public class ValueBindingObligation extends ProofObligation
 {
@@ -39,11 +41,14 @@ public class ValueBindingObligation extends ProofObligation
 		sb.append(":");
 		sb.append(poValueDefinition.type);
 		sb.append(" & ");
+		POGetMatchingExpressionVisitor.init();
 		sb.append(poValueDefinition.pattern.getMatchingExpression());
 		sb.append(" = ");
 		sb.append(poValueDefinition.exp);
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, poValueDefinition.exp);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public ValueBindingObligation(POEqualsDefinition def, POContextStack ctxt)
@@ -51,15 +56,19 @@ public class ValueBindingObligation extends ProofObligation
 		super(def.location, POType.VALUE_BINDING, ctxt);
 		StringBuilder sb = new StringBuilder();
 
+		PORemoveIgnoresVisitor.init();
 		sb.append("exists ");
-		sb.append(def.pattern.getMatchingExpression());
+		sb.append(def.pattern.removeIgnorePatterns());
 		sb.append(":");
 		sb.append(def.expType);
 		sb.append(" & ");
-		sb.append(def.pattern.getMatchingExpression());
+		PORemoveIgnoresVisitor.init();
+		sb.append(def.pattern.removeIgnorePatterns());
 		sb.append(" = ");
 		sb.append(def.test);
 
-		value = ctxt.getObligation(sb.toString());
+		source = ctxt.getSource(sb.toString());
+		setObligationVars(ctxt, def.test);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 }

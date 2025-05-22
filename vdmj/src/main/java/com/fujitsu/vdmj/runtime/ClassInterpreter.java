@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
@@ -44,18 +43,15 @@ import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.definitions.POClassList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
 import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.RunState;
@@ -75,6 +71,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.BUSValue;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -94,7 +91,6 @@ public class ClassInterpreter extends Interpreter
 	private INClassDefinition defaultClass;
 	private NameValuePairMap createdValues;
 	private TCDefinitionSet createdDefinitions;
-	private POClassList pogClasses;
 
 	public ClassInterpreter(INClassList executableClasses, TCClassList checkedClasses) throws Exception
 	{
@@ -115,6 +111,11 @@ public class ClassInterpreter extends Interpreter
 		}
 	}
 
+	public static ClassInterpreter getInstance()
+	{
+		return (ClassInterpreter) instance;
+	}
+
 	@Override
 	public void setDefaultName(String cname) throws Exception
 	{
@@ -122,6 +123,7 @@ public class ClassInterpreter extends Interpreter
 		{
 			defaultClass = new INClassDefinition();
 			executableClasses.add(defaultClass);
+			TypeComparator.setCurrentModule(getDefaultName());
 		}
 		else
 		{
@@ -130,6 +132,7 @@ public class ClassInterpreter extends Interpreter
     			if (c.name.getName().equals(cname))
     			{
     				defaultClass = c;
+					TypeComparator.setCurrentModule(getDefaultName());
     				return;
     			}
     		}
@@ -155,6 +158,11 @@ public class ClassInterpreter extends Interpreter
 	public String getDefaultName()
 	{
 		return defaultClass.name.getName();
+	}
+	
+	public INClassDefinition getDefaultClass()
+	{
+		return defaultClass;
 	}
 
 	@Override
@@ -249,7 +257,7 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	protected TCExpression parseExpression(String line, String module) throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(line, Settings.dialect, Console.charset);
+		LexTokenReader ltr = new LexTokenReader(line, Settings.dialect);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression ast = reader.readExpression();
@@ -260,7 +268,7 @@ public class ClassInterpreter extends Interpreter
 			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
 		}
 
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 	}
 
 	private Value execute(INExpression inex) throws Exception
@@ -292,9 +300,15 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public Value execute(String line) throws Exception
 	{
+		return execute(line, getGlobalEnvironment());
+	}
+	
+	@Override
+	public Value execute(String line, Environment env) throws Exception
+	{
 		TCExpression expr = parseExpression(line, getDefaultName());
 		typeCheck(expr);
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(expr);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);
 		return execute(inex);
 	}
 
@@ -324,7 +338,7 @@ public class ClassInterpreter extends Interpreter
 		}
 
 		ctxt.threadState.init();
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(expr);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);
 		return inex.eval(ctxt);
 	}
 
@@ -411,13 +425,27 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public INStatement findStatement(File file, int lineno)
 	{
-		return executableClasses.findStatement(file, lineno);
+		INStatementList list = findStatements(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INStatementList findStatements(File file, int lineno)
+	{
+		return executableClasses.findStatements(file, lineno);
 	}
 
 	@Override
 	public INExpression findExpression(File file, int lineno)
 	{
-		return executableClasses.findExpression(file, lineno);
+		INExpressionList list = findExpressions(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INExpressionList findExpressions(File file, int lineno)
+	{
+		return executableClasses.findExpressions(file, lineno);
 	}
 
 	public void create(String var, String exp) throws Exception
@@ -431,22 +459,6 @@ public class ClassInterpreter extends Interpreter
 
 		createdValues.put(name, v);
 		createdDefinitions.add(new TCLocalDefinition(location, name, type));
-	}
-
-	@Override
-	public ProofObligationList getProofObligations() throws Exception
-	{
-		if (pogClasses == null)
-		{
-			long now = System.currentTimeMillis();
-			pogClasses = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedClasses);
-			VDMJ.mapperStats(now, PONode.MAPPINGS);
-		}
-		
-		POAnnotation.init();
-		ProofObligationList list = pogClasses.getProofObligations();
-		POAnnotation.close();
-		return list;
 	}
 
 	private void logSwapIn()
@@ -537,22 +549,8 @@ public class ClassInterpreter extends Interpreter
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends List<?>> T getTC()
-	{
-		return (T)checkedClasses;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends List<?>> T getIN()
+	public <T> T getIN()
 	{
 		return (T)executableClasses;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends List<?>> T getPO()
-	{
-		return (T)pogClasses;
 	}
 }

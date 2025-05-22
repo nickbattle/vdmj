@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -34,6 +35,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -79,7 +81,6 @@ public class TCTypeDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition mindef;
 	public TCExplicitFunctionDefinition maxdef;
 	
-	public boolean infinite = false;
 	private TCDefinitionList composeDefinitions;
 
 	public TCTypeDefinition(TCAnnotationList annotations, TCAccessSpecifier accessSpecifier, TCNameToken name,
@@ -188,10 +189,10 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		try
 		{
-			infinite = false;
-			type = (TCInvariantType)type.typeResolve(base, this);
+			type = (TCInvariantType)type.typeResolve(base);
+			if (annotations != null) annotations.tcResolve(this, base);
 
-			if (infinite)
+			if (type.isInfinite())
 			{
 				report(3050, "Type '" + name + "' is infinite");
 			}
@@ -279,7 +280,7 @@ public class TCTypeDefinition extends TCDefinition
 		{
 			pass = Pass.DEFS;		// Come back later for the invariant functions
 			
-			if (type.isUnion(location))
+			if (!type.isInfinite() && type.isUnion(location))
 			{
 				TCUnionType ut = type.getUnion();
 				
@@ -457,27 +458,21 @@ public class TCTypeDefinition extends TCDefinition
 		parameters.add(params);
 
 		TCTypeList ptypes = new TCTypeList();
-
-		if (type instanceof TCRecordType)
-		{
-			// Records are inv_R: R +> bool
-			ptypes.add(new TCUnresolvedType(name));
-		}
-		else
-		{
-			// Named types are inv_T: x +> bool, for T = x
-			TCNamedType nt = (TCNamedType)type;
-			ptypes.add(nt.type);
-		}
+		TCInvariantType param = type.copy(true);
+		ptypes.add(param);
 
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
-			name.getInvName(invExpression.location), null, ftype, parameters, invExpression, null, null, true, null);
+			name.getInvName(invPattern.location), null, ftype, parameters, invExpression, null, null, true, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
+		
+		param.definitions = new TCDefinitionList(def);
+		param.setInvariant(def);
+		
 		return def;
 	}
 
@@ -485,32 +480,43 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		LexLocation loc = p1.location;
 		TCPatternList params = new TCPatternList();
-		params.add(p1);
-		params.add(p2);
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p1$")));
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p2$")));
 
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
+		// Functions are eq_T: T * T +> bool, and ord_T: T * T -> bool (partial)
 		TCTypeList ptypes = new TCTypeList();
-		if (type instanceof TCRecordType)
-		{
-			// Records are xxx_R: R * R +> bool
-			ptypes.add(new TCUnresolvedType(name));
-			ptypes.add(new TCUnresolvedType(name));
-		}
-		else
-		{
-			// Named types are xxx_T: X * X +> bool, for T = X
-			TCNamedType nt = (TCNamedType)type;
-			ptypes.add(nt.type);
-			ptypes.add(nt.type);
-		}
+		ptypes.add(type);
+		ptypes.add(type);
+		
+		boolean order = fname.getName().startsWith("ord_");
 
 		TCFunctionType ftype =
-			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
-
+			new TCFunctionType(loc, ptypes, order, new TCBooleanType(loc));
+		
+		TCExpression body = null;
+		
+		try
+		{
+			TCType max = type.copy(true);
+			
+			// We have to build the "let" expression, with the body of the eq/ord
+			// in the right LexLocation (for error reporting), so we build a "let"
+			// and then edit-in the original expression.
+			
+			String let = String.format("let %s : %s = p1$, %s : %s = p2$ in 0", p1.toSource(), max, p2.toSource(), max);
+			TCLetDefExpression ldef = (TCLetDefExpression) parse(let);
+			body = new TCLetDefExpression(ldef.location, ldef.localDefs, exp);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException("Cannot process eq/ord clause " + p1.location);
+		}
+		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
-			fname, null, ftype, parameters, exp, null, null, false, null);
+			fname, null, ftype, parameters, body, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
@@ -527,28 +533,31 @@ public class TCTypeDefinition extends TCDefinition
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
+		// Functions are xxx_T: T * T -> bool
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(new TCUnresolvedType(name));
-		ptypes.add(new TCUnresolvedType(name));
+		ptypes.add(type);
+		ptypes.add(type);
 
-		// min_T: T * T +> T, max_T: T * T +> T
-		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCUnresolvedType(name));
+		TCFunctionType ftype = new TCFunctionType(loc, ptypes, true, new TCUnresolvedType(name));
 		TCExpression body = null;
+		
+		// We're not worried about the LexLocations here, because the expression is always
+		// valid (no errors to report). Compare getEqOrdDefinition above.
 		
 		try
 		{
 			if (isMin)
 			{
-				body = parse(String.format("if a < b or a = b then a else b"));
+				body = parse("if a < b or a = b then a else b");
 			}
 			else
 			{
-				body = parse(String.format("if a < b or a = b then b else a"));
+				body = parse("if a < b or a = b then b else a");
 			}
 		}
 		catch (Exception e)
 		{
-			// Never reached
+			throw new RuntimeException("Cannot process min/max clause " + location);
 		}
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
@@ -562,10 +571,21 @@ public class TCTypeDefinition extends TCDefinition
 	private TCExpression parse(String body) throws Exception
 	{
 		LexTokenReader ltr = new LexTokenReader(body, Dialect.VDM_SL);
-		ExpressionReader er = new ExpressionReader(ltr);
-		er.setCurrentModule(name.getModule());
-		ASTExpression ast = er.readExpression();
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		boolean old = Properties.parser_maximal_types;
+		
+		try
+		{
+			Properties.parser_maximal_types = true;		// Allow T! types here
+			ExpressionReader er = new ExpressionReader(ltr);
+			er.setCurrentModule(location.module);
+			ASTExpression ast = er.readExpression();
+			return ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
+		}
+		finally
+		{
+			Properties.parser_maximal_types = old;
+			ltr.close();
+		}
 	}
 
 	@Override

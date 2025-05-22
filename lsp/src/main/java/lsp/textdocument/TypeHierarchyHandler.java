@@ -37,7 +37,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
 
 public class TypeHierarchyHandler extends LSPHandler
 {
@@ -60,10 +60,10 @@ public class TypeHierarchyHandler extends LSPHandler
 				return prepareTypeHierarchy(request);
 			
 			case "typeHierarchy/supertypes":
-				return getHierarchy(request, false);
+				return supertypes(request);
 			
 			case "typeHierarchy/subtypes":
-				return getHierarchy(request, true);
+				return subtypes(request);
 
 			default:
 				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected type hierarchy method");
@@ -82,8 +82,7 @@ public class TypeHierarchyHandler extends LSPHandler
 			Long line = position.get("line");
 			Long col = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().prepareHierarchy(request,
-					file, line.intValue(), col.intValue());
+			return LSPPlugin.getInstance().lspPrepareTypeHierarchy(request, file, line, col);
 		}
 		catch (URISyntaxException e)
 		{
@@ -97,7 +96,7 @@ public class TypeHierarchyHandler extends LSPHandler
 		return null;
 	}
 
-	private RPCMessageList getHierarchy(RPCRequest request, boolean subtypes)
+	private RPCMessageList supertypes(RPCRequest request)
 	{
 		try
 		{
@@ -105,7 +104,25 @@ public class TypeHierarchyHandler extends LSPHandler
 			JSONObject item = params.get("item");
 			String classname = item.get("name");
 			
-			return LSPWorkspaceManager.getInstance().getTypeHierarchy(request, classname, subtypes);
+			return LSPPlugin.getInstance().lspSupertypes(request, classname);
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+		}
+
+		return null;
+	}
+
+	private RPCMessageList subtypes(RPCRequest request)
+	{
+		try
+		{
+			JSONObject params = request.get("params");
+			JSONObject item = params.get("item");
+			String classname = item.get("name");
+			
+			return LSPPlugin.getInstance().lspSubtypes(request, classname);
 		}
 		catch (Exception e)
 		{

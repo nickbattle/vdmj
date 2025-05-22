@@ -34,12 +34,11 @@ import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
+import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.in.types.INPatternListTypePairList;
 import com.fujitsu.vdmj.in.types.INPatternTypePair;
-import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -55,7 +54,7 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 public class INImplicitFunctionDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final INPatternListTypePairList parameterPatterns;
 	public final INPatternTypePair result;
 	public final INExpression body;
@@ -72,7 +71,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 
 	public INImplicitFunctionDefinition(INAnnotationList annotations,
 		INAccessSpecifier accessSpecifier, TCNameToken name,
-		TCNameList typeParams,
+		TCTypeList typeParams,
 		INPatternListTypePairList parameterPatterns,
 		INPatternTypePair result,
 		INExpression body,
@@ -112,7 +111,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return	name.getName() +
+		return	accessSpecifier.ifSet(" ") + name.getName() +
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +
@@ -131,37 +130,33 @@ public class INImplicitFunctionDefinition extends INDefinition
 	{
 		NameValuePairList nvl = new NameValuePairList();
 
-		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null);
-
-		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
-
-		// Note, body may be null if it is really implicit. This is caught
-		// when the function is invoked. The value is needed to implement
-		// the pre_() expression for implicit functions.
-
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, null);
-		func.isStatic = accessSpecifier.isStatic;
-		func.uninstantiated = (typeParams != null);
-		nvl.add(new NameValuePair(name, func));
+		FunctionValue prefunc = null;
+		FunctionValue postfunc = null;
+		FunctionValue measurefunc = null;
 
 		if (predef != null)
 		{
-			nvl.add(new NameValuePair(predef.name, prefunc));
-			prefunc.uninstantiated = (typeParams != null);
+			NameValuePairList names = predef.getNamedValues(ctxt);
+			prefunc = names.getNamedValue(predef.name);
+			nvl.addAll(names);
 		}
 
 		if (postdef != null)
 		{
-			nvl.add(new NameValuePair(postdef.name, postfunc));
-			postfunc.uninstantiated = (typeParams != null);
+			NameValuePairList names = postdef.getNamedValues(ctxt);
+			postfunc = names.getNamedValue(postdef.name);
+			nvl.addAll(names);
+		}
+		
+		if (measureDef != null && measureDef.name.isMeasureName())
+		{
+			NameValuePairList names = measureDef.getNamedValues(ctxt);
+			measurefunc = names.getNamedValue(measureDef.name);
+			nvl.addAll(names);
 		}
 
-		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
-		{
-			nvl.add(new NameValuePair(measureDef.name, new FunctionValue(measureDef, null, null, null)));
-		}
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc, null);
+		nvl.add(new NameValuePair(name, func));
 
 		return nvl;
 	}
@@ -189,6 +184,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		
 		FunctionValue prefv = null;
 		FunctionValue postfv = null;
+		FunctionValue measurefv = null;
 
 		if (predef != null)
 		{
@@ -199,9 +195,14 @@ public class INImplicitFunctionDefinition extends INDefinition
 		{
 			postfv = postdef.getPolymorphicValue(actualTypes, params, ctxt);
 		}
+		
+		if (measureDef != null)
+		{
+			measurefv = measureDef.getPolymorphicValue(actualTypes, params, ctxt);
+		}
 
 		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
-		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv, null);
 
 		polyfuncs.put(actualTypes, rv);
 		return rv;
@@ -231,6 +232,12 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public boolean isCallableFunction()
 	{
 		return (body != null);
+	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
 	}
 
 	@Override

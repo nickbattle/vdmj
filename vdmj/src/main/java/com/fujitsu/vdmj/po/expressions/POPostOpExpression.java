@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 
 public class POPostOpExpression extends POExpression
@@ -31,9 +32,9 @@ public class POPostOpExpression extends POExpression
 	private static final long serialVersionUID = 1L;
 	public final POExpression postexpression;
 
-	public POPostOpExpression(POExpression postexpression)
+	public POPostOpExpression(LexLocation location, POExpression postexpression)
 	{
-		super(postexpression.location);
+		super(location);
 		this.postexpression = postexpression;
 	}
 

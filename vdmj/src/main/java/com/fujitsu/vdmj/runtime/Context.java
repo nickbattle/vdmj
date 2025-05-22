@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
+import com.fujitsu.vdmj.plugins.VDMJ;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -62,7 +62,10 @@ public class Context extends HashMap<TCNameToken, Value>
 	public String prepostMsg = null;
 	/** Set to the operation being guarded, if any. */
 	public OperationValue guardOp = null;
-
+	
+	/** The name of a temporary RESULT symbol, when debugging */
+	private TCNameToken RESULT = null;
+	
 	/**
 	 * Create a context at the given location.
 	 *
@@ -326,6 +329,23 @@ public class Context extends HashMap<TCNameToken, Value>
 
 		return sb.toString();
 	}
+	
+	public String toStringLine()
+	{
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (TCNameToken vname: this.keySet())
+		{
+			sb.append(sep);
+			sb.append(vname.getName());
+			sb.append(" = ");
+			sb.append(this.get(vname));
+			sep = ", ";
+		}
+		
+		return sb.toString();
+	}
 
 	/**
 	 * This is used by the stack overflow processing via Function/OperationValue.
@@ -415,5 +435,25 @@ public class Context extends HashMap<TCNameToken, Value>
 	{
 		this.prepost = prepost;
 		this.prepostMsg = prepostMsg;
+	}
+
+	/**
+	 * Add/remove a temporary result value to the current stack frame.
+	 */
+	public void addResult(LexLocation location, String name, Value rv)
+	{
+		RESULT = new TCNameToken(location, location.module, "RESULT " + name);
+		put(RESULT, rv);
+	}
+	
+	public TCNameToken getResult()
+	{
+		return RESULT;
+	}
+
+	public void removeResult(LexLocation location)
+	{
+		remove(RESULT);
+		RESULT = null;
 	}
 }

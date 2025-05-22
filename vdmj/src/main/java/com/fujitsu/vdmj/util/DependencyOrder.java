@@ -27,10 +27,13 @@ package com.fujitsu.vdmj.util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -51,8 +54,11 @@ public class DependencyOrder
 	protected Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
 	protected Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
 	
+	private boolean sortCalled;
+	
 	public DependencyOrder()
 	{
+		sortCalled = false;
 	}
     			
     public void classOrder(TCClassList classList)
@@ -110,6 +116,22 @@ public class DependencyOrder
 	    }
     }
 	
+	public void definitionOrder(TCDefinitionList definitions)
+	{
+		for (TCDefinition def: definitions.singleDefinitions())
+		{
+	    	String myname = def.name.getName();
+	    	nameToFile.put(myname, def.location.file);
+
+			TCNameSet freevars = def.getFreeVariables();
+	    	
+	    	for (TCNameToken dep: freevars)
+	    	{
+				add(myname, dep.getName());
+	    	}
+	    }		
+	}
+	
     /**
      * Create a "dot" language version of the graph for the graphviz tool.
      * @throws IOException 
@@ -140,8 +162,113 @@ public class DependencyOrder
 		fw.write(sb.toString());
 		fw.close();
 	}
+    
+    public List<String> getStartpoints()
+    {
+		/*
+		 * The startpoints are where there are no incoming links to a node. So
+		 * the usedBy entry is blank (removed cycles) or null.
+		 */
+		List<String> startpoints = new Vector<String>();
 
-	private void add(String from, String to)
+		for (String module: nameToFile.keySet())
+		{
+			if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
+			{
+				startpoints.add(module);
+				usedBy.put(module, new HashSet<String>());
+			}
+		}
+
+		return startpoints;
+    }
+    
+    /**
+     * Note that the graph must be acyclic!
+     * @return the initialization order of the names
+     */
+    public List<String> topologicalSort()
+    {
+    	return topologicalSort(getStartpoints());
+    }
+    
+    public List<String> topologicalSort(List<String> startpoints)
+    {
+    	if (sortCalled)
+    	{
+    		throw new IllegalStateException("topologicalSort already called");
+    	}
+    	
+		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
+		//
+		//	L ← Empty list that will contain the sorted elements
+		//	S ← Set of all nodes with no incoming edge
+		//
+		//	while S is not empty do
+		//	    remove a node n from S
+		//	    add n to L
+		//	    for each node m with an edge e from n to m do
+		//	        remove edge e from the graph
+		//	        if m has no other incoming edges then
+		//	            insert m into S
+		//
+		//	if graph has edges then
+		//	    return error   (graph has at least one cycle)
+		//	else 
+		//	    return L   (a topologically sorted order)
+
+		List<String> ordering = new Vector<String>();
+
+		while (!startpoints.isEmpty())
+		{
+		    String n = startpoints.remove(0);
+		    ordering.add(n);
+		    Set<String> usesSet = uses.get(n);
+	    	
+		    if (usesSet != null)
+		    {
+		    	Set<String> copy = new HashSet<String>(usesSet);
+		    	
+		    	for (String m: copy)
+		    	{	
+	    			if (delete(n, m) == 0)
+			    	{
+						startpoints.add(m);
+				    }
+		    	}
+		    }
+		}
+		
+		if (edgeCount() > 0)
+		{
+			throw new IllegalStateException("Dependency graph has cycles");
+		}
+		else
+		{
+			Collections.reverse(ordering);	// the init order
+			sortCalled = true;
+			return ordering;
+		}
+    }
+
+	private int edgeCount()
+	{
+		int count = 0;
+		
+		for (Set<String> set: uses.values())
+		{
+			count += set.size();
+		}
+		
+		for (Set<String> set: usedBy.values())
+		{
+			count += set.size();	// include reverse links too?
+		}
+		
+		return count;
+	}
+
+	protected void add(String from, String to)
     {
     	if (!from.equals(to))
     	{
@@ -165,4 +292,32 @@ public class DependencyOrder
     		set.add(from);
     	}
     }
+	
+	protected int delete(String from, String to)
+	{
+    	uses.get(from).remove(to);
+    	usedBy.get(to).remove(from);
+    	return usedBy.get(to).size();	// remaining size
+	}
+
+	public static void main(String[] args)
+	{
+		class Test extends DependencyOrder
+		{
+			public void test()
+			{
+				nameToFile.put("A", new File("test.vdm"));
+				add("A", "B");	// A depends on B etc.
+				add("A", "C");
+				add("B", "C");
+				System.out.println(nameToFile);
+				System.out.println(uses);
+				System.out.println(usedBy);
+				System.out.println("Sort = " + topologicalSort());
+			}
+		};
+		
+		Test test = new Test();
+		test.test();
+	}
 }

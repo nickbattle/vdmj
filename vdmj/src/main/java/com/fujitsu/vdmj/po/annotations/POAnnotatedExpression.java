@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -43,19 +44,20 @@ public class POAnnotatedExpression extends POExpression
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
+		setExptype(expression.getExptype());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "/* " + annotation + " */ " + expression;
+		return expression.toString();	// Don't include annotation in PO sources
 	}
 	
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		annotation.poBefore(this, ctxt);
-		ProofObligationList obligations = expression.getProofObligations(ctxt, env);
+		ProofObligationList obligations = expression.getProofObligations(ctxt, pogState, env);
 		annotation.poAfter(this, obligations, ctxt);
 		return obligations;
 	}

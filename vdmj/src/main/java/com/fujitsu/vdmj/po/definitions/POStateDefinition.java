@@ -28,12 +28,14 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInitObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -82,6 +84,27 @@ public class POStateDefinition extends PODefinition
 	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
 	    		"\nend";
 	}
+	
+	@Override
+	public String toPattern(boolean maximal)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("mk_");
+		sb.append(name);
+		if (maximal) sb.append("!");
+		sb.append("(");
+		String sep = "";
+
+		for (TCField field: fields)
+		{
+			sb.append(sep);
+			sb.append(field.tag);
+			sep = ", ";
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
 
 	@Override
 	public TCType getType()
@@ -90,23 +113,23 @@ public class POStateDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		ctxt = new POContextStack();
+		ctxt.pop();		// Remove default name context
 		ctxt.push(new PONameContext(new TCNameList(this.name)));
 				
 		if (invExpression != null)
 		{
-			list.addAll(invdef.getProofObligations(ctxt, env));
+			list.addAll(invdef.getProofObligations(ctxt, pogState, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 		
 		if (initExpression != null)
 		{
-			list.addAll(initdef.getProofObligations(ctxt, env));
+			list.addAll(initdef.getProofObligations(ctxt, pogState, env));
 			list.add(new StateInitObligation(this, ctxt));
 		}
 

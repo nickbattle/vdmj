@@ -24,68 +24,45 @@
 
 package vdmj.commands;
 
+import com.fujitsu.vdmj.plugins.HelpList;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import workspace.PluginRegistry;
 
-public class HelpCommand extends Command
+public class HelpCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String HELP = "help [<command>] - information about commands";
 	
 	private String command = null;
 
 	public HelpCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			this.command = parts[1];
+			this.command = argv[1];
 		}
-		else if (parts.length != 1)
+		else if (argv.length != 1)
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		ModulesCommand.HELP,
-		ClassesCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		LogCommand.HELP,
-		HelpCommand.HELP,
-		InitCommand.HELP,
-		VersionCommand.HELP,
-		ScriptCommand.HELP,
-		QuitCommand.HELP
-	};
-	
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
 		StringBuilder sb = new StringBuilder();
+		HelpList help = PluginRegistry.getInstance().getCommandHelp();
 		
-		for (String[] help: entries)
+		for (String cmd: help.keySet())
 		{
-			if (command == null || command.equals(help[0]))
+			if (command == null || cmd.equals(command))
 			{
-				sb.append(help[1] + "\n");
-			}
-		}
-		
-		for (String[][] phelp: PluginRegistry.getInstance().getCommandHelp())
-		{
-			for (String[] help: phelp)
-			{
-				if (command == null || command.equals(help[0]))
-				{
-					sb.append(help[1] + "\n");
-				}
+				sb.append(help.get(cmd) + "\n");
 			}
 		}
 

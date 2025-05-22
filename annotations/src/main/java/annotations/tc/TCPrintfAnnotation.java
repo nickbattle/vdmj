@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.values.SeqValue;
 
 public class TCPrintfAnnotation extends TCAnnotation
 {
@@ -98,13 +99,13 @@ public class TCPrintfAnnotation extends TCAnnotation
 				try
 				{
 					// Try to format with string arguments to check they are all %s (up to 20)
-					Object[] args = new String[20];
-					Arrays.fill(args, "A string");
+					Object[] args = new SeqValue[20];
+					Arrays.fill(args, new SeqValue("abc"));
 					String.format(format, args);
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@Printf must use %[arg$][width]s conversions");
+					name.report(6008, "@Printf must use %[arg$][#][width](s|S) conversions");
 				}
 			}
 			else

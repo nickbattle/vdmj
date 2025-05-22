@@ -35,7 +35,9 @@ import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.in.definitions.INRenamedDefinition;
 import com.fujitsu.vdmj.in.definitions.INStateDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.FileList;
@@ -177,7 +179,10 @@ public class INModule extends INNode implements Serializable
 		{
 			try
 			{
-				initialContext.putList(d.getNamedValues(initialContext));
+				// Create a root context to identify the init location for this defn.
+				Context ctxt = new StateContext(d.location, "<init> " + d, initialContext, null); 
+				
+				initialContext.putList(d.getNamedValues(ctxt));
 			}
 			catch (ContextException e)
 			{
@@ -217,13 +222,13 @@ public class INModule extends INNode implements Serializable
 	}
 
 	/**
-	 * Find the first {@link INStatement} in the module that starts on a given line.
+	 * Find all {@link INStatement} in the module that start on a given line.
 	 *
 	 * @param file The file to search for.
 	 * @param lineno The line number to search for.
-	 * @return	The first {@link TCStatement} on that line, or null.
+	 * @return	The {@link TCStatement} on that line, or null.
 	 */
-	public INStatement findStatement(File file, int lineno)
+	public INStatementList findStatements(File file, int lineno)
 	{
 		// The DEFAULT module can include definitions from many files,
 		// so we have to consider each definition's file before searching
@@ -233,11 +238,11 @@ public class INModule extends INNode implements Serializable
 		{
 			if (d.location.file.equals(file))
 			{
-				INStatement stmt = d.findStatement(lineno);
+				INStatementList stmts = d.findStatements(lineno);
 
-				if (stmt != null)
+				if (!stmts.isEmpty())
 				{
-					return stmt;
+					return stmts;
 				}
 			}
 		}
@@ -246,13 +251,13 @@ public class INModule extends INNode implements Serializable
 	}
 
 	/**
-	 * Find the first {@link INExpression} in the module that starts on a given line.
+	 * Find all {@link INExpression} in the module that start on a given line.
 	 *
 	 * @param file The file to search for.
 	 * @param lineno The line number to search for.
-	 * @return	The first {@link TCExpression} on that line, or null.
+	 * @return	The {@link TCExpression} on that line, or null.
 	 */
-	public INExpression findExpression(File file, int lineno)
+	public INExpressionList findExpressions(File file, int lineno)
 	{
 		// The DEFAULT module can include definitions from many files,
 		// so we have to consider each definition's file before searching
@@ -262,11 +267,11 @@ public class INModule extends INNode implements Serializable
 		{
 			if (d.location.file.equals(file))
 			{
-				INExpression exp = d.findExpression(lineno);
+				INExpressionList exps = d.findExpressions(lineno);
 
-				if (exp != null)
+				if (!exps.isEmpty())
 				{
-					return exp;
+					return exps;
 				}
 			}
 		}

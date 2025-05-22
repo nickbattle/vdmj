@@ -24,18 +24,21 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -50,17 +53,19 @@ public class POApplyExpression extends POExpression
 	public final POExpressionList args;
 	public final TCType type;
 	public final TCTypeList argtypes;
-	public final PODefinitionListList recursive;
+	public final PODefinitionListList recursiveCycles;
+	public final PODefinition opdef;
 
 	public POApplyExpression(POExpression root, POExpressionList args,
-		TCType type, TCTypeList argtypes, PODefinitionListList recursive)
+		TCType type, TCTypeList argtypes, PODefinitionListList recursiveCycles, PODefinition opdef)
 	{
 		super(root);
 		this.root = root;
 		this.args = args;
 		this.type = type;
 		this.argtypes = argtypes;
-		this.recursive = recursive;
+		this.recursiveCycles = recursiveCycles;
+		this.opdef = opdef;
 	}
 
 	@Override
@@ -69,10 +74,15 @@ public class POApplyExpression extends POExpression
 		if (root instanceof POVariableExpression)
 		{
 			POVariableExpression v = (POVariableExpression)root;
+			// Exclude the param types from the TCNameToken...
 			
-			if (!v.name.getModule().equals(location.module))	// explicit external calls
+			if (!v.name.getModule().equals(location.module))
 			{
-				return v.name.getExplicit(true) +  "("+ Utils.listToString(args) + ")";
+				return v.name.getModule() + "`" + v.name.getName() + "("+ Utils.listToString(args) + ")";
+			}
+			else
+			{
+				return v.name.getName() + "("+ Utils.listToString(args) + ")";
 			}
 		}
 
@@ -80,86 +90,123 @@ public class POApplyExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (type.isMap(location))
+		if (!type.isUnknown(location))
 		{
-			TCMapType m = type.getMap();
-			obligations.add(new MapApplyObligation(root, args.get(0), ctxt));
-			TCType atype = ctxt.checkType(args.get(0), argtypes.get(0));
-
-			if (!TypeComparator.isSubType(atype, m.from))
+			if (type.isMap(location))
 			{
-				obligations.add(new SubTypeObligation(args.get(0), m.from, atype, ctxt));
+				TCMapType m = type.getMap();
+				obligations.addAll(MapApplyObligation.getAllPOs(root, args.get(0), ctxt));
+				TCType atype = ctxt.checkType(args.get(0), argtypes.get(0));
+	
+				if (!TypeComparator.isSubType(atype, m.from))
+				{
+					obligations.addAll(SubTypeObligation.getAllPOs(args.get(0), m.from, atype, ctxt));
+				}
 			}
-		}
-
-		if (!type.isUnknown(location) && (type.isFunction(location) || type.isOperation(location)))
-		{
-			TCTypeList paramTypes = type.isFunction(location) ?
-				type.getFunction().parameters : type.getOperation().parameters;
 			
-			String prename = root.getPreName();
-
-			if (type.isFunction(location) && (prename == null || !prename.equals("")))
+			if (type.isFunction(location) || type.isOperation(location))
 			{
-				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
-			}
-
-			int i=0;
-
-			for (TCType at: argtypes)
-			{
-				at = ctxt.checkType(args.get(i), at);
-				TCType pt = paramTypes.get(i);
-
-				if (!TypeComparator.isSubType(at, pt))
+				String prename = root.getPreName();
+	
+				if (type.isFunction(location) && prename != null && !prename.isEmpty())
 				{
-					obligations.add(new SubTypeObligation(args.get(i), pt, at, ctxt));
+					obligations.addAll(FunctionApplyObligation.getAllPOs(root, args, prename, ctxt));
 				}
-
-				i++;
-			}
-		}
-
-		if (!type.isUnknown(location) && type.isFunction(location))
-		{
-			if (recursive != null)	// name is a function in a recursive loop
-			{
-				for (PODefinitionList loop: recursive)
+				
+				TCTypeList paramTypes = type.isFunction(location) ?
+						type.getFunction().parameters : type.getOperation().parameters;
+					
+				int i=0;
+	
+				for (TCType at: argtypes)
 				{
-					obligations.add(new RecursiveObligation(loop, this, ctxt));
+					at = ctxt.checkType(args.get(i), at);
+					TCType pt = paramTypes.get(i);
+	
+					if (!TypeComparator.isSubType(at, pt))
+					{
+						obligations.addAll(SubTypeObligation.getAllPOs(args.get(i), pt, at, ctxt));
+					}
+	
+					i++;
 				}
 			}
+	
+			if (type.isFunction(location))
+			{
+				if (recursiveCycles != null)	// name is a function in a recursive loop
+				{
+					/**
+					 * All of the functions in the loop will generate similar obligations,
+					 * so the "add" method eliminates any duplicates.
+					 */
+					for (PODefinitionList loop: recursiveCycles)
+					{
+						obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+					}
+				}
+			}
+	
+			if (type.isSeq(location))
+			{
+				TCSeqType st = type.getSeq();
+				POExpression arg = args.get(0);
+				
+				if (st instanceof TCSeq1Type && arg instanceof POIntegerLiteralExpression)
+				{
+					POIntegerLiteralExpression e = (POIntegerLiteralExpression)arg;
+					
+					if (e.value.value != 1)		// s(1) is always okay for seq1
+					{
+						obligations.addAll(SeqApplyObligation.getAllPOs(root, arg, ctxt));
+					}
+				}
+				else
+				{
+					obligations.addAll(SeqApplyObligation.getAllPOs(root, arg, ctxt));
+				}
+			}
+			
+			if (type.isOperation(location))
+			{
+				// Mark the context stack as ambiguous, if needed. This marks subsequent POs Unchecked.
+				
+				ctxt.addOperationCall(location, pogState, opdef, false);
+				
+				// Additionally, we mark the state as generally ambiguous, so that if this expression
+				// is being used to define something in a "let", we can mark that as ambiguous too.
+				
+				if (opdef == null || !opdef.accessSpecifier.isPure)
+				{
+					pogState.setAmbiguous(true);
+				}
+			}
 		}
 
-		if (type.isSeq(location))
-		{
-			obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
-		}
-
-		obligations.addAll(root.getProofObligations(ctxt, env));
+		obligations.addAll(root.getProofObligations(ctxt, pogState, env));
 
 		for (POExpression arg: args)
 		{
-			obligations.addAll(arg.getProofObligations(ctxt, env));
+			obligations.addAll(arg.getProofObligations(ctxt, pogState, env));
 		}
 
 		return obligations;
 	}
 	
-	public String getMeasureApply(TCNameToken measure)
+	public String getMeasureApply(String measure)
 	{
 		return getMeasureApply(measure, true);
 	}
 	
 	/**
 	 * Create a measure application string from this apply, turning the root function
-	 * name into the measure name passed, and collapsing curried argument sets into one. 
+	 * name into the measure name passed. 
 	 */
-	private String getMeasureApply(TCNameToken measure, boolean close)
+	private String getMeasureApply(String measure, boolean close)
 	{
 		String start = null;
 		
@@ -170,19 +217,46 @@ public class POApplyExpression extends POExpression
 		}
 		else if (root instanceof POVariableExpression)
 		{
-			start = measure.getName() + "(";
+			start = measure;
 		}
 		else if (root instanceof POFuncInstantiationExpression)
 		{
 			POFuncInstantiationExpression fie = (POFuncInstantiationExpression)root;
-			start = measure.getName() + "[" + Utils.listToString(fie.actualTypes) + "](";
+			start = measure + "[" + Utils.listToString(fie.actualTypes) + "]";
 		}
 		else
 		{
-			start = root.toString() + "(";
+			start = root.toString();
+		}
+
+		StringBuilder sb = new StringBuilder(start);
+		sb.append("(");
+		String separator = "";
+		
+		for (POExpression arg: args)
+		{
+			sb.append(separator);
+			sb.append(Utils.deBracketed(arg));
+			separator = ", ";
+		}
+
+		sb.append(")");
+		return sb.toString();
+	}
+	
+	/**
+	 * This is used in apply chains or curried calls, where the precondition is needed
+	 * at the end of the chain.
+	 */
+	@Override
+	public String getPreName()
+	{
+		if (root.getPreName() == null)
+		{
+			return null;
 		}
 		
-		return start  + Utils.listToString(args) + (close ? ")" : ", ");
+		return FunctionApplyObligation.UNKNOWN;		// Use pre_(root, args) form
 	}
 
 	@Override

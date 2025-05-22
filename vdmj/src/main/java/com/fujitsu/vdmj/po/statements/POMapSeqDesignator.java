@@ -24,11 +24,18 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POMapSeqDesignator extends POStateDesignator
 {
@@ -50,19 +57,73 @@ public class POMapSeqDesignator extends POStateDesignator
 	{
 		return mapseq + "(" + exp + ")";
 	}
+	
+	@Override
+	public POExpression toExpression()
+	{
+		POExpression root = mapseq.toExpression();
+		POExpressionList args = new POExpressionList();
+		args.add(exp);
+		TCTypeList argtypes = new TCTypeList();
+		TCType type = new TCUnknownType(location);
+		argtypes.add(type);
+		return new POApplyExpression(root, args , type, argtypes, null, null);
+	}
 
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList list = new ProofObligationList();
+		ProofObligationList list = mapseq.getProofObligations(ctxt);
 
 		if (seqType != null)
 		{
-			list.add(new SeqApplyObligation(mapseq, exp, ctxt));
+			list.addAll(SeqApplyObligation.getAllPOs(mapseq, exp, ctxt));
 		}
 		
 		// Maps are OK, as you can create new map domain entries
 
+		return list;
+	}
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	@Override
+	public TCNameToken updatedVariableName()
+	{
+		return mapseq.updatedVariableName();
+	}
+
+	/**
+	 * The updated variable type, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the type of the variable "x".
+	 */
+	@Override
+	public TCType updatedVariableType()
+	{
+		return mapseq.updatedVariableType();
+	}
+	
+	/**
+	 * All variables used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	@Override
+	public TCNameSet getVariableNames()
+	{
+		TCNameSet set = mapseq.getVariableNames();
+		set.addAll(exp.getVariableNames());
+		return set;
+	}
+	
+	/**
+	 * All expressions used in a designator, eg. m(x).fld(y) is {m, x, y}
+	 */
+	@Override
+	public POExpressionList getExpressions()
+	{
+		POExpressionList list = mapseq.getExpressions();
+		list.add(exp);
 		return list;
 	}
 }

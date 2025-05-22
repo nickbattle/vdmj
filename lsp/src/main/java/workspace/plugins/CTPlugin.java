@@ -24,15 +24,17 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -43,18 +45,30 @@ import com.fujitsu.vdmj.traces.TraceIterator;
 import com.fujitsu.vdmj.traces.TraceReductionType;
 import com.fujitsu.vdmj.traces.Verdict;
 
+import dap.DAPMessageList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.LSPException;
 import lsp.LSPServer;
+import lsp.Utils;
+import lsp.lspx.CTHandler;
 import rpc.RPCErrors;
+import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
-import workspace.DAPWorkspaceManager;
+import vdmj.commands.AnalysisCommand;
+import vdmj.commands.GenerateCommand;
+import vdmj.commands.RuntraceCommand;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.DAPBeforeEvaluateEvent;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
 
-abstract public class CTPlugin extends AnalysisPlugin
+abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected TraceIterator traceIterator = null;
 	protected INClassDefinition traceClassDef = null;
@@ -81,8 +95,8 @@ abstract public class CTPlugin extends AnalysisPlugin
 				return new CTPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 
@@ -96,19 +110,69 @@ abstract public class CTPlugin extends AnalysisPlugin
 	{
 		return "CT";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return CT_PRIORITY;
+	}
 
 	@Override
 	public void init()
 	{
+		lspDispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
+
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(DAPBeforeEvaluateEvent.class, this);
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return new JSONObject("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
+		}
 	}
 
-	public void preCheck()
+	@Override
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		if (event instanceof CheckPrepareEvent)
+		{
+			preCheck((CheckPrepareEvent) event);
+		}
+		else if (event instanceof CheckCompleteEvent)
+		{ 
+			INPlugin in = registry.getPlugin("IN");
+			checkLoadedFiles(in.getIN());
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
+	{
+		if (event instanceof DAPBeforeEvaluateEvent)
+		{
+			if (isRunning())
+			{
+				return new DAPMessageList(event.request, false, "CT is still running", null);
+			}
+		}
+		
+		return null;
+	}
+
+	protected void preCheck(CheckPrepareEvent event)
 	{
 		if (traceExecutor != null && traceRunning)
 		{
@@ -123,16 +187,165 @@ abstract public class CTPlugin extends AnalysisPlugin
 			}
 		}
 	}
+	
+	@Override
+	public AnalysisCommand getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "generate":	return new GenerateCommand(line);
+			case "runtrace":	return new RuntraceCommand(line);
+					
+			default:
+				return null;
+		}
+	}
+	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList
+		(
+			GenerateCommand.HELP
+			// RuntraceCommand.HELP		// Hidden from usual help menu
+		);
+	}
 
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
+	
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T inList) throws Exception;
 
 	abstract public Map<String, TCNameList> getTraceNames();
 
 	abstract public <T extends Mappable> T getCT();
 	
+
+	public RPCMessageList ctTraces(RPCRequest request, File project)
+	{
+		try
+		{
+			if (messagehub.hasErrors())
+			{
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
+			}
+			
+			DAPPlugin.getInstance().refreshInterpreter();
+			CTPlugin ct = registry.getPlugin("CT");
+			Map<String, TCNameList> nameMap = ct.getTraceNames();
+			JSONArray results = new JSONArray();
+			
+			for (String module: nameMap.keySet())
+			{
+				JSONArray array = new JSONArray();
+				
+				for (TCNameToken name: nameMap.get(module))
+				{
+					array.add(new JSONObject(
+						"name",		name.getExplicit(true).toString(),
+						"location",	Utils.lexLocationToLocation(name.getLocation())));
+				}
+				
+				results.add(new JSONObject("name", module, "traces", array));
+			}
+			
+			return new RPCMessageList(request, results);
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList ctGenerate(RPCRequest request, String name)
+	{
+		try
+		{
+			if (messagehub.hasErrors())
+			{
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
+			}
+			
+			CTPlugin ct = registry.getPlugin("CT");
+			
+			if (ct.isRunning())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
+			}
+	
+			DAPPlugin.getInstance().refreshInterpreter();
+			TCNameToken tracename = Utils.stringToName(name);
+			int count = ct.generate(tracename);
+			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
+		}
+		catch (LSPException e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, e.getError(), e.getMessage());
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList ctExecute(RPCRequest request, String name,
+			Object progressToken, Object workDoneToken,
+			TraceReductionType rType, float subset, long seed, Long start, Long end)
+	{
+		try
+		{
+			if (messagehub.hasErrors())
+			{
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
+			}
+
+			TCNameToken tracename = Utils.stringToName(name);
+			CTPlugin ct = registry.getPlugin("CT");
+
+			if (ct.isRunning())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
+			}
+
+			if (DAPPlugin.getInstance().refreshInterpreter())
+			{
+				Diag.error("The spec has changed since generate, so re-generating");
+				ct.generate(tracename);
+			}
+			
+			JSONArray batch = ct.runTraceRange(request, tracename, progressToken, workDoneToken,
+					rType, subset, seed, start, end);
+			
+			if (batch == null)	// Running in background
+			{
+				return null;
+			}
+			else
+			{
+				return new RPCMessageList(request, batch);
+			}
+		}
+		catch (LSPException e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, e.getError(), e.getMessage());
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+	
 	public int generate(TCNameToken tracename) throws LSPException
 	{
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 		interpreter.init();
 		INNamedTraceDefinition tracedef = interpreter.findTraceDefinition(tracename);
 
@@ -155,8 +368,11 @@ abstract public class CTPlugin extends AnalysisPlugin
 			Diag.info("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
 			return traceCount;
 		}
-		catch (Exception e)
+		catch (Exception e)		// Probably during expansion
 		{
+			Console.err.println("Exception during trace expansion:");
+			Console.err.println(e.getMessage());
+			Console.err.println("You can debug this using the 'generate' console command");
 			throw new LSPException(RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -239,7 +455,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 		CallSequence test = traceIterator.getNextTest();
 		String callString = test.getCallString(traceContext);
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 
 		// interpreter.init();  Not needed as we run from InitExecutor only
 		List<Object> result = interpreter.runOneTrace(traceClassDef, test, true);
@@ -391,7 +607,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 		private JSONArray runBatch(int batchSize, long endTest) throws Exception
 		{
-			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+			Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 			JSONArray array = new JSONArray();
 			
 			Diag.fine("Starting batch at test number %d...", testNumber);

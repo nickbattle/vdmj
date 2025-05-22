@@ -1,0 +1,2 @@
+.pdf = examples.parser.PDFStreamReader
+.ext = examples.parser.ExternalStreamReader

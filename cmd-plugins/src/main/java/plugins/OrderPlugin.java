@@ -28,30 +28,44 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
-import com.fujitsu.vdmj.commands.CommandPlugin;
+
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.runtime.ModuleInterpreter;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
-public class OrderPlugin extends CommandPlugin
+/**
+ * Attempt to produce an optimal ordering for modules and classes.
+ */
+public class OrderPlugin extends AnalysisCommand
 {
-	public OrderPlugin(Interpreter interpreter)
+	private final static String CMD = "order [filename]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - print/save optimal module/class order";
+
+	public OrderPlugin(String line)
 	{
-		super(interpreter);
+		super(line);
+		
+		if (!argv[0].equals("order"))
+		{
+			throw new IllegalArgumentException(USAGE);
+		}
 	}
 
 	@Override
-	public boolean run(String[] argv) throws Exception
+	public String run(String line)
 	{
 		String outputfile = null;
 		
@@ -61,28 +75,22 @@ public class OrderPlugin extends CommandPlugin
 		}
 		else if (argv.length != 1)
 		{
-			help();
-			return true;
+			return USAGE;
 		}
 		
 		Order order = new Order(outputfile);
+		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		
-		if (interpreter instanceof ModuleInterpreter)
+		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			order.moduleOrder(interpreter.getTC());
+			order.moduleOrder(tc.getTC());
 		}
 		else
 		{
-			order.classOrder(interpreter.getTC());
+			order.classOrder(tc.getTC());
 		}
 
-		return true;	// Even if command failed
-	}
-
-	@Override
-	public String help()
-	{
-		return "order [filename] - print/save optimal module/class order";
+		return null;
 	}
 
 	/**
@@ -142,16 +150,7 @@ public class OrderPlugin extends CommandPlugin
 			 * The startpoints are where there are no incoming links to a node. So
 			 * the usedBy entry is blank (removed cycles) or null.
 			 */
-			List<String> startpoints = new Vector<String>();
-	
-			for (String module: nameToFile.keySet())
-			{
-				if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
-				{
-					startpoints.add(module);
-					usedBy.put(module, new HashSet<String>());
-				}
-			}
+			List<String> startpoints = getStartpoints();
 	
 			if (startpoints.isEmpty())
 			{
@@ -163,47 +162,7 @@ public class OrderPlugin extends CommandPlugin
 				Console.out.println("Ordering from startpoints: " + startpoints);
 			}
 			
-			//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
-			//
-			//	L ← Empty list that will contain the sorted elements
-			//	S ← Set of all nodes with no incoming edge
-			//
-			//	while S is not empty do
-			//	    remove a node n from S
-			//	    add n to L
-			//	    for each node m with an edge e from n to m do
-			//	        remove edge e from the graph
-			//	        if m has no other incoming edges then
-			//	            insert m into S
-			//
-			//	if graph has edges then
-			//	    return error   (graph has at least one cycle)
-			//	else 
-			//	    return L   (a topologically sorted order)
-	
-			List<String> ordering = new Vector<String>();
-	
-			while (!startpoints.isEmpty())
-			{
-			    String n = startpoints.remove(0);
-			    ordering.add(n);
-			    Set<String> usesSet = uses.get(n);
-		    	
-			    if (usesSet != null)
-			    {
-			    	Set<String> copy = new HashSet<String>(usesSet);
-			    	
-			    	for (String m: copy)
-			    	{	
-		    			if (delete(n, m) == 0)
-				    	{
-							startpoints.add(m);
-					    }
-			    	}
-			    }
-			}
-			
-			Collections.reverse(ordering);
+			List<String> ordering = topologicalSort(startpoints);
 			List<String> filenames = new Vector<String>();
 			
 			for (String name: ordering)
@@ -294,13 +253,6 @@ public class OrderPlugin extends CommandPlugin
 	    	}
 	    	
 	    	return count;
-		}
-	
-		private int delete(String from, String to)
-		{
-	    	uses.get(from).remove(to);
-	    	usedBy.get(to).remove(from);
-	    	return usedBy.get(to).size();	// remaining size
 		}
 	}
 }

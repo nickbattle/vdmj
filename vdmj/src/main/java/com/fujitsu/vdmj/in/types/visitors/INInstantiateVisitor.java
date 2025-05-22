@@ -33,7 +33,9 @@ import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -55,47 +57,41 @@ public class INInstantiateVisitor extends TCTypeVisitor<TCType, Context>
 	}
 	
 	@Override
-	public TCType caseBracketType(TCBracketType type, Context params)
+	public TCType caseBracketType(TCBracketType btype, Context params)
 	{
-		TCBracketType btype = (TCBracketType) type;
 		return new TCBracketType(btype.type.apply(this, params));
 	}
 
 	@Override
-	public TCType caseInMapType(TCInMapType type, Context params)
+	public TCType caseInMapType(TCInMapType mtype, Context params)
 	{
-		TCInMapType mtype = (TCInMapType) type;
-		return new TCInMapType(type.location, mtype.from.apply(this, params), mtype.to.apply(this, params));
+		return new TCInMapType(mtype.location, mtype.from.apply(this, params), mtype.to.apply(this, params));
 	}
 
 	@Override
-	public TCType caseMapType(TCMapType type, Context params)
+	public TCType caseMapType(TCMapType mtype, Context params)
 	{
-		TCMapType mtype = (TCMapType) type;
-		return new TCMapType(type.location, mtype.from.apply(this, params), mtype.to.apply(this, params));
+		return new TCMapType(mtype.location, mtype.from.apply(this, params), mtype.to.apply(this, params));
 	}
 
 	@Override
-	public TCType caseOptionalType(TCOptionalType type, Context params)
+	public TCType caseOptionalType(TCOptionalType otype, Context params)
 	{
-		TCOptionalType otype = (TCOptionalType) type;
-		return new TCOptionalType(type.location, otype.type.apply(this, params));
+		return new TCOptionalType(otype.location, otype.type.apply(this, params));
 	}
 
 	@Override
-	public TCType caseFunctionType(TCFunctionType type, Context params)
+	public TCType caseFunctionType(TCFunctionType ftype, Context params)
 	{
-		TCFunctionType ftype = (TCFunctionType) type;
-		ftype = new TCFunctionType(type.location, instantiate(ftype.parameters, params), ftype.partial,
+		ftype = new TCFunctionType(ftype.location, instantiate(ftype.parameters, params), ftype.partial,
 				ftype.result.apply(this, params));
 		ftype.instantiated = true;
 		return ftype;
 	}
 
 	@Override
-	public TCType caseParameterType(TCParameterType type, Context params)
+	public TCType caseParameterType(TCParameterType pname, Context params)
 	{
-		TCParameterType pname = (TCParameterType) type;
 		Value t = params.lookup(pname.name);
 
 		if (t == null)
@@ -114,31 +110,39 @@ public class INInstantiateVisitor extends TCTypeVisitor<TCType, Context>
 	}
 
 	@Override
-	public TCType caseProductType(TCProductType type, Context params)
+	public TCType caseProductType(TCProductType ptype, Context params)
 	{
-		TCProductType ptype = (TCProductType) type;
-		return new TCProductType(type.location, instantiate(ptype.types, params));
+		return new TCProductType(ptype.location, instantiate(ptype.types, params));
 	}
 
 	@Override
-	public TCType caseSeqType(TCSeqType type, Context params)
+	public TCType caseSeqType(TCSeqType stype, Context params)
 	{
-		TCSeqType stype = (TCSeqType) type;
-		return new TCSeqType(type.location, stype.seqof.apply(this, params));
+		return new TCSeqType(stype.location, stype.seqof.apply(this, params));
+	}
+	
+	@Override
+	public TCType caseSeq1Type(TCSeq1Type stype, Context params)
+	{
+		return new TCSeq1Type(stype.location, stype.seqof.apply(this, params));
 	}
 
 	@Override
-	public TCType caseSetType(TCSetType type, Context params)
+	public TCType caseSetType(TCSetType stype, Context params)
 	{
-		TCSetType stype = (TCSetType) type;
-		return new TCSetType(type.location, stype.setof.apply(this, params));
+		return new TCSetType(stype.location, stype.setof.apply(this, params));
 	}
 
 	@Override
-	public TCType caseUnionType(TCUnionType type, Context params)
+	public TCType caseSet1Type(TCSet1Type stype, Context params)
 	{
-		TCUnionType utype = (TCUnionType) type;
-		return new TCUnionType(type.location, instantiate(utype.types, params));
+		return new TCSet1Type(stype.location, stype.setof.apply(this, params));
+	}
+
+	@Override
+	public TCType caseUnionType(TCUnionType utype, Context params)
+	{
+		return new TCUnionType(utype.location, instantiate(utype.types, params));
 	}
 
 	private TCTypeList instantiate(TCTypeList types, Context map)

@@ -1,0 +1,28 @@
+--
+-- An example VDM-SL file to show how to define CSV types and invariants.
+-- These will be checked during the specification initialization when the
+-- constant value returned by the CSVReader is created.
+--
+types
+	-- The cells of our data can only be natural numbers
+	CellType = nat;
+	
+functions
+	-- Each cell value must be between 0 and 10.
+	cellInvariant: CellType +> bool
+	cellInvariant(cell) ==
+		-- @OnFail("Cell values must be 0-10: %s", cell)
+		( cell <= 10 );
+	
+	-- Rows must have 5 items.
+	rowInvariant: seq1 of CSVCell +> bool
+	rowInvariant(row) ==
+		-- @OnFail("Rows must have 5 values: %s", row)
+		( len row = 5 );
+	
+	-- File must have 5 rows
+	fileInvariant: seq of CSVRow +> bool
+	fileInvariant(file) ==
+		-- @OnFail("File must have 5 rows, not %s", len file)
+		( len file = 5 );
+

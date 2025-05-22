@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImportedDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTInheritedDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTInstanceVariableDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTLocalDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTMultiBindListDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTMutexSyncDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTNamedTraceDefinition;
@@ -129,11 +128,6 @@ public abstract class ASTDefinitionVisitor<R, S>
  	public R caseInstanceVariableDefinition(ASTInstanceVariableDefinition node, S arg)
 	{
 		return caseAssignmentDefinition(node, arg);
-	}
-
- 	public R caseLocalDefinition(ASTLocalDefinition node, S arg)
-	{
-		return caseDefinition(node, arg);
 	}
 
  	public R caseMultiBindListDefinition(ASTMultiBindListDefinition node, S arg)

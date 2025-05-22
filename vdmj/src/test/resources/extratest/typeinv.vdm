@@ -21,7 +21,7 @@ module B
 imports
 	from A
 		types
-			S:: x:int
+			S -- :: x:int
 			
 		functions
 			inv_S: A`S +> bool

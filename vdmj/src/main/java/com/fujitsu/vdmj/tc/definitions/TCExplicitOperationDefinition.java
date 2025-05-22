@@ -103,7 +103,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return  (type.isPure() ? "pure " : "") + name + ": " + type +
+		return  accessSpecifier.ifSet(" ") + name + ": " + type +
 				"\n\t" + name + "(" + Utils.listToString(parameterPatterns) + ")" +
 				(body == null ? "" : " ==\n" + body) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
@@ -144,7 +144,8 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeResolve(Environment base)
 	{
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
+		if (annotations != null) annotations.tcResolve(this, base);
 
 		if (base.isVDMPP())
 		{
@@ -339,7 +340,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		if (!(body instanceof TCNotYetSpecifiedStatement) &&
 			!(body instanceof TCSubclassResponsibilityStatement))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (possibleExceptions == null)
@@ -438,7 +439,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 		if (state != null)
 		{
-			plist.add(new TCIdentifierPattern(state.name));
+			plist.add(new TCIdentifierPattern(state.name.getOldName()));
 		}
 		else if (base.isVDMPP() && !accessSpecifier.isStatic)
 		{

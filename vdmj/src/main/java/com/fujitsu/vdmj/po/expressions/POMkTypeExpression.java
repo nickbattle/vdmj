@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -64,9 +65,9 @@ public class POMkTypeExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList list = args.getProofObligations(ctxt, env);
+		ProofObligationList list = args.getProofObligations(ctxt, pogState, env);
 		Iterator<TCType> it = argTypes.iterator();
 		int i = 0;
 
@@ -77,15 +78,15 @@ public class POMkTypeExpression extends POExpression
 			if (!TypeComparator.isSubType(
 				ctxt.checkType(args.get(i), atype), f.type))
 			{
-				list.add(new SubTypeObligation(args.get(i), f.type, atype, ctxt));
+				list.addAll(SubTypeObligation.getAllPOs(args.get(i), f.type, atype, ctxt));
 			}
 
 			i++;
 		}
 
-		if (recordType.invdef != null)
+		if (recordType.invdef != null && !recordType.isMaximal())
 		{
-			list.add(new SubTypeObligation(this, recordType, recordType, ctxt));
+			list.addAll(SubTypeObligation.getAllPOs(this, recordType, recordType, ctxt));
 		}
 
 		return list;

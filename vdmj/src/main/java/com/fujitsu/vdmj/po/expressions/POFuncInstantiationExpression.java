@@ -27,12 +27,14 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.util.Utils;
 
 public class POFuncInstantiationExpression extends POExpression
 {
@@ -60,19 +62,53 @@ public class POFuncInstantiationExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return "(" + function + ")[" + Utils.listToString(actualTypes) + "]";
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("(");
+		sb.append(function);
+		sb.append(")[");
+		String sep = "";
+		
+		for (TCType p: actualTypes)
+		{
+			sb.append(sep);
+			sb.append(p.toExplicitString(location));
+			sep = ", ";
+		}
+		
+		sb.append("]");
+		return sb.toString();
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		return function.getProofObligations(ctxt, env);
+		return function.getProofObligations(ctxt, pogState, env);
 	}
 
 	@Override
 	public String getPreName()
 	{
-		return function.getPreName();
+		String prename = function.getPreName();
+		
+		if (prename == null || prename.isEmpty() || prename == FunctionApplyObligation.UNKNOWN)
+		{
+			return prename;
+		}
+		
+		StringBuilder sb = new StringBuilder(prename);
+		sb.append("[");
+		String sep = "";
+		
+		for (TCType p: actualTypes)
+		{
+			sb.append(sep);
+			sb.append(p.toExplicitString(location));
+			sep = ", ";
+		}
+		
+		sb.append("]");
+		return sb.toString();
 	}
 
 	@Override

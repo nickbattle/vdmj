@@ -26,11 +26,16 @@ package com.fujitsu.vdmj.in.statements;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.scheduler.InitThread;
 import com.fujitsu.vdmj.values.Value;
 
 /**
@@ -42,6 +47,9 @@ public abstract class INStatement extends INNode implements Serializable
 
 	/** The statement's breakpoint, if any. */
 	public Breakpoint breakpoint;
+	
+	/** A list of annotations, if any. See POAnnotatedStatement */
+	protected INAnnotationList annotations = new INAnnotationList();
 
 	/**
 	 * Create a statement at the given location.
@@ -60,6 +68,26 @@ public abstract class INStatement extends INNode implements Serializable
 
 	/** Evaluate the statement in the context given. */
 	abstract public Value eval(Context ctxt);
+
+	/**
+	 * Check whether we are running during initialzation and fail if we are. This is used by
+	 * some expressions and statements that are not permitted (like "duration" in RT).
+	 */
+	protected void assertNotInit(Context ctxt)
+	{
+		if (Properties.in_init_checks && Thread.currentThread() instanceof InitThread)
+		{
+			throw new ContextException(4177, "Not permitted during initialization", location, ctxt);
+		}
+	}
+
+	/**
+	 * Add annotations from POAnnotatedAnnotation
+	 */
+	public void addAnnotation(INAnnotation annotation)
+	{
+		annotations.add(annotation);
+	}
 
 	/**
 	 * Implemented by all statements to allow visitor processing.

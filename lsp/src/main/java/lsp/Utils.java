@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
@@ -167,6 +168,9 @@ public class Utils
 		}
 		else
 		{
+			// Some URIs have illegal spaces - like the Kate editor - so fix here
+			s = s.replaceAll(" ", "%20");
+			
 			URI uri = new URI(s);
 			return new File(uri).getAbsoluteFile();
 		}
@@ -269,6 +273,85 @@ public class Utils
 		
 		Diag.error("Cannot locate line %d character %s in buffer length %d", zline, zcol, buffer.length());
 		return -1;
+	}
+	
+	/**
+	 * Fix the "range" fields of the DocumentSymbol array passed in, such that each
+	 * range starts at the selectionRange and ends at the start of the next symbol,
+	 * or the end passed (for the last one). Recurse into any children.
+	 */
+	public static void fixRanges(JSONArray symbols, JSONObject endPosition)
+	{
+		for (int s = 0; s < symbols.size(); s++)
+		{
+			JSONObject symbol = symbols.index(s);
+			JSONObject start = symbol.getPath("selectionRange.start");
+
+			JSONObject nextstart = null;
+			
+			for (int n = s + 1; n <= symbols.size(); n++)
+			{
+				if (n == symbols.size())
+				{
+					nextstart = endPosition;
+				}
+				else
+				{
+					JSONObject next = symbols.index(n);
+					nextstart = next.getPath("selectionRange.start");
+				}
+				
+				if (!nextstart.get("line").equals(start.get("line")))
+				{
+					break;	// Guaranteed exit for endPosition
+				}
+			}
+			
+			JSONObject range = symbol.get("range");
+			range.put("start", startLine(start));
+			range.put("end", beforeNext(nextstart));
+			
+			verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
+			
+			JSONArray children = symbol.get("children");
+			
+			if (children != null)
+			{
+				fixRanges(children, nextstart);
+			}
+		}
+	}
+	
+	private static void verifyRange(String name, JSONObject range, JSONObject selectionRange)
+	{
+		File file = new File("?");
+		LexLocation rloc = Utils.rangeToLexLocation(file, range);
+		LexLocation sloc = Utils.rangeToLexLocation(file, selectionRange);
+		
+		if (!sloc.within(rloc))
+		{
+			Diag.error("Selection not within range at symbol %s", name);
+			Diag.error("Range %s", range);
+			Diag.error("Selection %s", selectionRange);
+		}
+	}
+
+	public static JSONObject afterLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line+1, "character", 0);
+	}
+	
+	private static JSONObject startLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line, "character", 0);
+	}
+	
+	private static JSONObject beforeNext(JSONObject next)
+	{
+		long line = next.get("line");
+		return new JSONObject("line", line - 1, "character", 999999999);
 	}
 	
 	public static JSONObject getEndPosition(StringBuilder buffer)
@@ -448,5 +531,17 @@ public class Utils
 					return true;
 			}
 		}
+	}
+	
+	public static JSONObject contextToJSON(Context ctxt)
+	{
+		JSONObject json = new JSONObject();
+		
+		for (TCNameToken vname: ctxt.keySet())
+		{
+			json.put(vname.getName(), ctxt.get(vname).toString());
+		}
+		
+		return json;
 	}
 }

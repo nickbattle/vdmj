@@ -27,7 +27,11 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -38,7 +42,7 @@ public class POIfStatement extends POStatement
 	public final POStatement thenStmt;
 	public final POElseIfStatementList elseList;
 	public final POStatement elseStmt;
-
+	
 	public POIfStatement(LexLocation location, POExpression ifExp, POStatement thenStmt,
 		POElseIfStatementList elseList, POStatement elseStmt)
 	{
@@ -70,21 +74,54 @@ public class POIfStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = ifExp.getProofObligations(ctxt, env);
-		obligations.addAll(thenStmt.getProofObligations(ctxt, env));
+		POAltContext altContext = new POAltContext();
+		boolean hasEffect = false;
+
+		ProofObligationList obligations = ifExp.getProofObligations(ctxt, pogState, env);
+		
+		int base = ctxt.pushAt(new POImpliesContext(ifExp));
+		obligations.addAll(thenStmt.getProofObligations(ctxt, pogState, env));
+		hasEffect = ctxt.size() > base + 1;
+		ctxt.popInto(base, altContext.add());
+
+		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt, env));
+			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
+
+			int popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
+			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, pogState, env));
+			hasEffect = hasEffect || ctxt.size() > popto + 1;
+			ctxt.copyInto(base, altContext.add());
+			ctxt.popTo(popto);
+			obligations.addAll(oblist);
+
+			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 
 		if (elseStmt != null)
 		{
-			obligations.addAll(elseStmt.getProofObligations(ctxt, env));
+			int popto = ctxt.size();
+			obligations.addAll(elseStmt.getProofObligations(ctxt, pogState, env));
+			hasEffect = hasEffect || ctxt.size() > popto;
+			ctxt.copyInto(base, altContext.add());
+			ctxt.popTo(popto);
+		}
+		else
+		{
+			ctxt.copyInto(base, altContext.add());	// eg. for an if with no else
 		}
 
+		ctxt.popTo(base);
+		
+		if (hasEffect)
+		{
+			ctxt.push(altContext);
+		}
+		
 		return obligations;
 	}
 

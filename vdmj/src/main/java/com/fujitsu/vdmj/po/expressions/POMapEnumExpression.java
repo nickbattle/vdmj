@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.MapSeqOfCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -63,18 +64,18 @@ public class POMapEnumExpression extends POMapExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
+	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
 		for (POMapletExpression maplet: members)
 		{
-			list.addAll(maplet.getProofObligations(ctxt, env));
+			list.addAll(maplet.getProofObligations(ctxt, pogState, env));
 		}
 
 		if (members.size() > 1)
 		{
-			list.add(new MapSeqOfCompatibleObligation(this, ctxt));
+			list.addAll(MapSeqOfCompatibleObligation.getAllPOs(this, ctxt));
 		}
 
 		return list;

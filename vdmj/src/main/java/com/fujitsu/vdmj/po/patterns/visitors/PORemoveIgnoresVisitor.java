@@ -54,7 +54,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 {
 	private static int var = 1;		// Used in caseIgnorePattern()
-	private TCNameToken anyName = null;
 
 	public static void init()
 	{
@@ -95,6 +94,15 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 	@Override
 	public POPattern caseIdentifierPattern(POIdentifierPattern node, Object arg)
 	{
+		// If we encounter any "old" state names, like "Sigma~", we rename to
+		// "oldSigma" to allow POs to work as simple expressions.
+		
+		if (node.name.isOld())
+		{
+			TCNameToken oldName = new TCNameToken(node.location, node.location.module, "old" + node.name.getName());
+			return new POIdentifierPattern(oldName);
+		}
+		
 		return node;
 	}
 	
@@ -104,11 +112,7 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 		// Generate a new "any" name for use during PO generation. The name
 		// must be unique for the pattern instance.
 		
-		if (anyName == null)
-		{
-			anyName = new TCNameToken(node.location, "", "$any" + var++);
-		}
-		
+		TCNameToken anyName = new TCNameToken(node.location, node.location.module, "$any" + var++);
 		return new POIdentifierPattern(anyName);
 	}
 	
@@ -125,10 +129,16 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 
 		for (POMapletPattern p: node.maplets)
 		{
-			list.add(new POMapletPattern(p.from.apply(this, arg), p.to.apply(this, arg)));
+			list.add((POMapletPattern) p.apply(this, arg));
 		}
 
 		return new POMapPattern(node.location, list);
+	}
+	
+	@Override
+	public POPattern caseMapletPattern(POMapletPattern node, Object arg)
+	{
+		return new POMapletPattern(node.from.apply(this, arg), node.to.apply(this, arg));
 	}
 	
 	@Override

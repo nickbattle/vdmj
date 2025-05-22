@@ -65,7 +65,7 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 				definitionVisitor = TCDependencyDefinitionVisitor.this;
 				expressionVisitor = new TCDependencyExpressionVisitor(this);
 				statementVisitor = new TCDependencyStatementVisitor(this);
-				typeVisitor = new TCDependencyTypeVisitor(this);
+				typeVisitor = new TCDependencyTypeVisitor();
 				bindVisitor = new TCDependencyBindVisitor(this);
 				multiBindVisitor = new TCDependencyMultipleBindVisitor(this); 
 			}
@@ -117,16 +117,8 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 
 		Environment local = new FlatEnvironment(defs, arg.env);
 		TCNameSet names = visitorSet.applyExpressionVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns));
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, new EnvTriple(arg.globals, local, arg.returns)));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, new EnvTriple(arg.globals, local, arg.returns)));
 		
 		return names;
 	}
@@ -143,16 +135,8 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 
 		Environment local = new FlatEnvironment(defs, arg.env);
 		TCNameSet names = visitorSet.applyStatementVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns));
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, new EnvTriple(arg.globals, local, arg.returns)));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, new EnvTriple(arg.globals, local, arg.returns)));
 		
 		return names;
 	}
@@ -168,22 +152,9 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 		}
 
 		Environment local = new FlatEnvironment(defs, arg.env);
-		TCNameSet names = new TCNameSet();
-		
-		if (node.body != null)
-		{
-			names.addAll(visitorSet.applyExpressionVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
+		TCNameSet names = visitorSet.applyExpressionVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, new EnvTriple(arg.globals, local, arg.returns)));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, new EnvTriple(arg.globals, local, arg.returns)));
 		
 		return names;
 	}
@@ -199,22 +170,9 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 		}
 
 		Environment local = new FlatEnvironment(defs, arg.env);
-		TCNameSet names = new TCNameSet();
-		
-		if (node.body != null)
-		{
-			names.addAll(visitorSet.applyStatementVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
+		TCNameSet names = visitorSet.applyStatementVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, new EnvTriple(arg.globals, local, arg.returns)));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, new EnvTriple(arg.globals, local, arg.returns)));
 		
 		return names;
 	}
@@ -233,9 +191,9 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 	{
 		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
 		
-		if (node.valueDefinition != null)
+		if (node.isValueDefinition())
 		{
-			names.addAll(node.valueDefinition.apply(this, arg));
+			names.addAll(visitorSet.applyDefinitionVisitor(node.valueDefinition, arg));
 		}
 		
 		return names;
@@ -246,17 +204,8 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 	{
 		Environment local = new FlatEnvironment(node, arg.env);
 		TCNameSet names = new TCNameSet();
-		
-		if (node.invdef != null)
-		{
-			names.addAll(node.invdef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
-		if (node.initdef != null)
-		{
-			names.addAll(node.initdef.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
-		}
-		
+		names.addAll(visitorSet.applyDefinitionVisitor(node.invdef, new EnvTriple(arg.globals, local, arg.returns)));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.initdef, new EnvTriple(arg.globals, local, arg.returns)));
 		return names;
 	}
 	
@@ -280,24 +229,14 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 			}
 		}
 		
-		if (node.invdef != null)
-		{
-			names.addAll(node.invdef.apply(this, arg));
-		}
-		
+		names.addAll(visitorSet.applyDefinitionVisitor(node.invdef, arg));
 		return names;
 	}
 	
 	@Override
 	public TCNameSet caseValueDefinition(TCValueDefinition node, EnvTriple arg)
 	{
-		TCNameSet names = new TCNameSet();
-		
-		if (node.type != null)
-		{
-			names.addAll(visitorSet.applyTypeVisitor(node.type, arg));
-		}
-		
+		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
 		names.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return names;
 	}

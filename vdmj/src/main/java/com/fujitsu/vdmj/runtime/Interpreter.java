@@ -32,29 +32,30 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
@@ -191,6 +192,7 @@ abstract public class Interpreter
 	 * @throws Exception Parser, type checking or runtime errors.
 	 */
 	abstract public Value execute(String line) throws Exception;
+	abstract public Value execute(String line, Environment env) throws Exception;
 
 	/**
 	 * Parse the line passed, and evaluate it as an expression in the context
@@ -313,14 +315,6 @@ abstract public class Interpreter
 	abstract public Set<File> getSourceFiles();
 
 	/**
-	 * Get a list of proof obligations for the loaded specification.
-	 *
-	 * @return A list of POs.
-	 * @throws Exception 
-	 */
-	abstract public ProofObligationList getProofObligations() throws Exception;
-
-	/**
 	 * Find a statement by file name and line number.
 	 *
 	 * @param file The name of the class/module
@@ -328,6 +322,7 @@ abstract public class Interpreter
 	 * @return A INStatement object if found, else null.
 	 */
 	abstract public INStatement findStatement(File file, int lineno);
+	abstract public INStatementList findStatements(File file, int lineno);
 
 	/**
 	 * Find an expression by file name and line number.
@@ -337,6 +332,7 @@ abstract public class Interpreter
 	 * @return An INExpression object if found, else null.
 	 */
 	abstract public INExpression findExpression(File file, int lineno);
+	abstract public INExpressionList findExpressions(File file, int lineno);
 
 	/**
 	 * Find a global environment value by name.
@@ -419,7 +415,7 @@ abstract public class Interpreter
 	 * Set an exception catchpoint. This stops execution at the point that a matching
 	 * exception is thrown.
 	 *
-	 * @param exp The exception value(s) at which to stop, or null for any exception.
+	 * @param sequence The exception value(s) at which to stop, or null for any exception.
 	 * @return The Breakpoint object created.
 	 * @throws Exception 
 	 */
@@ -497,9 +493,14 @@ abstract public class Interpreter
 	abstract protected TCExpression parseExpression(String line, String module) throws Exception;
 
 	/**
-	 * Type check a TC expression tree passed.
+	 * Type check a TC expression tree passed, optionally in a given environment.
 	 */
 	public TCType typeCheck(TCNode tree) throws Exception
+	{
+		return typeCheck(tree, getGlobalEnvironment());
+	}
+	
+	public TCType typeCheck(TCNode tree, Environment env) throws Exception
 	{
 		TypeChecker.clearErrors();
 		TCType type = null;
@@ -507,12 +508,12 @@ abstract public class Interpreter
 		if (tree instanceof TCExpression)
 		{
 			TCExpression exp = (TCExpression)tree;
-			type = exp.typeCheck(getGlobalEnvironment(), null, NameScope.NAMESANDSTATE, null);
+			type = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
 		}
 		else if (tree instanceof TCStatement)
 		{
 			TCStatement stmt = (TCStatement)tree;
-			type = stmt.typeCheck(getGlobalEnvironment(), NameScope.NAMESANDSTATE, null, false);
+			type = stmt.typeCheck(env, NameScope.NAMESANDSTATE, null, false);
 		}
 		else
 		{
@@ -606,9 +607,6 @@ abstract public class Interpreter
 		TraceIterator tests = tracedef.getIterator(getTraceContext(tracedef.classDefinition));
 		long after = System.currentTimeMillis();
 
-		boolean wasCMD = Settings.usingCmdLine;
-		Settings.usingCmdLine = debug;
-
 		if (writer == null)
 		{
 			writer = Console.out;
@@ -699,7 +697,6 @@ abstract public class Interpreter
 
 		init();
 		savedInitialContext = null;
-		Settings.usingCmdLine = wasCMD;
 		
 		if (excluded > 0)
 		{
@@ -714,7 +711,9 @@ abstract public class Interpreter
 
 	public abstract List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
 	
-	abstract public <T extends List<?>> T getTC();
-	abstract public <T extends List<?>> T getIN();
-	abstract public <T extends List<?>> T getPO();
+	/**
+	 * Return the executable AST that is loaded in the interpreter, rather than the
+	 * one that is loaded in the INPlugin (ie. differences mean that the spec has changed).
+	 */
+	public abstract <T> T getIN();
 }

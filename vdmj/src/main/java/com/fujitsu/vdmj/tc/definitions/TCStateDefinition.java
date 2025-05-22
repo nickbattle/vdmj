@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -142,7 +143,7 @@ public class TCStateDefinition extends TCDefinition
 		{
 			try
 			{
-				f.typeResolve(env, null);
+				f.typeResolve(env);
 			}
 			catch (TypeCheckException e)
 			{
@@ -151,7 +152,9 @@ public class TCStateDefinition extends TCDefinition
 			}
 		}
 
-		recordType = (TCRecordType) recordType.typeResolve(env, null);
+		recordType = (TCRecordType) recordType.typeResolve(env);
+		
+		if (annotations != null) annotations.tcResolve(this, env);
 
 		if (invPattern != null)
 		{
@@ -271,11 +274,13 @@ public class TCStateDefinition extends TCDefinition
 		parameters.add(params);
 
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(new TCUnresolvedType(name));
+		TCInvariantType param = recordType.copy(true);
+		ptypes.add(param);
+		// ptypes.add(new TCUnresolvedType(name));
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, TCAccessSpecifier.DEFAULT,
-			name.getInvName(invExpression.location), null, ftype, parameters, invExpression, null, null, true, null);
+			name.getInvName(invPattern.location), null, ftype, parameters, invExpression, null, null, true, null);
 
 		ftype.definitions = new TCDefinitionList(def);
 		return def;
@@ -297,7 +302,7 @@ public class TCStateDefinition extends TCDefinition
 		TCExpression body = new TCStateInitExpression(this);
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, TCAccessSpecifier.DEFAULT,
-			name.getInitName(initExpression.location), null, ftype, parameters, body, null, null, false, null);
+			name.getInitName(initPattern.location), null, ftype, parameters, body, null, null, false, null);
 
 		ftype.definitions = new TCDefinitionList(def);
 		return def;

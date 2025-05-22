@@ -103,7 +103,7 @@ public class TCExportedValue extends TCExport
 	@Override
 	public void typeCheck(Environment env, TCDefinitionList actualDefs)
 	{
-		type = type.typeResolve(env, null);
+		type = type.typeResolve(env);
 		
 		for (TCNameToken name: nameList)
 		{
@@ -117,7 +117,7 @@ public class TCExportedValue extends TCExport
 			{
     			TCType actualType = actual.getType();
     			
-				if (actualType != null && !TypeComparator.compatible(type, actualType))
+				if (actualType != null && !TypeComparator.compatible(name.getModule(), type, actualType))
 				{
 					report(3189, "Exported type does not match actual type");
 					detail2("Exported", type, "Actual", actualType);

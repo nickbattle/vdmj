@@ -29,7 +29,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -277,14 +276,14 @@ public class CSV implements Serializable
 	private static Value createValue(String module, String method, String value)
 			throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_PP, VDMJ.filecharset);
+		LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_PP);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression exp = reader.readExpression();
-		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(exp);
+		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(exp);
 		Interpreter ip = Interpreter.getInstance();
 		ip.typeCheck(tcexp);
-		INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+		INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
 		Context ctxt = new Context(LexLocation.ANY, method, null);
 		ctxt.setThreadState(CPUValue.vCPU);
 		

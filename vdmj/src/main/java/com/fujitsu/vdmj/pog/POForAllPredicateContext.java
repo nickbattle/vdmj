@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.po.expressions.POLetBeStExpression;
 import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
+import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POForAllPredicateContext extends POForAllContext
 {
@@ -65,11 +67,17 @@ public class POForAllPredicateContext extends POForAllContext
 		this.predicate = exp.suchThat;
 	}
 
+	public POForAllPredicateContext(POLetBeStStatement stmt)
+	{
+		super(stmt);
+		this.predicate = stmt.suchThat;
+	}
+
 	@Override
-	public String getContext()
+	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(super.getContext());
+		sb.append(super.getSource());
 
 		if (predicate != null)
 		{
@@ -79,5 +87,18 @@ public class POForAllPredicateContext extends POForAllContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCNameSet reasonsAbout()
+	{
+		TCNameSet names = super.reasonsAbout();
+		
+		if (predicate != null)
+		{
+			names.addAll(predicate.getVariableNames());
+		}
+		
+		return names;
 	}
 }
