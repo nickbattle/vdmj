@@ -109,6 +109,7 @@ public class POForIndexStatement extends POStatement
 		}
 		else
 		{
+			// Note: location of first loop check is the @LoopInvariant itself.
 			POAssignmentDefinition assign = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
 			ctxt.push(new POLetDefContext(assign));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
