@@ -623,7 +623,7 @@ public class LSPPlugin extends AnalysisPlugin
 			}
 		}
 		
-		if (!ignored.isEmpty())
+		if (!ignored.isEmpty() && !Boolean.getBoolean("lsp.noIgnoreWarnings"))
 		{
 			Collections.sort(ignored);
 			StringBuilder sb = new StringBuilder();
