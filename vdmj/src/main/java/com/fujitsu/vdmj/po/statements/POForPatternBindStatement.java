@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POHeadExpression;
+import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.patterns.POPatternBind;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
@@ -147,11 +148,19 @@ public class POForPatternBindStatement extends POStatement
 			
 			if (patternBind.pattern != null)
 			{
-				POValueDefinition headdef = new POValueDefinition(annotations, patternBind.pattern, null, head, null, null);
-				ctxt.push(new POLetDefContext(headdef));
-				obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
-				obligations.lastElement().setMessage("check initial for-loop");
-				ctxt.pop();
+				if (patternBind.pattern instanceof POIgnorePattern)
+				{
+					obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+					obligations.lastElement().setMessage("check initial for-loop");
+				}
+				else
+				{
+					POValueDefinition headdef = new POValueDefinition(annotations, patternBind.pattern, null, head, null, null);
+					ctxt.push(new POLetDefContext(headdef));
+					obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+					obligations.lastElement().setMessage("check initial for-loop");
+					ctxt.pop();
+				}
 
 				ctxt.push(new POForAllSequenceContext(patternBind.pattern, sequence));
 			}
