@@ -26,11 +26,12 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.util.KPermutor;
 
 public class PONonDeterministicStatement extends POSimpleBlockStatement
 {
@@ -44,17 +45,23 @@ public class PONonDeterministicStatement extends POSimpleBlockStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		int popto = ctxt.size();
-		ProofObligationList obligations = super.getProofObligations(ctxt, pogState, env);
-		ctxt.popTo(popto);
+		KPermutor permutor = new KPermutor(statements.size(), statements.size());
+		POAltContext altContext = new POAltContext();
+		ProofObligationList obligations = new ProofObligationList();
 		
-		for (POStatement statement: statements)
+		for (int[] permutation: permutor)
 		{
-			if (!statement.updatesState().isEmpty())
+			int popto = ctxt.size();
+			
+			for (int index: permutation)
 			{
-				obligations.markUnchecked(ProofObligation.NON_DETERMINISTIC);
+				obligations.addAll(statements.get(index).getProofObligations(ctxt, pogState, env));
 			}
+			
+			ctxt.popInto(popto, altContext.add());
 		}
+		
+		ctxt.push(altContext);
 		
 		return obligations;
 	}

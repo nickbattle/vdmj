@@ -26,8 +26,6 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
@@ -37,11 +35,9 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
-import com.fujitsu.vdmj.pog.POLetBeStContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POForAllStatement extends POStatement
@@ -95,15 +91,10 @@ public class POForAllStatement extends POStatement
 		}
 		else
 		{
-			TCSetType stype = set.getExptype().getSet();
-			PODefinitionList defs = pattern.getDefinitions(stype.setof);
-			POLocalDefinition first = (POLocalDefinition) defs.firstElement();
-			
-			ctxt.push(new POLetBeStContext(first.name, "in set", set, null));
+			// Note: location of initial check is the @LoopInvariant itself.
 			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check initial for-loop");
-			ctxt.pop();
-			
+
 			int popto = ctxt.size();
 			
 			ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));
