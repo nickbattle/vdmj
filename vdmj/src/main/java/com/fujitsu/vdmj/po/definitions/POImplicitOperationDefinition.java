@@ -54,7 +54,6 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
-import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -202,7 +201,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		
 		if (result != null)
 		{
-			pogState.setResult(result.pattern);
+			pogState.setResult(result.pattern, result.type);
 		}
 		
 		if (body != null)
@@ -260,8 +259,8 @@ public class POImplicitOperationDefinition extends PODefinition
 			if (!isConstructor && result != null &&
 				!TypeComparator.isSubType(actualResult, type.result))
 			{
-				obligations.add(new SubTypeObligation(this, actualResult, ctxt).
-					markUnchecked(ProofObligation.NOT_YET_SUPPORTED));
+				// obligations.add(new SubTypeObligation(this, actualResult, ctxt));
+				// Covered by various return statements
 			}
 		}
 		else

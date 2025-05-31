@@ -100,6 +100,13 @@ public class POCallObjectStatement extends POStatement
 
 		ctxt.addOperationCall(location, pogState, fdef, getStmttype().isReturn());
 		
+		TCType rtype = pogState.getResultType();
+		
+		if (rtype != null && getStmttype().isReturn() && !TypeComparator.isSubType(getStmttype(), rtype))
+		{
+			obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
+		}
+		
 		return obligations;
 	}
 

@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -176,11 +178,11 @@ public class SubTypeObligation extends ProofObligation
 	{
 		super(def.location, POType.SUB_TYPE, ctxt);
 
-		POVariableExpression result = new POVariableExpression(
-			new TCNameToken(def.location, def.name.getModule(), "RESULT"), null);
+		POVariableExpression result = new POVariableExpression(TCNameToken.getResult(location), null);
 
 		source = ctxt.getSource(oneTypeSafe(false, result, def.type.result, actualResult));
-		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
+		setObligationVars(ctxt, result);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	public SubTypeObligation(
@@ -209,6 +211,8 @@ public class SubTypeObligation extends ProofObligation
 		}
 
 		source = ctxt.getSource(oneTypeSafe(false, result, def.type.result, actualResult));
+		setObligationVars(ctxt, result);
+		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 
 	// NOTE! The atype parameter used to allow null to mean "any type", but this
@@ -674,6 +678,39 @@ public class SubTypeObligation extends ProofObligation
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
 			results.add(new SubTypeObligation(exp, etype, atype, choice));
+		}
+		
+		return results;
+	}
+
+	public static List<ProofObligation> getAllPOs(LexLocation call, PODefinition opdef, TCType atype, POContextStack ctxt)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives(false))	// Note, include the returns
+		{
+			POContext last = choice.lastElement();
+			
+			if (last instanceof POReturnContext)
+			{
+				POReturnContext rctxt = (POReturnContext)last;
+				
+				if (!rctxt.result.location.equals(call))
+				{
+					// We have to get alternatives with returns to see the return for the call,
+					// but we only want alternatives that end with this "call" :-)
+					continue;
+				}
+			}
+			
+			if (opdef instanceof POImplicitOperationDefinition)
+			{
+				results.add(new SubTypeObligation((POImplicitOperationDefinition)opdef, atype, choice));
+			}
+			else if (opdef instanceof POExplicitOperationDefinition)
+			{
+				results.add(new SubTypeObligation((POExplicitOperationDefinition)opdef, atype, choice));
+			}
 		}
 		
 		return results;

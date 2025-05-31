@@ -59,7 +59,7 @@ public class POErrorStatement extends POStatement
 		names.add(result);
 		
 		ctxt.push(new POAmbiguousContext("error reached", names, location));
-		ctxt.push(new POReturnContext(pogState.getResult(), new POUndefinedExpression(location)));
+		ctxt.push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(location)));
 		
 		return super.getProofObligations(ctxt, pogState, env);
 	}
