@@ -314,4 +314,24 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		return this;	// Convenient for getProofObligations(ctxt, env).markUnchecked("Some reason")
 	}
+	
+	/**
+	 * Count the number of POs that are unchecked because of a type error.
+	 */
+	public int countErrors()
+	{
+		int count = 0;
+
+		for (ProofObligation obligation: this)
+		{
+			if (obligation.status == POStatus.UNCHECKED &&
+				obligation.message != null &&
+				obligation.message.equals(ProofObligation.PO_HAS_ERRORS))
+			{
+				count++;
+			}
+		}
+		
+		return count;
+	}
 }
