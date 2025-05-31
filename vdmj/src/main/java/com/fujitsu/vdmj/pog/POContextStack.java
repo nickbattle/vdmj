@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POInheritedDefinition;
 import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
 import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -191,7 +192,20 @@ public class POContextStack extends Stack<POContext>
 		else if (called.getPossibleExceptions() != null)
 		{
 			String opname = called.name.toExplicitString(from);
-			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+			
+			if (addReturn)
+			{
+				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+				TCNameList names = getStateVariables();
+				names.add(result);
+				
+				push(new POAmbiguousContext(opname + " throws exceptions", names, from));
+				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+			}
+			else
+			{
+				push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+			}
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -205,6 +219,11 @@ public class POContextStack extends Stack<POContext>
 			{
 				PORenamedDefinition rdef = (PORenamedDefinition)called;
 				called = rdef.def;
+			}
+			else if (called instanceof POInheritedDefinition)
+			{
+				POInheritedDefinition idef = (POInheritedDefinition)called;
+				called = idef.superdef;
 			}
 			
 			if (called instanceof POImplicitOperationDefinition)
