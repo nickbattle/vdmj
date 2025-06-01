@@ -56,7 +56,15 @@ public class POAmbiguousContext extends POContext
 	@Override
 	public String getSource()
 	{
-		return "-- Ambiguous " + reason + ", affects " + variables +
-			"? at " + location.startLine + ":" + location.startPos;
+		if (variables.isEmpty())
+		{
+			return "-- Ambiguous " + reason + " with no state updates? at " +
+					location.startLine + ":" + location.startPos;
+		}
+		else
+		{
+			return "-- Ambiguous " + reason + ", affects " + variables +
+					"? at " + location.startLine + ":" + location.startPos;
+		}
 	}
 }

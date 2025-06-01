@@ -177,13 +177,10 @@ public class POApplyExpression extends POExpression
 				
 				ctxt.addOperationCall(location, pogState, opdef, false);
 				
-				// Additionally, we mark the state as generally ambiguous, so that if this expression
+				// Additionally, we mark the result as generally ambiguous, so that if this expression
 				// is being used to define something in a "let", we can mark that as ambiguous too.
 				
-				if (opdef == null || !opdef.accessSpecifier.isPure)
-				{
-					pogState.setAmbiguous(true);
-				}
+				pogState.setAmbiguous(true);
 			}
 		}
 
