@@ -62,6 +62,12 @@ public class INAnnotatedStatement extends INStatement
 	}
 	
 	@Override
+	public void addAnnotation(INAnnotation annotation)
+	{
+		statement.addAnnotation(annotation);
+	}
+	
+	@Override
 	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseAnnotatedStatement(this, arg);
