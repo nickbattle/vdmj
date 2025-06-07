@@ -4,7 +4,8 @@ VDMJ Error and Warning Messages
 Messages and warnings are numbered in the following blocks:
 
 0000-0999	Internal errors
-1000-1999	Lexical errors
+1000-1499	Lexical errors
+1500-1999	Preprocessor errors
 2000-2999	Syntax errors
 3000-3999	Type checking errors
 4000-4999	Runtime errors

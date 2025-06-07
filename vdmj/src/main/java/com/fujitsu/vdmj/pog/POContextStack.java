@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POInheritedDefinition;
 import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
 import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -176,12 +177,12 @@ public class POContextStack extends Stack<POContext>
 		{
 			if (addReturn)
 			{
-				TCNameToken result = TCNameToken.getResult(from);
+				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
 				TCNameList names = getStateVariables();
 				names.add(result);
 				
 				push(new POAmbiguousContext("operation call", names, from));
-				push(new POReturnContext(pogState.getResult(), new POUndefinedExpression(from)));
+				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
 			}
 			else
 			{
@@ -191,7 +192,20 @@ public class POContextStack extends Stack<POContext>
 		else if (called.getPossibleExceptions() != null)
 		{
 			String opname = called.name.toExplicitString(from);
-			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+			
+			if (addReturn)
+			{
+				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+				TCNameList names = getStateVariables();
+				names.add(result);
+				
+				push(new POAmbiguousContext(opname + " throws exceptions", names, from));
+				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+			}
+			else
+			{
+				push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+			}
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -206,36 +220,54 @@ public class POContextStack extends Stack<POContext>
 				PORenamedDefinition rdef = (PORenamedDefinition)called;
 				called = rdef.def;
 			}
+			else if (called instanceof POInheritedDefinition)
+			{
+				POInheritedDefinition idef = (POInheritedDefinition)called;
+				called = idef.superdef;
+			}
 			
 			if (called instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+				TCNameList names = getStateVariables();
 				
 				if (imp.externals != null && imp.location.module.equals(from.module))
 				{
+					names.clear();
+					
 					for (POExternalClause ext: imp.externals)
 					{
 						if (ext.mode.is(Token.WRITE))
 						{
-							push(new POAmbiguousContext("operation ext clause in " + opname, ext.identifiers, from));
+							names.addAll(ext.identifiers);
 						}
 					}
 				}
+
+				if (addReturn)
+				{
+					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+					names.add(result);
+					
+					push(new POAmbiguousContext("operation call to " + opname, names, from));
+					push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+				}
 				else
 				{
-					push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
+					push(new POAmbiguousContext("operation call to " + opname, names, from));
 				}
+
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
 				if (addReturn)
 				{
-					TCNameToken result = TCNameToken.getResult(from);
+					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
 					TCNameList names = getStateVariables();
 					names.add(result);
 					
 					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResult(), new POUndefinedExpression(from)));
+					push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
 				}
 				else
 				{

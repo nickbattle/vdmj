@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
@@ -140,6 +142,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				{
 					println("Generated " + plural(list.size(), "proof obligation", "s") + ":\n");
 					printf("%s", list.toString());
+					
+					if (list.countErrors() > 0)
+					{
+						messages.add(new VDMError(3000, "Some obligations have errors", LexLocation.ANY));
+					}
 				}
 			}
 			

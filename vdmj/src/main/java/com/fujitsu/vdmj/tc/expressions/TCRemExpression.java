@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -45,7 +47,15 @@ public class TCRemExpression extends TCNumericBinaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		checkNumeric(env, scope);
-		return setType(new TCIntegerType(location));
+		
+		if (ltype instanceof TCNaturalType || ltype instanceof TCNaturalOneType)
+		{
+			return setType(new TCNaturalType(location));	// Sign of rem is sign of LHS, can be zero
+		}
+		else
+		{
+			return setType(new TCIntegerType(location));
+		}
 	}
 
 	@Override

@@ -92,7 +92,7 @@ public class POReturnStatement extends POStatement
 		
 		if (rtype != null && rtype.isReturn())
 		{
-			POPattern result = pogState.getResult();
+			POPattern result = pogState.getResultPattern();
 
 			if (pogState.isAmbiguous())		// expression has ambiguous values
 			{

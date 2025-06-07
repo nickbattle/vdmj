@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * A class to hold state information for POG of statements, which involve potentially
@@ -43,6 +44,7 @@ public class POGState
 	
 	private boolean ambiguousExpression = false;
 	private POPattern resultPattern = null;
+	private TCType resultType = null;
 	
 	public POGState()
 	{
@@ -102,34 +104,48 @@ public class POGState
 	}
 	
 	/**
-	 * Set the name of the RESULT variable. Null means "RESULT"
+	 * Set the def/name/type of the RESULT variable. Null means "RESULT"
 	 */
-	public void setResult(POPattern result)
+	public void setResult(POPattern result, TCType rtype)
 	{
 		if (outerState != null)
 		{
-			outerState.setResult(result);
+			outerState.setResult(result, rtype);
 		}
 		else if (result == null)
 		{
 			TCNameToken R = TCNameToken.getResult(LexLocation.ANY);
 			resultPattern = new POIdentifierPattern(R);
+			resultType = rtype;
 		}
 		else
 		{
 			resultPattern = result;
+			resultType = rtype;
 		}
 	}
 	
-	public POPattern getResult()
+	public POPattern getResultPattern()
 	{
 		if (outerState != null)
 		{
-			return outerState.getResult();
+			return outerState.getResultPattern();
 		}
 		else
 		{
 			return resultPattern;
+		}
+	}
+	
+	public TCType getResultType()
+	{
+		if (outerState != null)
+		{
+			return outerState.getResultType();
+		}
+		else
+		{
+			return resultType;
 		}
 	}
 	

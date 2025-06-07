@@ -48,7 +48,6 @@ import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
-import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -173,7 +172,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
-		pogState.setResult(null);	// Indicate "RESULT" should be used
+		pogState.setResult(null, type.result);	// Indicate "RESULT" should be used
 		
 		if (stateDefinition != null)
 		{
@@ -228,7 +227,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		if (!isConstructor &&
 			!TypeComparator.isSubType(actualResult, type.result))
 		{
-			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
+			// obligations.add(new SubTypeObligation(this, actualResult, ctxt));
+			// Covered by various return statements
 		}
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);

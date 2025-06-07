@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -45,7 +47,15 @@ public class TCModExpression extends TCNumericBinaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		checkNumeric(env, scope);
-		return setType(new TCIntegerType(location));
+
+		if (rtype instanceof TCNaturalType || rtype instanceof TCNaturalOneType)
+		{
+			return setType(new TCNaturalType(location));	// Sign of mod is sign of RHS, can be zero
+		}
+		else
+		{
+			return setType(new TCIntegerType(location));
+		}
 	}
 
 	@Override

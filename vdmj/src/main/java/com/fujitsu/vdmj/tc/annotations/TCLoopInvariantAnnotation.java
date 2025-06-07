@@ -81,9 +81,13 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	@Override
 	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
 	{
-		TCAnnotatedStatement astmt = (TCAnnotatedStatement)stmt;
+		while (stmt instanceof TCAnnotatedStatement)
+		{
+			TCAnnotatedStatement astmt = (TCAnnotatedStatement)stmt;
+			stmt = astmt.statement;
+		}
 		
-		if (!isLoop(astmt.statement))
+		if (!isLoop(stmt))
 		{
 			name.report(6006, "@LoopInvariant only applies to loop statements");
 		}
@@ -94,7 +98,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		else
 		{
 			TCExpression inv = args.get(0);
-			Environment local = loopEnvironment(astmt.statement, env);
+			Environment local = loopEnvironment(stmt, env);
 			TCType itype = inv.typeCheck(local, null, scope, null);	// Just checks scope
 			
 			if (!(itype instanceof TCBooleanType))
@@ -103,7 +107,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			}
 			
 			TCNameSet reasonsAbout = inv.getVariableNames();
-			TCNameSet updates = astmt.statement.updatesState();
+			TCNameSet updates = stmt.updatesState();
 			
 			if (!reasonsAbout.containsAll(updates))
 			{
