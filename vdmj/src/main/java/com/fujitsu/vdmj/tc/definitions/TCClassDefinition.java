@@ -142,7 +142,6 @@ public class TCClassDefinition extends TCDefinition
 
 	/**
 	 * Link the class hierarchy and generate the invariant operation.
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#implicitDefinitions(com.fujitsu.vdmj.typechecker.Environment)
 	 */
 	@Override
 	public void implicitDefinitions(Environment publicClasses)
@@ -510,8 +509,6 @@ public class TCClassDefinition extends TCDefinition
 	/**
 	 * Get a list of all definitions for this class, including the local
 	 * definitions as well as those inherited.
-	 *
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#getDefinitions()
 	 */
 	@Override
 	public TCDefinitionList getDefinitions()

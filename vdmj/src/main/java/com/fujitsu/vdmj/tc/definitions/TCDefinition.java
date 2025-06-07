@@ -301,8 +301,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * need for a scope parameter since state definitions' types are always in
 	 * scope. The method is implemented by the {@link TCTypeDefinition} class, by
 	 * {@link TCStateDefinition} (when module state is referred to as a
-	 * record type), and by {@link com.fujitsu.vdmj.ast.modules.TCImportedType TCImportedType}
-	 * definitions.
+	 * record type), and by TCImportedType definitions.
 	 *
 	 * @param name The name of the type definition being sought.
 	 * @param fromModule The name of the module seeking the type.

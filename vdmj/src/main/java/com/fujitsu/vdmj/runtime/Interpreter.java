@@ -415,7 +415,7 @@ abstract public class Interpreter
 	 * Set an exception catchpoint. This stops execution at the point that a matching
 	 * exception is thrown.
 	 *
-	 * @param sequence The exception value(s) at which to stop, or null for any exception.
+	 * @param value The exception value(s) at which to stop, or null for any exception.
 	 * @return The Breakpoint object created.
 	 * @throws Exception 
 	 */

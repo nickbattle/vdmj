@@ -27,12 +27,9 @@ package com.fujitsu.vdmj.ast.patterns;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.patterns.visitors.ASTMultipleBindVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 
 /**
- * The parent class of {@link TCMultipleSetBind} and {@link TCMultipleTypeBind}.
+ * The parent class of {@link ASTMultipleSetBind} and {@link ASTMultipleTypeBind}.
  */
 public abstract class ASTMultipleBind extends ASTNode
 {
@@ -53,7 +50,7 @@ public abstract class ASTMultipleBind extends ASTNode
 		this.location = plist.get(0).location;
 	}
 
-	/** Return this one bind as a list of {@link TCMultipleBind}. */
+	/** Return this one bind as a list of {@link ASTMultipleBind}. */
 	public ASTMultipleBindList getMultipleBindList()
 	{
 		ASTMultipleBindList list = new ASTMultipleBindList();

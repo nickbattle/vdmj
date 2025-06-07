@@ -69,10 +69,6 @@ public abstract class INMultipleBind extends INNode
 	/** Get a list of all the possible values to bind the variables to. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
 
-	/**
-	 * @see org.INDefinition.vdmj.definitions.Definition#abort
-	 */
-
 	@Override
 	public Value abort(ValueException ve)
 	{

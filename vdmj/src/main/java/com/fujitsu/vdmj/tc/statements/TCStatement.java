@@ -120,33 +120,21 @@ public abstract class TCStatement extends TCNode implements Serializable
 		return possible;
 	}
 
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#report
-	 */
 	public void report(int number, String msg)
 	{
 		TypeChecker.report(number, msg, location);
 	}
 
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#warning
-	 */
 	public void warning(int number, String msg)
 	{
 		TypeChecker.warning(number, msg, location);
 	}
 
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#detail
-	 */
 	public void detail(String tag, Object obj)
 	{
 		TypeChecker.detail(tag, obj);
 	}
 
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#detail2
-	 */
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)
 	{
 		TypeChecker.detail2(tag1, obj1, tag2, obj2);

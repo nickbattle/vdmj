@@ -53,7 +53,7 @@ public class ClassContext extends RootContext
 	 * not present search the global context. Note that the context
 	 * chain is not followed.
 	 *
-	 * @see com.fujitsu.vdmj.runtime.Context#check(com.fujitsu.vdmj.ast.lex.LexNameToken)
+	 * @see com.fujitsu.vdmj.runtime.Context#check(com.fujitsu.vdmj.tc.lex.TCNameToken)
 	 */
 	@Override
 	public Value check(TCNameToken name)

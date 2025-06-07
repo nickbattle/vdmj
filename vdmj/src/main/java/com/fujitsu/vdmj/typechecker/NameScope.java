@@ -28,10 +28,9 @@ import java.io.Serializable;
 
 /**
  * An enum to represent name scoping. When names are being looked up with
- * {@link com.fujitsu.vdmj.ast.definitions.ASTDefinition#findName findName}, the scope is used
+ * findName, the scope is used
  * to indicate what sorts of names are being sought. When a specification is
- * being type checked, the {@link com.fujitsu.vdmj.ast.definitions.ASTDefinition#typeCheck
- * typeCheck} method uses NameScope to indicate what names are permitted when
+ * being type checked, the typeCheck method uses NameScope to indicate what names are permitted when
  * checking the content. For example, an operation would be type checked under
  * the NAMESANDSTATE scope, but when its post condition is checked, it would
  * be checked under NAMESANDANYSTATE to include the "old" names.

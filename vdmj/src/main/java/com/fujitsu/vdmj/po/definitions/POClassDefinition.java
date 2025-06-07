@@ -79,7 +79,6 @@ public class POClassDefinition extends PODefinition
 
 	/**
 	 * Get this class' POClassType.
-	 * @see org.PODefinition.vdmj.definitions.Definition#getType()
 	 */
 	@Override
 	public TCType getType()

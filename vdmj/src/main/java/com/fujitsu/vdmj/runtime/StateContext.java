@@ -77,10 +77,7 @@ public class StateContext extends RootContext
 	 * Check for the name in the current context and state, and if
 	 * not present search the global context. Note that the context
 	 * chain is not followed.
-	 *
-	 * @see com.fujitsu.vdmj.runtime.Context#check(com.fujitsu.vdmj.ast.lex.LexNameToken)
 	 */
-
 	@Override
 	public Value check(TCNameToken name)
 	{

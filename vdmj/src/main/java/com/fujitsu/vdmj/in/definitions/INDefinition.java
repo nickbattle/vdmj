@@ -106,8 +106,8 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * the type of a value definition would be that value's type; the type of a
 	 * type definition is the underlying type being defined.
 	 * <p>
-	 * Note that for Definitions which define multiple inner definitions (see
-	 * {@link #getDefinitions}), this method returns the primary type - eg.
+	 * Note that for Definitions which define multiple inner definitions,
+	 * this method returns the primary type - eg.
 	 * the type of a function, not the types of its pre/post definitions.
 	 *
 	 * @return The primary type of this definition.
@@ -130,7 +130,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * Locate all {@link TCExpression} that start on the line number indicated.
 	 * This is used by the debugger to set breakpoints.
 	 *
-	 * @param linno The line number to look for.
+	 * @param lineno The line number to look for.
 	 * @return An expression that starts on the line, or null if there is none.
 	 */
 	public final INExpressionList findExpressions(int lineno)

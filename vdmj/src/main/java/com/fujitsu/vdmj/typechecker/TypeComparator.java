@@ -628,7 +628,6 @@ public class TypeComparator
 	 *
 	 * @param sub
 	 * @param sup
-	 * @param invignore True if type invariants should be unmapped 
 	 * @return True if sub is a subtype of sup.
 	 */
 

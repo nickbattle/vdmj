@@ -65,27 +65,15 @@ abstract public class TCExport extends TCNode implements Serializable
 	/** Check that the export types match the defined types. */
 	abstract public void typeCheck(Environment env, TCDefinitionList actualDefs);
 
-	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#report
-	 */
-
 	public void report(int number, String msg)
 	{
 		TypeChecker.report(number, msg, location);
 	}
 
-	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#detail
-	 */
-
 	public void detail(String tag, Object obj)
 	{
 		TypeChecker.detail(tag, obj);
 	}
-
-	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#detail2
-	 */
 
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)
 	{

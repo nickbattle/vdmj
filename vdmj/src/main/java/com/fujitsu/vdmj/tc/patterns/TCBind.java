@@ -55,25 +55,16 @@ public abstract class TCBind extends TCNode implements Serializable
 	/** Return this one bind as a list of {@link TCMultipleBind}. */
 	abstract public TCMultipleBindList getMultipleBindList();
 
-	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#report
-	 */
 	public void report(int number, String msg)
 	{
 		TypeChecker.report(number, msg, location);
 	}
 
-	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#detail
-	 */
 	public void detail(String tag, Object obj)
 	{
 		TypeChecker.detail(tag, obj);
 	}
 
-	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#detail2
-	 */
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)
 	{
 		TypeChecker.detail2(tag1, obj1, tag2, obj2);

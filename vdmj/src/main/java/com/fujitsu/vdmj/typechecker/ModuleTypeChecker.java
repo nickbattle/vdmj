@@ -46,7 +46,7 @@ public class ModuleTypeChecker extends TypeChecker
 	 * Create a type checker with the list of executableModules passed. The warnings
 	 * flag indicates whether warnings should be printed or just counted.
 	 *
-	 * @param executableModules
+	 * @param modules
 	 */
 
 	public ModuleTypeChecker(TCModuleList modules)
