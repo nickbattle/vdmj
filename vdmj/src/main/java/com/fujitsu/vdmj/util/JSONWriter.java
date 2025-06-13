@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * A very simple JSON format writer, printing Map<String, Object>.
+ * A very simple JSON format writer, printing Map&lt;String, Object&gt;.
  */
 public class JSONWriter
 {

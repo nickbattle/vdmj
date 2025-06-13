@@ -136,7 +136,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	 * For example, a three field tuple/record with one value each gives 1x1x1=1 records;
 	 * with two values each it gives 2x2x2=8 values, with three 3x3x3=27 values. So to
 	 * generate up to N values from F field combinations, we need to find the largest n,
-	 * such that n^F < N.
+	 * such that n^F &lt; N.
 	 * 
 	 * If there is only one field, we can generate N values.
 	 */

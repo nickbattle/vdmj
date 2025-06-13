@@ -115,7 +115,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	 * {@link TCType} of the expression it checked, and is used
 	 * recursively across an expression tree. For example, a boolean "and"
 	 * expression would type check its left and right hand sides, check that the
-	 * types returned were both compatible with {@link org.INBooleanType.vdmj.types.BooleanType}
+	 * types returned were both compatible with TCBooleanType
 	 * and then return a TCBooleanType (regardless of any errors).
 	 * <p>
 	 * The qualifiers argument is passed when checking function and operation
@@ -176,17 +176,11 @@ public abstract class TCExpression extends TCNode implements Serializable
 		return apply(new TCQualifiedDefinitionFinder(), env);
 	}
 	
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#report
-	 */
 	public void report(int number, String msg)
 	{
 		TypeChecker.report(number, msg, location);
 	}
 
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#warning
-	 */
 	public void warning(int number, String msg)
 	{
 		TypeChecker.warning(number, msg, location);
@@ -211,10 +205,6 @@ public abstract class TCExpression extends TCNode implements Serializable
 		}
 	}
 
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#detail
-	 */
-
 	public void detail(String tag, Object obj)
 	{
 		TypeChecker.detail(tag, obj);
@@ -227,10 +217,6 @@ public abstract class TCExpression extends TCNode implements Serializable
 			TypeChecker.detail(tag, obj);
 		}
 	}
-
-	/**
-	 * @see org.TCDefinition.vdmj.definitions.Definition#detail2
-	 */
 
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)
 	{

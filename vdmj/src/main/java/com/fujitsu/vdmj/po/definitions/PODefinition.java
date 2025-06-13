@@ -147,8 +147,8 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	 * the type of a value definition would be that value's type; the type of a
 	 * type definition is the underlying type being defined.
 	 * <p>
-	 * Note that for Definitions which define multiple inner definitions (see
-	 * {@link #getDefinitions}), this method returns the primary type - eg.
+	 * Note that for Definitions which define multiple inner definitions,
+	 * this method returns the primary type - eg.
 	 * the type of a function, not the types of its pre/post definitions.
 	 *
 	 * @return The primary type of this definition.

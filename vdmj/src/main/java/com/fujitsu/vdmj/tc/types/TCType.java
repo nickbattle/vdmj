@@ -113,7 +113,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 
 	/**
 	 * Resolve the type. After syntax checking, all named type references are
-	 * created as {@link com.fujitsu.vdmj.ast.types.TCUnresolvedType}, which simply have a name.
+	 * created as TCUnresolvedType, which simply have a name.
 	 * The process of resolving a type in a given {@link Environment} will
 	 * lookup any UnresolvedTypes and replace them with the type of the actual
 	 * definition. This process is performed across all of the subtypes of a
@@ -314,7 +314,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * True if the type is numeric, or defines an ord clause (so can use "<").
+	 * True if the type is numeric, or defines an ord clause (so can use "&lt;").
 	 * @param from
 	 */
 	public boolean isOrdered(LexLocation from)

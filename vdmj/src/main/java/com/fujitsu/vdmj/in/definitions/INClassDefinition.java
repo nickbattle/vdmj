@@ -152,7 +152,6 @@ public class INClassDefinition extends INDefinition
 
 	/**
 	 * Get this class' TCClassType.
-	 * @see org.INDefinition.vdmj.definitions.Definition#getType()
 	 */
 	@Override
 	public TCType getType()

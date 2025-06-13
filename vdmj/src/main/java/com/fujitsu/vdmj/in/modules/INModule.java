@@ -226,7 +226,7 @@ public class INModule extends INNode implements Serializable
 	 *
 	 * @param file The file to search for.
 	 * @param lineno The line number to search for.
-	 * @return	The {@link TCStatement} on that line, or null.
+	 * @return	The {@link INStatement} on that line, or null.
 	 */
 	public INStatementList findStatements(File file, int lineno)
 	{
@@ -255,7 +255,7 @@ public class INModule extends INNode implements Serializable
 	 *
 	 * @param file The file to search for.
 	 * @param lineno The line number to search for.
-	 * @return	The {@link TCExpression} on that line, or null.
+	 * @return	The {@link INExpression} on that line, or null.
 	 */
 	public INExpressionList findExpressions(File file, int lineno)
 	{

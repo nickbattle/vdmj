@@ -600,7 +600,6 @@ public abstract class SyntaxReader
 	 * Raise a {@link ParserException} with a given toek depth.
 	 * @param number The error number.
 	 * @param message The error message.
-	 * @param token The location of the error.
 	 * @param depth The depth of the exception (tokens read).
 	 *
 	 * @throws ParserException

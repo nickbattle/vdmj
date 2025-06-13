@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.ast.patterns.visitors.ASTBindVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
- * The parent class of {@link TCSetBind} and {@link TCTypeBind}.
+ * The parent class of {@link ASTSetBind} and {@link ASTTypeBind}.
  */
 public abstract class ASTBind extends ASTNode implements Serializable
 {
