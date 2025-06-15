@@ -800,7 +800,7 @@ public class QuickCheck
 	 * PO #2, FAILED in 0.003s
 	 * Counterexample: i = 1, s = [1.25]
 	 * ----
-	 * (forall i:nat, s:seq of real &amp; pre_f(i, s) =>
+	 * (forall i:nat, s:seq of real &amp; pre_f(i, s) =&gt;
 	 *   is_nat(s(i)))
 	 */
 	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
