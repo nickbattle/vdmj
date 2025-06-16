@@ -117,7 +117,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	 * expression would type check its left and right hand sides, check that the
 	 * types returned were both compatible with TCBooleanType
 	 * and then return a TCBooleanType (regardless of any errors).
-	 * &lt;p&gt;
+	 * p
 	 * The qualifiers argument is passed when checking function and operation
 	 * application. It contains the list of argument types of the application,
 	 * and is used to choose between overloaded function/operation definitions.
