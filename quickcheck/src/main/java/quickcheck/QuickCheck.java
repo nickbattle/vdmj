@@ -788,9 +788,9 @@ public class QuickCheck
 	 * Produce output (subject to include/quiet flags) for a standard QuickCheck command line.
 	 * The format is as follows, with several fields being optional:
 	 * 
-	 * PO #<number>, <status> <qualifier> in &lt;time&gt;
+	 * PO #&lt;number&gt;, &lt;status&gt; &lt;qualifier&gt; in &lt;time&gt;
 	 * &lt;message&gt;
-	 * <counterexample>|&lt;witness&gt;
+	 * &lt;counterexample&gt;|&lt;witness&gt;
 	 * ----
 	 * &lt;source&gt;
 	 * 

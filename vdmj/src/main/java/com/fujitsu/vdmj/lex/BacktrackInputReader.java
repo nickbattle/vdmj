@@ -143,7 +143,7 @@ public class BacktrackInputReader
 	}
 
 	/**
-	 * Property format is "<suffix>=<class>,&lt;suffix&gt;=&lt;class&gt;,..."
+	 * Property format is "&lt;suffix&gt;=&lt;class&gt;,&lt;suffix&gt;=&lt;class&gt;,..."
 	 */
 	@SuppressWarnings("unchecked")
 	private static synchronized void buildExternalReaders() throws Exception
