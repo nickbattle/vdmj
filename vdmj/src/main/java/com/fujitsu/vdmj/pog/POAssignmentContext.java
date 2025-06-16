@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.expressions.POMuExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 import com.fujitsu.vdmj.po.expressions.PORecordModifier;
 import com.fujitsu.vdmj.po.expressions.PORecordModifierList;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
@@ -71,7 +72,7 @@ public class POAssignmentContext extends POContext
 		{
 			POAssignmentDefinition adef = (POAssignmentDefinition) def;
 
-			// if (!(adef.expression instanceof POUndefinedExpression))
+			if (!(adef.expression instanceof POUndefinedExpression))
 			{
 				this.assignmentDefs.add(adef);
 			}
