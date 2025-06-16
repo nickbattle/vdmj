@@ -106,6 +106,7 @@
                         <failOnError>false</failOnError>
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <quiet>true</quiet>
+                        <doclint>none</doclint>
                         <source>8</source>
                     </configuration>
                 </plugin>
