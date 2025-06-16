@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -77,8 +77,8 @@ public class INDivExpression extends INNumericBinaryExpression
 		 *
 		 * Integer division is defined using floor and real number division:
 		 *
-		 *		x/y < 0:	x div y = -floor(abs(-x/y))
-		 *		x/y >= 0:	x div y = floor(abs(x/y))
+		 *		x/y &lt; 0:	x div y = -floor(abs(-x/y))
+		 *		x/y &gt;= 0:	x div y = floor(abs(x/y))
 		 *
 		 * Note that the order of floor and abs on the right-hand side makes a difference,
 		 * the above example would yield -5 if we changed the order. This is

@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -117,7 +117,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	 * expression would type check its left and right hand sides, check that the
 	 * types returned were both compatible with TCBooleanType
 	 * and then return a TCBooleanType (regardless of any errors).
-	 * <p>
+	 * &lt;p&gt;
 	 * The qualifiers argument is passed when checking function and operation
 	 * application. It contains the list of argument types of the application,
 	 * and is used to choose between overloaded function/operation definitions.

@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -201,7 +201,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	 * recognised above. By convention, each Command has a field called HELP that
 	 * contains a helpful message. For example:
 	 * 
-	 * String[] HELP = "example <text> - echo text to the console";
+	 * String[] HELP = "example &lt;text&gt; - echo text to the console";
 	 */
 	@Override
 	public HelpList getCommandHelp()

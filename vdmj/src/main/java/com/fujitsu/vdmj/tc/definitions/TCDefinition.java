@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -151,7 +151,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * looking up type names (which are all that is known after parsing, unless
 	 * the types are primitive) and replacing them with the {@link TCType} value
 	 * from the definition of the named type in the {@link Environment} passed.
-	 * <p>
+	 * &lt;p&gt;
 	 * This method is defined for TCDefinition subclasses which have a
 	 * {@link com.fujitsu.vdmj.typechecker.Pass Pass} value of
 	 * {@link com.fujitsu.vdmj.typechecker.Pass Pass.TYPES}.
@@ -204,7 +204,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * function or operation definition would be its parameter/result signature;
 	 * the type of a value definition would be that value's type; the type of a
 	 * type definition is the underlying type being defined.
-	 * <p>
+	 * &lt;p&gt;
 	 * Note that for Definitions which define multiple inner definitions (see
 	 * {@link #getDefinitions}), this method returns the primary type - eg.
 	 * the type of a function, not the types of its pre/post definitions.

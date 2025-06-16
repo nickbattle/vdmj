@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -831,7 +831,7 @@ public abstract class SyntaxReader
 		
 		/*
 		 * The preferred method of loading uses an "annotations" resource file, allowing
-		 * annotations to be in any package, though the AST<name>Annotation rule remains.
+		 * annotations to be in any package, though the AST&lt;name&gt;Annotation rule remains.
 		 */
 		
 		for (String annotationClass: annotationClasses)

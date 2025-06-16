@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -66,7 +66,7 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 	}
 
 	/**
-	 * Override the default parse, and look for @QuickCheck @T = <type> [,<type>*];
+	 * Override the default parse, and look for @QuickCheck @T = <type> [,&lt;type&gt;*];
 	 * or @QuickCheck new Ctor(args);
 	 */
 	@Override

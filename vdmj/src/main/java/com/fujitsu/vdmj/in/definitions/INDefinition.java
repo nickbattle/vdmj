@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -105,7 +105,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * function or operation definition would be its parameter/result signature;
 	 * the type of a value definition would be that value's type; the type of a
 	 * type definition is the underlying type being defined.
-	 * <p>
+	 * &lt;p&gt;
 	 * Note that for Definitions which define multiple inner definitions,
 	 * this method returns the primary type - eg.
 	 * the type of a function, not the types of its pre/post definitions.

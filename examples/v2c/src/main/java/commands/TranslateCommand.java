@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -49,7 +49,7 @@ public class TranslateCommand extends AnalysisCommand
 
 	/**
 	 * The constructor is called from the command line interpreter when the user first types
-	 * "translate <args>". It is passed the whole line typed by the user, which is broken into
+	 * "translate &lt;args&gt;". It is passed the whole line typed by the user, which is broken into
 	 * an argv[] array by the superclass.
 	 */
 	public TranslateCommand(String line)
@@ -63,7 +63,7 @@ public class TranslateCommand extends AnalysisCommand
 	}
 	
 	/**
-	 * The run method is called whenever the user types "translate <args>" in the VDMJ command
+	 * The run method is called whenever the user types "translate &lt;args&gt;" in the VDMJ command
 	 * line interpreter (CommandReader.java). Note that this class has access to the "argv"
 	 * array, which is created during construction (above).
 	 * 

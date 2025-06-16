@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -54,7 +54,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
  * 
  * The expression should already have been type checked.
  * 
- * For example, in "if is_real(a) then <exp of a> else 0" we can assume "a" is type real
+ * For example, in "if is_real(a) then &lt;exp of a&gt; else 0" we can assume "a" is type real
  * within the "then" clause, and so the caseIsExpression below will create a QualifiedDefinition.
  * Note that it cannot be used in the "else" clause though. See TCIfExpression.
  * 

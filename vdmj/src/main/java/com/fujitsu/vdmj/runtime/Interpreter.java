@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -171,8 +171,6 @@ abstract public class Interpreter
 	 * initializers are re-run to put the global environment back into its
 	 * original state. This is run implicitly when the interpreter starts,
 	 * but it can also be invoked explicitly via the "init" command.
-	 *
-	 * @throws Exception
 	 */
 	abstract public void init();
 

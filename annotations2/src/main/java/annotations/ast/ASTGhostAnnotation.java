@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -49,7 +49,7 @@ public class ASTGhostAnnotation extends ASTAnnotation
 	}
 	
 	/**
-	 * Override the default parse, and look for @Ghost <name> = <exp>;
+	 * Override the default parse, and look for @Ghost <name> = &lt;exp&gt;;
 	 */
 	@Override
 	public void parse(LexTokenReader ltr) throws LexException, ParserException

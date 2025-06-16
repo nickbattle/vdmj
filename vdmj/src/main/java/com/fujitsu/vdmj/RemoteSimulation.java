@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -223,7 +223,7 @@ abstract public class RemoteSimulation
 	/**
 	 * Intercept the simulation. This method is called at the start of the execution (time=0)
 	 * and subsequently at (or as soon after as possible) the time returned by this call. The
-	 * method can call getSystem<Type>Value and setSystemValue to read or change the value of
+	 * method can call getSystemi&lt;Type&gt;Value and setSystemValue to read or change the value of
 	 * objects defined within the system class.
 	 */
 	abstract public long step(long time);
