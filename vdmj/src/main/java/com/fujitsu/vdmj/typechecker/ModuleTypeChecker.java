@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -58,7 +58,7 @@ public class ModuleTypeChecker extends TypeChecker
 	/**
 	 * Perform the type checking for the set of executableModules. This is a complicated
 	 * process.
-	 * <p>
+	 * &lt;p&gt;
 	 * First the module names are checked for uniqueness. Then each module
 	 * generates its implicit definitions (eg. for pre_ and post_ functions).
 	 * Then export definitions for each module are generated, and the import

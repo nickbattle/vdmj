@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -121,7 +121,7 @@ abstract public class AnalysisPlugin
 	}
 
 	/**
-	 * A convenience method for turning exceptions into a List<VDMMessage>, returned
+	 * A convenience method for turning exceptions into a List&lt;VDMMessage&gt;, returned
 	 * by handleEvent methods (see EventListener interface).
 	 */
 	protected List<VDMMessage> errsOf(Throwable e)

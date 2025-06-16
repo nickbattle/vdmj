@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -46,9 +46,9 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  * This abstract class is made concrete and defines visitors of the different types that
  * can be called by the Leaf visitors for this particular application. 
  *
- * @param <E> - an element of the collection result
- * @param <C> - the collection result
- * @param <S> - the argument type.
+ * @param &lt;E&gt; - an element of the collection result
+ * @param &lt;C&gt; - the collection result
+ * @param &lt;S&gt; - the argument type.
  */
 abstract public class INVisitorSet<E, C extends Collection<E>, S>
 {

@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -39,11 +39,10 @@ import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A set of values. Note that although this class implements a set (no duplicates)
- * it is not based on a java.util.Set<Value>, but rather a Vector<Value>. This is
+ * it is not based on a java.util.Set&lt;Value&gt;, but rather a Vector&lt;Value&gt;. This is
  * so that the possible orderings of set values can be enumerated when
  * performing quantifiers like "a,b,c in set {{1,2,3}, {4,5,6}}".
  */
-
 @SuppressWarnings("serial")
 public class ValueSet extends Vector<Value>		// NB based on Vector
 {

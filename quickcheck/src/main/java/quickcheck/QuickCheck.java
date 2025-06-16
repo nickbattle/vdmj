@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -788,11 +788,11 @@ public class QuickCheck
 	 * Produce output (subject to include/quiet flags) for a standard QuickCheck command line.
 	 * The format is as follows, with several fields being optional:
 	 * 
-	 * PO #<number>, <status> <qualifier> in <time>
-	 * <message>
-	 * <counterexample>|<witness>
+	 * PO #<number>, <status> <qualifier> in &lt;time&gt;
+	 * &lt;message&gt;
+	 * <counterexample>|&lt;witness&gt;
 	 * ----
-	 * <source>
+	 * &lt;source&gt;
 	 * 
 	 * For example:
 	 * 

@@ -17,7 +17,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
@@ -107,8 +107,8 @@ public class POAssignmentContext extends POContext
 	 * Return a POExpression for the update value for the updatedVariable above.
 	 * 
 	 * For x := E updates, it is "E"
-	 * For x(i) := E updates, it is "x ++ {i |-> E}"
-	 * For x.fld := E updates, it is "mu(x, {fld |-> E})"
+	 * For x(i) := E updates, it is "x ++ {i |-&gt; E}"
+	 * For x.fld := E updates, it is "mu(x, {fld |-&gt; E})"
 	 * 
 	 * More complex combinations nest these expressions.
 	 */
