@@ -66,7 +66,7 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 	}
 
 	/**
-	 * Override the default parse, and look for @QuickCheck @T = <type> [,&lt;type&gt;*];
+	 * Override the default parse, and look for @QuickCheck @T = &lt;type&gt; [,&lt;type&gt;*];
 	 * or @QuickCheck new Ctor(args);
 	 */
 	@Override

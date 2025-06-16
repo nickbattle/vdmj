@@ -49,7 +49,7 @@ public class ASTGhostAnnotation extends ASTAnnotation
 	}
 	
 	/**
-	 * Override the default parse, and look for @Ghost <name> = &lt;exp&gt;;
+	 * Override the default parse, and look for @Ghost &lt;name&gt; = &lt;exp&gt;;
 	 */
 	@Override
 	public void parse(LexTokenReader ltr) throws LexException, ParserException
