@@ -58,7 +58,7 @@ public class ModuleTypeChecker extends TypeChecker
 	/**
 	 * Perform the type checking for the set of executableModules. This is a complicated
 	 * process.
-	 * &lt;p&gt;
+	 * p
 	 * First the module names are checked for uniqueness. Then each module
 	 * generates its implicit definitions (eg. for pre_ and post_ functions).
 	 * Then export definitions for each module are generated, and the import

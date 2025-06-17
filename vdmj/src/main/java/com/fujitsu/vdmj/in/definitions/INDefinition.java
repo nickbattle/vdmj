@@ -105,7 +105,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * function or operation definition would be its parameter/result signature;
 	 * the type of a value definition would be that value's type; the type of a
 	 * type definition is the underlying type being defined.
-	 * &lt;p&gt;
+	 * p
 	 * Note that for Definitions which define multiple inner definitions,
 	 * this method returns the primary type - eg.
 	 * the type of a function, not the types of its pre/post definitions.

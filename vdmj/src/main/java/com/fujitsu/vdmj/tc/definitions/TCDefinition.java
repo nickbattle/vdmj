@@ -151,7 +151,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * looking up type names (which are all that is known after parsing, unless
 	 * the types are primitive) and replacing them with the {@link TCType} value
 	 * from the definition of the named type in the {@link Environment} passed.
-	 * &lt;p&gt;
+	 * p
 	 * This method is defined for TCDefinition subclasses which have a
 	 * {@link com.fujitsu.vdmj.typechecker.Pass Pass} value of
 	 * {@link com.fujitsu.vdmj.typechecker.Pass Pass.TYPES}.
@@ -204,7 +204,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * function or operation definition would be its parameter/result signature;
 	 * the type of a value definition would be that value's type; the type of a
 	 * type definition is the underlying type being defined.
-	 * &lt;p&gt;
+	 * p
 	 * Note that for Definitions which define multiple inner definitions (see
 	 * {@link #getDefinitions}), this method returns the primary type - eg.
 	 * the type of a function, not the types of its pre/post definitions.
