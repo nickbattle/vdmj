@@ -35,9 +35,9 @@ import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 
-public class TypeBindFinder extends INLeafExpressionVisitor<INBindingOverride, List<INBindingOverride>, Object>
+public class ExpressionTypeBindOverrider extends INLeafExpressionVisitor<INBindingOverride, List<INBindingOverride>, Object>
 {
-	public TypeBindFinder()
+	public ExpressionTypeBindOverrider()
 	{
 		super(false);
 		
@@ -46,16 +46,16 @@ public class TypeBindFinder extends INLeafExpressionVisitor<INBindingOverride, L
 			@Override
 			protected void setVisitors()
 			{
-				expressionVisitor = TypeBindFinder.this;
-				multiBindVisitor = new MultiTypeBindFinder(this);
-				bindVisitor = new SingleTypeBindFinder(this);
-				definitionVisitor = new DefinitionTypeBindFinder(this);
+				expressionVisitor = ExpressionTypeBindOverrider.this;
+				multiBindVisitor = new MultiTypeBindOverrider(this);
+				bindVisitor = new TypeBindOverrider(this);
+				definitionVisitor = new DefinitionTypeBindOverrider(this);
 			}
 			
 			@Override
 			protected List<INBindingOverride> newCollection()
 			{
-				return TypeBindFinder.this.newCollection();
+				return ExpressionTypeBindOverrider.this.newCollection();
 			}
 		};
 	}

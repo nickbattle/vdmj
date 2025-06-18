@@ -78,7 +78,7 @@ import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
-import quickcheck.visitors.TypeBindFinder;
+import quickcheck.visitors.ExpressionTypeBindOverrider;
 
 public class QuickCheck
 {
@@ -295,7 +295,7 @@ public class QuickCheck
 	
 	public List<INBindingOverride> getINBindList(INExpression inexp)
 	{
-		return inexp.apply(new TypeBindFinder(), null);
+		return inexp.apply(new ExpressionTypeBindOverrider(), null);
 	}
 	
 	public StrategyResults getValues(ProofObligation po)
