@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -98,15 +99,14 @@ public class POWhileStatement extends POStatement
 			
 			ctxt.push(new POImpliesContext(this.exp));	// while C => ...
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check before while body");
+			obligations.lastElement().setMessage("check start while body");
 			ctxt.pop();
-			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));	// invariant && while C => ...
-			
-			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-			
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check after while body");
 
+			ctxt.push(new POForAllContext(updates, env));						// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));	// invariant && while C => ...
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check end while body");
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs

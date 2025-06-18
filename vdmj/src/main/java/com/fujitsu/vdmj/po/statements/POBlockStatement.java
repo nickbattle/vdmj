@@ -40,8 +40,11 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.POReturnContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class POBlockStatement extends POSimpleBlockStatement
 {
@@ -63,15 +66,19 @@ public class POBlockStatement extends POSimpleBlockStatement
 		if (!assignmentDefs.isEmpty())
 		{
 			POGState dclState = pogState.getLink();
+			TCDefinitionList defs = new TCDefinitionList();
 			
 			for (PODefinition dcl: assignmentDefs)
 			{
 				POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
 				dclState.addDclLocal(adef.name);
+				defs.add(new TCLocalDefinition(dcl.location, adef.name, adef.type));
 			}
-	
+
+			Environment locals = new FlatEnvironment(defs, env);
+
 			int dcls = ctxt.pushAt(new POAssignmentContext(assignmentDefs));
-			obligations.addAll(super.getProofObligations(ctxt, dclState, env));
+			obligations.addAll(super.getProofObligations(ctxt, dclState, locals));
 			
 			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
 			// assignments to outer state within the block, since the dcls/lets are needed

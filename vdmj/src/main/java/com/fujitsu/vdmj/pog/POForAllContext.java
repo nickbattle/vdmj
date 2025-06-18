@@ -36,12 +36,17 @@ import com.fujitsu.vdmj.po.expressions.POLetBeStExpression;
 import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class POForAllContext extends POContext
 {
@@ -103,6 +108,23 @@ public class POForAllContext extends POContext
 	public POForAllContext(POLetBeStStatement stmt)
 	{
 		this.bindings = stmt.bind.getMultipleBindList();
+	}
+
+	public POForAllContext(TCNameSet updates, Environment env)
+	{
+		this.bindings = new Vector<POMultipleBind>();
+		
+		for (TCNameToken var: updates)
+		{
+			TCDefinition def = env.findName(var, NameScope.NAMESANDSTATE);
+			
+			if (def != null)
+			{
+				POPatternList plist = new POPatternList();
+				plist.add(new POIdentifierPattern(var));
+				bindings.add(new POMultipleTypeBind(plist, def.getType()));
+			}
+		}
 	}
 
 	@Override
