@@ -75,8 +75,14 @@ public class INExists1Expression extends INExpression
 			{
 				Context evalContext = new Context(location, "exists1", ctxt);
 				evalContext.putList(bind.pattern.getNamedValues(val, ctxt));
+				Value result = predicate.eval(evalContext);
+				
+				if (result.isUndefined())
+				{
+					return result;	// Cannot know whether there is only one
+				}
 
-				if (predicate.eval(evalContext).boolValue(ctxt))
+				if (result.boolValue(ctxt))
 				{
 					if (alreadyFound)
 					{

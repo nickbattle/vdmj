@@ -64,6 +64,12 @@ public class INOrExpression extends INBooleanBinaryExpression
 				}
 
 				Value rv = right.eval(ctxt);
+				
+				if (rv.isUndefined())
+				{
+					return rv;	// false or undefined
+				}
+				
 				boolean rb = rv.boolValue(ctxt);
 
 				if (lb || rb)

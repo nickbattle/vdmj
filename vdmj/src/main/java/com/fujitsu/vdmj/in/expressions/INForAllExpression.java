@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Quantifier;
 import com.fujitsu.vdmj.values.QuantifierList;
+import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -68,6 +69,7 @@ public class INForAllExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
+		boolean hasUndefined = false;
 
 		try
 		{
@@ -112,15 +114,20 @@ public class INForAllExpression extends INExpression
 
 				try
 				{
-					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
+					if (matches)
 					{
-						if (globals != null)
-						{
-							globals.setCounterexample(evalContext);
-							globals.setMaybe(false);
-						}
+						Value result = predicate.eval(evalContext);
+						hasUndefined = hasUndefined || result.isUndefined();
 						
-						return new BooleanValue(false);
+						if (!result.isUndefined() && !result.boolValue(ctxt))
+						{
+							if (globals != null)
+							{
+								globals.setCounterexample(evalContext);
+							}
+							
+							return new BooleanValue(false);
+						}
 					}
 				}
 				catch (ContextException e)
@@ -128,7 +135,6 @@ public class INForAllExpression extends INExpression
 					if (globals != null)
 					{
 						globals.setCounterexample(evalContext);
-						globals.setMaybe(false);
 					}
 					
 					throw e;
@@ -144,9 +150,9 @@ public class INForAllExpression extends INExpression
 	    	return abort(e);
 	    }
 
-		if (globals != null)
+		if (hasUndefined || (globals != null && !bindList.hasAllValues()))
 		{
-			globals.setMaybe(!bindList.hasAllValues());
+			return new UndefinedValue();
 		}
 		
 		return new BooleanValue(true);

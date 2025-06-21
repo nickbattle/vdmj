@@ -43,7 +43,6 @@ public class INBindingGlobals
 	private Context bindCounterexample = null;
 	private Context bindWitness = null;
 	private boolean bindAllValues = false;
-	private boolean maybe = false;
 
 	private INBindingGlobals()
 	{
@@ -55,7 +54,6 @@ public class INBindingGlobals
 		bindCounterexample = null;
 		bindWitness = null;
 		bindAllValues = false;
-		maybe = false;
 	}
 
 	public void setAllValues(boolean hasAllValues)
@@ -100,15 +98,5 @@ public class INBindingGlobals
 	public Context getWitness()
 	{
 		return bindWitness;
-	}
-	
-	public void setMaybe(boolean maybe)
-	{
-		this.maybe = this.maybe || maybe;	// Cumulative
-	}
-	
-	public boolean hasMaybe()
-	{
-		return maybe;
 	}
 }
