@@ -531,7 +531,11 @@ public class QuickCheck
 	{
 		po.clearAnalysis();
 		
-		if (execResult instanceof BooleanValue)
+		if (execResult.isUndefined())
+		{
+			po.setStatus(POStatus.MAYBE);
+		}
+		else if (execResult instanceof BooleanValue)
 		{
 			BooleanValue result = (BooleanValue)execResult;
 			
@@ -540,10 +544,6 @@ public class QuickCheck
 				if (timedOut)	// Result would be false (below), but...
 				{
 					po.setStatus(POStatus.TIMEOUT);
-				}
-				else if (globals.hasMaybe())
-				{
-					po.setStatus(POStatus.MAYBE);
 				}
 				else if (po.isExistential())
 				{
@@ -596,10 +596,6 @@ public class QuickCheck
 					{
 						po.setStatus(POStatus.MAYBE);
 					}
-				}
-				else if (globals.hasMaybe() && execCompleted)
-				{
-					po.setStatus(POStatus.MAYBE);
 				}
 				else
 				{
