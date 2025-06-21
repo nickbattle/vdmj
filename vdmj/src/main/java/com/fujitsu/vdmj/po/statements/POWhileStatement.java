@@ -111,7 +111,8 @@ public class POWhileStatement extends POStatement
 			
 			// Leave implication for following POs
 			POExpression negated = new PONotExpression(location, this.exp);
-			ctxt.push(new POImpliesContext(annotation.invariant, negated));	// invariant && not C => ...
+			ctxt.push(new POForAllContext(updates, env));						// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant, negated));		// invariant && not C => ...
 			
 			return obligations;
 		}
