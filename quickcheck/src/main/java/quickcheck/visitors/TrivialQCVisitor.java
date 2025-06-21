@@ -26,6 +26,7 @@ package quickcheck.visitors;
 
 import static quickcheck.commands.QCConsole.verbose;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
@@ -84,7 +85,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	{
 		for (int i=0; i<pushes; i++)
 		{
-			truths.pop();
+			if (!truths.isEmpty()) truths.pop();
 		}
 	}
 	
@@ -103,6 +104,22 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 		}
 		
 		return count;
+	}
+
+	private void removeHidden(Stack<TCExpression> truths, TCIdentifierPattern id)
+	{
+		// If the id hides other symbols in truths, we have to remove them
+		Iterator<TCExpression> it = truths.iterator();
+		
+		while (it.hasNext())
+		{
+			TCExpression truth = it.next();
+			
+			if (truth.getVariableNames().contains(id.name))
+			{
+				it.remove();
+			}
+		}
 	}
 
 	@Override
@@ -152,12 +169,13 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
 					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
+					removeHidden(truths, id);
 
 					truths.push(new TCEqualsExpression(
 							new TCVariableExpression(id.location, id.name, id.toString()),
 							new LexKeywordToken(Token.EQUALS, id.location),
 							vdef.exp));
-						
+
 					pushes++;
 				}
 			}
@@ -167,7 +185,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 		pops(truths, pushes);
 		return result;
 	}
-	
+
 	@Override
 	public Boolean caseDefExpression(TCDefExpression node, Stack<TCExpression> truths)
 	{
@@ -182,6 +200,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
 					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
+					removeHidden(truths, id);
 
 					truths.push(new TCEqualsExpression(
 							new TCVariableExpression(id.location, id.name, id.toString()),
