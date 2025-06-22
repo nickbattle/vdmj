@@ -32,7 +32,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmjunit.VDMJUnitTestSL;
 
 public class SLTest extends VDMJUnitTestSL
 {

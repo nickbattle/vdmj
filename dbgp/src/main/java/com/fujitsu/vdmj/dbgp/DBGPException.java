@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.dbgp;
 
-@SuppressWarnings("serial")
 public class DBGPException extends Exception
 {
 	public final DBGPErrorCode code;

@@ -106,12 +106,7 @@ public abstract class POExpression extends PONode implements Serializable
 
 	/**
 	 * Get a list of proof obligations from the expression.
-	 *
-	 * @param ctxt The call context.
-	 * @param pogState TODO
-	 * @return The list of proof obligations.
 	 */
-
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();

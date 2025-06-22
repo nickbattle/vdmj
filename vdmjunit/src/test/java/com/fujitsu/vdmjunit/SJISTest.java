@@ -30,8 +30,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.fujitsu.vdmjunit.VDMJUnitTestPP;
-
 public class SJISTest extends VDMJUnitTestPP
 {
 	@BeforeClass

@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
 
 /**
  * Find an expression by line number within a root expression.

@@ -32,7 +32,6 @@ import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
-import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;

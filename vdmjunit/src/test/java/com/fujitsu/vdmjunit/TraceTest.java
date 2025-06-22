@@ -33,7 +33,6 @@ import org.junit.Test;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.traces.TraceReductionType;
-import com.fujitsu.vdmjunit.VDMJUnitTestSL;
 
 public class TraceTest extends VDMJUnitTestSL
 {

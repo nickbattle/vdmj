@@ -32,7 +32,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fujitsu.vdmj.runtime.ContextException;
-import com.fujitsu.vdmjunit.VDMJUnitTestPP;
 
 public class PPTest extends VDMJUnitTestPP
 {
