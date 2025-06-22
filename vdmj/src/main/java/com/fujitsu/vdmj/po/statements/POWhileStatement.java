@@ -73,6 +73,7 @@ public class POWhileStatement extends POStatement
 			obligations.add(new LoopInvariantObligation(location, ctxt));
 			
 			int popto = ctxt.size();
+			ctxt.push(new POImpliesContext(this.exp));	// while C => ...
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
 
