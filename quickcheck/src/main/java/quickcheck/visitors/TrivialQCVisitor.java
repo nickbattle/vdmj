@@ -26,9 +26,7 @@ package quickcheck.visitors;
 
 import static quickcheck.commands.QCConsole.verbose;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
@@ -59,6 +57,8 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.util.Utils;
 
+import quickcheck.strategies.TrivialQCKnown;
+
 /**
  * Search for trivial truths in POs. Each method is passed a stack of expressions
  * which are known to be true in the current context and they return true if they
@@ -67,7 +67,7 @@ import com.fujitsu.vdmj.util.Utils;
  * eg. X =&gt; Y will pass "X" as a truth when evaluating Y. If Y is just X, then
  * that will always be true and so the whole implication is always true, etc.
  */
-public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpression>>
+public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, TrivialQCKnown>
 {
 	private final List<String> evaluated;
 	
@@ -81,52 +81,24 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 		return Utils.listToString(evaluated);
 	}
 	
-	private void pops(Stack<TCExpression> truths, int pushes)
+	private TrivialQCKnown pushTruthsOf(TCExpression exp, TrivialQCKnown truths)
 	{
-		for (int i=0; i<pushes; i++)
-		{
-			if (!truths.isEmpty()) truths.pop();
-		}
-	}
-	
-	private int pushTruthsOf(TCExpression exp, Stack<TCExpression> truths)
-	{
-		int count = 0;
-		truths.push(exp);
-		count++;
+		truths = new TrivialQCKnown(exp, truths);
 		
 		if (exp instanceof TCAndExpression)
 		{
 			TCAndExpression and = (TCAndExpression)exp;
 			
-			count += pushTruthsOf(and.left, truths);
-			count += pushTruthsOf(and.right, truths);
+			truths = pushTruthsOf(and.left, truths);
+			truths = pushTruthsOf(and.right, truths);
 		}
 		
-		return count;
-	}
-
-	private void removeHidden(Stack<TCExpression> truths, TCIdentifierPattern id)
-	{
-		// If the id hides other symbols in truths, we have to remove them
-		Iterator<TCExpression> it = truths.iterator();
-		
-		while (it.hasNext())
-		{
-			TCExpression truth = it.next();
-			
-			if (truth.getVariableNames().contains(id.name))
-			{
-				it.remove();
-			}
-		}
+		return truths;
 	}
 
 	@Override
-	public Boolean caseForAllExpression(TCForAllExpression node, Stack<TCExpression> truths)
+	public Boolean caseForAllExpression(TCForAllExpression node, TrivialQCKnown truths)
 	{
-		int pushes = 0;
-		
 		for (TCMultipleBind bind: node.bindList)
 		{
 			if (bind instanceof TCMultipleSetBind)
@@ -139,27 +111,23 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 					{
 						TCIdentifierPattern id = (TCIdentifierPattern)p;
 
-						truths.push(new TCInSetExpression(
+						TCInSetExpression exp = new TCInSetExpression(
 							new TCVariableExpression(id.location, id.name, p.toString()),
 							new LexKeywordToken(Token.INSET, sbind.location),
-							sbind.set));
+							sbind.set);
 						
-						pushes++;
+						truths = new TrivialQCKnown(exp, truths, id.name);
 					}
 				}
 			}
 		}
 		
-		boolean result = node.predicate.apply(this, truths);
-		pops(truths, pushes);
-		return result;
+		return node.predicate.apply(this, truths);
 	}
 	
 	@Override
-	public Boolean caseLetDefExpression(TCLetDefExpression node, Stack<TCExpression> truths)
+	public Boolean caseLetDefExpression(TCLetDefExpression node, TrivialQCKnown truths)
 	{
-		int pushes = 0;
-		
 		for (TCDefinition def: node.localDefs)
 		{
 			if (def instanceof TCValueDefinition)
@@ -169,28 +137,23 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
 					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
-					removeHidden(truths, id);
 
-					truths.push(new TCEqualsExpression(
+					TCEqualsExpression exp = new TCEqualsExpression(
 							new TCVariableExpression(id.location, id.name, id.toString()),
 							new LexKeywordToken(Token.EQUALS, id.location),
-							vdef.exp));
+							vdef.exp);
 
-					pushes++;
+					truths = new TrivialQCKnown(exp, truths, id.name);
 				}
 			}
 		}
 		
-		boolean result = node.expression.apply(this, truths);
-		pops(truths, pushes);
-		return result;
+		return node.expression.apply(this, truths);
 	}
 
 	@Override
-	public Boolean caseDefExpression(TCDefExpression node, Stack<TCExpression> truths)
+	public Boolean caseDefExpression(TCDefExpression node, TrivialQCKnown truths)
 	{
-		int pushes = 0;
-		
 		for (TCDefinition def: node.localDefs)
 		{
 			if (def instanceof TCValueDefinition)
@@ -200,59 +163,46 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
 					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
-					removeHidden(truths, id);
 
-					truths.push(new TCEqualsExpression(
+					TCEqualsExpression exp = new TCEqualsExpression(
 							new TCVariableExpression(id.location, id.name, id.toString()),
 							new LexKeywordToken(Token.EQUALS, id.location),
-							vdef.exp));
+							vdef.exp);
 						
-					pushes++;
+					truths = new TrivialQCKnown(exp, truths, id.name);
 				}
 			}
 		}
 		
-		boolean result = node.expression.apply(this, truths);
-		pops(truths, pushes);
-		return result;
+		return node.expression.apply(this, truths);
 	}
 	
 	@Override
-	public Boolean caseIfExpression(TCIfExpression node, Stack<TCExpression> truths)
+	public Boolean caseIfExpression(TCIfExpression node, TrivialQCKnown truths)
 	{
-		int p = pushTruthsOf(node.ifExp, truths);
-		boolean result = node.thenExp.apply(this, truths);
-		pops(truths, p);
+		boolean result = node.thenExp.apply(this, pushTruthsOf(node.ifExp, truths));
 		
-		int pushes = 0;
-		truths.push(new TCNotExpression(node.location, node.ifExp));
-		pushes++;
+		truths = new TrivialQCKnown(new TCNotExpression(node.location, node.ifExp), truths);
 		
 		for (TCElseIfExpression elif: node.elseList)
 		{
-			p = pushTruthsOf(elif.elseIfExp, truths);
-			result = result && elif.thenExp.apply(this, truths);
-			pops(truths, p);
-			
-			truths.push(new TCNotExpression(node.location, elif.thenExp));
-			pushes++;
+			result = result && elif.thenExp.apply(this, pushTruthsOf(elif.elseIfExp, truths));
+			truths = new TrivialQCKnown(new TCNotExpression(node.location, elif.thenExp), truths);
 		}
 
-		result = result && node.elseExp.apply(this, truths);
-		pops(truths, pushes);
-		return result;		// All paths always true
+		return result && node.elseExp.apply(this, truths);
 	}
 	
 	@Override
-	public Boolean caseImpliesExpression(TCImpliesExpression node, Stack<TCExpression> truths)
+	public Boolean caseImpliesExpression(TCImpliesExpression node, TrivialQCKnown truths)
 	{
-		int pushes = pushTruthsOf(node.left, truths);
+		truths = pushTruthsOf(node.left, truths);
 
 		if (node.left instanceof TCEqualsExpression)
 		{
 			TCEqualsExpression eq = (TCEqualsExpression)node.left;
-			truths.push(new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right));
-			pushes++;
+			truths = new TrivialQCKnown(
+				new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right), truths);
 		}
 		else if (node.left instanceof TCNotExpression)
 		{
@@ -261,18 +211,16 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 			if (nexp.exp instanceof TCEqualsExpression)
 			{
 				TCEqualsExpression eq = (TCEqualsExpression)nexp.exp;
-				truths.push(new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right));
-				pushes++;
+				truths = new TrivialQCKnown(
+					new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right), truths);
 			}
 		}
 		
-		boolean result = node.right.apply(this, truths);
-		pops(truths, pushes);
-		return result;
+		return node.right.apply(this, truths);
 	}
 	
 	@Override
-	public Boolean caseNotEqualExpression(TCNotEqualExpression node, Stack<TCExpression> truths)
+	public Boolean caseNotEqualExpression(TCNotEqualExpression node, TrivialQCKnown truths)
 	{
 		if (node.left instanceof TCSeqEnumExpression &&
 			node.right instanceof TCSeqEnumExpression)
@@ -311,13 +259,12 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	}
 
 	@Override
-	public Boolean caseExpression(TCExpression node, Stack<TCExpression> truths)
+	public Boolean caseExpression(TCExpression node, TrivialQCKnown truths)
 	{
-		int idx = truths.indexOf(node);
+		TCExpression original = truths.isKnown(node);
 		
-		if (idx >= 0)
+		if (original != null)
 		{
-			TCExpression original = truths.get(idx);
 			verbose("Expression %s defined at line %d\n", original, original.location.startLine);
 			verbose("Expression %s true at line %d\n", node, node.location.startLine);
 			
