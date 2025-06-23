@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.PONode;
 

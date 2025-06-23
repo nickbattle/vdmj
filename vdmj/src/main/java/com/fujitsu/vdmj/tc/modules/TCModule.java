@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.tc.modules;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 

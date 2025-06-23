@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.traces;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.po.PONode;
 
 /**

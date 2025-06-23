@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.typechecker;
 
-import java.io.Serializable;
-
 /**
  * An enum to represent name scoping. When names are being looked up with
  * findName, the scope is used

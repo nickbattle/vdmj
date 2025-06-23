@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.types;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;

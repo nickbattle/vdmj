@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionExpressionFinder;

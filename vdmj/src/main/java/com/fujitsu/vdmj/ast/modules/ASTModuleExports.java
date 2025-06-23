@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.ast.modules;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
 
 public class ASTModuleExports extends ASTNode

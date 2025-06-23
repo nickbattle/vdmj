@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;

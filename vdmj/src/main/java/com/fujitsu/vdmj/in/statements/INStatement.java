@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;

@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;

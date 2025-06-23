@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.ast.modules;
 
 import java.io.File;
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;

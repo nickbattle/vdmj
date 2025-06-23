@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;

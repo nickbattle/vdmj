@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.INNode;

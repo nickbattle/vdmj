@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.typechecker;
 
-import java.io.Serializable;
-
 /**
  * An enum to indicate which type checking pass a definition belongs to.
  */

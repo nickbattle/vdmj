@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.ast.lex.LexCommentList;

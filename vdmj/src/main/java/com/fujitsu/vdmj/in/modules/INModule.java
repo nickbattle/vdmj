@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.in.modules;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 

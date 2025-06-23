@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;

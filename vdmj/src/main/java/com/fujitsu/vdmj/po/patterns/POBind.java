@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.LexLocation;

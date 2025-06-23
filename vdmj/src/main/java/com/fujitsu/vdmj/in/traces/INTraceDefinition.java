@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.in.traces;
 
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;

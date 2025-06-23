@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.mapper.MappedObject;
 
 /**

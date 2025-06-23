@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;

@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.lex;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
