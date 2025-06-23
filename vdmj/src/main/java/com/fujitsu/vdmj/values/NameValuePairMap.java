@@ -28,7 +28,6 @@ import java.util.HashMap;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-@SuppressWarnings("serial")
 public class NameValuePairMap extends HashMap<TCNameToken, Value>
 {
 	public void put(NameValuePair nvp)

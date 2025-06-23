@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.messages;
 
-@SuppressWarnings("serial")
 public class InternalException extends RuntimeException
 {
 	public final int number;

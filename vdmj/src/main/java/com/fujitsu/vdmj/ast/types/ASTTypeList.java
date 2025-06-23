@@ -29,7 +29,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class ASTTypeList extends Vector<ASTType> implements Mappable
 {
 	public ASTTypeList()

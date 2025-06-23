@@ -29,7 +29,6 @@ import java.util.TreeSet;
 /**
  * A class to hold a set of Definitions with unique names.
  */
-@SuppressWarnings("serial")
 public class PODefinitionSet extends TreeSet<PODefinition>
 {
 	public PODefinitionSet()

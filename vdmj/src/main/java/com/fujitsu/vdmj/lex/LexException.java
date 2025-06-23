@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.messages.LocatedException;
 /**
  * An exception class for lexical analyser exceptions.
  */
-@SuppressWarnings("serial")
 public class LexException extends LocatedException
 {
 	public LexException(int number, String msg, LexLocation location)

@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 /**
  * A class representing a sequence of trace definitions.
  */
-@SuppressWarnings("serial")
 public class TCTraceDefinitionTerm extends TCMappedList<ASTTraceDefinition, TCTraceDefinition>
 {
 	public TCTraceDefinitionTerm()

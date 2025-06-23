@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 /**
  * A class to hold a list of Definitions.
  */
-@SuppressWarnings("serial")
 public class TCDefinitionList extends TCMappedList<ASTDefinition, TCDefinition>
 {
 	public TCDefinitionList(ASTDefinitionList from) throws Exception

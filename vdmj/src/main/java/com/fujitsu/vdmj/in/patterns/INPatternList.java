@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
-@SuppressWarnings("serial")
 public class INPatternList extends INMappedList<TCPattern, INPattern>
 {
 	public INPatternList(TCPatternList from) throws Exception

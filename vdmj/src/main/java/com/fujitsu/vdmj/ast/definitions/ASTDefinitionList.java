@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.mapper.Mappable;
 /**
  * A class to hold a list of Definitions.
  */
-@SuppressWarnings("serial")
 public class ASTDefinitionList extends Vector<ASTDefinition> implements Mappable
 {
 	public ASTDefinitionList()

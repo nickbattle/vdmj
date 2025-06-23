@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.util.Utils;
  * so that the possible orderings of set values can be enumerated when
  * performing quantifiers like "a,b,c in set {{1,2,3}, {4,5,6}}".
  */
-@SuppressWarnings("serial")
 public class ValueSet extends Vector<Value>		// NB based on Vector
 {
 	private boolean isSorted;

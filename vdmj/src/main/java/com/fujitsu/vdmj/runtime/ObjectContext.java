@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * A root context for object method invocations.
  */
-@SuppressWarnings("serial")
 public class ObjectContext extends RootContext
 {
 	public final ObjectValue self;

@@ -31,7 +31,6 @@ import java.util.Vector;
  * A class to hold the name/Value list of fields in a record.
  */
 
-@SuppressWarnings("serial")
 public class FieldMap extends Vector<FieldValue>
 {
 	public FieldMap()

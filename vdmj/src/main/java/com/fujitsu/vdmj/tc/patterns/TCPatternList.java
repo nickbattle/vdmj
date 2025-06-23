@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class TCPatternList extends TCMappedList<ASTPattern, TCPattern>
 {
 	public TCPatternList(ASTPatternList from) throws Exception

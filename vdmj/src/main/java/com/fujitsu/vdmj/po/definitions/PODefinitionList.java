@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.typechecker.Environment;
 /**
  * A class to hold a list of Definitions.
  */
-@SuppressWarnings("serial")
 public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 {
 	public PODefinitionList(TCDefinitionList from) throws Exception

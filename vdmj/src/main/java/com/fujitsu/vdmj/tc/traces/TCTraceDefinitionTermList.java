@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.TCMappedList;
 /**
  * A class representing a sequence of trace definitions.
  */
-@SuppressWarnings("serial")
 public class TCTraceDefinitionTermList extends TCMappedList<ASTTraceDefinitionTerm, TCTraceDefinitionTerm>
 {
 	public TCTraceDefinitionTermList()

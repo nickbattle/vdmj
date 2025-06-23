@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.runtime;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 
-@SuppressWarnings("serial")
 public class ContextException extends RuntimeException
 {
 	private static final int STACK_OVERFLOW	= 4998;

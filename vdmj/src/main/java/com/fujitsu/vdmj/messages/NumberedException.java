@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.messages;
 
-@SuppressWarnings("serial")
 abstract public class NumberedException extends Exception
 {
 	public final int number;

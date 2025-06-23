@@ -30,7 +30,6 @@ import java.util.TreeSet;
  * A class to hold a set of Definitions with unique names.
  */
 
-@SuppressWarnings("serial")
 public class TCDefinitionSet extends TreeSet<TCDefinition>
 {
 	public TCDefinitionSet()

@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class TCNamePatternPairList extends TCMappedList<ASTNamePatternPair, TCNamePatternPair>
 {
 	public TCNamePatternPairList(ASTNamePatternPairList from) throws Exception

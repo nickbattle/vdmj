@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.traces.TraceIteratorList;
 /**
  * A class representing a sequence of trace definitions.
  */
-@SuppressWarnings("serial")
 public class INTraceDefinitionTerm extends INMappedList<TCTraceDefinition, INTraceDefinition>
 {
 	public INTraceDefinitionTerm()

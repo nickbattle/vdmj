@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class PONamePatternPairList extends POMappedList<TCNamePatternPair, PONamePatternPair>
 {
 	public PONamePatternPairList(TCNamePatternPairList list) throws Exception

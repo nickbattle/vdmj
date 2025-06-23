@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.util.Utils;
 
 
-@SuppressWarnings("serial")
 public class TCTypeSet extends TreeSet<TCType> implements Mappable
 {
 	// This ought to be a MappedSet

@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.util.Utils;
  * A sequential list of values.
  */
 
-@SuppressWarnings("serial")
 public class ValueList extends Vector<Value>
 {
 	public ValueList()

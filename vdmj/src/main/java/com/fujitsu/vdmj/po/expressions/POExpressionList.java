@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 
-@SuppressWarnings("serial")
 public class POExpressionList extends POMappedList<TCExpression, POExpression>
 {
 	public POExpressionList(TCExpressionList from) throws Exception

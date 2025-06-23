@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.runtime;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.LocatedException;
 
-@SuppressWarnings("serial")
 public class PatternMatchException extends LocatedException
 {
 	public PatternMatchException(int number, String msg, LexLocation location)

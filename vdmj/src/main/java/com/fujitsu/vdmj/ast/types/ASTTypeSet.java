@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.ast.types;
 import java.util.TreeSet;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class ASTTypeSet extends TreeSet<ASTType>
 {
 	public ASTTypeSet()

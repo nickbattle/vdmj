@@ -28,7 +28,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class NameValuePairList extends Vector<NameValuePair>
 {
 	public NameValuePairList()

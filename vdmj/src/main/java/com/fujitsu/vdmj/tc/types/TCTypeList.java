@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class TCTypeList extends TCMappedList<ASTType, TCType>
 {
 	public TCTypeList(ASTTypeList from) throws Exception

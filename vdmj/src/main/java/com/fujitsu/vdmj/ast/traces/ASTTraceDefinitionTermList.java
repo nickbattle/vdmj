@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.mapper.Mappable;
 /**
  * A class representing a sequence of trace definition terms.
  */
-@SuppressWarnings("serial")
 public class ASTTraceDefinitionTermList extends Vector<ASTTraceDefinitionTerm> implements Mappable
 {
 	// :-)
