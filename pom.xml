@@ -176,6 +176,20 @@
                     <version>3.0.1</version>
                 </plugin>
 
+				<plugin>
+					<groupId>com.outbrain.swinfra</groupId>
+					<artifactId>ci-friendly-flatten-maven-plugin</artifactId>
+					<version>1.0.17</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>clean</goal>
+								<goal>flatten</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -183,6 +197,7 @@
             ${project.artifactId}-${project.version}-${maven.build.timestamp}
         </finalName>
 
+<!-- Move into pluginManagement
         <plugins>
             <plugin>
                 <groupId>com.outbrain.swinfra</groupId>
@@ -198,6 +213,7 @@
                 </executions>
             </plugin>
 		</plugins>
+-->
     </build>
     
 
