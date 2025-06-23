@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class TCImportFromModule extends TCNode implements Serializable
+public class TCImportFromModule extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

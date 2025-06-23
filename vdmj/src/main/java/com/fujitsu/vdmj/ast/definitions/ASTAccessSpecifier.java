@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.ast.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.lex.Token;
 /**
  * A class to represent a [pure][static] public/private/protected specifier.
  */
-public class ASTAccessSpecifier extends ASTNode implements Serializable
+public class ASTAccessSpecifier extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

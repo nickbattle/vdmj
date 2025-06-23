@@ -43,7 +43,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * A class holding all the details for one module.
  */
-public class TCModule extends TCNode implements Serializable
+public class TCModule extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * The parent class of all import declarations.
  */
-abstract public class ASTImport extends ASTNode implements Serializable
+abstract public class ASTImport extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

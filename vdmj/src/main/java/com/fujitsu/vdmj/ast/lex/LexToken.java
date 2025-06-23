@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.lex.Token;
 /**
  * The parent class for all lexical token types.
  */
-abstract public class LexToken extends ASTNode implements Serializable
+abstract public class LexToken extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

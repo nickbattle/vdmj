@@ -28,7 +28,7 @@ import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public class ASTModuleImports extends ASTNode implements Serializable
+public class ASTModuleImports extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 	public final LexIdentifierToken name;

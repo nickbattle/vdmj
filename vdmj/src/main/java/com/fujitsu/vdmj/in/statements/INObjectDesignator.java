@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * An abstract class for all object designators.
  */
-public abstract class INObjectDesignator extends INNode implements Serializable
+public abstract class INObjectDesignator extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

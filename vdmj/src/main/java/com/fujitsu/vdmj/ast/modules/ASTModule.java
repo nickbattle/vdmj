@@ -39,7 +39,7 @@ import com.fujitsu.vdmj.mapper.FileList;
 /**
  * A class holding all the details for one module.
  */
-public class ASTModule extends ASTNode implements Serializable
+public class ASTModule extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

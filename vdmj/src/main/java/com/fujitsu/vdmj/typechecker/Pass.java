@@ -30,7 +30,7 @@ import java.io.Serializable;
  * An enum to indicate which type checking pass a definition belongs to.
  */
 
-public enum Pass implements Serializable
+public enum Pass
 {
 	TYPES, VALUES, DEFS, FINAL
 }

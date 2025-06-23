@@ -47,7 +47,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 /**
  *	The parent class of all VDM expressions.
  */
-public abstract class POExpression extends PONode implements Serializable
+public abstract class POExpression extends PONode
 {
 	private static final long serialVersionUID = 1L;
 	

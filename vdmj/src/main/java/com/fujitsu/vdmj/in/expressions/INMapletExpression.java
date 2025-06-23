@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
 
-public class INMapletExpression extends INNode implements Serializable
+public class INMapletExpression extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

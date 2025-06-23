@@ -31,7 +31,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class TCField extends TCNode implements Serializable
+public class TCField extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.po.PONode;
 /**
  * A class to hold an object assignment designator.
  */
-public abstract class POObjectDesignator extends PONode implements Serializable
+public abstract class POObjectDesignator extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

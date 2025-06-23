@@ -47,7 +47,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class PODefinition extends PONode implements Serializable, Comparable<PODefinition>
+public abstract class PODefinition extends PONode implements Comparable<PODefinition>
 {
 	private static final long serialVersionUID = 1L;
 

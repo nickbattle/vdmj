@@ -41,7 +41,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * The parent class of all statements.
  */
-public abstract class INStatement extends INNode implements Serializable
+public abstract class INStatement extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

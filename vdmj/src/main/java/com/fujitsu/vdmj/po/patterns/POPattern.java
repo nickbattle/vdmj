@@ -45,7 +45,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 /**
  * The parent type of all patterns.
  */
-public abstract class POPattern extends PONode implements Serializable
+public abstract class POPattern extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

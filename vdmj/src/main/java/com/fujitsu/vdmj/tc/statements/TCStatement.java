@@ -50,7 +50,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  * The parent class of all statements.
  */
-public abstract class TCStatement extends TCNode implements Serializable
+public abstract class TCStatement extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

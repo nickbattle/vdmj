@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 
-public class ASTField extends ASTNode implements Serializable
+public class ASTField extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

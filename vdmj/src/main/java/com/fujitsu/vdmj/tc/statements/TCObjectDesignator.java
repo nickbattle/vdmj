@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * A class to hold an object assignment designator.
  */
-public abstract class TCObjectDesignator extends TCNode implements Serializable
+public abstract class TCObjectDesignator extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

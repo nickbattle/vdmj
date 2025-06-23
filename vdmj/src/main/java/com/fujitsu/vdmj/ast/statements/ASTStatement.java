@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * The parent class of all statements.
  */
-public abstract class ASTStatement extends ASTNode implements Serializable
+public abstract class ASTStatement extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

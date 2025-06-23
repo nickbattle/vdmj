@@ -46,7 +46,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * The parent type of all patterns.
  */
-public abstract class INPattern extends INNode implements Serializable
+public abstract class INPattern extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

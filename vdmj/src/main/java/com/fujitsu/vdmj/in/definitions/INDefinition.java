@@ -48,7 +48,7 @@ import com.fujitsu.vdmj.values.NameValuePairList;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class INDefinition extends INNode implements Serializable, Comparable<INDefinition>
+public abstract class INDefinition extends INNode implements Comparable<INDefinition>
 {
 	private static final long serialVersionUID = 1L;
 

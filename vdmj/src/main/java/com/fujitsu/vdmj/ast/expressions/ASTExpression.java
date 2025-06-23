@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.ast.expressions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  *	The parent class of all VDM expressions.
  */
-public abstract class ASTExpression extends ASTNode implements Serializable
+public abstract class ASTExpression extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.values.ValueList;
 /**
  * The parent class of {@link INSetBind} and {@link INTypeBind}.
  */
-public abstract class INBind extends INNode implements Serializable
+public abstract class INBind extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

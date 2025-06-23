@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.util.Utils;
 
 
 @SuppressWarnings("serial")
-public class TCTypeSet extends TreeSet<TCType> implements Cloneable, Mappable
+public class TCTypeSet extends TreeSet<TCType> implements Mappable
 {
 	// This ought to be a MappedSet
 	public TCTypeSet(ASTTypeSet from) throws Exception

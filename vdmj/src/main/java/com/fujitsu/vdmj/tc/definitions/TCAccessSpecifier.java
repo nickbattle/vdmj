@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 /**
  * A class to represent a [pure][static] public/private/protected specifier.
  */
-public class TCAccessSpecifier extends TCNode implements Serializable
+public class TCAccessSpecifier extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

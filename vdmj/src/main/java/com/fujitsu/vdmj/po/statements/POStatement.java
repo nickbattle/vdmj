@@ -42,7 +42,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 /**
  * The parent class of all statements.
  */
-public abstract class POStatement extends PONode implements Serializable
+public abstract class POStatement extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

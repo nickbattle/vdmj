@@ -40,7 +40,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 /**
  * A class holding all the details for one module.
  */
-public class POModule extends PONode implements Serializable
+public class POModule extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

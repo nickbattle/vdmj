@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * A class representing a trace definition.
  */
-abstract public class ASTTraceDefinition extends ASTNode implements Serializable
+abstract public class ASTTraceDefinition extends ASTNode
 {
     private static final long serialVersionUID = 1L;
 	public final LexLocation location;

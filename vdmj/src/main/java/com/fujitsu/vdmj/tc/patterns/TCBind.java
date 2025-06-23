@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * The parent class of {@link TCSetBind} and {@link TCTypeBind}.
  */
-public abstract class TCBind extends TCNode implements Serializable
+public abstract class TCBind extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -36,7 +36,7 @@ import java.io.Serializable;
  * be checked under NAMESANDANYSTATE to include the "old" names.
  */
 
-public enum NameScope implements Serializable
+public enum NameScope
 {
 	LOCAL(1),		// Let definitions and parameters
 	GLOBAL(2),		// Eg. module and class func/ops/values

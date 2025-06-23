@@ -55,7 +55,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class TCDefinition extends TCNode implements Serializable, Comparable<TCDefinition>
+public abstract class TCDefinition extends TCNode implements Comparable<TCDefinition>
 {
 	private static final long serialVersionUID = 1L;
 

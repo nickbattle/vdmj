@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.traces.TraceIterator;
 /**
  * A class representing a trace definition.
  */
-abstract public class INTraceDefinition extends INNode implements Serializable
+abstract public class INTraceDefinition extends INNode
 {
     private static final long serialVersionUID = 1L;
 

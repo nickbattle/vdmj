@@ -47,7 +47,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  *	The parent class of all VDM expressions.
  */
-public abstract class TCExpression extends TCNode implements Serializable
+public abstract class TCExpression extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

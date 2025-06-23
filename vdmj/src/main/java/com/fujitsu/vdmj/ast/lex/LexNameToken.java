@@ -24,12 +24,10 @@
 
 package com.fujitsu.vdmj.ast.lex;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 
-public class LexNameToken extends LexToken implements Serializable, Comparable<LexNameToken>
+public class LexNameToken extends LexToken implements Comparable<LexNameToken>
 {
 	private static final long serialVersionUID = 1L;
 

@@ -46,7 +46,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  * The parent type of all patterns.
  */
-public abstract class TCPattern extends TCNode implements Serializable
+public abstract class TCPattern extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

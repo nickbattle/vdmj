@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * The parent class of {@link ASTSetBind} and {@link ASTTypeBind}.
  */
-public abstract class ASTBind extends ASTNode implements Serializable
+public abstract class ASTBind extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

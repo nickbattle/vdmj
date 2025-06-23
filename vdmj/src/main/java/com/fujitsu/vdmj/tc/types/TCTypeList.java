@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
-public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneable
+public class TCTypeList extends TCMappedList<ASTType, TCType>
 {
 	public TCTypeList(ASTTypeList from) throws Exception
 	{

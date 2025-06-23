@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
  * The parent class of all export declarations.
  */
 
-abstract public class TCExport extends TCNode implements Serializable
+abstract public class TCExport extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

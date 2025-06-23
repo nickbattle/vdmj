@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.lex.Token;
 /**
  * A class to represent a [pure][static] public/private/protected specifier.
  */
-public class INAccessSpecifier extends INNode implements Serializable
+public class INAccessSpecifier extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

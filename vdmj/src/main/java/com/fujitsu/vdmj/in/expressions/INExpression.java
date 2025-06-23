@@ -45,7 +45,7 @@ import com.fujitsu.vdmj.values.ValueList;
 /**
  *	The parent class of all VDM expressions.
  */
-public abstract class INExpression extends INNode implements Serializable
+public abstract class INExpression extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

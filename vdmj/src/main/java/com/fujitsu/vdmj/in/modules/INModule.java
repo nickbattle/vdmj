@@ -51,7 +51,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * A class holding all the details for one module.
  */
-public class INModule extends INNode implements Serializable
+public class INModule extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

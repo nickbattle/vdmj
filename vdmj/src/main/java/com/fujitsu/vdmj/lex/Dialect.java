@@ -26,12 +26,11 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.Serializable;
 
 /**
  * An enumeration to indicate the VDM dialect being parsed.
  */
-public enum Dialect implements Serializable
+public enum Dialect
 {
 	VDM_SL("-vdmsl", ".+\\.vdm|.+\\.vdmsl"),
 	VDM_PP("-vdmpp", ".+\\.vpp|.+\\.vdmpp"),

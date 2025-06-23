@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 /**
  * A class representing a trace definition.
  */
-abstract public class TCTraceDefinition extends TCNode implements Serializable
+abstract public class TCTraceDefinition extends TCNode
 {
     private static final long serialVersionUID = 1L;
 	public final LexLocation location;

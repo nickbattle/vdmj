@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  * A name token for the purpose of type checking.
  */
-public class TCNameToken extends TCToken implements Serializable, Comparable<TCNameToken>
+public class TCNameToken extends TCToken implements Comparable<TCNameToken>
 {
 	private static final long serialVersionUID = 1L;
 
