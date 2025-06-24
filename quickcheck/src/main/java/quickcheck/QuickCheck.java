@@ -870,6 +870,11 @@ public class QuickCheck
 			sep = ", ";
 		}
 		
+		if (path.location.startLine != 1)
+		{
+			result.append(" @PO line #" + path.location.startLine);
+		}
+
 		return result.toString();
 	}
 

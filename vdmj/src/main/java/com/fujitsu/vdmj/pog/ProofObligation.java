@@ -136,7 +136,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		else
 		{
-			counterexample = new Context(location, "Counterexample", null);
+			counterexample = new Context(path.location, "Counterexample", null);
 			Context ctxt = path;
 			
 			while (ctxt != null && ctxt.outer != null)
