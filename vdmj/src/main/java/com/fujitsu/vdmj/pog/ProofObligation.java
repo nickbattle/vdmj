@@ -163,12 +163,20 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		else
 		{
-			witness = new Context(location, "Witness", null);
+			witness = new Context(path.location, "Witness", null);
 			Context ctxt = path;
 			
 			while (ctxt != null && ctxt.outer != null)
 			{
-				witness.putAll(ctxt);
+				for (TCNameToken key: ctxt.keySet())
+				{
+					// Only update unknown values, so "most recent" values show
+					if (!witness.containsKey(key))
+					{
+						witness.put(key, ctxt.get(key));
+					}
+				}
+
 				ctxt = ctxt.outer;
 			}
 		}
