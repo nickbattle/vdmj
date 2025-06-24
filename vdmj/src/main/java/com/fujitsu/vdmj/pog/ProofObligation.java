@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -140,7 +141,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			
 			while (ctxt != null && ctxt.outer != null)
 			{
-				counterexample.putAll(ctxt);
+				for (TCNameToken key: ctxt.keySet())
+				{
+					// Only update unknown values, so "most recent" values show
+					if (!counterexample.containsKey(key))
+					{
+						counterexample.put(key, ctxt.get(key));
+					}
+				}
+
 				ctxt = ctxt.outer;
 			}
 		}
