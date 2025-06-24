@@ -28,7 +28,6 @@ import java.util.List;
 
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class VDMErrorsException extends Exception
 {
 	public final List<VDMError> errors;

@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class TCNameList extends Vector<TCNameToken> implements Mappable
 {
 	public TCNameList()

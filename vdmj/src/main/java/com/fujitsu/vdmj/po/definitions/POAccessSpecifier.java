@@ -24,15 +24,13 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.PONode;
 
 /**
  * A class to represent a [pure][static] public/private/protected specifier.
  */
-public class POAccessSpecifier extends PONode implements Serializable
+public class POAccessSpecifier extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -46,7 +44,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  * The parent type of all patterns.
  */
-public abstract class TCPattern extends TCNode implements Serializable
+public abstract class TCPattern extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

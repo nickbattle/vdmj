@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class POModuleList extends POMappedList<TCModule, POModule>
 {
 	public POModuleList(TCModuleList from) throws Exception

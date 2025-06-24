@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * An abstract class for all object designators.
  */
-public abstract class INObjectDesignator extends INNode implements Serializable
+public abstract class INObjectDesignator extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

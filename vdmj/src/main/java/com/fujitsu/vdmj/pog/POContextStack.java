@@ -51,7 +51,6 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
-@SuppressWarnings("serial")
 public class POContextStack extends Stack<POContext>
 {
 	/**

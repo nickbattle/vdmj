@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.ast.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
@@ -39,7 +37,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class ASTDefinition extends ASTNode implements Serializable, Comparable<ASTDefinition>
+public abstract class ASTDefinition extends ASTNode implements Comparable<ASTDefinition>
 {
 	private static final long serialVersionUID = 1L;
 

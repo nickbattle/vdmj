@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * A class to hold runtime name/value context information.
  */
-@SuppressWarnings("serial")
 public class Context extends HashMap<TCNameToken, Value>
 {
 	/** The location of the context. */

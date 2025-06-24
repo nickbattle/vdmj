@@ -28,12 +28,10 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.List;
-import java.util.Stack;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
 
 import quickcheck.visitors.TrivialQCVisitor;
 
@@ -68,7 +66,7 @@ public class TrivialQCStrategy extends QCStrategy
 		{
 			TrivialQCVisitor visitor = new TrivialQCVisitor();
 
-			if (po.getCheckedExpression().apply(visitor, new Stack<TCExpression>()))
+			if (po.getCheckedExpression().apply(visitor, new TrivialQCKnown()))
 			{
 				return new StrategyResults(getName(), visitor.getMessage(), null);
 			}

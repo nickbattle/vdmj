@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class TCExpressionList extends TCMappedList<ASTExpression, TCExpression>
 {
 	public TCExpressionList(ASTExpressionList from) throws Exception

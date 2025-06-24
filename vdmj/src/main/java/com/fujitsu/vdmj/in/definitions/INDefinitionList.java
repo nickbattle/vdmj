@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 /**
  * A class to hold a list of Definitions.
  */
-@SuppressWarnings("serial")
 public class INDefinitionList extends INMappedList<TCDefinition, INDefinition>
 {
 	public INDefinitionList(TCDefinitionList from) throws Exception

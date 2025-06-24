@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.runtime;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.values.Value;
 
-@SuppressWarnings("serial")
 public class ExitException extends ContextException
 {
 	public final Value value;

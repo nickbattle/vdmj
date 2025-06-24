@@ -24,15 +24,13 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
  * A class to hold an object assignment designator.
  */
-public abstract class ASTObjectDesignator extends ASTNode implements Serializable
+public abstract class ASTObjectDesignator extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

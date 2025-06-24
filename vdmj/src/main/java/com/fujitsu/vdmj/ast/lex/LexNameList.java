@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.ast.lex;
 import java.util.Vector;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class LexNameList extends Vector<LexNameToken>
 {
 	public LexNameList()

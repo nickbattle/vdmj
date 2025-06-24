@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.lex.Token;
 /**
  * A class to represent a [pure][static] public/private/protected specifier.
  */
-public class INAccessSpecifier extends INNode implements Serializable
+public class INAccessSpecifier extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.Value;
 
-@SuppressWarnings("serial")
 public class ClassContext extends RootContext
 {
 	public final INClassDefinition classdef;

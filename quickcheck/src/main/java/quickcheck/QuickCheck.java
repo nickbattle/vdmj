@@ -78,7 +78,7 @@ import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
-import quickcheck.visitors.TypeBindFinder;
+import quickcheck.visitors.ExpressionTypeBindOverrider;
 
 public class QuickCheck
 {
@@ -295,7 +295,7 @@ public class QuickCheck
 	
 	public List<INBindingOverride> getINBindList(INExpression inexp)
 	{
-		return inexp.apply(new TypeBindFinder(), null);
+		return inexp.apply(new ExpressionTypeBindOverrider(), null);
 	}
 	
 	public StrategyResults getValues(ProofObligation po)
@@ -531,7 +531,11 @@ public class QuickCheck
 	{
 		po.clearAnalysis();
 		
-		if (execResult instanceof BooleanValue)
+		if (execResult.isUndefined())
+		{
+			po.setStatus(POStatus.MAYBE);
+		}
+		else if (execResult instanceof BooleanValue)
 		{
 			BooleanValue result = (BooleanValue)execResult;
 			
@@ -540,10 +544,6 @@ public class QuickCheck
 				if (timedOut)	// Result would be false (below), but...
 				{
 					po.setStatus(POStatus.TIMEOUT);
-				}
-				else if (globals.hasMaybe())
-				{
-					po.setStatus(POStatus.MAYBE);
 				}
 				else if (po.isExistential())
 				{
@@ -596,10 +596,6 @@ public class QuickCheck
 					{
 						po.setStatus(POStatus.MAYBE);
 					}
-				}
-				else if (globals.hasMaybe() && execCompleted)
-				{
-					po.setStatus(POStatus.MAYBE);
 				}
 				else
 				{
@@ -874,6 +870,11 @@ public class QuickCheck
 			sep = ", ";
 		}
 		
+		if (path.location.startLine != 1)
+		{
+			result.append(" @PO line #" + path.location.startLine);
+		}
+
 		return result.toString();
 	}
 

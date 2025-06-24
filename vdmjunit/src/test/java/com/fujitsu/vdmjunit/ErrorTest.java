@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import com.fujitsu.vdmjunit.VDMJUnitTestPP;
 
 public class ErrorTest extends VDMJUnitTestPP
 {

@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * The parent class of {@link TCSetBind} and {@link TCTypeBind}.
  */
-public abstract class TCBind extends TCNode implements Serializable
+public abstract class TCBind extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class TCModuleList extends TCMappedList<ASTModule, TCModule>
 {
 	public TCModuleList()

@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.PONotYetSpecifiedExpression;
 import com.fujitsu.vdmj.po.expressions.POStarStarExpression;
 import com.fujitsu.vdmj.po.expressions.POTailExpression;
-import com.fujitsu.vdmj.po.expressions.visitors.POLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 

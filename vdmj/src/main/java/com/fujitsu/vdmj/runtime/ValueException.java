@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.runtime;
 
 import com.fujitsu.vdmj.messages.NumberedException;
 
-@SuppressWarnings("serial")
 public class ValueException extends NumberedException
 {
 	public final Context ctxt;

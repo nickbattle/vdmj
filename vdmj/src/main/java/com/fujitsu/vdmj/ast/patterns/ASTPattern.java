@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -33,7 +31,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * The parent type of all patterns.
  */
-public abstract class ASTPattern extends ASTNode implements Serializable
+public abstract class ASTPattern extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

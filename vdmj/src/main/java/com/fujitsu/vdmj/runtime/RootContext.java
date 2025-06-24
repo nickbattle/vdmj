@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.values.ObjectValue;
  * name resolution does not proceed further down the chain, but rather jumps to
  * the outermost level.
  */
-@SuppressWarnings("serial")
 public abstract class RootContext extends Context
 {
 	protected final Context freeVariables;

@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -47,7 +45,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class PODefinition extends PONode implements Serializable, Comparable<PODefinition>
+public abstract class PODefinition extends PONode implements Comparable<PODefinition>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -91,7 +89,6 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	/**
 	 * For a state definition S, return a pattern like mk_S(a, b, ...) where the field patterns
 	 * are the names of the state fields. Similarly with objects, using "obj_C" patterns.
-	 * @param maximal TODO
 	 */
 	public String toPattern(boolean maximal)
 	{

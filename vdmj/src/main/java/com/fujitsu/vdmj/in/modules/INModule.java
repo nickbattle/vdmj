@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.in.modules;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,7 +50,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * A class holding all the details for one module.
  */
-public class INModule extends INNode implements Serializable
+public class INModule extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

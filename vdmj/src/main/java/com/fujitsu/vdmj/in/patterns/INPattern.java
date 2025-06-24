@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.INNode;
@@ -46,7 +45,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * The parent type of all patterns.
  */
-public abstract class INPattern extends INNode implements Serializable
+public abstract class INPattern extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

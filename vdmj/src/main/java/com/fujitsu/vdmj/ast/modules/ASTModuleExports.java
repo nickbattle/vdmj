@@ -24,10 +24,9 @@
 
 package com.fujitsu.vdmj.ast.modules;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
 
-public class ASTModuleExports extends ASTNode implements Serializable
+public class ASTModuleExports extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 	public final ASTExportList exports;

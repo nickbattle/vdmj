@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
@@ -55,7 +54,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class TCDefinition extends TCNode implements Serializable, Comparable<TCDefinition>
+public abstract class TCDefinition extends TCNode implements Comparable<TCDefinition>
 {
 	private static final long serialVersionUID = 1L;
 

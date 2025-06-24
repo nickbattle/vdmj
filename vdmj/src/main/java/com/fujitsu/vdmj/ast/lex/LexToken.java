@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.ast.lex;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -32,7 +31,7 @@ import com.fujitsu.vdmj.lex.Token;
 /**
  * The parent class for all lexical token types.
  */
-abstract public class LexToken extends ASTNode implements Serializable
+abstract public class LexToken extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

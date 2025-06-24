@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.traces.PermuteArray;
  * we only have "eq" and not a hashCode function defined, can which produce inconsistent
  * results with a HashMap (or TreeMap, with "ord" clauses).
  */
-@SuppressWarnings("serial")
 public class ValueMap extends HashMap<Value, Value>
 {
 	private InvariantValueMap delegate = null;

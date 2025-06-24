@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
  * A type checking exception.
  */
 
-@SuppressWarnings("serial")
 public class TypeCheckException extends RuntimeException
 {
 	public final LexLocation location;

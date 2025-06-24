@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class INExpressionList extends INMappedList<TCExpression, INExpression>
 {
 	public INExpressionList(TCExpressionList from) throws Exception

@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.traces.TCTraceDefinitionTermList;
 /**
  * A class representing a sequence of trace definitions.
  */
-@SuppressWarnings("serial")
 public class POTraceDefinitionTermList extends POMappedList<TCTraceDefinitionTerm, POTraceDefinitionTerm>
 {
 	public POTraceDefinitionTermList()

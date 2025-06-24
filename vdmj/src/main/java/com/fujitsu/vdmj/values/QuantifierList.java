@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 
 
-@SuppressWarnings("serial")
 public class QuantifierList extends Vector<Quantifier>
 {
 	private int count;

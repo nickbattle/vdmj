@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 /**
  * A class to represent a [pure][static] public/private/protected specifier.
  */
-public class TCAccessSpecifier extends TCNode implements Serializable
+public class TCAccessSpecifier extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

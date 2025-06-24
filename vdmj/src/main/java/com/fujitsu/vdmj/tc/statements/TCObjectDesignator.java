@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -36,7 +34,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * A class to hold an object assignment designator.
  */
-public abstract class TCObjectDesignator extends TCNode implements Serializable
+public abstract class TCObjectDesignator extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

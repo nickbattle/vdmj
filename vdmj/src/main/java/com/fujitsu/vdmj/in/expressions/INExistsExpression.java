@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Quantifier;
 import com.fujitsu.vdmj.values.QuantifierList;
+import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -65,6 +66,7 @@ public class INExistsExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
+		boolean hasUndefined = false;
 
 		try
 		{
@@ -109,15 +111,20 @@ public class INExistsExpression extends INExpression
 
 				try
 				{
-					if (matches && predicate.eval(evalContext).boolValue(ctxt))
+					if (matches)
 					{
-						if (globals != null)
-						{
-							globals.setWitness(evalContext);
-							globals.setMaybe(false);
-						}
+						Value result = predicate.eval(evalContext);
+						hasUndefined = hasUndefined || result.isUndefined();
 						
-						return new BooleanValue(true);
+						if (!result.isUndefined() && result.boolValue(ctxt))
+						{
+							if (globals != null)
+							{
+								globals.setWitness(evalContext);
+							}
+							
+							return new BooleanValue(true);
+						}
 					}
 				}
 				catch (ValueException e)
@@ -131,9 +138,9 @@ public class INExistsExpression extends INExpression
 	    	abort(e);
 	    }
 
-		if (globals != null)
+		if (hasUndefined || (globals != null && !bindList.hasAllValues()))
 		{
-			globals.setMaybe(!bindList.hasAllValues());
+			return new UndefinedValue();
 		}
 		
 		return new BooleanValue(false);

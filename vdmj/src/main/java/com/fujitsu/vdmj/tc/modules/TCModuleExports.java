@@ -24,13 +24,12 @@
 
 package com.fujitsu.vdmj.tc.modules;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 
-public class TCModuleExports extends TCNode implements Serializable
+public class TCModuleExports extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 	public final TCExportList exports;

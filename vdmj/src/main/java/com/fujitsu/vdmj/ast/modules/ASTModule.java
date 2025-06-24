@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.ast.modules;
 
 import java.io.File;
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
@@ -39,7 +37,7 @@ import com.fujitsu.vdmj.mapper.FileList;
 /**
  * A class holding all the details for one module.
  */
-public class ASTModule extends ASTNode implements Serializable
+public class ASTModule extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

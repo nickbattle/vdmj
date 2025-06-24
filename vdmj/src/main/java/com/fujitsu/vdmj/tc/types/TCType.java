@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.types;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
@@ -42,7 +40,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * The parent class of all static type checking types.
  */
-public abstract class TCType extends TCNode implements Comparable<TCType>, Serializable
+public abstract class TCType extends TCNode implements Comparable<TCType>
 {
 	private static final long serialVersionUID = 1L;
 

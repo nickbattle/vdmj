@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;

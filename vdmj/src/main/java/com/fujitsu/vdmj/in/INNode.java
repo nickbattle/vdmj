@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.MappedObject;
 import com.fujitsu.vdmj.messages.LocatedException;
@@ -38,7 +36,7 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * The abstract root of all interpreter nodes.
  */
-abstract public class INNode extends MappedObject implements Serializable
+abstract public class INNode extends MappedObject
 {
 	private static final long serialVersionUID = 1L;
 

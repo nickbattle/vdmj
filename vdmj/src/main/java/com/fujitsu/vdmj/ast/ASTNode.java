@@ -24,14 +24,12 @@
 
 package com.fujitsu.vdmj.ast;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.mapper.MappedObject;
 
 /**
  * The abstract root of all AST nodes.
  */
-abstract public class ASTNode extends MappedObject implements Serializable
+abstract public class ASTNode extends MappedObject
 {
 	private static final long serialVersionUID = 1L;
 

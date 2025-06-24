@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.patterns.visitors.ASTBindVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -32,7 +31,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * The parent class of {@link ASTSetBind} and {@link ASTTypeBind}.
  */
-public abstract class ASTBind extends ASTNode implements Serializable
+public abstract class ASTBind extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

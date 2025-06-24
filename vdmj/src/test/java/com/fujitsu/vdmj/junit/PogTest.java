@@ -159,7 +159,7 @@ public class PogTest extends TestCase
 			/* 88 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    (not (m(1) < 10) =>\n      2 in set dom m)))\n",
 			/* 89 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (not 1 = i =>\n    (2 = i => \n      3 in set dom m)))\n",
 			/* 90 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    -- Missing loop invariant))\n",
-			/* 91 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (let iv : int = (iv + 1) in\n      (iv < 10))))\n",
+			/* 91 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    ((x > 0) =>\n      (let iv : int = (iv + 1) in\n        (iv < 10)))))\n"
 	};
 	
 	private String[] expectedSL =
@@ -182,7 +182,7 @@ public class PogTest extends TestCase
 			/* 16 */ "(forall a:nat, r:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7b(a, r, oldSigma, Sigma), bool))\n",
 			/* 17 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let r = xv in\n          (r > (xv$ + sv$)))))))\n",
 			/* 18 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      -- Missing loop invariant)))\n",
-			/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      si <> [])))\n",
+			/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      ((si <> []) =>\n        si <> []))))\n",
 			/* 20 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous bang throws exceptions, affects (si, sv, xv, sr)? at 135:9\n    a <> 0))\n",
 			/* 21 */ "(forall a:real, r:real, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op10(a, r, oldSigma, Sigma), bool))\n",
 			/* 22 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      is_nat((a + 1)))))\n",

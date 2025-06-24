@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.runtime;
 
-@SuppressWarnings("serial")
 public class DebuggerException extends RuntimeException
 {
 	public DebuggerException(String msg)

@@ -35,7 +35,6 @@ import org.junit.Test;
 
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmjunit.VDMJUnitTestPP;
 
 public class UTF8Test extends VDMJUnitTestPP
 {

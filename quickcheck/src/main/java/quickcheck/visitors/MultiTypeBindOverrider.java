@@ -33,9 +33,9 @@ import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.in.patterns.visitors.INLeafMultipleBindVisitor;
 
-public class MultiTypeBindFinder extends INLeafMultipleBindVisitor<INBindingOverride, List<INBindingOverride>, Object>
+public class MultiTypeBindOverrider extends INLeafMultipleBindVisitor<INBindingOverride, List<INBindingOverride>, Object>
 {
-	public MultiTypeBindFinder(INVisitorSet<INBindingOverride, List<INBindingOverride>, Object> inVisitorSet)
+	public MultiTypeBindOverrider(INVisitorSet<INBindingOverride, List<INBindingOverride>, Object> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}

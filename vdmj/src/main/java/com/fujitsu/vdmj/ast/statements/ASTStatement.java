@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
@@ -34,7 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 /**
  * The parent class of all statements.
  */
-public abstract class ASTStatement extends ASTNode implements Serializable
+public abstract class ASTStatement extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

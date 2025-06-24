@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionExpressionFinder;
@@ -48,7 +46,7 @@ import com.fujitsu.vdmj.values.NameValuePairList;
  * explicit operations, module state, as well as various sorts of local variable
  * definition.
  */
-public abstract class INDefinition extends INNode implements Serializable, Comparable<INDefinition>
+public abstract class INDefinition extends INNode implements Comparable<INDefinition>
 {
 	private static final long serialVersionUID = 1L;
 

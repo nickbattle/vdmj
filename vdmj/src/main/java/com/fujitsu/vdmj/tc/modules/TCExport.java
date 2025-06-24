@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.modules;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -37,7 +35,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
  * The parent class of all export declarations.
  */
 
-abstract public class TCExport extends TCNode implements Serializable
+abstract public class TCExport extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

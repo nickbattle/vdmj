@@ -24,14 +24,12 @@
 
 package com.fujitsu.vdmj.tc;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.mapper.MappedObject;
 
 /**
  * The abstract root of all TC nodes.
  */
-abstract public class TCNode extends MappedObject implements Serializable
+abstract public class TCNode extends MappedObject
 {
 	private static final long serialVersionUID = 1L;
 	public final static String MAPPINGS = "ast-tc.mappings";

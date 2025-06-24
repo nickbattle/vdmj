@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;
@@ -47,7 +45,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 /**
  *	The parent class of all VDM expressions.
  */
-public abstract class POExpression extends PONode implements Serializable
+public abstract class POExpression extends PONode
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -106,12 +104,7 @@ public abstract class POExpression extends PONode implements Serializable
 
 	/**
 	 * Get a list of proof obligations from the expression.
-	 *
-	 * @param ctxt The call context.
-	 * @param pogState TODO
-	 * @return The list of proof obligations.
 	 */
-
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		return new ProofObligationList();

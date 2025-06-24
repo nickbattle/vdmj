@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -135,12 +136,20 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		else
 		{
-			counterexample = new Context(location, "Counterexample", null);
+			counterexample = new Context(path.location, "Counterexample", null);
 			Context ctxt = path;
 			
 			while (ctxt != null && ctxt.outer != null)
 			{
-				counterexample.putAll(ctxt);
+				for (TCNameToken key: ctxt.keySet())
+				{
+					// Only update unknown values, so "most recent" values show
+					if (!counterexample.containsKey(key))
+					{
+						counterexample.put(key, ctxt.get(key));
+					}
+				}
+
 				ctxt = ctxt.outer;
 			}
 		}
@@ -154,12 +163,20 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 		else
 		{
-			witness = new Context(location, "Witness", null);
+			witness = new Context(path.location, "Witness", null);
 			Context ctxt = path;
 			
 			while (ctxt != null && ctxt.outer != null)
 			{
-				witness.putAll(ctxt);
+				for (TCNameToken key: ctxt.keySet())
+				{
+					// Only update unknown values, so "most recent" values show
+					if (!witness.containsKey(key))
+					{
+						witness.put(key, ctxt.get(key));
+					}
+				}
+
 				ctxt = ctxt.outer;
 			}
 		}

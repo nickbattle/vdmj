@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class POPatternList extends POMappedList<TCPattern, POPattern>
 {
 	public POPatternList(TCPatternList from) throws Exception

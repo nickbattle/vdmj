@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.tc.modules;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
@@ -43,7 +42,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * A class holding all the details for one module.
  */
-public class TCModule extends TCNode implements Serializable
+public class TCModule extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

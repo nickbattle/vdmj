@@ -24,15 +24,13 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 
 /**
  * A class to hold an object assignment designator.
  */
-public abstract class POObjectDesignator extends PONode implements Serializable
+public abstract class POObjectDesignator extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

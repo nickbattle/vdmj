@@ -40,7 +40,6 @@ import com.fujitsu.vdmj.in.traces.INTraceVariableStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 
-@SuppressWarnings("serial")
 public class CallSequence extends Vector<INStatement>
 {
 	public String getCallString(Context context)

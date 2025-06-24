@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.modules;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -40,7 +38,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 /**
  * A class holding all the details for one module.
  */
-public class POModule extends PONode implements Serializable
+public class POModule extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

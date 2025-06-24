@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -45,7 +43,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 /**
  * The parent type of all patterns.
  */
-public abstract class POPattern extends PONode implements Serializable
+public abstract class POPattern extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

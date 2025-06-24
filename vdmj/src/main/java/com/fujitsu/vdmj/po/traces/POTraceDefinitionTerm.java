@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.mapper.Mappable;
 /**
  * A class representing a sequence of trace definitions.
  */
-@SuppressWarnings("serial")
 public class POTraceDefinitionTerm extends Vector<POTraceDefinition> implements Mappable
 {
 }

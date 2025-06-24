@@ -24,14 +24,13 @@
 
 package com.fujitsu.vdmj.ast.modules;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
  * The parent class of all export declarations.
  */
-abstract public class ASTExport extends ASTNode implements Serializable
+abstract public class ASTExport extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

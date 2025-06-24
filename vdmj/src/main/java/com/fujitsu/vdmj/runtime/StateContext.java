@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * A root context for non-object method invocations.
  */
-@SuppressWarnings("serial")
 public class StateContext extends RootContext
 {
 	/** The state context, if any. */

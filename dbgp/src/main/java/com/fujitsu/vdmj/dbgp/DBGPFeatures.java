@@ -28,7 +28,6 @@ import java.util.Properties;
 
 import com.fujitsu.vdmj.Settings;
 
-@SuppressWarnings("serial")
 public class DBGPFeatures extends Properties
 {
 	public DBGPFeatures()

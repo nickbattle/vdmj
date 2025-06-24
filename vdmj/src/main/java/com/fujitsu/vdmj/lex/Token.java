@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.lex;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +38,7 @@ import static com.fujitsu.vdmj.lex.Dialect.VDM_SL;
 /**
  * An enumeration for the basic token types recognised by the lexical analyser.
  */
-public enum Token implements Serializable
+public enum Token
 {
 	// Variables
 	IDENTIFIER(null, "id", VDM_SL, VDM_PP, VDM_RT),

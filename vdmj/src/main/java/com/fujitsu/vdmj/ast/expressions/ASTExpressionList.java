@@ -29,7 +29,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("serial")
 public class ASTExpressionList extends Vector<ASTExpression> implements Mappable
 {
 	@Override

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.messages;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 
-@SuppressWarnings("serial")
 abstract public class LocatedException extends NumberedException
 {
 	public final LexLocation location;

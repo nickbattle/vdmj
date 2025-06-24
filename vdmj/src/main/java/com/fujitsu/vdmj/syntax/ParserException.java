@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.messages.LocatedException;
  * A syntax analyser exception.
  */
 
-@SuppressWarnings("serial")
 public class ParserException extends LocatedException
 {
 	private int depth;

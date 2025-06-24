@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.lex;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -37,7 +35,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  * A name token for the purpose of type checking.
  */
-public class TCNameToken extends TCToken implements Serializable, Comparable<TCNameToken>
+public class TCNameToken extends TCToken implements Comparable<TCNameToken>
 {
 	private static final long serialVersionUID = 1L;
 

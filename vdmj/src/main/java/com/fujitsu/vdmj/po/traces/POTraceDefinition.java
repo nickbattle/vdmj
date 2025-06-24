@@ -24,14 +24,12 @@
 
 package com.fujitsu.vdmj.po.traces;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.po.PONode;
 
 /**
  * A class representing a trace definition.
  */
-abstract public class POTraceDefinition extends PONode implements Serializable
+abstract public class POTraceDefinition extends PONode
 {
     private static final long serialVersionUID = 1L;
 

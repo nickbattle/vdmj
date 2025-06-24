@@ -61,7 +61,6 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
-@SuppressWarnings("serial")
 public class ProofObligationList extends Vector<ProofObligation>
 {
 	// Convenience class to hold lists of POs.

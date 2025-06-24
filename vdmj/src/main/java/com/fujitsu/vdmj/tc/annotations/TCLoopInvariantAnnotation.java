@@ -115,7 +115,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 				TCNameList missing = new TCNameList();
 				missing.addAll(updates);
 				missing.removeAll(reasonsAbout);
-				name.report(6007, "@LoopInvariant does not reason about " + missing);
+				name.warning(6007, "@LoopInvariant does not reason about " + missing);
 			}
 		}
 	}
