@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 
@@ -259,6 +260,7 @@ public class MessageHub
 								"range",	Utils.lexLocationToRange(message.location),
 								"severity", (message instanceof VDMError ? 1 : 2),
 								"code", 	message.number,
+								"source",	Settings.dialect.toString(),
 								"message",	message.toProblemString().replaceAll("\n", ", ")));
 						
 					}
