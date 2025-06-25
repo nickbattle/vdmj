@@ -54,33 +54,29 @@ public class INOrExpression extends INBooleanBinaryExpression
 			{
 				return lv;
 			}
-			else
+
+			boolean lb = lv.boolValue(ctxt);
+
+			if (lb)
 			{
-				boolean lb = lv.boolValue(ctxt);
-
-				if (lb)
-				{
-					return lv;	// Stop after LHS
-				}
-
-				Value rv = right.eval(ctxt);
-				
-				if (rv.isUndefined())
-				{
-					return rv;	// false or undefined
-				}
-				
-				boolean rb = rv.boolValue(ctxt);
-
-				if (lb || rb)
-				{
-					return new BooleanValue(true);
-				}
-				else
-				{
-					return rv;
-				}
+				return lv;	// Stop after LHS
 			}
+
+			Value rv = right.eval(ctxt);
+			
+			if (rv.isUndefined())
+			{
+				return rv;	// false or undefined
+			}
+			
+			boolean rb = rv.boolValue(ctxt);
+
+			if (lb || rb)
+			{
+				return new BooleanValue(true);
+			}
+			
+			return new BooleanValue(false);
 		}
 		catch (ValueException e)
 		{
