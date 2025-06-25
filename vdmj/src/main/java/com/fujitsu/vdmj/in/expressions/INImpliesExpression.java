@@ -50,20 +50,31 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 		{
 			Value lv = left.eval(ctxt);
 
+			if (!lv.isUndefined() && !lv.boolValue(ctxt))
+			{
+				return new BooleanValue(true);	// false => *, always true
+			}
+
+			Value rv = right.eval(ctxt);
+
+			if (!rv.isUndefined() && rv.boolValue(ctxt))
+			{
+				return new BooleanValue(true);	// * => true, always true
+			}
+
 			if (lv.isUndefined())
 			{
-				return lv;
+				return lv;	// undefined
 			}
-
-			boolean lb = lv.boolValue(ctxt);
-
-			if (lb)
+			else if (rv.isUndefined())	// lv is true
 			{
-				return right.eval(ctxt);
+				return rv;
 			}
-
-			return new BooleanValue(true);
-		}
+			else
+			{
+				return new BooleanValue(false);
+			}
+		}	
 		catch (ValueException e)
 		{
 			return abort(e);

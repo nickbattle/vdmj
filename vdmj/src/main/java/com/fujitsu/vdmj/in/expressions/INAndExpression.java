@@ -63,6 +63,12 @@ public class INAndExpression extends INBooleanBinaryExpression
 			}
 
 			Value rv = right.eval(ctxt);
+
+			if (rv.isUndefined())
+			{
+				return rv;
+			}
+
 			boolean rb = rv.boolValue(ctxt);
 
 			if (lb && rb)
