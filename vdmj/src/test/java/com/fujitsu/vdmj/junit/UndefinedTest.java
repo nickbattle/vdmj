@@ -27,10 +27,15 @@ package com.fujitsu.vdmj.junit;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.INImpliesExpression;
 import com.fujitsu.vdmj.in.expressions.INNotExpression;
 import com.fujitsu.vdmj.in.expressions.INOrExpression;
 import com.fujitsu.vdmj.in.expressions.INUndefinedExpression;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
+import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
+import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
+import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.expressions.INAndExpression;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INEquivalentExpression;
@@ -77,17 +82,17 @@ public class UndefinedTest extends TestCase
 	public void testAnd() throws Exception
 	{
 		assertTrue(new INAndExpression(TRUE, AND, UNDEFINED).eval(ctxt).isUndefined());
-		assertEquals(F, new INAndExpression(FALSE, AND, UNDEFINED).eval(ctxt));
+		assertTrue(new INAndExpression(FALSE, AND, UNDEFINED).eval(ctxt).equals(F));
 		assertTrue(new INAndExpression(UNDEFINED, AND, TRUE).eval(ctxt).isUndefined());
-		assertEquals(F, new INAndExpression(UNDEFINED, AND, FALSE).eval(ctxt));
+		assertTrue(new INAndExpression(UNDEFINED, AND, FALSE).eval(ctxt).equals(F));
 		assertTrue(new INAndExpression(UNDEFINED, AND, UNDEFINED).eval(ctxt).isUndefined());
 	}
 
 	public void testOr() throws Exception
 	{
-		assertEquals(T, new INOrExpression(TRUE, OR, UNDEFINED).eval(ctxt));
+		assertTrue(new INOrExpression(TRUE, OR, UNDEFINED).eval(ctxt).equals(T));
 		assertTrue(new INOrExpression(FALSE, OR, UNDEFINED).eval(ctxt).isUndefined());
-		assertEquals(T, new INOrExpression(UNDEFINED, OR, TRUE).eval(ctxt));
+		assertTrue(new INOrExpression(UNDEFINED, OR, TRUE).eval(ctxt).equals(T));
 		assertTrue(new INOrExpression(UNDEFINED, OR, FALSE).eval(ctxt).isUndefined());
 		assertTrue(new INOrExpression(UNDEFINED, OR, UNDEFINED).eval(ctxt).isUndefined());
 	}
@@ -100,8 +105,8 @@ public class UndefinedTest extends TestCase
 	public void testImplies() throws Exception
 	{
 		assertTrue(new INImpliesExpression(TRUE, IMP, UNDEFINED).eval(ctxt).isUndefined());
-		assertEquals(T, new INImpliesExpression(FALSE, IMP, UNDEFINED).eval(ctxt));
-		assertEquals(T, new INImpliesExpression(UNDEFINED, IMP, TRUE).eval(ctxt));
+		assertTrue(new INImpliesExpression(FALSE, IMP, UNDEFINED).eval(ctxt).equals(T));
+		assertTrue(new INImpliesExpression(UNDEFINED, IMP, TRUE).eval(ctxt).equals(T));
 		assertTrue(new INImpliesExpression(UNDEFINED, IMP, FALSE).eval(ctxt).isUndefined());
 		assertTrue(new INImpliesExpression(UNDEFINED, IMP, UNDEFINED).eval(ctxt).isUndefined());
 	}
