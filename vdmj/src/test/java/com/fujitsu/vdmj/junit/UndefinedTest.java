@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2025 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -27,21 +27,28 @@ package com.fujitsu.vdmj.junit;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.INImpliesExpression;
 import com.fujitsu.vdmj.in.expressions.INNotExpression;
 import com.fujitsu.vdmj.in.expressions.INOrExpression;
+import com.fujitsu.vdmj.in.expressions.INSetEnumExpression;
 import com.fujitsu.vdmj.in.expressions.INUndefinedExpression;
-import com.fujitsu.vdmj.in.patterns.INMultipleBind;
+import com.fujitsu.vdmj.in.expressions.INVariableExpression;
+import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
+import com.fujitsu.vdmj.in.patterns.INMultipleSetBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.expressions.INAndExpression;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INEquivalentExpression;
+import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -55,7 +62,7 @@ public class UndefinedTest extends TestCase
 	private final INExpression UNDEFINED = new INUndefinedExpression(LexLocation.ANY);
 
 	private final LexKeywordToken AND = new LexKeywordToken(Token.AND, LexLocation.ANY);
-	private final LexKeywordToken OR = new LexKeywordToken(Token.OR, LexLocation.ANY);
+	private final LexKeywordToken OR  = new LexKeywordToken(Token.OR, LexLocation.ANY);
 	private final LexKeywordToken IMP = new LexKeywordToken(Token.IMPLIES, LexLocation.ANY);
 	private final LexKeywordToken EQV = new LexKeywordToken(Token.EQUIVALENT, LexLocation.ANY);
 
@@ -118,5 +125,81 @@ public class UndefinedTest extends TestCase
 		assertTrue(new INEquivalentExpression(UNDEFINED, EQV, TRUE).eval(ctxt).isUndefined());
 		assertTrue(new INEquivalentExpression(UNDEFINED, EQV, FALSE).eval(ctxt).isUndefined());
 		assertTrue(new INEquivalentExpression(UNDEFINED, EQV, UNDEFINED).eval(ctxt).isUndefined());
+	}
+
+	public void testForall() throws Exception
+	{
+		TCNameToken VAR = new TCNameToken(LexLocation.ANY, "DEFAULT", "x");
+		INPatternList patternList = new INPatternList();
+		patternList.add(new INIdentifierPattern(VAR));
+		INMultipleBindList bindList = new INMultipleBindList();
+		bindList.add(new INMultipleTypeBind(patternList, new TCBooleanType(LexLocation.ANY)));
+		INExpression predicate = new INImpliesExpression(new INVariableExpression(VAR), IMP, UNDEFINED);
+		INForAllExpression forall = new INForAllExpression(LexLocation.ANY, bindList, predicate);
+
+		// forall x:bool & x => undefined
+		assertTrue(forall.eval(ctxt).isUndefined());	// Because one case is undefined and none are false
+	}
+
+	public void testForall2() throws Exception
+	{
+		TCNameToken VAR = new TCNameToken(LexLocation.ANY, "DEFAULT", "x");
+		INPatternList patternList = new INPatternList();
+		patternList.add(new INIdentifierPattern(VAR));
+		INExpressionList members = new INExpressionList();
+		members.add(UNDEFINED);
+		members.add(TRUE);
+		members.add(FALSE);
+		INSetEnumExpression set = new INSetEnumExpression(LexLocation.ANY, members);
+		INMultipleBindList bindList = new INMultipleBindList();
+		bindList.add(new INMultipleSetBind(patternList, set));
+		INExpression predicate = new INVariableExpression(VAR);
+		INForAllExpression forall = new INForAllExpression(LexLocation.ANY, bindList, predicate);
+
+		// forall x in set {undefined, true, false} & x
+		assertTrue(forall.eval(ctxt).equals(F));
+
+		members.remove(FALSE);
+
+		// forall x in set {undefined, true} & x
+		assertTrue(forall.eval(ctxt).isUndefined());
+	}
+
+	public void testExists() throws Exception
+	{
+		TCNameToken VAR = new TCNameToken(LexLocation.ANY, "DEFAULT", "x");
+		INPatternList patternList = new INPatternList();
+		patternList.add(new INIdentifierPattern(VAR));
+		INMultipleBindList bindList = new INMultipleBindList();
+		bindList.add(new INMultipleTypeBind(patternList, new TCBooleanType(LexLocation.ANY)));
+		INExpression predicate = new INImpliesExpression(new INVariableExpression(VAR), IMP, UNDEFINED);
+		INExistsExpression exists = new INExistsExpression(LexLocation.ANY, bindList, predicate);
+
+		// exists x:bool & x => undefined
+		assertTrue(exists.eval(ctxt).equals(T));		// Because one case is true, regardless of undefined
+	}
+
+	public void testExists2() throws Exception
+	{
+		TCNameToken VAR = new TCNameToken(LexLocation.ANY, "DEFAULT", "x");
+		INPatternList patternList = new INPatternList();
+		patternList.add(new INIdentifierPattern(VAR));
+		INExpressionList members = new INExpressionList();
+		members.add(UNDEFINED);
+		members.add(TRUE);
+		members.add(FALSE);
+		INSetEnumExpression set = new INSetEnumExpression(LexLocation.ANY, members);
+		INMultipleBindList bindList = new INMultipleBindList();
+		bindList.add(new INMultipleSetBind(patternList, set));
+		INExpression predicate = new INVariableExpression(VAR);
+		INExistsExpression forall = new INExistsExpression(LexLocation.ANY, bindList, predicate);
+
+		// exists x in set {undefined, true, false} & x
+		assertTrue(forall.eval(ctxt).equals(T));
+
+		members.remove(TRUE);
+
+		// exists x in set {undefined, false} & x
+		assertTrue(forall.eval(ctxt).isUndefined());
 	}
 }
