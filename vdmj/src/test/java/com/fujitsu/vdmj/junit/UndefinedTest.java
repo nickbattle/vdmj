@@ -93,6 +93,11 @@ public class UndefinedTest extends TestCase
 		assertTrue(new INAndExpression(UNDEFINED, AND, TRUE).eval(ctxt).isUndefined());
 		assertTrue(new INAndExpression(UNDEFINED, AND, FALSE).eval(ctxt).equals(F));
 		assertTrue(new INAndExpression(UNDEFINED, AND, UNDEFINED).eval(ctxt).isUndefined());
+
+		assertTrue(new INAndExpression(TRUE, AND, TRUE).eval(ctxt).equals(T));
+		assertTrue(new INAndExpression(TRUE, AND, FALSE).eval(ctxt).equals(F));
+		assertTrue(new INAndExpression(FALSE, AND, TRUE).eval(ctxt).equals(F));
+		assertTrue(new INAndExpression(FALSE, AND, FALSE).eval(ctxt).equals(F));
 	}
 
 	public void testOr() throws Exception
@@ -102,11 +107,19 @@ public class UndefinedTest extends TestCase
 		assertTrue(new INOrExpression(UNDEFINED, OR, TRUE).eval(ctxt).equals(T));
 		assertTrue(new INOrExpression(UNDEFINED, OR, FALSE).eval(ctxt).isUndefined());
 		assertTrue(new INOrExpression(UNDEFINED, OR, UNDEFINED).eval(ctxt).isUndefined());
+
+		assertTrue(new INOrExpression(TRUE, OR, TRUE).eval(ctxt).equals(T));
+		assertTrue(new INOrExpression(TRUE, OR, FALSE).eval(ctxt).equals(T));
+		assertTrue(new INOrExpression(FALSE, OR, TRUE).eval(ctxt).equals(T));
+		assertTrue(new INOrExpression(FALSE, OR, FALSE).eval(ctxt).equals(F));
 	}
 
 	public void testNot() throws Exception
 	{
 		assertTrue(new INNotExpression(LexLocation.ANY, UNDEFINED).eval(ctxt).isUndefined());
+
+		assertTrue(new INNotExpression(LexLocation.ANY, TRUE).eval(ctxt).equals(F));
+		assertTrue(new INNotExpression(LexLocation.ANY, FALSE).eval(ctxt).equals(T));
 	}
 
 	public void testImplies() throws Exception
@@ -116,6 +129,11 @@ public class UndefinedTest extends TestCase
 		assertTrue(new INImpliesExpression(UNDEFINED, IMP, TRUE).eval(ctxt).equals(T));
 		assertTrue(new INImpliesExpression(UNDEFINED, IMP, FALSE).eval(ctxt).isUndefined());
 		assertTrue(new INImpliesExpression(UNDEFINED, IMP, UNDEFINED).eval(ctxt).isUndefined());
+
+		assertTrue(new INImpliesExpression(TRUE, IMP, TRUE).eval(ctxt).equals(T));
+		assertTrue(new INImpliesExpression(TRUE, IMP, FALSE).eval(ctxt).equals(F));
+		assertTrue(new INImpliesExpression(FALSE, IMP, TRUE).eval(ctxt).equals(T));
+		assertTrue(new INImpliesExpression(FALSE, IMP, FALSE).eval(ctxt).equals(T));
 	}
 
 	public void testEquiv() throws Exception
@@ -125,6 +143,11 @@ public class UndefinedTest extends TestCase
 		assertTrue(new INEquivalentExpression(UNDEFINED, EQV, TRUE).eval(ctxt).isUndefined());
 		assertTrue(new INEquivalentExpression(UNDEFINED, EQV, FALSE).eval(ctxt).isUndefined());
 		assertTrue(new INEquivalentExpression(UNDEFINED, EQV, UNDEFINED).eval(ctxt).isUndefined());
+
+		assertTrue(new INEquivalentExpression(TRUE, EQV, TRUE).eval(ctxt).equals(T));
+		assertTrue(new INEquivalentExpression(TRUE, EQV, FALSE).eval(ctxt).equals(F));
+		assertTrue(new INEquivalentExpression(FALSE, EQV, TRUE).eval(ctxt).equals(F));
+		assertTrue(new INEquivalentExpression(FALSE, EQV, FALSE).eval(ctxt).equals(T));
 	}
 
 	public void testForall() throws Exception
