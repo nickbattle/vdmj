@@ -50,36 +50,45 @@ public class INAndExpression extends INBooleanBinaryExpression
 		try
 		{
 			Value lv = left.eval(ctxt);
-			Value rv = right.eval(ctxt);
 
 			if (lv.isUndefined())
 			{
-				if (!rv.isUndefined() && !rv.boolValue(ctxt))
+				Value rv = right.eval(ctxt);
+
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new UndefinedValue();
+				}
+				else
 				{
 					return new BooleanValue(false);
 				}
-
-				return new UndefinedValue();
 			}
-			else if (rv.isUndefined())
+			else if (lv.boolValue(ctxt))
 			{
-				if (!lv.boolValue(ctxt))
+				Value rv = right.eval(ctxt);
+
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new BooleanValue(true);
+				}
+				else
 				{
 					return new BooleanValue(false);
 				}
-
-				return new UndefinedValue();
 			}
-
-			boolean lb = lv.boolValue(ctxt);
-			boolean rb = rv.boolValue(ctxt);
-
-			if (lb && rb)
+			else
 			{
-				return rv;	// true
+				return new BooleanValue(false);
 			}
-
-			return new BooleanValue(false);
 		}
 		catch (ValueException e)
 		{

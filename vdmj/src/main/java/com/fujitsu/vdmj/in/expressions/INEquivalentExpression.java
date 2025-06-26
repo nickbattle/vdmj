@@ -50,14 +50,45 @@ public class INEquivalentExpression extends INBooleanBinaryExpression
 		try
 		{
 			Value lv = left.eval(ctxt);
-			Value rv = right.eval(ctxt);
 
-			if (lv.isUndefined() || rv.isUndefined())
+			if (lv.isUndefined())
 			{
 				return new UndefinedValue();
 			}
+			else if (lv.boolValue(ctxt))
+			{
+				Value rv = right.eval(ctxt);
 
-			return new BooleanValue(lv.boolValue(ctxt) == rv.boolValue(ctxt));
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new BooleanValue(true);
+				}
+				else
+				{
+					return new BooleanValue(false);
+				}
+			}
+			else
+			{
+				Value rv = right.eval(ctxt);
+
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new BooleanValue(false);
+				}
+				else
+				{
+					return new BooleanValue(true);
+				}
+			}
         }
         catch (ValueException e)
         {

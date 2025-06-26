@@ -50,36 +50,45 @@ public class INOrExpression extends INBooleanBinaryExpression
 		try
 		{
 			Value lv = left.eval(ctxt);
-			Value rv = right.eval(ctxt);
 
 			if (lv.isUndefined())
 			{
-				if (!rv.isUndefined() && rv.boolValue(ctxt))
+				Value rv = right.eval(ctxt);
+
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
 				{
 					return new BooleanValue(true);
 				}
-
-				return new UndefinedValue();
-			}
-			else if (rv.isUndefined())
-			{
-				if (lv.boolValue(ctxt))
+				else
 				{
-					return new BooleanValue(true);
+					return new UndefinedValue();
 				}
-
-				return new UndefinedValue();
 			}
-
-			boolean lb = lv.boolValue(ctxt);
-			boolean rb = rv.boolValue(ctxt);
-
-			if (lb || rb)
+			else if (lv.boolValue(ctxt))
 			{
 				return new BooleanValue(true);
 			}
+			else
+			{
+				Value rv = right.eval(ctxt);
 
-			return new BooleanValue(false);
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new BooleanValue(true);
+				}
+				else
+				{
+					return new BooleanValue(false);
+				}
+			}
 		}
 		catch (ValueException e)
 		{
