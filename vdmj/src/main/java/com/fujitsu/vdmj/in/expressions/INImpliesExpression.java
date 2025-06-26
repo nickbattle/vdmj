@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
 
 public class INImpliesExpression extends INBooleanBinaryExpression
@@ -50,29 +51,43 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 		{
 			Value lv = left.eval(ctxt);
 
-			if (!lv.isUndefined() && !lv.boolValue(ctxt))
-			{
-				return new BooleanValue(true);	// false => *, always true
-			}
-
-			Value rv = right.eval(ctxt);
-
-			if (!rv.isUndefined() && rv.boolValue(ctxt))
-			{
-				return new BooleanValue(true);	// * => true, always true
-			}
-
 			if (lv.isUndefined())
 			{
-				return lv;	// undefined
+				Value rv = right.eval(ctxt);
+
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new BooleanValue(true);
+				}
+				else
+				{
+					return new UndefinedValue();
+				}
 			}
-			else if (rv.isUndefined())	// lv is true
+			else if (lv.boolValue(ctxt))
 			{
-				return rv;
+				Value rv = right.eval(ctxt);
+
+				if (rv.isUndefined())
+				{
+					return new UndefinedValue();
+				}
+				else if (rv.boolValue(ctxt))
+				{
+					return new BooleanValue(true);
+				}
+				else
+				{
+					return new BooleanValue(false);
+				}
 			}
 			else
 			{
-				return new BooleanValue(false);
+				return new BooleanValue(true);
 			}
 		}	
 		catch (ValueException e)
