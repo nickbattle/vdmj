@@ -203,10 +203,10 @@ public abstract class TCStatement extends TCNode
 	/**
 	 * State variables updated by this statement.
 	 */
-	public TCNameSet updatesState()
+	public TCNameSet updatesState(boolean nested)
 	{
 		TCStatementStateFinder visitor = new TCStatementStateFinder();
-		return this.apply(visitor, true);
+		return this.apply(visitor, nested);
 	}
 
 	/**

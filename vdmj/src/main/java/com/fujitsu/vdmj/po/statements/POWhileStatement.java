@@ -66,10 +66,10 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
-		TCNameSet updates = statement.updatesState();
 		
 		if (annotation == null)		// No loop invariant defined
 		{
+			TCNameSet updates = statement.updatesState(true);
 			obligations.add(new LoopInvariantObligation(location, ctxt));
 			
 			int popto = ctxt.size();
@@ -92,6 +92,9 @@ public class POWhileStatement extends POStatement
 		}
 		else
 		{
+			// Only track updates for this loop. Inner looks have their own.
+			TCNameSet updates = statement.updatesState(false);
+
 			// Note: location of first loop check is the @LoopInvariant itself.
 			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check before while condition");

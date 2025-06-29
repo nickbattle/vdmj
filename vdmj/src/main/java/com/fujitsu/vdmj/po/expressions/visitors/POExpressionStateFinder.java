@@ -45,11 +45,11 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(POVariableExpression node, Boolean updates)
+	public TCNameSet caseVariableExpression(POVariableExpression node, Boolean nested)
 	{
 		TCNameSet all = newCollection();
 		
-		if (!updates && node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
+		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
 		{
 			all.add(node.name);
 		}
@@ -58,13 +58,13 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseApplyExpression(POApplyExpression node, Boolean updates)
+	public TCNameSet caseApplyExpression(POApplyExpression node, Boolean nested)
 	{
-		TCNameSet all = super.caseApplyExpression(node, updates);
+		TCNameSet all = super.caseApplyExpression(node, nested);
 		
 		if (node.type instanceof TCOperationType)
 		{
-			all.addAll(POStatementStateFinder.operationCall(node.opdef, updates));
+			all.addAll(POStatementStateFinder.operationCall(node.opdef));
 		}
 		
 		return all;
@@ -77,7 +77,7 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseExpression(POExpression node, Boolean updates)
+	public TCNameSet caseExpression(POExpression node, Boolean nested)
 	{
 		return newCollection();
 	}

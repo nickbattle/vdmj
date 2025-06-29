@@ -44,11 +44,11 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(TCVariableExpression node, Boolean updates)
+	public TCNameSet caseVariableExpression(TCVariableExpression node, Boolean nested)
 	{
 		TCNameSet all = newCollection();
 		
-		if (!updates && node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
+		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
 		{
 			all.add(node.name);
 		}
@@ -57,9 +57,9 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseApplyExpression(TCApplyExpression node, Boolean updates)
+	public TCNameSet caseApplyExpression(TCApplyExpression node, Boolean nested)
 	{
-		TCNameSet all = super.caseApplyExpression(node, updates);
+		TCNameSet all = super.caseApplyExpression(node, nested);
 		
 		if (node.type instanceof TCOperationType)
 		{
@@ -80,7 +80,7 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseExpression(TCExpression node, Boolean updates)
+	public TCNameSet caseExpression(TCExpression node, Boolean nested)
 	{
 		return newCollection();
 	}

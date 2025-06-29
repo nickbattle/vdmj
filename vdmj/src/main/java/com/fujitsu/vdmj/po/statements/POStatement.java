@@ -93,16 +93,10 @@ public abstract class POStatement extends PONode
 	/**
 	 * State variables updated or read by this statement.
 	 */
-	public TCNameSet updatesState()
+	public TCNameSet updatesState(boolean nested)
 	{
 		POStatementStateFinder visitor = new POStatementStateFinder();
-		return this.apply(visitor, true);
-	}
-
-	public TCNameSet readsState()
-	{
-		POStatementStateFinder visitor = new POStatementStateFinder();
-		return this.apply(visitor, false);
+		return this.apply(visitor, nested);
 	}
 
 	/**

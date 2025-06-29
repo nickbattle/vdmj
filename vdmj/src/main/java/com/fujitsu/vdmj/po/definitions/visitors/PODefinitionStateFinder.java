@@ -41,11 +41,14 @@ public class PODefinitionStateFinder extends POLeafDefinitionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseAssignmentDefinition(POAssignmentDefinition node, Boolean updates)
+	public TCNameSet caseAssignmentDefinition(POAssignmentDefinition node, Boolean nested)
 	{
 		TCNameSet all = newCollection();
 		
-		all.add(node.name);		// eg. dcl declarations.
+		if (nested)
+		{
+			all.add(node.name);		// eg. dcl declarations.
+		}
 		
 		return all;
 	}

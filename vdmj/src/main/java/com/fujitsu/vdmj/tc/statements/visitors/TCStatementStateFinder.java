@@ -25,10 +25,12 @@
 package com.fujitsu.vdmj.tc.statements.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionStateFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
+import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
@@ -40,6 +42,8 @@ import com.fujitsu.vdmj.tc.statements.TCStatement;
  */
 public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Boolean>
 {
+	private boolean firstBlock = true;
+
 	public TCStatementStateFinder()
 	{
 		super();
@@ -60,17 +64,37 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 			}
 		};
 	}
-	
+
 	@Override
-	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Boolean updates)
+	public TCNameSet caseAnnotatedStatement(TCAnnotatedStatement node, Boolean nested)
 	{
-		if (updates)
+		if (nested)
 		{
-			return designatorUpdates(node.target);
+			return super.caseAnnotatedStatement(node, nested);
 		}
 		else
 		{
-			return designatorReads(node.target);
+			return newCollection();
+		}
+	}
+	
+	@Override
+	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Boolean nested)
+	{
+		return designatorUpdates(node.target);
+	}
+
+	@Override
+	public TCNameSet caseBlockStatement(TCBlockStatement node, Boolean nested)
+	{
+		if (nested || firstBlock)
+		{
+			firstBlock = false;
+			return super.caseBlockStatement(node, nested);
+		}
+		else
+		{
+			return newCollection();
 		}
 	}
 	
@@ -81,7 +105,7 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 	}
 
 	@Override
-	public TCNameSet caseStatement(TCStatement node, Boolean updates)
+	public TCNameSet caseStatement(TCStatement node, Boolean nested)
 	{
 		return newCollection();
 	}
@@ -110,30 +134,5 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 		}
 		
 		return all;
-	}
-
-	/**
-	 * Identify the names that are read by a given state designator.
-	 */
-	private TCNameSet designatorReads(TCStateDesignator sd)
-	{
-		if (sd instanceof TCIdentifierDesignator)
-		{
-			return newCollection();
-		}
-		else if (sd instanceof TCFieldDesignator)
-		{
-			TCFieldDesignator fd = (TCFieldDesignator)sd;
-			return designatorReads(fd.object);
-		}
-		else if (sd instanceof TCMapSeqDesignator)
-		{
-			TCMapSeqDesignator msd = (TCMapSeqDesignator)sd;
-			TCNameSet all = designatorReads(msd.mapseq);
-			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, false));
-			return all;
-		}
-		
-		return newCollection();		
 	}
 }
