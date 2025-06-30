@@ -37,15 +37,15 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Boolean>
+public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public POExpressionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public POExpressionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(POVariableExpression node, Boolean nested)
+	public TCNameSet caseVariableExpression(POVariableExpression node, Object arg)
 	{
 		TCNameSet all = newCollection();
 		
@@ -58,9 +58,9 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseApplyExpression(POApplyExpression node, Boolean nested)
+	public TCNameSet caseApplyExpression(POApplyExpression node, Object arg)
 	{
-		TCNameSet all = super.caseApplyExpression(node, nested);
+		TCNameSet all = super.caseApplyExpression(node, arg);
 		
 		if (node.type instanceof TCOperationType)
 		{
@@ -77,7 +77,7 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseExpression(POExpression node, Boolean nested)
+	public TCNameSet caseExpression(POExpression node, Object arg)
 	{
 		return newCollection();
 	}

@@ -170,14 +170,14 @@ public abstract class POExpression extends PONode
 	public TCNameSet updatesState()
 	{
 		POStatementStateFinder finder = new POStatementStateFinder();
-		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		POVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, true);
 	}
 
 	public TCNameSet readsState()
 	{
 		POStatementStateFinder finder = new POStatementStateFinder();
-		POVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		POVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, false);
 	}
 

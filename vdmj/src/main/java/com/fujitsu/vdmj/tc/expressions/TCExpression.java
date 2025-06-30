@@ -266,7 +266,7 @@ public abstract class TCExpression extends TCNode
 	public TCNameSet updatesState()
 	{
 		TCStatementStateFinder finder = new TCStatementStateFinder();
-		TCVisitorSet<TCNameToken, TCNameSet, Boolean> vset = finder.getVistorSet();
+		TCVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, true);
 	}
 

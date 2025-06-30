@@ -36,31 +36,34 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateFinder;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindStateFinder;
 import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateFinder;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
-import com.fujitsu.vdmj.po.statements.POBlockStatement;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
+import com.fujitsu.vdmj.po.statements.POForAllStatement;
+import com.fujitsu.vdmj.po.statements.POForIndexStatement;
+import com.fujitsu.vdmj.po.statements.POForPatternBindStatement;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
+import com.fujitsu.vdmj.po.statements.POWhileStatement;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, TCNameSet, Boolean>
+public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
 	private static TCNameToken EVERYTHING = new TCNameToken(LexLocation.ANY, "*", "*");
-	private boolean firstBlock = true;
+	private boolean firstLoop = false;
 	
 	public POStatementStateFinder()
 	{
 		super(false);
 		
-		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Boolean>()
+		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Object>()
 		{
 			@Override
 			protected void setVisitors()
@@ -81,46 +84,73 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	}
 
 	@Override
-	public TCNameSet caseAnnotatedStatement(POAnnotatedStatement node, Boolean nested)
+	public TCNameSet caseAnnotatedStatement(POAnnotatedStatement node, Object arg)
 	{
-		if (nested)
-		{
-			return super.caseAnnotatedStatement(node, nested);
-		}
-		else
-		{
-			return newCollection();
-		}
+		return newCollection();
 	}
 	
 	@Override
-	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Boolean nested)
+	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Object arg)
 	{
 		return designatorUpdates(node.target);
 	}
-
-	@Override
-	public TCNameSet caseBlockStatement(POBlockStatement node, Boolean nested)
-	{
-		if (nested || firstBlock)
-		{
-			firstBlock = false;
-			return super.caseBlockStatement(node, nested);
-		}
-		else
-		{
-			return newCollection();
-		}
-	}
 	
 	@Override
-	public TCNameSet caseCallStatement(POCallStatement node, Boolean nested)
+	public TCNameSet caseWhileStatement(POWhileStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseWhileStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseForAllStatement(POForAllStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseForAllStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseForIndexStatement(POForIndexStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseForIndexStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseForPatternBindStatement(POForPatternBindStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseForPatternBindStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
 	{
 		return operationCall(node.opdef);
 	}
 	
 	@Override
-	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Boolean nested)
+	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Object arg)
 	{
 		return operationCall(node.fdef);
 	}
@@ -132,7 +162,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	}
 
 	@Override
-	public TCNameSet caseStatement(POStatement node, Boolean nested)
+	public TCNameSet caseStatement(POStatement node, Object arg)
 	{
 		return newCollection();
 	}

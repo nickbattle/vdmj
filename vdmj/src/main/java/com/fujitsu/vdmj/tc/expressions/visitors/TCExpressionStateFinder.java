@@ -36,15 +36,15 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 /**
  * A visitor set to explore the TC tree and return the state names accessed.
  */
-public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Boolean>
+public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public TCExpressionStateFinder(TCVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public TCExpressionStateFinder(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(TCVariableExpression node, Boolean nested)
+	public TCNameSet caseVariableExpression(TCVariableExpression node, Object arg)
 	{
 		TCNameSet all = newCollection();
 		
@@ -57,9 +57,9 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 	
 	@Override
-	public TCNameSet caseApplyExpression(TCApplyExpression node, Boolean nested)
+	public TCNameSet caseApplyExpression(TCApplyExpression node, Object arg)
 	{
-		TCNameSet all = super.caseApplyExpression(node, nested);
+		TCNameSet all = super.caseApplyExpression(node, arg);
 		
 		if (node.type instanceof TCOperationType)
 		{
@@ -80,7 +80,7 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseExpression(TCExpression node, Boolean nested)
+	public TCNameSet caseExpression(TCExpression node, Object arg)
 	{
 		return newCollection();
 	}

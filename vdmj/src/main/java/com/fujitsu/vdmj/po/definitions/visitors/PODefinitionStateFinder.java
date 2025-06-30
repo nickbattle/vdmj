@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.po.definitions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -33,24 +32,11 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class PODefinitionStateFinder extends POLeafDefinitionVisitor<TCNameToken, TCNameSet, Boolean>
+public class PODefinitionStateFinder extends POLeafDefinitionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public PODefinitionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public PODefinitionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
-	}
-	
-	@Override
-	public TCNameSet caseAssignmentDefinition(POAssignmentDefinition node, Boolean nested)
-	{
-		TCNameSet all = newCollection();
-		
-		if (nested)
-		{
-			all.add(node.name);		// eg. dcl declarations.
-		}
-		
-		return all;
 	}
 	
 	@Override
@@ -60,7 +46,7 @@ public class PODefinitionStateFinder extends POLeafDefinitionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseDefinition(PODefinition node, Boolean updates)
+	public TCNameSet caseDefinition(PODefinition node, Object arg)
 	{
 		return newCollection();
 	}
