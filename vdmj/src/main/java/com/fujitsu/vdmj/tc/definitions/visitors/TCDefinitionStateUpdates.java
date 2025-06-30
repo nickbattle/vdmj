@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the TC tree and return the state names accessed.
+ * A visitor set to explore the TC tree and return the state names updated.
  */
 public class TCDefinitionStateUpdates extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, Object>
 {

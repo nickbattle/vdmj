@@ -52,7 +52,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names accessed.
+ * A visitor set to explore the PO tree and return the state names updated.
  */
 public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {

@@ -40,7 +40,7 @@ import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 
 /**
- * A visitor set to explore the TC tree and return the state names accessed.
+ * A visitor set to explore the TC tree and return the state names updated.
  */
 public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {

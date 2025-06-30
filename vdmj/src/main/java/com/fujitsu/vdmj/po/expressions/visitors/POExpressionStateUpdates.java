@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
- * A visitor set to explore the PO tree and return the state names accessed.
+ * A visitor set to explore the PO tree and return the state names updated.
  */
 public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
@@ -46,10 +46,10 @@ public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToke
 	{
 		TCNameSet all = newCollection();
 
-		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
-		{
-			all.add(node.name);
-		}
+//		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
+//		{
+//			all.add(node.name);
+//		}
 
 		return all;
 	}
