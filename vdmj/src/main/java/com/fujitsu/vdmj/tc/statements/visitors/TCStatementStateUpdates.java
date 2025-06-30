@@ -26,28 +26,25 @@ package com.fujitsu.vdmj.tc.statements.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionStateFinder;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionStateUpdates;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionStateUpdates;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCBindStateUpdates;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindStateUpdates;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
-import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
-import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
-import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
-import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
 
 /**
  * A visitor set to explore the TC tree and return the state names accessed.
  */
-public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Object>
+public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
-	private boolean firstLoop = true;
-
-	public TCStatementStateFinder()
+	public TCStatementStateUpdates()
 	{
 		super();
 		
@@ -56,14 +53,17 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 			@Override
 			protected void setVisitors()
 			{
-				statementVisitor = TCStatementStateFinder.this;
-				expressionVisitor = new TCExpressionStateFinder(this);
+				statementVisitor = TCStatementStateUpdates.this;
+				definitionVisitor = new TCDefinitionStateUpdates(this);
+				expressionVisitor = new TCExpressionStateUpdates(this);
+				bindVisitor = new TCBindStateUpdates(this);
+				multiBindVisitor = new TCMultipleBindStateUpdates(this);
 			}
 
 			@Override
 			protected TCNameSet newCollection()
 			{
-				return TCStatementStateFinder.this.newCollection();
+				return TCStatementStateUpdates.this.newCollection();
 			}
 		};
 	}
@@ -71,61 +71,13 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 	@Override
 	public TCNameSet caseAnnotatedStatement(TCAnnotatedStatement node, Object arg)
 	{
-		return newCollection();
+		return node.statement.apply(this, null);	// Don't process args
 	}
 	
 	@Override
 	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Object arg)
 	{
 		return designatorUpdates(node.target);
-	}
-
-	@Override
-	public TCNameSet caseWhileStatement(TCWhileStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseWhileStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
-	@Override
-	public TCNameSet caseForAllStatement(TCForAllStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseForAllStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
-	@Override
-	public TCNameSet caseForIndexStatement(TCForIndexStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseForIndexStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
-	@Override
-	public TCNameSet caseForPatternBindStatement(TCForPatternBindStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseForPatternBindStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
 	}
 	
 	@Override

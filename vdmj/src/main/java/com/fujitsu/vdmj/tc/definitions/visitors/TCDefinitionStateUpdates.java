@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2025 Nick Battle.
+ *	Copyright (c) 2024 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,47 +22,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions.visitors;
+package com.fujitsu.vdmj.tc.definitions.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCOperationType;
 
 /**
  * A visitor set to explore the TC tree and return the state names accessed.
  */
-public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
+public class TCDefinitionStateUpdates extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public TCExpressionStateFinder(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public TCDefinitionStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
-	}
-	
-	@Override
-	public TCNameSet caseVariableExpression(TCVariableExpression node, Object arg)
-	{
-		return newCollection();
-	}
-	
-	@Override
-	public TCNameSet caseApplyExpression(TCApplyExpression node, Object arg)
-	{
-		TCNameSet all = super.caseApplyExpression(node, arg);
-		
-		if (node.type instanceof TCOperationType)
-		{
-			if (node.root instanceof TCVariableExpression)
-			{
-				TCVariableExpression name = (TCVariableExpression)node.root;
-				all.add(name.name);
-			}
-		}
-		
-		return all;
 	}
 	
 	@Override
@@ -72,7 +46,7 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseExpression(TCExpression node, Object arg)
+	public TCNameSet caseDefinition(TCDefinition node, Object arg)
 	{
 		return newCollection();
 	}

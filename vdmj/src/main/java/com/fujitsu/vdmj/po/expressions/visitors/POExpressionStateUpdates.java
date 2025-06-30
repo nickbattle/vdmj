@@ -25,20 +25,18 @@
 package com.fujitsu.vdmj.po.expressions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
-import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCOperationType;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
+public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public POExpressionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public POExpressionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
@@ -46,19 +44,13 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	@Override
 	public TCNameSet caseVariableExpression(POVariableExpression node, Object arg)
 	{
-		return newCollection();
-	}
-	
-	@Override
-	public TCNameSet caseApplyExpression(POApplyExpression node, Object arg)
-	{
-		TCNameSet all = super.caseApplyExpression(node, arg);
-		
-		if (node.type instanceof TCOperationType)
+		TCNameSet all = newCollection();
+
+		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
 		{
-			all.addAll(POStatementStateFinder.operationCall(node.opdef));
+			all.add(node.name);
 		}
-		
+
 		return all;
 	}
 	

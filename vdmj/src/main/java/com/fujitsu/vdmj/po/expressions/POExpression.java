@@ -29,7 +29,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
-import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -169,14 +169,14 @@ public abstract class POExpression extends PONode
 
 	public TCNameSet updatesState()
 	{
-		POStatementStateFinder finder = new POStatementStateFinder();
+		POStatementStateUpdates finder = new POStatementStateUpdates();
 		POVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, true);
 	}
 
 	public TCNameSet readsState()
 	{
-		POStatementStateFinder finder = new POStatementStateFinder();
+		POStatementStateUpdates finder = new POStatementStateUpdates();
 		POVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, false);
 	}

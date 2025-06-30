@@ -31,10 +31,10 @@ import com.fujitsu.vdmj.po.annotations.POAnnotatedStatement;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateFinder;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateFinder;
-import com.fujitsu.vdmj.po.patterns.visitors.POBindStateFinder;
-import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateFinder;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateUpdates;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateUpdates;
+import com.fujitsu.vdmj.po.patterns.visitors.POBindStateUpdates;
+import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateUpdates;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
@@ -54,12 +54,12 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
  */
-public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
+public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
 	private static TCNameToken EVERYTHING = new TCNameToken(LexLocation.ANY, "*", "*");
 	private boolean firstLoop = false;
 	
-	public POStatementStateFinder()
+	public POStatementStateUpdates()
 	{
 		super(false);
 		
@@ -68,17 +68,17 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 			@Override
 			protected void setVisitors()
 			{
-				statementVisitor = POStatementStateFinder.this;
-				definitionVisitor = new PODefinitionStateFinder(this);
-				expressionVisitor = new POExpressionStateFinder(this);
-				bindVisitor = new POBindStateFinder(this);
-				multiBindVisitor = new POMultipleBindStateFinder(this);
+				statementVisitor = POStatementStateUpdates.this;
+				definitionVisitor = new PODefinitionStateUpdates(this);
+				expressionVisitor = new POExpressionStateUpdates(this);
+				bindVisitor = new POBindStateUpdates(this);
+				multiBindVisitor = new POMultipleBindStateUpdates(this);
 			}
 
 			@Override
 			protected TCNameSet newCollection()
 			{
-				return POStatementStateFinder.this.newCollection();
+				return POStatementStateUpdates.this.newCollection();
 			}
 		};
 	}
