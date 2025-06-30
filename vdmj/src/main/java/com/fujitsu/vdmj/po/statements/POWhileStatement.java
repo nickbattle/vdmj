@@ -106,8 +106,8 @@ public class POWhileStatement extends POStatement
 			obligations.lastElement().setMessage("check start while body");
 			ctxt.pop();
 
-			ctxt.push(new POForAllContext(updates, env));						// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));	// invariant && while C => ...
+			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));		// invariant && while C => ...
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check end while body");
@@ -115,8 +115,8 @@ public class POWhileStatement extends POStatement
 			
 			// Leave implication for following POs
 			POExpression negated = new PONotExpression(location, this.exp);
-			ctxt.push(new POForAllContext(updates, env));						// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant, negated));		// invariant && not C => ...
+			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant, negated));			// invariant && not C => ...
 			
 			return obligations;
 		}

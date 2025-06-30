@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * A visitor set to explore the PO tree and return the state names accessed.
@@ -47,14 +46,7 @@ public class POExpressionStateFinder extends POLeafExpressionVisitor<TCNameToken
 	@Override
 	public TCNameSet caseVariableExpression(POVariableExpression node, Object arg)
 	{
-		TCNameSet all = newCollection();
-		
-		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
-		{
-			all.add(node.name);
-		}
-		
-		return all;
+		return newCollection();
 	}
 	
 	@Override
