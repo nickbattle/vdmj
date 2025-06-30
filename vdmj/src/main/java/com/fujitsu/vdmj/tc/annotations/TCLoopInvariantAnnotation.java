@@ -107,7 +107,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			}
 			
 			TCNameSet reasonsAbout = inv.getVariableNames();
-			TCNameSet updates = stmt.updatesState();
+			TCNameSet updates = stmt.updatesState(false);
 			
 			if (!reasonsAbout.containsAll(updates))
 			{

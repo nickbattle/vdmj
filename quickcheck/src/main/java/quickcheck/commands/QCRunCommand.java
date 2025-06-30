@@ -197,6 +197,14 @@ public class QCRunCommand extends AnalysisCommand
 							Properties.parser_maximal_types = saved;
 						}
 					}
+					else if (obligation.counterexample != null && obligation.counterexample.location.startLine != 1)
+					{
+						return "Context refers to PO line #" + obligation.counterexample.location.startLine;
+					}
+					else if (obligation.witness != null && obligation.witness.location.startLine != 1)
+					{
+						return "Context refers to PO line #" + obligation.witness.location.startLine;
+					}
 					else
 					{
 						return "Context does not bind all " + obligation.definition.name + " parameters?";

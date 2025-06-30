@@ -27,79 +27,132 @@ package com.fujitsu.vdmj.po.statements.visitors;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.annotations.POAnnotatedStatement;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateFinder;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateFinder;
-import com.fujitsu.vdmj.po.patterns.visitors.POBindStateFinder;
-import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateFinder;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionStateUpdates;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionStateUpdates;
+import com.fujitsu.vdmj.po.patterns.visitors.POBindStateUpdates;
+import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindStateUpdates;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
+import com.fujitsu.vdmj.po.statements.POForAllStatement;
+import com.fujitsu.vdmj.po.statements.POForIndexStatement;
+import com.fujitsu.vdmj.po.statements.POForPatternBindStatement;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
+import com.fujitsu.vdmj.po.statements.POWhileStatement;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names accessed.
+ * A visitor set to explore the PO tree and return the state names updated.
  */
-public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, TCNameSet, Boolean>
+public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
 	private static TCNameToken EVERYTHING = new TCNameToken(LexLocation.ANY, "*", "*");
+	private boolean firstLoop = false;
 	
-	public POStatementStateFinder()
+	public POStatementStateUpdates()
 	{
 		super(false);
 		
-		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Boolean>()
+		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Object>()
 		{
 			@Override
 			protected void setVisitors()
 			{
-				statementVisitor = POStatementStateFinder.this;
-				definitionVisitor = new PODefinitionStateFinder(this);
-				expressionVisitor = new POExpressionStateFinder(this);
-				bindVisitor = new POBindStateFinder(this);
-				multiBindVisitor = new POMultipleBindStateFinder(this);
+				statementVisitor = POStatementStateUpdates.this;
+				definitionVisitor = new PODefinitionStateUpdates(this);
+				expressionVisitor = new POExpressionStateUpdates(this);
+				bindVisitor = new POBindStateUpdates(this);
+				multiBindVisitor = new POMultipleBindStateUpdates(this);
 			}
 
 			@Override
 			protected TCNameSet newCollection()
 			{
-				return POStatementStateFinder.this.newCollection();
+				return POStatementStateUpdates.this.newCollection();
 			}
 		};
 	}
-	
+
 	@Override
-	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Boolean updates)
+	public TCNameSet caseAnnotatedStatement(POAnnotatedStatement node, Object arg)
 	{
-		if (updates)
-		{
-			return designatorUpdates(node.target);
-		}
-		else
-		{
-			return designatorReads(node.target);
-		}
+		return newCollection();
 	}
 	
 	@Override
-	public TCNameSet caseCallStatement(POCallStatement node, Boolean updates)
+	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Object arg)
 	{
-		return operationCall(node.opdef, updates);
+		return designatorUpdates(node.target);
 	}
 	
 	@Override
-	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Boolean updates)
+	public TCNameSet caseWhileStatement(POWhileStatement node, Object arg)
 	{
-		return operationCall(node.fdef, updates);
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseWhileStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseForAllStatement(POForAllStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseForAllStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseForIndexStatement(POForIndexStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseForIndexStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseForPatternBindStatement(POForPatternBindStatement node, Object arg)
+	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			return super.caseForPatternBindStatement(node, arg);
+		}
+		
+		return newCollection();		// Don't nest loops
+	}
+
+	@Override
+	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
+	{
+		return operationCall(node.opdef);
+	}
+	
+	@Override
+	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Object arg)
+	{
+		return operationCall(node.fdef);
 	}
 	
 	@Override
@@ -109,7 +162,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	}
 
 	@Override
-	public TCNameSet caseStatement(POStatement node, Boolean updates)
+	public TCNameSet caseStatement(POStatement node, Object arg)
 	{
 		return newCollection();
 	}
@@ -141,35 +194,10 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 	}
 
 	/**
-	 * Identify the names that are read by a given state designator.
-	 */
-	private TCNameSet designatorReads(POStateDesignator sd)
-	{
-		if (sd instanceof POIdentifierDesignator)
-		{
-			return newCollection();
-		}
-		else if (sd instanceof POFieldDesignator)
-		{
-			POFieldDesignator fd = (POFieldDesignator)sd;
-			return designatorReads(fd.object);
-		}
-		else if (sd instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator msd = (POMapSeqDesignator)sd;
-			TCNameSet all = designatorReads(msd.mapseq);
-			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, false));
-			return all;
-		}
-		
-		return newCollection();		
-	}
-
-	/**
 	 * Use the operation's pure and ext clauses to try to determine the variable
 	 * access.
 	 */
-	public static TCNameSet operationCall(PODefinition def, boolean updates)
+	public static TCNameSet operationCall(PODefinition def)
 	{
 		TCNameSet all = new TCNameSet();
 		
@@ -177,7 +205,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 		{
 			all.add(EVERYTHING);	// Don't know!
 		}
-		else if (def.accessSpecifier.isPure && updates)
+		else if (def.accessSpecifier.isPure)
 		{
 			// No updates by definition of pure
 		}
@@ -189,11 +217,7 @@ public class POStatementStateFinder extends POLeafStatementVisitor<TCNameToken, 
 			{
 				for (POExternalClause ext: imp.externals)
 				{
-					if (updates && ext.mode.is(Token.WRITE))
-					{
-						all.addAll(ext.identifiers);
-					}
-					else if (!updates && ext.mode.is(Token.READ))
+					if (ext.mode.is(Token.WRITE))
 					{
 						all.addAll(ext.identifiers);
 					}

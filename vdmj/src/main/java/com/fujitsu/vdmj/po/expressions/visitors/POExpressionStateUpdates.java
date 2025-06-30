@@ -22,31 +22,34 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.definitions.visitors;
+package com.fujitsu.vdmj.po.expressions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
-import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names accessed.
+ * A visitor set to explore the PO tree and return the state names updated.
  */
-public class PODefinitionStateFinder extends POLeafDefinitionVisitor<TCNameToken, TCNameSet, Boolean>
+public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public PODefinitionStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public POExpressionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	public TCNameSet caseAssignmentDefinition(POAssignmentDefinition node, Boolean updates)
+	public TCNameSet caseVariableExpression(POVariableExpression node, Object arg)
 	{
 		TCNameSet all = newCollection();
-		
-		all.add(node.name);		// eg. dcl declarations.
-		
+
+//		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
+//		{
+//			all.add(node.name);
+//		}
+
 		return all;
 	}
 	
@@ -57,7 +60,7 @@ public class PODefinitionStateFinder extends POLeafDefinitionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseDefinition(PODefinition node, Boolean updates)
+	public TCNameSet caseExpression(POExpression node, Object arg)
 	{
 		return newCollection();
 	}

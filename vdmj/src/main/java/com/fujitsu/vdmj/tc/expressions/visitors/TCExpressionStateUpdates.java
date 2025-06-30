@@ -25,51 +25,31 @@
 package com.fujitsu.vdmj.tc.expressions.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCOperationType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
- * A visitor set to explore the TC tree and return the state names accessed.
+ * A visitor set to explore the TC tree and return the state names updated.
  */
-public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Boolean>
+public class TCExpressionStateUpdates extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public TCExpressionStateFinder(TCVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public TCExpressionStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(TCVariableExpression node, Boolean updates)
+	public TCNameSet caseVariableExpression(TCVariableExpression node, Object arg)
 	{
 		TCNameSet all = newCollection();
-		
-		if (!updates && node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
-		{
-			all.add(node.name);
-		}
-		
-		return all;
-	}
-	
-	@Override
-	public TCNameSet caseApplyExpression(TCApplyExpression node, Boolean updates)
-	{
-		TCNameSet all = super.caseApplyExpression(node, updates);
-		
-		if (node.type instanceof TCOperationType)
-		{
-			if (node.root instanceof TCVariableExpression)
-			{
-				TCVariableExpression name = (TCVariableExpression)node.root;
-				all.add(name.name);
-			}
-		}
-		
+
+//		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
+//		{
+//			all.add(node.name);
+//		}
+
 		return all;
 	}
 	
@@ -80,7 +60,7 @@ public class TCExpressionStateFinder extends TCLeafExpressionVisitor<TCNameToken
 	}
 
 	@Override
-	public TCNameSet caseExpression(TCExpression node, Boolean updates)
+	public TCNameSet caseExpression(TCExpression node, Object arg)
 	{
 		return newCollection();
 	}

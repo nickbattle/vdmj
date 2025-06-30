@@ -28,7 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
-import com.fujitsu.vdmj.po.statements.visitors.POStatementStateFinder;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
@@ -93,16 +93,10 @@ public abstract class POStatement extends PONode
 	/**
 	 * State variables updated or read by this statement.
 	 */
-	public TCNameSet updatesState()
+	public TCNameSet updatesState(boolean nested)
 	{
-		POStatementStateFinder visitor = new POStatementStateFinder();
-		return this.apply(visitor, true);
-	}
-
-	public TCNameSet readsState()
-	{
-		POStatementStateFinder visitor = new POStatementStateFinder();
-		return this.apply(visitor, false);
+		POStatementStateUpdates visitor = new POStatementStateUpdates();
+		return this.apply(visitor, nested);
 	}
 
 	/**

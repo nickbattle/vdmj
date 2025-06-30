@@ -25,9 +25,13 @@
 package com.fujitsu.vdmj.tc.statements.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionStateFinder;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionStateUpdates;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionStateUpdates;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCBindStateUpdates;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindStateUpdates;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
@@ -36,42 +40,44 @@ import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 
 /**
- * A visitor set to explore the TC tree and return the state names accessed.
+ * A visitor set to explore the TC tree and return the state names updated.
  */
-public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Boolean>
+public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
-	public TCStatementStateFinder()
+	public TCStatementStateUpdates()
 	{
 		super();
 		
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Boolean>()
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Object>()
 		{
 			@Override
 			protected void setVisitors()
 			{
-				statementVisitor = TCStatementStateFinder.this;
-				expressionVisitor = new TCExpressionStateFinder(this);
+				statementVisitor = TCStatementStateUpdates.this;
+				definitionVisitor = new TCDefinitionStateUpdates(this);
+				expressionVisitor = new TCExpressionStateUpdates(this);
+				bindVisitor = new TCBindStateUpdates(this);
+				multiBindVisitor = new TCMultipleBindStateUpdates(this);
 			}
 
 			@Override
 			protected TCNameSet newCollection()
 			{
-				return TCStatementStateFinder.this.newCollection();
+				return TCStatementStateUpdates.this.newCollection();
 			}
 		};
 	}
+
+	@Override
+	public TCNameSet caseAnnotatedStatement(TCAnnotatedStatement node, Object arg)
+	{
+		return node.statement.apply(this, null);	// Don't process args
+	}
 	
 	@Override
-	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Boolean updates)
+	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Object arg)
 	{
-		if (updates)
-		{
-			return designatorUpdates(node.target);
-		}
-		else
-		{
-			return designatorReads(node.target);
-		}
+		return designatorUpdates(node.target);
 	}
 	
 	@Override
@@ -81,7 +87,7 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 	}
 
 	@Override
-	public TCNameSet caseStatement(TCStatement node, Boolean updates)
+	public TCNameSet caseStatement(TCStatement node, Object arg)
 	{
 		return newCollection();
 	}
@@ -110,30 +116,5 @@ public class TCStatementStateFinder extends TCLeafStatementVisitor<TCNameToken, 
 		}
 		
 		return all;
-	}
-
-	/**
-	 * Identify the names that are read by a given state designator.
-	 */
-	private TCNameSet designatorReads(TCStateDesignator sd)
-	{
-		if (sd instanceof TCIdentifierDesignator)
-		{
-			return newCollection();
-		}
-		else if (sd instanceof TCFieldDesignator)
-		{
-			TCFieldDesignator fd = (TCFieldDesignator)sd;
-			return designatorReads(fd.object);
-		}
-		else if (sd instanceof TCMapSeqDesignator)
-		{
-			TCMapSeqDesignator msd = (TCMapSeqDesignator)sd;
-			TCNameSet all = designatorReads(msd.mapseq);
-			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, false));
-			return all;
-		}
-		
-		return newCollection();		
 	}
 }

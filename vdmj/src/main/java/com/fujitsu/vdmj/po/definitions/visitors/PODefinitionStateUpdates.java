@@ -21,19 +21,20 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.po.patterns.visitors;
+
+package com.fujitsu.vdmj.po.definitions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.patterns.POBind;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names accessed.
+ * A visitor set to explore the PO tree and return the state names updated.
  */
-public class POBindStateFinder extends POLeafBindVisitor<TCNameToken, TCNameSet, Boolean>
+public class PODefinitionStateUpdates extends POLeafDefinitionVisitor<TCNameToken, TCNameSet, Object>
 {
-	public POBindStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public PODefinitionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
@@ -45,7 +46,7 @@ public class POBindStateFinder extends POLeafBindVisitor<TCNameToken, TCNameSet,
 	}
 
 	@Override
-	public TCNameSet caseBind(POBind node, Boolean arg)
+	public TCNameSet caseDefinition(PODefinition node, Object arg)
 	{
 		return newCollection();
 	}

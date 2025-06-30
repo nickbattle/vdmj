@@ -85,10 +85,11 @@ public class POForIndexStatement extends POStatement
 		}
 
 		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
-		TCNameSet updates = statement.updatesState();
 		
 		if (annotation == null)		// No loop invariant defined
 		{
+			TCNameSet updates = statement.updatesState(true);
+
 			int popto = ctxt.pushAt(new POScopeContext());
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);

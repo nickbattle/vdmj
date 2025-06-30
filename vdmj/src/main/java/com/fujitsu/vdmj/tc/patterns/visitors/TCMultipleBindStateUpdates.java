@@ -13,7 +13,7 @@
  *
  *	VDMJ is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURTCSE.  See the
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
@@ -21,19 +21,19 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.po.patterns.visitors;
+package com.fujitsu.vdmj.tc.patterns.visitors;
 
-import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.patterns.POMultipleBind;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names accessed.
+ * A visitor set to explore the TC tree and return the state names updated.
  */
-public class POMultipleBindStateFinder extends POLeafMultipleBindVisitor<TCNameToken, TCNameSet, Boolean>
+public class TCMultipleBindStateUpdates extends TCLeafMultipleBindVisitor<TCNameToken, TCNameSet, Object>
 {
-	public POMultipleBindStateFinder(POVisitorSet<TCNameToken, TCNameSet, Boolean> visitors)
+	public TCMultipleBindStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
 	{
 		this.visitorSet = visitors;
 	}
@@ -45,7 +45,7 @@ public class POMultipleBindStateFinder extends POLeafMultipleBindVisitor<TCNameT
 	}
 
 	@Override
-	public TCNameSet caseMultipleBind(POMultipleBind node, Boolean arg)
+	public TCNameSet caseMultipleBind(TCMultipleBind node, Object arg)
 	{
 		return newCollection();
 	}
