@@ -183,6 +183,16 @@ public class QCRunLSPCommand extends AnalysisCommand
 					executor.start();
 					return null;
 				}
+				else if (obligation.counterexample != null && obligation.counterexample.location.startLine != 1)
+				{
+					return new DAPMessageList(request, false,
+						"Context refers to PO line #" + obligation.counterexample.location.startLine, null);
+				}
+				else if (obligation.witness != null && obligation.witness.location.startLine != 1)
+				{
+					return new DAPMessageList(request, false,
+						"Context refers to PO line #" + obligation.witness.location.startLine, null);
+				}
 				else
 				{
 					return new DAPMessageList(request, false,

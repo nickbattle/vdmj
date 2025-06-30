@@ -151,6 +151,12 @@ public class POLaunchFactory
 	{
 		try
 		{
+			if (ctxt.location.startLine != 1)
+			{
+				// Complex context which relates to a deeper forall/exists, so...
+				return null;
+			}
+
 			applyCall = new ApplyCall();
 
 			if (po.definition instanceof POExplicitFunctionDefinition)
