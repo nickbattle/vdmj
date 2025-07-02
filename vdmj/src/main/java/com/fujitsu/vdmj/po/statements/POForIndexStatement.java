@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
@@ -85,11 +86,10 @@ public class POForIndexStatement extends POStatement
 		}
 
 		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
+		TCNameSet updates = statement.updatesState();
 		
 		if (annotation == null)		// No loop invariant defined
 		{
-			TCNameSet updates = statement.updatesState(true);
-
 			int popto = ctxt.pushAt(new POScopeContext());
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
@@ -111,28 +111,26 @@ public class POForIndexStatement extends POStatement
 		else
 		{
 			// Note: location of first loop check is the @LoopInvariant itself.
-			POAssignmentDefinition assign = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
-			ctxt.push(new POLetDefContext(assign));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check initial for-loop");
-			ctxt.pop();
-			
-			int popto = ctxt.size();
-			
-			ctxt.push(new POForAllSequenceContext(var, from, to, by));
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
 			obligations.lastElement().setMessage("check before for-loop");
 
-			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
-			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-			
+			int popto = ctxt.size();
+
+			ctxt.push(new POForAllSequenceContext(var, from, to, by));				// forall x=A to B by C
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check after for-loop");
+			obligations.lastElement().setMessage("check before each for-loop");
+
+			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant));					// invariant => ...
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.lastElement().setMessage("check after each for-loop");
 
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs
-			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant));					// invariant => ...
 			
 			return obligations;
 		}

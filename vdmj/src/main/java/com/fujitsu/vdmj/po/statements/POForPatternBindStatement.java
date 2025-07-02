@@ -86,7 +86,7 @@ public class POForPatternBindStatement extends POStatement
 		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
 
 		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
-		TCNameSet updates = statement.updatesState(false);
+		TCNameSet updates = statement.updatesState();
 		
 		if (annotation == null)		// No loop invariant defined
 		{
