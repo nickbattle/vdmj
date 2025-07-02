@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
@@ -93,24 +94,25 @@ public class POForAllStatement extends POStatement
 		{
 			// Note: location of initial check is the @LoopInvariant itself.
 			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check initial for-loop");
+			obligations.lastElement().setMessage("check before for-loop");
 
 			int popto = ctxt.size();
 			
-			ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));
+			ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));	// forall p in set S
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check before for-loop");
+			obligations.lastElement().setMessage("check before each for-loop");
 			
-			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant));						// invariant => ...
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-			
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check after for-loop");
+			obligations.lastElement().setMessage("check after each for-loop");
 
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs
-			ctxt.push(new POImpliesContext(annotation.invariant));	// invariant => ...
+			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotation.invariant));						// invariant => ...
 			
 			return obligations;
 		}
