@@ -79,12 +79,6 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
-	{
-		super.tcBefore(stmt, env, scope);
-	}
-
-	@Override
 	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
 	{
 		if (!isLoop(stmt))

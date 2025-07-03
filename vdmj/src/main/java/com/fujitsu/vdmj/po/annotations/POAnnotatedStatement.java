@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
@@ -31,6 +33,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.util.Pair;
 
 public class POAnnotatedStatement extends POStatement
 {
@@ -45,16 +48,7 @@ public class POAnnotatedStatement extends POStatement
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
 		setStmttype(statement.getStmttype());
-
-		POStatement stmt = this.statement;
-
-		while (stmt instanceof POAnnotatedStatement)
-		{
-			POAnnotatedStatement astmt = (POAnnotatedStatement)stmt;
-			stmt = astmt.statement;
-		}
-
-		stmt.addAnnotation(annotation);
+		addAnnotation(annotation);
 	}
 
 	@Override
@@ -66,10 +60,34 @@ public class POAnnotatedStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		annotation.poBefore(this, ctxt);
-		ProofObligationList obligations = statement.getProofObligations(ctxt, pogState, env);
-		annotation.poAfter(this, obligations, ctxt);
+		Pair<POAnnotationList, POStatement> pair = unpackAnnotations();
+		pair.first.poBefore(pair.second, ctxt);
+		ProofObligationList obligations = pair.second.getProofObligations(ctxt, pogState, env);
+		Collections.reverse(pair.first);	// Preserve nested in/out order
+		pair.first.poAfter(pair.second, obligations, ctxt);
 		return obligations;
+	}
+
+	private Pair<POAnnotationList, POStatement> unpackAnnotations()
+	{
+		POAnnotationList list = new POAnnotationList();
+		list.add(this.annotation);
+		POStatement stmt = this.statement;
+
+		while (stmt instanceof POAnnotatedStatement)
+		{
+			POAnnotatedStatement astmt = (POAnnotatedStatement)stmt;
+			list.add(astmt.annotation);		// In AST chain order, which is text order
+			stmt = astmt.statement;
+		}
+
+		return new Pair<POAnnotationList, POStatement>(list, stmt);
+	}
+
+	@Override
+	public void addAnnotation(POAnnotation annotation)
+	{
+		statement.addAnnotation(annotation);
 	}
 
 	@Override

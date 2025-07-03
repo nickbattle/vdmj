@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
@@ -31,6 +33,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.util.Pair;
 
 public class POAnnotatedExpression extends POExpression
 {
@@ -56,10 +59,28 @@ public class POAnnotatedExpression extends POExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		annotation.poBefore(this, ctxt);
+		Pair<POAnnotationList, POExpression> pair = unpackAnnotations();
+		pair.first.poBefore(pair.second, ctxt);
 		ProofObligationList obligations = expression.getProofObligations(ctxt, pogState, env);
-		annotation.poAfter(this, obligations, ctxt);
+		Collections.reverse(pair.first);	// Preserve nested in/out order
+		pair.first.poAfter(pair.second, obligations, ctxt);
 		return obligations;
+	}
+
+	private Pair<POAnnotationList, POExpression> unpackAnnotations()
+	{
+		POAnnotationList list = new POAnnotationList();
+		list.add(this.annotation);
+		POExpression exp = this.expression;
+
+		while (exp instanceof POAnnotatedExpression)
+		{
+			POAnnotatedExpression aexp = (POAnnotatedExpression)exp;
+			list.add(aexp.annotation);		// In AST chain order, which is text order
+			exp = aexp.expression;
+		}
+
+		return new Pair<POAnnotationList, POExpression>(list, exp);
 	}
 
 	@Override
