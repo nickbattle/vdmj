@@ -33,7 +33,9 @@ import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
@@ -181,6 +183,38 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		for (TCAnnotation annotation: this)
 		{
 			annotation.tcAfter(clazz, self);
+		}
+	}
+
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcBefore(stmt, env, scope);
+		}
+	}
+
+	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcAfter(stmt, type, env, scope);
+		}
+	}
+
+	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcBefore(exp, env, scope);
+		}
+	}
+
+	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcAfter(exp, type, env, scope);
 		}
 	}
 }

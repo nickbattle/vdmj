@@ -24,12 +24,15 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.util.Pair;
 
 public class TCAnnotatedStatement extends TCStatement
 {
@@ -62,13 +65,38 @@ public class TCAnnotatedStatement extends TCStatement
 		return annotation + " " + statement;
 	}
 
+	/**
+	 * If a statement has multiple annotations, the AST is built as a chain of TCAnnotatedStatements,
+	 * each pointing to the next down the chain (see SyntaxReader.readStatement). But it is sensible
+	 * for each tcBefore/tcAfter to be called with the base TCStatement, not the next TCAnnotatedStatement.
+	 * So we calculate the list once here, and call all of the tcBefore/tcAfter methods, passing the
+	 * base TCStatement.
+	 */
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		annotation.tcBefore(this, env, scope);
-		TCType type = statement.typeCheck(env, scope, constraint, mandatory);
-		annotation.tcAfter(this, type, env, scope);
+		Pair<TCAnnotationList, TCStatement> pair = unpackAnnotations();
+		pair.first.tcBefore(pair.second, env, scope);
+		TCType type = pair.second.typeCheck(env, scope, constraint, mandatory);
+		Collections.reverse(pair.first);	// Preserve nested in/out order
+		pair.first.tcAfter(pair.second, type, env, scope);
 		return setType(type);
+	}
+
+	private Pair<TCAnnotationList, TCStatement> unpackAnnotations()
+	{
+		TCAnnotationList list = new TCAnnotationList();
+		list.add(this.annotation);
+		TCStatement stmt = this.statement;
+
+		while (stmt instanceof TCAnnotatedStatement)
+		{
+			TCAnnotatedStatement astmt = (TCAnnotatedStatement)stmt;
+			list.add(astmt.annotation);		// In AST chain order, which is text order
+			stmt = astmt.statement;
+		}
+
+		return new Pair<TCAnnotationList, TCStatement>(list, stmt);
 	}
 
 	@Override

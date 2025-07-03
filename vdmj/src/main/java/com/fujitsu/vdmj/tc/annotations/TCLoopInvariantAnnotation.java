@@ -79,14 +79,14 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	}
 
 	@Override
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
+	{
+		super.tcBefore(stmt, env, scope);
+	}
+
+	@Override
 	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
 	{
-		while (stmt instanceof TCAnnotatedStatement)
-		{
-			TCAnnotatedStatement astmt = (TCAnnotatedStatement)stmt;
-			stmt = astmt.statement;
-		}
-		
 		if (!isLoop(stmt))
 		{
 			name.report(6006, "@LoopInvariant only applies to loop statements");
