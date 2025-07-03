@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.util.List;
+import java.util.Vector;
 import java.util.function.Predicate;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
@@ -62,6 +64,36 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 				return a == null;
 			}
 		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends TCAnnotation> List<T> getInstances(Class<?> type)
+	{
+		List<T> found = new Vector<T>();
+		
+		for (TCAnnotation instance: this)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add((T) instance);
+			}
+		}
+		
+		return found;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends TCAnnotation> T getInstance(Class<?> type)
+	{
+		for (TCAnnotation instance: this)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				return (T) instance;
+			}
+		}
+		
+		return null;
 	}
 	
 	public void tcResolve(TCDefinition def, Environment env)

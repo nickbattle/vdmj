@@ -160,7 +160,7 @@ public class POForIndexStatement extends POStatement
 			ctxt.popTo(popto);
 			
 			/*
-			 * Leave implication for following POs
+			 * Leave implication for following POs, which uses the LoopInvariants that exclude "var"
 			 */
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
 			ctxt.push(new POImpliesContext(combineInvariants(invariants, var)));	// invariant => ...

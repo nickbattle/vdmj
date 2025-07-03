@@ -44,6 +44,16 @@ public class TCAnnotatedStatement extends TCStatement
 		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.statement = statement;
 		setType(statement.getType());
+
+		TCStatement stmt = this.statement;
+
+		while (stmt instanceof TCAnnotatedStatement)
+		{
+			TCAnnotatedStatement astmt = (TCAnnotatedStatement)stmt;
+			stmt = astmt.statement;
+		}
+
+		stmt.addAnnotation(annotation);
 	}
 
 	@Override

@@ -782,6 +782,7 @@ as the expected and actual values.
 3365, "Void operation cannot use 'return <exp>'"
 3366, "Cannot access state field '<name>' from this context"
 3367, "Cannot divide by zero literal"
+3368, "At least one @LoopInvariant must be independent of <var>"
 
 
 4000, "Cannot instantiate abstract class <class>"

@@ -28,6 +28,8 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
@@ -60,6 +62,9 @@ public abstract class TCStatement extends TCNode
 	
 	/** The type of this sub-expression */
 	private TCType stmttype;
+	
+	/** A list of annotations, if any. See TCAnnotatedStatement */
+	protected TCAnnotationList annotations = new TCAnnotationList();
 
 	/**
 	 * Create a statement at the given location.
@@ -207,6 +212,14 @@ public abstract class TCStatement extends TCNode
 	{
 		TCStatementStateUpdates visitor = new TCStatementStateUpdates();
 		return this.apply(visitor, nested);
+	}
+
+	/**
+	 * Add annotations from TCAnnotatedAnnotation
+	 */
+	public void addAnnotation(TCAnnotation annotation)
+	{
+		annotations.add(annotation);
 	}
 
 	/**

@@ -24,7 +24,10 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -94,6 +97,28 @@ public class TCForIndexStatement extends TCStatement
 		Environment local = new FlatCheckedEnvironment(vardef, env, scope);
 		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
+
+		List<TCLoopInvariantAnnotation> loopInvs = annotations.getInstances(TCLoopInvariantAnnotation.class);
+
+		if (!loopInvs.isEmpty())
+		{
+			boolean withoutVar = false;
+
+			for (TCLoopInvariantAnnotation loopInv: loopInvs)
+			{
+				if (!loopInv.args.get(0).getVariableNames().contains(var))
+				{
+					withoutVar = true;		// At least one can appear outside/after the loop
+					break;
+				}
+			}
+
+			if (!withoutVar)
+			{
+				var.report(3368, "At least one @LoopInvariant must be independent of " + var);
+			}
+		}
+
 		return setType(rt);
 	}
 
