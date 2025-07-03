@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -54,6 +56,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -100,10 +103,10 @@ public class POForIndexStatement extends POStatement
 			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
 		}
 
-		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
+		List<POLoopInvariantAnnotation> invariants = annotations.getInstances(POLoopInvariantAnnotation.class);
 		TCNameSet updates = statement.updatesState();
 		
-		if (annotation == null)		// No loop invariant defined
+		if (invariants.isEmpty())		// No loop invariants defined
 		{
 			int popto = ctxt.pushAt(new POScopeContext());
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
@@ -125,12 +128,14 @@ public class POForIndexStatement extends POStatement
 		}
 		else
 		{
+			POExpression invariant = combineInvariants(invariants, null);
+
 			/*
 			 * The initial case verifies that the invariant is true for the loop "from" value.
 			 */
 			POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
 			ctxt.add(new POLetDefContext(def));		// let x = 1 in
-			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before for-loop");
 			ctxt.pop();
 
@@ -139,59 +144,86 @@ public class POForIndexStatement extends POStatement
 			/*
 			 * A preservation case verifies that if the invariant is true at X, then it is true at X+1
 			 */
-
 			TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
 			Environment local = new FlatCheckedEnvironment(tcdef, env, null);
 			updates.add(var);
 
 			ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
-			ctxt.push(new POImpliesContext(varIsValid(), annotation.invariant));	// valid index && invariant => ...
+			ctxt.push(new POImpliesContext(varIsValid(), invariant));	// valid index && invariant => ...
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
 			def = new POAssignmentDefinition(var, vardef.getType(), fromPlusBy(), vardef.getType());
 			ctxt.add(new POLetDefContext(def));		// let x = x + 1 in
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 			obligations.lastElement().setMessage("preservation after each for-loop");
 
 			ctxt.popTo(popto);
 			
-			// Leave implication for following POs
+			/*
+			 * Leave implication for following POs
+			 */
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant));					// invariant => ...
+			ctxt.push(new POImpliesContext(combineInvariants(invariants, var)));	// invariant => ...
 			
 			return obligations;
 		}
+	}
+
+	private POExpression combineInvariants(List<POLoopInvariantAnnotation> invariants, TCNameToken exclude)
+	{
+		LexKeywordToken AND = new LexKeywordToken(Token.AND, location);
+		TCBooleanType BOOL = new TCBooleanType(location);
+
+		POExpression exp = null;
+
+		for (POLoopInvariantAnnotation loopInv: invariants)
+		{
+			if (exclude == null || !loopInv.invariant.getVariableNames().contains(exclude))
+			{
+				if (exp == null)
+				{
+					exp = loopInv.invariant;
+				}
+				else
+				{
+					exp = new POAndExpression(exp, AND, loopInv.invariant, BOOL, BOOL);
+				}
+			}
+		}
+
+		return exp;
 	}
 
 	private POExpression varIsValid()
 	{
 		TCRealType real = new TCRealType(location);
 		POExpression vexp = new POVariableExpression(var, vardef);
-		POExpression _by = (by == null) ? new POIntegerLiteralExpression(new LexIntegerToken(1L, location)) : by;
-		POExpression one = new POIntegerLiteralExpression(new LexIntegerToken(0L, location));
+		
+		POExpression ge = new POLessEqualExpression(vexp, new LexKeywordToken(Token.GE, location), from, real, real);		// x >= A
+		POExpression le = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), to, real, real);			// x <= B
+		POExpression range = new POAndExpression(ge, new LexKeywordToken(Token.AND, location), le, real, real);				// x >= A and x <= B
+		
+		if (by != null)
+		{
+			POExpression diff = new POSubtractExpression(vexp, new LexKeywordToken(Token.MINUS, location), from, real, real);	// (x-A)
+			POExpression rem = new PORemExpression(diff, new LexKeywordToken(Token.REM, location), by, real, real);				// (x-A) rem C
+			POExpression zero = new POIntegerLiteralExpression(new LexIntegerToken(0L, location));
+			POExpression equals = new POEqualsExpression(rem, new LexKeywordToken(Token.EQUALS, location), zero, real, real);	// (x-A) rem C == 0
 
-		POExpression diff = new POSubtractExpression(vexp, new LexKeywordToken(Token.MINUS, location), from, real, real);	// (x - A)
-		POExpression rem = new PORemExpression(diff, new LexKeywordToken(Token.REM, location), _by, real, real);				// (x-A) rem C
-		POExpression zero = new POEqualsExpression(rem, new LexKeywordToken(Token.EQUALS, location), one, real, real);			// (x-A) rem C == 0
-		POExpression less = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), to, real, real);		// x <= B
-
-		return new POAndExpression(zero, new LexKeywordToken(Token.AND, location), less, real, real);
-
+			return new POAndExpression(equals, new LexKeywordToken(Token.AND, location), range, real, real);	// x >= A and x <= B and (x-A) rem C == 0
+		}
+		else
+		{
+			return range;
+		}
 	}
 
 	private POExpression fromPlusBy()
 	{
 		POExpression vexp = new POVariableExpression(var, vardef);
-
-		if (by == null)
-		{
-			POExpression one = new POIntegerLiteralExpression(new LexIntegerToken(1L, location));
-			return new POPlusExpression(vexp, new LexKeywordToken(Token.PLUS, location), one, from.getExptype(), new TCIntegerType(location));
-		}
-		else
-		{
-			return new POPlusExpression(vexp, new LexKeywordToken(Token.PLUS, location), by, from.getExptype(), by.getExptype());
-		}
+		POExpression one = new POIntegerLiteralExpression(new LexIntegerToken(1L, location));
+		POExpression _by = (by == null) ? one : by;
+		return new POPlusExpression(vexp, new LexKeywordToken(Token.PLUS, location), _by, from.getExptype(), new TCIntegerType(location));
 	}
 
 	@Override
