@@ -54,8 +54,9 @@ public class POLoopInvariantAnnotation extends POAnnotation
 	 */
 	public static POExpression combine(List<POLoopInvariantAnnotation> invariants, TCNameToken exclude)
 	{
-		LexKeywordToken AND = new LexKeywordToken(Token.AND, LexLocation.ANY);
-		TCBooleanType BOOL = new TCBooleanType(LexLocation.ANY);
+		LexLocation loc = invariants.get(0).location;
+		LexKeywordToken AND = new LexKeywordToken(Token.AND, loc);
+		TCBooleanType BOOL = new TCBooleanType(loc);
 
 		POExpression exp = null;
 

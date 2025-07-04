@@ -151,10 +151,10 @@ public class POForIndexStatement extends POStatement
 			ctxt.push(new POImpliesContext(varIsValid(), invariant));	// valid index && invariant => ...
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
-			def = new POAssignmentDefinition(var, vardef.getType(), fromPlusBy(), vardef.getType());
+			def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(), vardef.getType());
 			ctxt.add(new POLetDefContext(def));		// let x = x + 1 in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("preservation after each for-loop");
+			obligations.lastElement().setMessage("preservation for next for-loop");
 
 			ctxt.popTo(popto);
 			
@@ -192,7 +192,7 @@ public class POForIndexStatement extends POStatement
 		}
 	}
 
-	private POExpression fromPlusBy()
+	private POExpression varPlusBy()
 	{
 		POExpression vexp = new POVariableExpression(var, vardef);
 		POExpression one = new POIntegerLiteralExpression(new LexIntegerToken(1L, location));
