@@ -56,7 +56,6 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -128,7 +127,7 @@ public class POForIndexStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = combineInvariants(invariants, null);
+			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
 
 			/*
 			 * The initial case verifies that the invariant is true for the loop "from" value.
@@ -163,35 +162,10 @@ public class POForIndexStatement extends POStatement
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "var"
 			 */
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-			ctxt.push(new POImpliesContext(combineInvariants(invariants, var)));	// invariant => ...
+			ctxt.push(new POImpliesContext(POLoopInvariantAnnotation.combine(invariants, var)));	// invariant => ...
 			
 			return obligations;
 		}
-	}
-
-	private POExpression combineInvariants(List<POLoopInvariantAnnotation> invariants, TCNameToken exclude)
-	{
-		LexKeywordToken AND = new LexKeywordToken(Token.AND, location);
-		TCBooleanType BOOL = new TCBooleanType(location);
-
-		POExpression exp = null;
-
-		for (POLoopInvariantAnnotation loopInv: invariants)
-		{
-			if (exclude == null || !loopInv.invariant.getVariableNames().contains(exclude))
-			{
-				if (exp == null)
-				{
-					exp = loopInv.invariant;
-				}
-				else
-				{
-					exp = new POAndExpression(exp, AND, loopInv.invariant, BOOL, BOOL);
-				}
-			}
-		}
-
-		return exp;
 	}
 
 	private POExpression varIsValid()

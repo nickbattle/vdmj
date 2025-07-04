@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -60,6 +61,8 @@ public class TCWhileStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
+		TCLoopInvariantAnnotation.typeCheck(this, null, annotations);
+
 		if (!exp.typeCheck(env, null, scope, null).isType(TCBooleanType.class, location))
 		{
 			exp.report(3218, "Expression is not boolean");
