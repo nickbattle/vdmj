@@ -102,9 +102,10 @@ public abstract class POStatement extends PONode
 	/**
 	 * Add annotations from POAnnotatedAnnotation
 	 */
-	public void addAnnotation(POAnnotation annotation)
+	public POStatement addAnnotation(POAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 	
 	/**

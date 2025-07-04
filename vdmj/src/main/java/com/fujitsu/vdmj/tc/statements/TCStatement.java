@@ -217,9 +217,10 @@ public abstract class TCStatement extends TCNode
 	/**
 	 * Add annotations from TCAnnotatedAnnotation
 	 */
-	public void addAnnotation(TCAnnotation annotation)
+	public TCStatement addAnnotation(TCAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 
 	/**

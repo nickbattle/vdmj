@@ -278,9 +278,10 @@ public abstract class TCExpression extends TCNode
 	/**
 	 * Add annotations from TCAnnotatedExpression
 	 */
-	public void addAnnotation(TCAnnotation annotation)
+	public TCExpression addAnnotation(TCAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 
 	/**

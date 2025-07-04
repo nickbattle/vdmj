@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
-import java.util.Collections;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
@@ -33,7 +31,6 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.util.Pair;
 
 public class POAnnotatedStatement extends POStatement
 {
@@ -41,14 +38,15 @@ public class POAnnotatedStatement extends POStatement
 
 	public final POAnnotation annotation;
 	public final POStatement statement;
+	public final POStatement base;
 	
 	public POAnnotatedStatement(LexLocation location, POAnnotation annotation, POStatement statement)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
+		this.base = addAnnotation(annotation);
 		setStmttype(statement.getStmttype());
-		addAnnotation(annotation);
 	}
 
 	@Override
@@ -60,41 +58,21 @@ public class POAnnotatedStatement extends POStatement
 	/**
 	 * If a statement has multiple annotations, the AST is built as a chain of POAnnotatedStatements,
 	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
-	 * for each tcBefore/tcAfter to be called with the base POStatement, not the next POAnnotatedStatement.
-	 * So we calculate the list once here, and call all of the tcBefore/tcAfter methods, passing the
-	 * base POStatement. The base statement's getProofObligations is only called once.
+	 * for each poBefore/poAfter to be called with the base POStatement, not the next POAnnotatedStatement.
 	 */
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		Pair<POAnnotationList, POStatement> pair = unpackAnnotations();
-		pair.first.poBefore(pair.second, ctxt);
-		ProofObligationList obligations = pair.second.getProofObligations(ctxt, pogState, env);
-		Collections.reverse(pair.first);	// Preserve nested in/out order
-		pair.first.poAfter(pair.second, obligations, ctxt);
+		annotation.poBefore(base, ctxt);
+		ProofObligationList obligations = statement.getProofObligations(ctxt, pogState, env);
+		annotation.poAfter(base, obligations, ctxt);
 		return obligations;
 	}
 
-	private Pair<POAnnotationList, POStatement> unpackAnnotations()
-	{
-		POAnnotationList list = new POAnnotationList();
-		list.add(this.annotation);
-		POStatement stmt = this.statement;
-
-		while (stmt instanceof POAnnotatedStatement)
-		{
-			POAnnotatedStatement astmt = (POAnnotatedStatement)stmt;
-			list.add(astmt.annotation);		// In AST chain order, which is text order
-			stmt = astmt.statement;
-		}
-
-		return new Pair<POAnnotationList, POStatement>(list, stmt);
-	}
-
 	@Override
-	public void addAnnotation(POAnnotation annotation)
+	public POStatement addAnnotation(POAnnotation annotation)
 	{
-		statement.addAnnotation(annotation);
+		return statement.addAnnotation(annotation);
 	}
 
 	@Override

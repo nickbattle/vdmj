@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.util.Pair;
 import com.fujitsu.vdmj.values.Value;
 
 public class INAnnotatedExpression extends INExpression
@@ -37,13 +36,14 @@ public class INAnnotatedExpression extends INExpression
 	
 	public final INAnnotation annotation;
 	public final INExpression expression;
+	public final INExpression base;
 	
 	public INAnnotatedExpression(LexLocation location, INAnnotation annotation, INExpression expression)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.expression = expression;
-		addAnnotation(annotation);
+		this.base = addAnnotation(annotation);
 	}
 
 	@Override
@@ -53,44 +53,24 @@ public class INAnnotatedExpression extends INExpression
 	}
 
 	/**
-	 * If a statement has multiple annotations, the AST is built as a chain of INAnnotatedStatements,
-	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
-	 * for each tcBefore/tcAfter to be called with the base INStatement, not the next INAnnotatedStatement.
-	 * So we calculate the list once here, and call all of the tcBefore/tcAfter methods, passing the
-	 * base INStatement. The base expression's typeCheck is only called once.
+	 * If an expression has multiple annotations, the AST is built as a chain of INAnnotatedExpressions,
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it
+	 * is sensible for each inBefore/inAfter to be called with the base INExpression.
 	 */
 	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-
-		Pair<INAnnotationList, INExpression> pair = unpackAnnotations();
-		if (!INAnnotation.suspended) pair.first.inBefore(pair.second, ctxt);
-		Value rv = pair.second.eval(ctxt);
-		if (!INAnnotation.suspended) pair.first.inAfter(pair.second, rv, ctxt);
+		if (!INAnnotation.suspended) annotation.inBefore(base, ctxt);
+		Value rv = expression.eval(ctxt);
+		if (!INAnnotation.suspended) annotation.inAfter(base, rv, ctxt);
 		return rv;
-	}
-	
-	private Pair<INAnnotationList, INExpression> unpackAnnotations()
-	{
-		INAnnotationList list = new INAnnotationList();
-		list.add(this.annotation);
-		INExpression exp = this.expression;
-
-		while (exp instanceof INAnnotatedExpression)
-		{
-			INAnnotatedExpression aexp = (INAnnotatedExpression)exp;
-			list.add(aexp.annotation);		// In AST chain order, which is text order
-			exp = aexp.expression;
-		}
-
-		return new Pair<INAnnotationList, INExpression>(list, exp);
 	}
 
 	@Override
-	public void addAnnotation(INAnnotation annotation)
+	public INExpression addAnnotation(INAnnotation annotation)
 	{
-		expression.addAnnotation(annotation);
+		return expression.addAnnotation(annotation);
 	}
 
 	@Override

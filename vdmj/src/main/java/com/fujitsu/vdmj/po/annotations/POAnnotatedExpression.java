@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
-import java.util.Collections;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
@@ -33,7 +31,6 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.util.Pair;
 
 public class POAnnotatedExpression extends POExpression
 {
@@ -41,14 +38,15 @@ public class POAnnotatedExpression extends POExpression
 	
 	public final POAnnotation annotation;
 	public final POExpression expression;
+	public final POExpression base;
 	
 	public POAnnotatedExpression(LexLocation location, POAnnotation annotation, POExpression expression)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
+		this.base = addAnnotation(annotation);
 		setExptype(expression.getExptype());
-		addAnnotation(annotation);
 	}
 
 	@Override
@@ -58,37 +56,17 @@ public class POAnnotatedExpression extends POExpression
 	}
 	
 	/**
-	 * If an expression has multiple annotations, the AST is built as a chain of POAnnotatedStatements,
-	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it is
-	 * sensible for each tcBefore/tcAfter to be called with the base POExpression, not the next
-	 * POAnnotatedExpression. So we calculate the list once here, and call all of the tcBefore/tcAfter
-	 * methods, passing the base POExpresssion. The base expression's getProofObligations is only called once.
+	 * If an expression has multiple annotations, the AST is built as a chain of POAnnotatedExpressions,
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it
+	 * is sensible for each poBefore/poAfter to be called with the base POExpression.
 	 */
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		Pair<POAnnotationList, POExpression> pair = unpackAnnotations();
-		pair.first.poBefore(pair.second, ctxt);
-		ProofObligationList obligations = pair.second.getProofObligations(ctxt, pogState, env);
-		Collections.reverse(pair.first);	// Preserve nested in/out order
-		pair.first.poAfter(pair.second, obligations, ctxt);
+		annotation.poBefore(base, ctxt);
+		ProofObligationList obligations = expression.getProofObligations(ctxt, pogState, env);
+		annotation.poAfter(base, obligations, ctxt);
 		return obligations;
-	}
-
-	private Pair<POAnnotationList, POExpression> unpackAnnotations()
-	{
-		POAnnotationList list = new POAnnotationList();
-		list.add(this.annotation);
-		POExpression exp = this.expression;
-
-		while (exp instanceof POAnnotatedExpression)
-		{
-			POAnnotatedExpression aexp = (POAnnotatedExpression)exp;
-			list.add(aexp.annotation);		// In AST chain order, which is text order
-			exp = aexp.expression;
-		}
-
-		return new Pair<POAnnotationList, POExpression>(list, exp);
 	}
 
 	@Override
@@ -98,9 +76,9 @@ public class POAnnotatedExpression extends POExpression
 	}
 
 	@Override
-	public void addAnnotation(POAnnotation annotation)
+	public POExpression addAnnotation(POAnnotation annotation)
 	{
-		expression.addAnnotation(annotation);
+		return expression.addAnnotation(annotation);
 	}
 
 	@Override

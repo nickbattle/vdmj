@@ -82,9 +82,10 @@ public abstract class INStatement extends INNode
 	/**
 	 * Add annotations from POAnnotatedAnnotation
 	 */
-	public void addAnnotation(INAnnotation annotation)
+	public INStatement addAnnotation(INAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 
 	/**

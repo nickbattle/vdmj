@@ -181,9 +181,10 @@ public abstract class INExpression extends INNode
 	/**
 	 * Add annotations from INAnnotatedExpression
 	 */
-	public void addAnnotation(INAnnotation annotation)
+	public INExpression addAnnotation(INAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 
 	/**

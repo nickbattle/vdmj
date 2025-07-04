@@ -189,9 +189,10 @@ public abstract class POExpression extends PONode
 	/**
 	 * Add annotations from POAnnotatedExpression
 	 */
-	public void addAnnotation(POAnnotation annotation)
+	public POExpression addAnnotation(POAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 
 	/**

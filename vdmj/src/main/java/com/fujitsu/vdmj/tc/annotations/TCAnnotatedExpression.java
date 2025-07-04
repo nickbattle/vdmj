@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
-import java.util.Collections;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
@@ -33,7 +31,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
-import com.fujitsu.vdmj.util.Pair;
 
 public class TCAnnotatedExpression extends TCExpression
 {
@@ -41,13 +38,14 @@ public class TCAnnotatedExpression extends TCExpression
 	
 	public final TCAnnotation annotation;
 	public final TCExpression expression;
+	public final TCExpression base;
 	
 	public TCAnnotatedExpression(LexLocation location, TCAnnotation annotation, TCExpression expression)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.expression = expression;
-		addAnnotation(annotation);
+		this.base = addAnnotation(annotation);
 	}
 
 	@Override
@@ -58,42 +56,22 @@ public class TCAnnotatedExpression extends TCExpression
 
 	/**
 	 * If an expression has multiple annotations, the AST is built as a chain of TCAnnotatedExpressions,
-	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it is
-	 * sensible for each tcBefore/tcAfter to be called with the base TCExpression, not the next
-	 * TCAnnotatedExpression. So we calculate the list once here, and call all of the tcBefore/tcAfter
-	 * methods, passing the base TCExpression. The base expression's typeCheck is only called once.
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it
+	 * is sensible for each tcBefore/tcAfter to be called with the base TCExpression.
 	 */
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		Pair<TCAnnotationList, TCExpression> pair = unpackAnnotations();
-		pair.first.tcBefore(pair.second, env, scope);
-		TCType type = pair.second.typeCheck(env, qualifiers, scope, constraint);
-		Collections.reverse(pair.first);	// Preserve nested in/out order
-		pair.first.tcAfter(pair.second, type, env, scope);
+		annotation.tcBefore(base, env, scope);
+		TCType type = expression.typeCheck(env, qualifiers, scope, constraint);
+		annotation.tcAfter(base, type, env, scope);
 		return setType(type);
 	}
 
-	private Pair<TCAnnotationList, TCExpression> unpackAnnotations()
-	{
-		TCAnnotationList list = new TCAnnotationList();
-		list.add(this.annotation);
-		TCExpression exp = this.expression;
-
-		while (exp instanceof TCAnnotatedExpression)
-		{
-			TCAnnotatedExpression aexp = (TCAnnotatedExpression)exp;
-			list.add(aexp.annotation);		// In AST chain order, which is text order
-			exp = aexp.expression;
-		}
-
-		return new Pair<TCAnnotationList, TCExpression>(list, exp);
-	}
-
 	@Override
-	public void addAnnotation(TCAnnotation annotation)
+	public TCExpression addAnnotation(TCAnnotation annotation)
 	{
-		expression.addAnnotation(annotation);
+		return expression.addAnnotation(annotation);
 	}
 
 	@Override
