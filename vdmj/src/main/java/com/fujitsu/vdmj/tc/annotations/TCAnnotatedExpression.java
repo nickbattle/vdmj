@@ -47,6 +47,7 @@ public class TCAnnotatedExpression extends TCExpression
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.expression = expression;
+		addAnnotation(annotation);
 	}
 
 	@Override
@@ -87,6 +88,12 @@ public class TCAnnotatedExpression extends TCExpression
 		}
 
 		return new Pair<TCAnnotationList, TCExpression>(list, exp);
+	}
+
+	@Override
+	public void addAnnotation(TCAnnotation annotation)
+	{
+		expression.addAnnotation(annotation);
 	}
 
 	@Override

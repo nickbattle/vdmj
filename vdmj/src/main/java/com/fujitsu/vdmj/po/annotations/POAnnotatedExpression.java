@@ -48,6 +48,7 @@ public class POAnnotatedExpression extends POExpression
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
 		setExptype(expression.getExptype());
+		addAnnotation(annotation);
 	}
 
 	@Override
@@ -94,6 +95,12 @@ public class POAnnotatedExpression extends POExpression
 	public String getPreName()
 	{
 		return expression.getPreName();
+	}
+
+	@Override
+	public void addAnnotation(POAnnotation annotation)
+	{
+		expression.addAnnotation(annotation);
 	}
 
 	@Override

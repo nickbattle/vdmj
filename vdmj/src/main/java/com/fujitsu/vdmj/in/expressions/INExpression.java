@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionUpdatableFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
@@ -49,6 +51,9 @@ public abstract class INExpression extends INNode
 
 	/** The expression's breakpoint, if any. */
 	public Breakpoint breakpoint;
+	
+	/** A list of annotations, if any. See INAnnotatedExpression */
+	protected INAnnotationList annotations = new INAnnotationList();
 
 	/**
 	 * Generate an expression at the given location.
@@ -171,6 +176,14 @@ public abstract class INExpression extends INNode
 		{
 			throw new ContextException(4177, "Not permitted during initialization", location, ctxt);
 		}
+	}
+
+	/**
+	 * Add annotations from INAnnotatedExpression
+	 */
+	public void addAnnotation(INAnnotation annotation)
+	{
+		annotations.add(annotation);
 	}
 
 	/**

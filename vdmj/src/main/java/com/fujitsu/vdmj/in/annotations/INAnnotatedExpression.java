@@ -43,6 +43,7 @@ public class INAnnotatedExpression extends INExpression
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.expression = expression;
+		addAnnotation(annotation);
 	}
 
 	@Override
@@ -84,6 +85,12 @@ public class INAnnotatedExpression extends INExpression
 		}
 
 		return new Pair<INAnnotationList, INExpression>(list, exp);
+	}
+
+	@Override
+	public void addAnnotation(INAnnotation annotation)
+	{
+		expression.addAnnotation(annotation);
 	}
 
 	@Override
