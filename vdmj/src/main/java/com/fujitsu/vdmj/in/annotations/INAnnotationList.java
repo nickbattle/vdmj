@@ -27,8 +27,12 @@ package com.fujitsu.vdmj.in.annotations;
 import java.util.function.Predicate;
 
 import com.fujitsu.vdmj.in.INMappedList;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
+import com.fujitsu.vdmj.values.Value;
 
 public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
 {
@@ -68,5 +72,37 @@ public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
 		}
 		
 		return null;
+	}
+
+	public void inBefore(INStatement stmt, Context ctxt)
+	{
+		for (INAnnotation annotation: this)
+		{
+			annotation.inBefore(stmt, ctxt);
+		}
+	}
+
+	public void inAfter(INStatement stmt, Value rv, Context ctxt)
+	{
+		for (INAnnotation annotation: this)
+		{
+			annotation.inAfter(stmt, rv, ctxt);
+		}
+	}
+
+	public void inBefore(INExpression second, Context ctxt)
+	{
+		for (INAnnotation annotation: this)
+		{
+			annotation.inBefore(second, ctxt);
+		}
+	}
+
+	public void inAfter(INExpression second, Value rv, Context ctxt)
+	{
+		for (INAnnotation annotation: this)
+		{
+			annotation.inAfter(second, rv, ctxt);
+		}
 	}
 }

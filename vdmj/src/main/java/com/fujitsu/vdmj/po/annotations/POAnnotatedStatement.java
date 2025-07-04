@@ -57,6 +57,13 @@ public class POAnnotatedStatement extends POStatement
 		return statement.toString();	// Don't include annotation in PO source
 	}
 	
+	/**
+	 * If a statement has multiple annotations, the AST is built as a chain of POAnnotatedStatements,
+	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
+	 * for each tcBefore/tcAfter to be called with the base POStatement, not the next POAnnotatedStatement.
+	 * So we calculate the list once here, and call all of the tcBefore/tcAfter methods, passing the
+	 * base POStatement. The base statement's getProofObligations is only called once.
+	 */
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{

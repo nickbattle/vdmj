@@ -58,10 +58,10 @@ public class TCAnnotatedStatement extends TCStatement
 
 	/**
 	 * If a statement has multiple annotations, the AST is built as a chain of TCAnnotatedStatements,
-	 * each pointing to the next down the chain (see SyntaxReader.readStatement). But it is sensible
+	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
 	 * for each tcBefore/tcAfter to be called with the base TCStatement, not the next TCAnnotatedStatement.
 	 * So we calculate the list once here, and call all of the tcBefore/tcAfter methods, passing the
-	 * base TCStatement.
+	 * base TCStatement. The base statement's typeCheck is only called once.
 	 */
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)

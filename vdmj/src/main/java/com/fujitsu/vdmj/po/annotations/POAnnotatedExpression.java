@@ -56,12 +56,19 @@ public class POAnnotatedExpression extends POExpression
 		return expression.toString();	// Don't include annotation in PO sources
 	}
 	
+	/**
+	 * If an expression has multiple annotations, the AST is built as a chain of POAnnotatedStatements,
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it is
+	 * sensible for each tcBefore/tcAfter to be called with the base POExpression, not the next
+	 * POAnnotatedExpression. So we calculate the list once here, and call all of the tcBefore/tcAfter
+	 * methods, passing the base POExpresssion. The base expression's getProofObligations is only called once.
+	 */
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		Pair<POAnnotationList, POExpression> pair = unpackAnnotations();
 		pair.first.poBefore(pair.second, ctxt);
-		ProofObligationList obligations = expression.getProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = pair.second.getProofObligations(ctxt, pogState, env);
 		Collections.reverse(pair.first);	// Preserve nested in/out order
 		pair.first.poAfter(pair.second, obligations, ctxt);
 		return obligations;

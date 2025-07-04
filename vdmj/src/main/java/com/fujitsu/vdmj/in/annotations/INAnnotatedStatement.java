@@ -24,10 +24,13 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.util.Pair;
 import com.fujitsu.vdmj.values.Value;
 
 public class INAnnotatedStatement extends INStatement
@@ -42,7 +45,7 @@ public class INAnnotatedStatement extends INStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.statement = statement;
-		this.statement.addAnnotation(annotation);
+		addAnnotation(annotation);
 	}
 
 	@Override
@@ -51,16 +54,42 @@ public class INAnnotatedStatement extends INStatement
 		return annotation + " " + statement;
 	}
 
+	/**
+	 * If a statement has multiple annotations, the AST is built as a chain of INAnnotatedStatements,
+	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
+	 * for each tcBefore/tcAfter to be called with the base INStatement, not the next INAnnotatedStatement.
+	 * So we calculate the list once here, and call all of the tcBefore/tcAfter methods, passing the
+	 * base INStatement. The base statement's typeCheck is only called once.
+	 */
 	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
-		Value rv = statement.eval(ctxt);
-		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
+
+		Pair<INAnnotationList, INStatement> pair = unpackAnnotations();
+		if (!INAnnotation.suspended) pair.first.inBefore(pair.second, ctxt);
+		Value rv = pair.second.eval(ctxt);
+		Collections.reverse(pair.first);	// Preserve nested in/out order
+		if (!INAnnotation.suspended) pair.first.inAfter(pair.second, rv, ctxt);
 		return rv;
 	}
 	
+	private Pair<INAnnotationList, INStatement> unpackAnnotations()
+	{
+		INAnnotationList list = new INAnnotationList();
+		list.add(this.annotation);
+		INStatement stmt = this.statement;
+
+		while (stmt instanceof INAnnotatedStatement)
+		{
+			INAnnotatedStatement astmt = (INAnnotatedStatement)stmt;
+			list.add(astmt.annotation);		// In AST chain order, which is text order
+			stmt = astmt.statement;
+		}
+
+		return new Pair<INAnnotationList, INStatement>(list, stmt);
+	}
+
 	@Override
 	public void addAnnotation(INAnnotation annotation)
 	{

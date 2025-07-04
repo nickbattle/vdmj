@@ -60,7 +60,7 @@ public class TCAnnotatedExpression extends TCExpression
 	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it is
 	 * sensible for each tcBefore/tcAfter to be called with the base TCExpression, not the next
 	 * TCAnnotatedExpression. So we calculate the list once here, and call all of the tcBefore/tcAfter
-	 * methods, passing the base TCExpression.
+	 * methods, passing the base TCExpression. The base expression's typeCheck is only called once.
 	 */
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
