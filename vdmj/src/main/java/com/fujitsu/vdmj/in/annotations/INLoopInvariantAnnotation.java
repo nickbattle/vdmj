@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -43,9 +44,11 @@ public class INLoopInvariantAnnotation extends INAnnotation
 	
 	public void check(Context ctxt) throws ValueException
 	{
-		if (!args.get(0).eval(ctxt).boolValue(ctxt))
+		INExpression inv = args.get(0);
+
+		if (!inv.eval(ctxt).boolValue(ctxt))
 		{
-			throw new ValueException(4178, "Loop invariant violated", ctxt);
+			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
 		}
 	}
 }
