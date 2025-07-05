@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import java.util.List;
+import java.util.Vector;
 import java.util.function.Predicate;
 
 import com.fujitsu.vdmj.in.INMappedList;
@@ -72,6 +74,22 @@ public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
 		}
 		
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends INAnnotation> List<T> getInstances(Class<?> type)
+	{
+		List<T> found = new Vector<T>();
+
+		for (INAnnotation instance: this)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add((T) instance);
+			}
+		}
+		
+		return found;
 	}
 
 	public void inBefore(INStatement stmt, Context ctxt)

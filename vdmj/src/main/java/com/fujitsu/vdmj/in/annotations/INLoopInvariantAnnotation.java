@@ -37,6 +37,9 @@ public class INLoopInvariantAnnotation extends INAnnotation
 	{
 		super(name, args);
 	}
+
+	// NOTE: inBefore/inAfter are not used. The check method is called directly by
+	// the various loop INStatements that need it during the loop eval.
 	
 	public void check(Context ctxt) throws ValueException
 	{
