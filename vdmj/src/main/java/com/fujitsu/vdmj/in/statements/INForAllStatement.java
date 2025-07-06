@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.in.statements;
 
+import java.util.List;
+
+import com.fujitsu.vdmj.in.annotations.INLoopInvariantAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
@@ -66,13 +69,21 @@ public class INForAllStatement extends INStatement
 		{
 			ValueSet values = set.eval(ctxt).setValue(ctxt);
 
+			List<INLoopInvariantAnnotation> invariants =
+				annotations.getInstances(INLoopInvariantAnnotation.class);
+	
+			INLoopInvariantAnnotation.check(invariants, ctxt);
+			
 			for (Value val: values)
 			{
 				try
 				{
 					Context evalContext = new Context(location, "for all", ctxt);
 					evalContext.putList(pattern.getNamedValues(val, ctxt));
+
+					INLoopInvariantAnnotation.check(invariants, ctxt);
 					Value rv = statement.eval(evalContext);
+					INLoopInvariantAnnotation.check(invariants, ctxt);
 
 					if (!rv.isVoid())
 					{

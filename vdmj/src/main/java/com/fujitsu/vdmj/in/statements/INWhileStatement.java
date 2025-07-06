@@ -59,38 +59,22 @@ public class INWhileStatement extends INStatement
 	{
 		breakpoint.check(location, ctxt);
 		
-		List<INLoopInvariantAnnotation> invariants =
-			annotations.getInstances(INLoopInvariantAnnotation.class);
-
 		try
 		{
-			if (invariants.isEmpty())
-			{
-				while (exp.eval(ctxt).boolValue(ctxt))
-				{
-					Value rv = statement.eval(ctxt);
+			List<INLoopInvariantAnnotation> invariants =
+				annotations.getInstances(INLoopInvariantAnnotation.class);
 	
-					if (!rv.isVoid())
-					{
-						return rv;
-					}
-				}
-			}
-			else
+			INLoopInvariantAnnotation.check(invariants, ctxt);
+			
+			while (exp.eval(ctxt).boolValue(ctxt))
 			{
-				check(invariants, ctxt);
-				
-				while (exp.eval(ctxt).boolValue(ctxt))
-				{
-					check(invariants, ctxt);
-					Value rv = statement.eval(ctxt);
-	
-					if (!rv.isVoid())
-					{
-						return rv;
-					}
+				INLoopInvariantAnnotation.check(invariants, ctxt);
+				Value rv = statement.eval(ctxt);
+				INLoopInvariantAnnotation.check(invariants, ctxt);
 
-					check(invariants, ctxt);
+				if (!rv.isVoid())
+				{
+					return rv;
 				}
 			}
 		}
@@ -100,14 +84,6 @@ public class INWhileStatement extends INStatement
 		}
 
 		return new VoidValue();
-	}
-
-	private void check(List<INLoopInvariantAnnotation> invariants, Context ctxt) throws ValueException
-	{
-		for (INLoopInvariantAnnotation invariant: invariants)
-		{
-			invariant.check(ctxt);
-		}
 	}
 
 	@Override

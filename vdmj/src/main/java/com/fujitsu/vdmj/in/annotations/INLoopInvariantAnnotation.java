@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.runtime.Context;
@@ -42,13 +44,21 @@ public class INLoopInvariantAnnotation extends INAnnotation
 	// NOTE: inBefore/inAfter are not used. The check method is called directly by
 	// the various loop INStatements that need it during the loop eval.
 	
-	public void check(Context ctxt) throws ValueException
+	private void check(Context ctxt) throws ValueException
 	{
 		INExpression inv = args.get(0);
 
 		if (!inv.eval(ctxt).boolValue(ctxt))
 		{
 			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
+		}
+	}
+
+	public static void check(List<INLoopInvariantAnnotation> invariants, Context ctxt) throws ValueException
+	{
+		for (INLoopInvariantAnnotation invariant: invariants)
+		{
+			invariant.check(ctxt);
 		}
 	}
 }
