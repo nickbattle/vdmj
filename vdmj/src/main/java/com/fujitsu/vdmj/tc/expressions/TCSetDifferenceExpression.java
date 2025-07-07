@@ -59,7 +59,10 @@ public class TCSetDifferenceExpression extends TCBinaryExpression
 			report(3161, "Right hand of '\\' is not a set");
 		}
 
-		if (!TypeComparator.compatible(ltype, rtype))
+		TCSetType sltype = ltype.getSet();
+		TCSetType srtype = rtype.getSet();
+
+		if (!sltype.empty && !srtype.empty && !TypeComparator.compatible(ltype, rtype))
 		{
 			report(3162, "Left and right of '\\' are different types");
 			detail2("Left", ltype, "Right", rtype);
