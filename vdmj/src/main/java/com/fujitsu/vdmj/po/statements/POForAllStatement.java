@@ -39,6 +39,8 @@ import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
+import com.fujitsu.vdmj.po.expressions.POSetUnionExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
@@ -112,16 +114,15 @@ public class POForAllStatement extends POStatement
 		else
 		{
 			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
-			POAssignmentDefinition ghost = ghostDef();
-
+			TCNameToken ghostName = ghostName(invariant);
+			POAssignmentDefinition ghostDef = ghostDef(ghostName);
 			/*
 			 * The initial case verifies that the invariant is true for the empty ax/gx state.
 			 */
-			ctxt.add(new POLetDefContext(ghost));		// let ghost = {} in
+			int popto = ctxt.size();
+			ctxt.add(new POLetDefContext(ghostDef));		// let ghost = {} in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before for-loop");
-
-			int popto = ctxt.size();
 
 			/*
 			 * A preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
@@ -138,11 +139,16 @@ public class POForAllStatement extends POStatement
 				}
 			}
 
+			tcdefs.add(new TCLocalDefinition(location, ghostName, ghostDef.type));
+
 			Environment local = new FlatCheckedEnvironment(tcdefs, env, null);
 			updates.addAll(pattern.getVariableNames());
+			updates.add(ghostName);
+			ctxt.popTo(popto);
 
-			ctxt.push(new POForAllContext(updates, local));					// forall <changed values> and vars
-			ctxt.push(new POImpliesContext(varsInSet(ghost), invariant));	// x in set S && invariant => ...
+			ctxt.push(new POForAllContext(updates, local));						// forall <changed values> and vars
+			ctxt.push(new POImpliesContext(varsInSet(ghostDef), invariant));	// x in set S \ GHOST$ && invariant => ...
+			ctxt.push(new POLetDefContext(ghostUpdate(ghostName)));				// ghost := ghost union {x}
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
@@ -150,55 +156,86 @@ public class POForAllStatement extends POStatement
 
 			ctxt.popTo(popto);
 
+			/*
+			 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
+			 * and GHOST$ substituted with the original set value.
+			 */
+			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
+			ctxt.push(new POImpliesContext(
+				POLoopInvariantAnnotation.combine(invariants, pattern.getVariableNames())));	// invariant => ...
 
-/***
-			// Note: location of initial check is the @LoopInvariant itself.
-			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check before for-loop");
-
-			int popto = ctxt.size();
-			
-			ctxt.push(new POForAllSequenceContext(pattern, set, " in set "));	// forall p in set S
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check before each for-loop");
-			
-			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant));						// invariant => ...
-			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
-			obligations.lastElement().setMessage("check after each for-loop");
-
-			ctxt.popTo(popto);
-			
-			// Leave implication for following POs
-			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant));						// invariant => ...
-			
-***/
 			return obligations;
 		}
 	}
 
-	private POAssignmentDefinition ghostDef()
+	/**
+	 * Produce type of ghost set, which is never set1.
+	 */
+	private TCSetType ghostType()
 	{
-		TCNameToken GHOST = new TCNameToken(location, location.module, "GHOST$");
 		TCSetType stype = set.getExptype().getSet();
 
 		if (stype instanceof TCSet1Type)
 		{
-			stype = new TCSetType(location, stype.setof);	// can't be set1 for ghost
+			return new TCSetType(location, stype.setof);
 		}
 
-		POSetEnumExpression empty = new POSetEnumExpression(location, new POExpressionList(), new TCTypeList());
-		return new POAssignmentDefinition(GHOST, stype, empty, stype);
+		return stype;
 	}
 
 	/**
-	 * Produce x subset (ax \ gx)
+	 * Find ghost name.
+	 */
+	private TCNameToken ghostName(POExpression invariant)
+	{
+		for (TCNameToken var: invariant.getVariableNames())
+		{
+			if (var.getName().endsWith("$"))
+			{
+				return var;	// Asume only one
+			}
+		}
+
+		return new TCNameToken(location, location.module, "GHOST$");
+	}
+
+	/**
+	 * Produce "dcl ghost : set of T := {}"
+	 */
+	private POAssignmentDefinition ghostDef(TCNameToken ghost)
+	{
+		TCSetType stype = ghostType();
+		POSetEnumExpression empty = new POSetEnumExpression(location, new POExpressionList(), new TCTypeList());
+		return new POAssignmentDefinition(ghost, stype, empty, stype);
+	}
+
+	/**
+	 * Produce "ghost := ghost union {x}"
+	 */
+	private POAssignmentDefinition ghostUpdate(TCNameToken ghost)
+	{
+		TCSetType stype = ghostType();
+		POLocalDefinition vardef = new POLocalDefinition(location, ghost, stype);
+		POExpressionList elist = new POExpressionList();
+		elist.add(pattern.getMatchingExpression());
+		TCTypeList tlist = new TCTypeList();
+		tlist.add(stype);
+
+		POSetUnionExpression union = new POSetUnionExpression(
+			new POVariableExpression(ghost, vardef),
+			new LexKeywordToken(Token.UNION, location),
+			new POSetEnumExpression(location, elist, tlist), stype, stype);
+
+		return new POAssignmentDefinition(ghost, stype, union, stype);
+	}
+
+	/**
+	 * Produce "x in set (ax \ gx)"
 	 */
 	private POExpression varsInSet(POAssignmentDefinition ghost)
 	{
-		TCSetType stype = set.getExptype().getSet();
+		TCSetType stype = ghostType();
+		POLocalDefinition vardef = new POLocalDefinition(location, ghost.name, stype);
 		
 		return new POInSetExpression(
 			pattern.getMatchingExpression(),				// eg mk_(x, y)
@@ -206,7 +243,7 @@ public class POForAllStatement extends POStatement
 			new POSetDifferenceExpression(
 				set,
 				new LexKeywordToken(Token.SETDIFF, location),
-				ghost.expression, stype, stype),
+				new POVariableExpression(ghost.name, vardef), stype, stype),
 			stype.setof, stype);
 	}
 

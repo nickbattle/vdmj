@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -95,7 +96,8 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		else
 		{
 			TCExpression inv = args.get(0);
-			Environment local = loopEnvironment(stmt, env);
+			Environment local = loopEnvironment(stmt, env, inv);
+
 			TCType itype = inv.typeCheck(local, null, scope, null);	// Just checks scope
 			
 			if (!(itype instanceof TCBooleanType))
@@ -109,7 +111,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	 * Some checks have to be performed across all of the @LoopInvariants declared. So this is
 	 * called from the typeCheck of each loop type.
 	 */
-	public static void typeCheck(TCStatement stmt, TCNameToken loopVar, TCAnnotationList annotations)
+	public static void typeCheck(TCStatement stmt, TCNameList loopVars, TCAnnotationList annotations)
 	{
 		List<TCLoopInvariantAnnotation> loopInvs = annotations.getInstances(TCLoopInvariantAnnotation.class);
 
@@ -132,22 +134,46 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 				stmt.warning(6007, "@LoopInvariants do not reason about " + missing);
 			}
 
-			if (loopVar != null)	// So we have to have at least one inv without this
+			if (!loopVars.isEmpty())	// So we must have at least one inv without these
 			{
-				boolean withoutVar = false;
+				boolean oneOkay = false;
 
 				for (TCLoopInvariantAnnotation loopInv: loopInvs)
 				{
-					if (!loopInv.args.get(0).getVariableNames().contains(loopVar))
+					boolean hasLoopVars = false;
+
+					for (TCNameToken loopVar: loopVars)
 					{
-						withoutVar = true;		// At least one can appear outside/after the loop
+						TCNameSet vars = loopInv.args.get(0).getVariableNames();
+
+						if (vars.contains(loopVar))
+						{
+							hasLoopVars = true;
+							break;
+						}
+						else
+						{
+							for (TCNameToken var: vars)
+							{
+								if (var.getName().endsWith("$"))
+								{
+									hasLoopVars = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (!hasLoopVars)
+					{
+						oneOkay = true;
 						break;
 					}
 				}
 
-				if (!withoutVar)
+				if (!oneOkay)
 				{
-					loopVar.report(6007, "At least one @LoopInvariant must be independent of " + loopVar);
+					stmt.report(6007, "At least one @LoopInvariant must be independent of " + loopVars + " and ghosts");
 				}
 			}
 		}
@@ -165,7 +191,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	/**
 	 * The for-loops create local variables, while loops don't.
 	 */
-	private Environment loopEnvironment(TCStatement stmt, Environment env)
+	private Environment loopEnvironment(TCStatement stmt, Environment env, TCExpression inv)
 	{
 		if (stmt instanceof TCWhileStatement)
 		{
@@ -184,6 +210,15 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			{
 				TCSetType st = fstmt.setType.getSet();
 				TCDefinitionList defs = fstmt.pattern.getDefinitions(st.setof, NameScope.LOCAL);
+
+				for (TCNameToken var: inv.getVariableNames())
+				{
+					if (var.getName().endsWith("$"))
+					{
+						defs.add(new TCLocalDefinition(inv.location, var, fstmt.setType));
+					}
+				}
+
 				return new FlatEnvironment(defs, env);
 			}
 
