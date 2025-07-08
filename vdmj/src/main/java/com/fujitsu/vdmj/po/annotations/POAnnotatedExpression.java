@@ -38,12 +38,14 @@ public class POAnnotatedExpression extends POExpression
 	
 	public final POAnnotation annotation;
 	public final POExpression expression;
+	public final POExpression base;
 	
 	public POAnnotatedExpression(LexLocation location, POAnnotation annotation, POExpression expression)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
+		this.base = addAnnotation(annotation);
 		setExptype(expression.getExptype());
 	}
 
@@ -53,12 +55,17 @@ public class POAnnotatedExpression extends POExpression
 		return expression.toString();	// Don't include annotation in PO sources
 	}
 	
+	/**
+	 * If an expression has multiple annotations, the AST is built as a chain of POAnnotatedExpressions,
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it
+	 * is sensible for each poBefore/poAfter to be called with the base POExpression.
+	 */
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		annotation.poBefore(this, ctxt);
+		annotation.poBefore(base, ctxt);
 		ProofObligationList obligations = expression.getProofObligations(ctxt, pogState, env);
-		annotation.poAfter(this, obligations, ctxt);
+		annotation.poAfter(base, obligations, ctxt);
 		return obligations;
 	}
 
@@ -66,6 +73,12 @@ public class POAnnotatedExpression extends POExpression
 	public String getPreName()
 	{
 		return expression.getPreName();
+	}
+
+	@Override
+	public POExpression addAnnotation(POAnnotation annotation)
+	{
+		return expression.addAnnotation(annotation);
 	}
 
 	@Override

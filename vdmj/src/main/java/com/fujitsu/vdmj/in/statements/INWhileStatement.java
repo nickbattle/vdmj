@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.statements;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.in.annotations.INLoopInvariantAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
@@ -57,37 +59,22 @@ public class INWhileStatement extends INStatement
 	{
 		breakpoint.check(location, ctxt);
 		
-		INLoopInvariantAnnotation invariant = annotations.getInstance(INLoopInvariantAnnotation.class);
-
 		try
 		{
-			if (invariant == null)
-			{
-				while (exp.eval(ctxt).boolValue(ctxt))
-				{
-					Value rv = statement.eval(ctxt);
+			List<INLoopInvariantAnnotation> invariants =
+				annotations.getInstances(INLoopInvariantAnnotation.class);
 	
-					if (!rv.isVoid())
-					{
-						return rv;
-					}
-				}
-			}
-			else
+			INLoopInvariantAnnotation.check(invariants, ctxt);
+			
+			while (exp.eval(ctxt).boolValue(ctxt))
 			{
-				invariant.check(ctxt);
-				
-				while (exp.eval(ctxt).boolValue(ctxt))
-				{
-					invariant.check(ctxt);
-					Value rv = statement.eval(ctxt);
-	
-					if (!rv.isVoid())
-					{
-						return rv;
-					}
+				INLoopInvariantAnnotation.check(invariants, ctxt);
+				Value rv = statement.eval(ctxt);
+				INLoopInvariantAnnotation.check(invariants, ctxt);
 
-					invariant.check(ctxt);
+				if (!rv.isVoid())
+				{
+					return rv;
 				}
 			}
 		}

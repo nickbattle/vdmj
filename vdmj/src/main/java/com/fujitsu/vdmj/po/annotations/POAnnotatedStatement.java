@@ -38,14 +38,15 @@ public class POAnnotatedStatement extends POStatement
 
 	public final POAnnotation annotation;
 	public final POStatement statement;
+	public final POStatement base;
 	
 	public POAnnotatedStatement(LexLocation location, POAnnotation annotation, POStatement statement)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
+		this.base = addAnnotation(annotation);
 		setStmttype(statement.getStmttype());
-		this.statement.addAnnotation(annotation);
 	}
 
 	@Override
@@ -54,13 +55,24 @@ public class POAnnotatedStatement extends POStatement
 		return statement.toString();	// Don't include annotation in PO source
 	}
 	
+	/**
+	 * If a statement has multiple annotations, the AST is built as a chain of POAnnotatedStatements,
+	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
+	 * for each poBefore/poAfter to be called with the base POStatement, not the next POAnnotatedStatement.
+	 */
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		annotation.poBefore(this, ctxt);
+		annotation.poBefore(base, ctxt);
 		ProofObligationList obligations = statement.getProofObligations(ctxt, pogState, env);
-		annotation.poAfter(this, obligations, ctxt);
+		annotation.poAfter(base, obligations, ctxt);
 		return obligations;
+	}
+
+	@Override
+	public POStatement addAnnotation(POAnnotation annotation)
+	{
+		return statement.addAnnotation(annotation);
 	}
 
 	@Override

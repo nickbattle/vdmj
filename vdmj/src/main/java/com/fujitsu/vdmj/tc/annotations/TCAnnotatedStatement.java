@@ -37,12 +37,14 @@ public class TCAnnotatedStatement extends TCStatement
 
 	public final TCAnnotation annotation;
 	public final TCStatement statement;
+	public final TCStatement base;
 	
 	public TCAnnotatedStatement(LexLocation location, TCAnnotation annotation, TCStatement statement)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.statement = statement;
+		this.base = addAnnotation(annotation);
 		setType(statement.getType());
 	}
 
@@ -52,13 +54,24 @@ public class TCAnnotatedStatement extends TCStatement
 		return annotation + " " + statement;
 	}
 
+	/**
+	 * If a statement has multiple annotations, the AST is built as a chain of TCAnnotatedStatements,
+	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
+	 * for each tcBefore/tcAfter to be called with the base TCStatement, not the next TCAnnotatedStatement.
+	 */
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		annotation.tcBefore(this, env, scope);
+		annotation.tcBefore(base, env, scope);
 		TCType type = statement.typeCheck(env, scope, constraint, mandatory);
-		annotation.tcAfter(this, type, env, scope);
+		annotation.tcAfter(base, type, env, scope);
 		return setType(type);
+	}
+
+	@Override
+	public TCStatement addAnnotation(TCAnnotation annotation)
+	{
+		return statement.addAnnotation(annotation);
 	}
 
 	@Override

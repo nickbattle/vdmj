@@ -40,14 +40,10 @@ import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
-import com.fujitsu.vdmj.po.statements.POForAllStatement;
-import com.fujitsu.vdmj.po.statements.POForIndexStatement;
-import com.fujitsu.vdmj.po.statements.POForPatternBindStatement;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
-import com.fujitsu.vdmj.po.statements.POWhileStatement;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -57,7 +53,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
 	private static TCNameToken EVERYTHING = new TCNameToken(LexLocation.ANY, "*", "*");
-	private boolean firstLoop = false;
 	
 	public POStatementStateUpdates()
 	{
@@ -86,7 +81,7 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	@Override
 	public TCNameSet caseAnnotatedStatement(POAnnotatedStatement node, Object arg)
 	{
-		return newCollection();
+		return node.statement.apply(this, null);	// Don't process args
 	}
 	
 	@Override
@@ -95,54 +90,6 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 		return designatorUpdates(node.target);
 	}
 	
-	@Override
-	public TCNameSet caseWhileStatement(POWhileStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseWhileStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
-	@Override
-	public TCNameSet caseForAllStatement(POForAllStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseForAllStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
-	@Override
-	public TCNameSet caseForIndexStatement(POForIndexStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseForIndexStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
-	@Override
-	public TCNameSet caseForPatternBindStatement(POForPatternBindStatement node, Object arg)
-	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			return super.caseForPatternBindStatement(node, arg);
-		}
-		
-		return newCollection();		// Don't nest loops
-	}
-
 	@Override
 	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
 	{

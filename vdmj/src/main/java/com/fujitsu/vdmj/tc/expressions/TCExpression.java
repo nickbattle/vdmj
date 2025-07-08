@@ -28,6 +28,8 @@ import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVariableFinder;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
@@ -54,6 +56,9 @@ public abstract class TCExpression extends TCNode
 	
 	/** A list of comments preceding the expression */
 	public LexCommentList comments;
+	
+	/** A list of annotations, if any. See TCAnnotatedExpression */
+	protected TCAnnotationList annotations = new TCAnnotationList();
 	
 	/** The type of this sub-expression */
 	private TCType exptype;
@@ -268,6 +273,15 @@ public abstract class TCExpression extends TCNode
 		TCStatementStateUpdates finder = new TCStatementStateUpdates();
 		TCVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, true);
+	}
+
+	/**
+	 * Add annotations from TCAnnotatedExpression
+	 */
+	public TCExpression addAnnotation(TCAnnotation annotation)
+	{
+		annotations.add(annotation);
+		return this;
 	}
 
 	/**

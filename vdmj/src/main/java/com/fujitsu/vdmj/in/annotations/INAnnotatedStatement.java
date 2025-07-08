@@ -36,13 +36,14 @@ public class INAnnotatedStatement extends INStatement
 
 	public final INAnnotation annotation;
 	public final INStatement statement;
+	public final INStatement base;
 	
 	public INAnnotatedStatement(LexLocation location, INAnnotation annotation, INStatement statement)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.statement = statement;
-		this.statement.addAnnotation(annotation);
+		this.base = addAnnotation(annotation);
 	}
 
 	@Override
@@ -51,20 +52,25 @@ public class INAnnotatedStatement extends INStatement
 		return annotation + " " + statement;
 	}
 
+	/**
+	 * If a statement has multiple annotations, the AST is built as a chain of INAnnotatedStatements,
+	 * each pointing to the next down the chain (see StatementReader.readStatement). But it is sensible
+	 * for each inBefore/inAfter to be called with the base INStatement, not the next INAnnotatedStatement.
+	 */
 	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
+		if (!INAnnotation.suspended) annotation.inBefore(base, ctxt);
 		Value rv = statement.eval(ctxt);
-		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
+		if (!INAnnotation.suspended) annotation.inAfter(base, rv, ctxt);
 		return rv;
 	}
-	
+
 	@Override
-	public void addAnnotation(INAnnotation annotation)
+	public INStatement addAnnotation(INAnnotation annotation)
 	{
-		statement.addAnnotation(annotation);
+		return statement.addAnnotation(annotation);
 	}
 	
 	@Override

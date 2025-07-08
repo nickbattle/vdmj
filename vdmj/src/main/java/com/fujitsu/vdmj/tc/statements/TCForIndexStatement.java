@@ -25,9 +25,11 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -67,6 +69,8 @@ public class TCForIndexStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
+		TCLoopInvariantAnnotation.typeCheck(this, new TCNameList(var), annotations);
+
 		TCType ft = from.typeCheck(env, null, scope, null);
 		TCType tt = to.typeCheck(env, null, scope, null);
 
@@ -94,6 +98,7 @@ public class TCForIndexStatement extends TCStatement
 		Environment local = new FlatCheckedEnvironment(vardef, env, scope);
 		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
+
 		return setType(rt);
 	}
 

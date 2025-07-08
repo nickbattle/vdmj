@@ -93,18 +93,19 @@ public abstract class POStatement extends PONode
 	/**
 	 * State variables updated or read by this statement.
 	 */
-	public TCNameSet updatesState(boolean nested)
+	public TCNameSet updatesState()
 	{
 		POStatementStateUpdates visitor = new POStatementStateUpdates();
-		return this.apply(visitor, nested);
+		return this.apply(visitor, null);
 	}
 
 	/**
 	 * Add annotations from POAnnotatedAnnotation
 	 */
-	public void addAnnotation(POAnnotation annotation)
+	public POStatement addAnnotation(POAnnotation annotation)
 	{
 		annotations.add(annotation);
+		return this;
 	}
 	
 	/**

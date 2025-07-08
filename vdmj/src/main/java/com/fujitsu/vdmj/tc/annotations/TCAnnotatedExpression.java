@@ -38,12 +38,14 @@ public class TCAnnotatedExpression extends TCExpression
 	
 	public final TCAnnotation annotation;
 	public final TCExpression expression;
+	public final TCExpression base;
 	
 	public TCAnnotatedExpression(LexLocation location, TCAnnotation annotation, TCExpression expression)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.expression = expression;
+		this.base = addAnnotation(annotation);
 	}
 
 	@Override
@@ -52,13 +54,24 @@ public class TCAnnotatedExpression extends TCExpression
 		return (annotation == null ? annotation + " " : "") + expression;
 	}
 
+	/**
+	 * If an expression has multiple annotations, the AST is built as a chain of TCAnnotatedExpressions,
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it
+	 * is sensible for each tcBefore/tcAfter to be called with the base TCExpression.
+	 */
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		annotation.tcBefore(this, env, scope);
+		annotation.tcBefore(base, env, scope);
 		TCType type = expression.typeCheck(env, qualifiers, scope, constraint);
-		annotation.tcAfter(this, type, env, scope);
+		annotation.tcAfter(base, type, env, scope);
 		return setType(type);
+	}
+
+	@Override
+	public TCExpression addAnnotation(TCAnnotation annotation)
+	{
+		return expression.addAnnotation(annotation);
 	}
 
 	@Override

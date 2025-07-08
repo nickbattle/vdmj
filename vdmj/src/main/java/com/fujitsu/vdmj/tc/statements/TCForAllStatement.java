@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -66,6 +67,8 @@ public class TCForAllStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
+		TCLoopInvariantAnnotation.typeCheck(this, pattern.getVariableNames(), annotations);
+
 		setType = set.typeCheck(base, null, scope, null);
 		pattern.typeResolve(base);
 

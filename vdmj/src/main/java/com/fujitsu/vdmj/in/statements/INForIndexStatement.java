@@ -25,7 +25,9 @@
 package com.fujitsu.vdmj.in.statements;
 
 import java.math.BigInteger;
+import java.util.List;
 
+import com.fujitsu.vdmj.in.annotations.INLoopInvariantAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -80,6 +82,11 @@ public class INForIndexStatement extends INStatement
 						" will never terminate", ctxt);
 			}
 
+			List<INLoopInvariantAnnotation> invariants =
+				annotations.getInstances(INLoopInvariantAnnotation.class);
+
+			INLoopInvariantAnnotation.check(invariants, ctxt);
+
 			for (BigInteger value = fval;
 				 (bval.compareTo(BigInteger.ZERO) > 0 && value.compareTo(tval) <= 0) ||
 				 (bval.compareTo(BigInteger.ZERO) < 0 && value.compareTo(tval) >= 0);
@@ -87,7 +94,10 @@ public class INForIndexStatement extends INStatement
 			{
 				Context evalContext = new Context(location, "for index", ctxt);
 				evalContext.put(var, new IntegerValue(value));
+
+				INLoopInvariantAnnotation.check(invariants, ctxt);
 				Value rv = statement.eval(evalContext);
+				INLoopInvariantAnnotation.check(invariants, ctxt);
 
 				if (!rv.isVoid())
 				{

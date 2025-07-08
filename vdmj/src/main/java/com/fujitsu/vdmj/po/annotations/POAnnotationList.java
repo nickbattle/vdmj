@@ -31,7 +31,9 @@ import java.util.function.Predicate;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.modules.POModule;
+import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
@@ -150,6 +152,38 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		for (POAnnotation annotation: this)
 		{
 			annotation.poAfter(clazz, obligations);
+		}
+	}
+
+	public void poBefore(POStatement second, POContextStack ctxt)
+	{
+		for (POAnnotation annotation: this)
+		{
+			annotation.poBefore(second, ctxt);
+		}
+	}
+
+	public void poAfter(POStatement second, ProofObligationList obligations, POContextStack ctxt)
+	{
+		for (POAnnotation annotation: this)
+		{
+			annotation.poAfter(second, obligations, ctxt);
+		}
+	}
+
+	public void poBefore(POExpression second, POContextStack ctxt)
+	{
+		for (POAnnotation annotation: this)
+		{
+			annotation.poBefore(second, ctxt);
+		}
+	}
+
+	public void poAfter(POExpression second, ProofObligationList obligations, POContextStack ctxt)
+	{
+		for (POAnnotation annotation: this)
+		{
+			annotation.poAfter(second, obligations, ctxt);
 		}
 	}
 }

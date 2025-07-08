@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVariableFinder;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
@@ -51,6 +53,9 @@ public abstract class POExpression extends PONode
 	
 	/** The type of this subexpression */
 	private TCType exptype;
+	
+	/** A list of annotations, if any. See POAnnotatedExpression */
+	protected POAnnotationList annotations = new POAnnotationList();
 
 	/**
 	 * Generate an expression at the given location.
@@ -179,6 +184,15 @@ public abstract class POExpression extends PONode
 		POStatementStateUpdates finder = new POStatementStateUpdates();
 		POVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
 		return vset.applyExpressionVisitor(this, false);
+	}
+
+	/**
+	 * Add annotations from POAnnotatedExpression
+	 */
+	public POExpression addAnnotation(POAnnotation annotation)
+	{
+		annotations.add(annotation);
+		return this;
 	}
 
 	/**

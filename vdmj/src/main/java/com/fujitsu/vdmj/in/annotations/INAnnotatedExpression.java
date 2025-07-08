@@ -36,12 +36,14 @@ public class INAnnotatedExpression extends INExpression
 	
 	public final INAnnotation annotation;
 	public final INExpression expression;
+	public final INExpression base;
 	
 	public INAnnotatedExpression(LexLocation location, INAnnotation annotation, INExpression expression)
 	{
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.expression = expression;
+		this.base = addAnnotation(annotation);
 	}
 
 	@Override
@@ -50,14 +52,25 @@ public class INAnnotatedExpression extends INExpression
 		return annotation + " " + expression;
 	}
 
+	/**
+	 * If an expression has multiple annotations, the AST is built as a chain of INAnnotatedExpressions,
+	 * each pointing to the next down the chain (see ExpressionReader.readAnnotatedExpression). But it
+	 * is sensible for each inBefore/inAfter to be called with the base INExpression.
+	 */
 	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
+		if (!INAnnotation.suspended) annotation.inBefore(base, ctxt);
 		Value rv = expression.eval(ctxt);
-		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
+		if (!INAnnotation.suspended) annotation.inAfter(base, rv, ctxt);
 		return rv;
+	}
+
+	@Override
+	public INExpression addAnnotation(INAnnotation annotation)
+	{
+		return expression.addAnnotation(annotation);
 	}
 
 	@Override
