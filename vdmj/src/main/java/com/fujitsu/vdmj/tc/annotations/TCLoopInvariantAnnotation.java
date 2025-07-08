@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -216,8 +217,24 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		else if (stmt instanceof TCForPatternBindStatement)
 		{
 			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
-			TCDefinitionList defs = fstmt.patternBind.getDefinitions();
-			return new FlatEnvironment(defs, env);
+
+			if (fstmt.expType.isSeq(fstmt.location))
+			{
+				TCSeqType st = fstmt.expType.getSeq();
+				TCDefinitionList defs = fstmt.getPattern().getDefinitions(st.seqof, NameScope.LOCAL);
+
+				for (TCNameToken var: inv.getVariableNames())
+				{
+					if (var.getName().endsWith("$"))
+					{
+						defs.add(new TCLocalDefinition(inv.location, var, fstmt.expType));
+					}
+				}
+
+				return new FlatEnvironment(defs, env);
+			}
+
+			return env;		// TC error reported elsewhere?
 		}
 		else
 		{

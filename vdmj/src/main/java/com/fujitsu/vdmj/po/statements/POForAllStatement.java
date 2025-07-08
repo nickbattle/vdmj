@@ -116,6 +116,7 @@ public class POForAllStatement extends POStatement
 			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
 			TCNameToken ghostName = ghostName(invariant);
 			POAssignmentDefinition ghostDef = ghostDef(ghostName);
+
 			/*
 			 * The initial case verifies that the invariant is true for the empty ax/gx state.
 			 */
@@ -231,7 +232,7 @@ public class POForAllStatement extends POStatement
 	}
 
 	/**
-	 * Produce "ghost := <set>>"
+	 * Produce "ghost := <set>"
 	 */
 	private POAssignmentDefinition ghostFinal(TCNameToken ghost)
 	{

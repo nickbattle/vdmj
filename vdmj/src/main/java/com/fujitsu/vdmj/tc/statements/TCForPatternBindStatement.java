@@ -27,7 +27,11 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
+import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
@@ -94,6 +98,32 @@ public class TCForPatternBindStatement extends TCStatement
 		{
 			seqexp.report(3223, "Expecting sequence type after 'in'");
 			return setType(new TCUnknownType(location));
+		}
+	}
+
+	/**
+	 * Find the TCPattern that defines the loop variable(s).
+	 */
+	public TCPattern getPattern()
+	{
+		if (patternBind.pattern != null)
+		{
+			return patternBind.pattern;
+		}
+		else if (patternBind.bind instanceof TCTypeBind)
+		{
+			TCTypeBind tb = (TCTypeBind)patternBind.bind;
+			return tb.pattern;
+		}
+		else if (patternBind.bind instanceof TCSetBind)
+		{
+			TCSetBind sb = (TCSetBind)patternBind.bind;
+			return sb.pattern;
+		}
+		else // (patternBind.bind instanceof TCSeqBind)
+		{
+			TCSeqBind sb = (TCSeqBind)patternBind.bind;
+			return sb.pattern;
 		}
 	}
 
