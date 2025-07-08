@@ -120,9 +120,10 @@ public class POForAllStatement extends POStatement
 			 * The initial case verifies that the invariant is true for the empty ax/gx state.
 			 */
 			int popto = ctxt.size();
-			ctxt.add(new POLetDefContext(ghostDef));		// let ghost = {} in
+			ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before for-loop");
+			ctxt.pop();
 
 			/*
 			 * A preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
@@ -140,27 +141,25 @@ public class POForAllStatement extends POStatement
 			}
 
 			tcdefs.add(new TCLocalDefinition(location, ghostName, ghostDef.type));
-
 			Environment local = new FlatCheckedEnvironment(tcdefs, env, null);
 			updates.addAll(pattern.getVariableNames());
 			updates.add(ghostName);
-			ctxt.popTo(popto);
 
 			ctxt.push(new POForAllContext(updates, local));						// forall <changed values> and vars
 			ctxt.push(new POImpliesContext(varsInSet(ghostDef), invariant));	// x in set S \ GHOST$ && invariant => ...
 			ctxt.push(new POLetDefContext(ghostUpdate(ghostName)));				// ghost := ghost union {x}
-			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
+			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 			obligations.lastElement().setMessage("preservation for next for-loop");
 
+			updates.remove(ghostName);
 			ctxt.popTo(popto);
 
 			/*
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
 			 * and GHOST$ set to the original set value.
 			 */
-			updates.remove(ghostName);
 			ctxt.push(new POLetDefContext(ghostFinal(ghostName)));								// let GHOST$ = set in
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 			ctxt.push(new POImpliesContext(

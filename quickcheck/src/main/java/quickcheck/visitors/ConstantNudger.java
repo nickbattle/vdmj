@@ -160,7 +160,7 @@ public class ConstantNudger extends ValueVisitor<Value, Integer>
 			nudged.add(v.apply(this, arg));
 		}
 		
-		return new SeqValue(nudged);
+		return new TupleValue(nudged);
 	}
 	
 	@Override
