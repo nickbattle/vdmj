@@ -151,17 +151,6 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 							hasLoopVars = true;
 							break;
 						}
-						else
-						{
-							for (TCNameToken var: vars)
-							{
-								if (var.getName().endsWith("$"))
-								{
-									hasLoopVars = true;
-									break;
-								}
-							}
-						}
 					}
 
 					if (!hasLoopVars)
@@ -173,7 +162,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 
 				if (!oneOkay)
 				{
-					stmt.report(6007, "At least one @LoopInvariant must be independent of " + loopVars + " and ghosts");
+					stmt.report(6007, "At least one @LoopInvariant must be independent of " + loopVars);
 				}
 			}
 		}

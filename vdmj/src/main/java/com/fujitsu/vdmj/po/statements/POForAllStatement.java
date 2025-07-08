@@ -158,8 +158,10 @@ public class POForAllStatement extends POStatement
 
 			/*
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
-			 * and GHOST$ substituted with the original set value.
+			 * and GHOST$ set to the original set value.
 			 */
+			updates.remove(ghostName);
+			ctxt.push(new POLetDefContext(ghostFinal(ghostName)));								// let GHOST$ = set in
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 			ctxt.push(new POImpliesContext(
 				POLoopInvariantAnnotation.combine(invariants, pattern.getVariableNames())));	// invariant => ...
@@ -227,6 +229,15 @@ public class POForAllStatement extends POStatement
 			new POSetEnumExpression(location, elist, tlist), stype, stype);
 
 		return new POAssignmentDefinition(ghost, stype, union, stype);
+	}
+
+	/**
+	 * Produce "ghost := <set>>"
+	 */
+	private POAssignmentDefinition ghostFinal(TCNameToken ghost)
+	{
+		TCSetType stype = ghostType();
+		return new POAssignmentDefinition(ghost, stype, set, stype);
 	}
 
 	/**
