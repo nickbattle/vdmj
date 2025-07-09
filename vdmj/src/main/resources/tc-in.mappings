@@ -350,7 +350,7 @@ unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 
 # Annotations
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.in.annotations;
-map TCLoopInvariantAnnotation{name, args} to INLoopInvariantAnnotation(name, args);
+map TCLoopInvariantAnnotation{name, args, ghost} to INLoopInvariantAnnotation(name, args, ghost);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;

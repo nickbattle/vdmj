@@ -84,6 +84,7 @@ public class INForIndexStatement extends INStatement
 			List<INLoopInvariantAnnotation> invariants =
 				annotations.getInstances(INLoopInvariantAnnotation.class);
 
+			INLoopInvariantAnnotation.before(invariants, ctxt);
 			INLoopInvariantAnnotation.check(invariants, ctxt);
 
 			for (long value = fval;
@@ -102,6 +103,8 @@ public class INForIndexStatement extends INStatement
 					return rv;
 				}
 			}
+
+			INLoopInvariantAnnotation.after(invariants, ctxt);
 		}
 		catch (ValueException e)
 		{

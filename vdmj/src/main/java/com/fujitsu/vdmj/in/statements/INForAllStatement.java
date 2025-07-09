@@ -72,6 +72,7 @@ public class INForAllStatement extends INStatement
 			List<INLoopInvariantAnnotation> invariants =
 				annotations.getInstances(INLoopInvariantAnnotation.class);
 	
+			INLoopInvariantAnnotation.before(invariants, ctxt);
 			INLoopInvariantAnnotation.check(invariants, ctxt);
 			
 			for (Value val: values)
@@ -95,6 +96,8 @@ public class INForAllStatement extends INStatement
 					// Ignore and try others
 				}
 			}
+
+			INLoopInvariantAnnotation.after(invariants, ctxt);
 		}
 		catch (ValueException e)
 		{

@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
@@ -42,11 +43,29 @@ public class POLoopInvariantAnnotation extends POAnnotation
 	private static final long serialVersionUID = 1L;
 	
 	public final POExpression invariant;
+	public final POAssignmentDefinition ghost;
 
-	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args)
+	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args, POAssignmentDefinition ghost)
 	{
 		super(name, args);
 		this.invariant = args.firstElement();
+		this.ghost = ghost;
+	}
+
+	/**
+	 * Find the ghost definition, if any.
+	 */
+	public static POAssignmentDefinition getGhost(List<POLoopInvariantAnnotation> invariants)
+	{
+		for (POLoopInvariantAnnotation loopInv: invariants)
+		{
+			if (loopInv.ghost != null)
+			{
+				return loopInv.ghost;
+			}
+		}
+
+		return null;	// No ghosts!
 	}
 
 	/**

@@ -26,12 +26,15 @@ package com.fujitsu.vdmj.tc.annotations;
 
 import java.util.List;
 
+import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
+import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -43,7 +46,9 @@ import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -53,6 +58,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCLoopInvariantAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	private TCAssignmentDefinition ghost = null;
 
 	public TCLoopInvariantAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -97,6 +103,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		else
 		{
 			TCExpression inv = args.get(0);
+			setGhost(env, stmt, inv);
 			Environment local = loopEnvironment(stmt, env, inv);
 
 			TCType itype = inv.typeCheck(local, null, scope, null);	// Just checks scope
@@ -105,6 +112,58 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			{
 				inv.report(6007, "Invariant must be a boolean expression");
 			}
+		}
+	}
+
+	/**
+	 * Look at the loop invariant and create a definition if it contains a GHOST$ variable.
+	 * We assume there is only for for now.
+	 */
+	private void setGhost(Environment env, TCStatement stmt, TCExpression inv)
+	{
+		TCNameToken ghostName = null;
+
+		for (TCNameToken var: inv.getVariableNames())
+		{
+			if (var.getName().endsWith("$"))
+			{
+				ghostName = var;
+				break;
+			}
+		}
+
+		if (ghostName != null)
+		{
+			if (stmt instanceof TCForAllStatement)
+			{
+				TCForAllStatement fstmt = (TCForAllStatement)stmt;
+				TCSetType st = fstmt.setType.getSet();
+
+				if (st instanceof TCSet1Type)
+				{
+					st = new TCSetType(st.location, st.setof);
+				}
+
+				ghost = new TCAssignmentDefinition(
+					TCAccessSpecifier.DEFAULT, ghostName, st,
+					new TCSetEnumExpression(inv.location, new TCExpressionList()));
+			}
+			else if (stmt instanceof TCForPatternBindStatement)
+			{
+				TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
+				TCSeqType st = fstmt.expType.getSeq();
+
+				if (st instanceof TCSeq1Type)
+				{
+					st = new TCSeqType(st.location, st.seqof);
+				}
+
+				ghost = new TCAssignmentDefinition(
+					TCAccessSpecifier.DEFAULT, ghostName, st,
+					new TCSeqEnumExpression(inv.location, new TCExpressionList()));
+			}
+
+			ghost.typeCheck(env, NameScope.LOCAL);
 		}
 	}
 
@@ -195,46 +254,28 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		else if (stmt instanceof TCForAllStatement)
 		{
 			TCForAllStatement fstmt = (TCForAllStatement)stmt;
-			
-			if (fstmt.setType.isSet(fstmt.location))
+			TCSetType st = fstmt.setType.getSet();
+			TCDefinitionList defs = fstmt.pattern.getDefinitions(st.setof, NameScope.LOCAL);
+
+			if (ghost != null)
 			{
-				TCSetType st = fstmt.setType.getSet();
-				TCDefinitionList defs = fstmt.pattern.getDefinitions(st.setof, NameScope.LOCAL);
-
-				for (TCNameToken var: inv.getVariableNames())
-				{
-					if (var.getName().endsWith("$"))
-					{
-						defs.add(new TCLocalDefinition(inv.location, var, fstmt.setType));
-					}
-				}
-
-				return new FlatEnvironment(defs, env);
+				defs.add(ghost);
 			}
 
-			return env;		// TC error reported elsewhere?
+			return new FlatEnvironment(defs, env);
 		}
 		else if (stmt instanceof TCForPatternBindStatement)
 		{
 			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
+			TCSeqType st = fstmt.expType.getSeq();
+			TCDefinitionList defs = fstmt.getPattern().getDefinitions(st.seqof, NameScope.LOCAL);
 
-			if (fstmt.expType.isSeq(fstmt.location))
+			if (ghost != null)
 			{
-				TCSeqType st = fstmt.expType.getSeq();
-				TCDefinitionList defs = fstmt.getPattern().getDefinitions(st.seqof, NameScope.LOCAL);
-
-				for (TCNameToken var: inv.getVariableNames())
-				{
-					if (var.getName().endsWith("$"))
-					{
-						defs.add(new TCLocalDefinition(inv.location, var, fstmt.expType));
-					}
-				}
-
-				return new FlatEnvironment(defs, env);
+				defs.add(ghost);
 			}
 
-			return env;		// TC error reported elsewhere?
+			return new FlatEnvironment(defs, env);
 		}
 		else
 		{

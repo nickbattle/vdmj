@@ -26,24 +26,36 @@ package com.fujitsu.vdmj.in.annotations;
 
 import java.util.List;
 
+import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.values.NameValuePair;
 
 public class INLoopInvariantAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	public final INAssignmentDefinition ghost;
 
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args)
+	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args, INAssignmentDefinition ghost)
 	{
 		super(name, args);
+		this.ghost = ghost;
 	}
 
 	// NOTE: inBefore/inAfter are not used. The check method is called directly by
 	// the various loop INStatements that need it during the loop eval.
 	
+	private void before(Context ctxt) throws ValueException
+	{
+		if (ghost != null)
+		{
+			ctxt.putList(ghost.getNamedValues(ctxt));
+		}
+	}
+
 	private void check(Context ctxt) throws ValueException
 	{
 		INExpression inv = args.get(0);
@@ -53,12 +65,39 @@ public class INLoopInvariantAnnotation extends INAnnotation
 			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
 		}
 	}
+	
+	private void after(Context ctxt) throws ValueException
+	{
+		if (ghost != null)
+		{
+			for (NameValuePair nvp: ghost.getNamedValues(ctxt))
+			{
+				ctxt.remove(nvp.name);		// Remove GHOST$
+			}
+		}
+	}
+
+	public static void before(List<INLoopInvariantAnnotation> invariants, Context ctxt) throws ValueException
+	{
+		for (INLoopInvariantAnnotation invariant: invariants)
+		{
+			invariant.before(ctxt);
+		}
+	}
 
 	public static void check(List<INLoopInvariantAnnotation> invariants, Context ctxt) throws ValueException
 	{
 		for (INLoopInvariantAnnotation invariant: invariants)
 		{
 			invariant.check(ctxt);
+		}
+	}
+
+	public static void after(List<INLoopInvariantAnnotation> invariants, Context ctxt) throws ValueException
+	{
+		for (INLoopInvariantAnnotation invariant: invariants)
+		{
+			invariant.after(ctxt);
 		}
 	}
 }

@@ -93,6 +93,7 @@ public class INForPatternBindStatement extends INStatement
 			List<INLoopInvariantAnnotation> invariants =
 				annotations.getInstances(INLoopInvariantAnnotation.class);
 	
+			INLoopInvariantAnnotation.before(invariants, ctxt);
 			INLoopInvariantAnnotation.check(invariants, ctxt);
 
 			if (patternBind.pattern != null)
@@ -118,6 +119,8 @@ public class INForPatternBindStatement extends INStatement
 						// Ignore mismatches
 					}
 				}
+
+				INLoopInvariantAnnotation.after(invariants, ctxt);
 			}
 			else if (patternBind.bind instanceof INSetBind)
 			{

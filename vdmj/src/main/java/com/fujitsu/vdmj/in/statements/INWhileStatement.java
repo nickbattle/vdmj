@@ -64,6 +64,7 @@ public class INWhileStatement extends INStatement
 			List<INLoopInvariantAnnotation> invariants =
 				annotations.getInstances(INLoopInvariantAnnotation.class);
 	
+			INLoopInvariantAnnotation.before(invariants, ctxt);
 			INLoopInvariantAnnotation.check(invariants, ctxt);
 			
 			while (exp.eval(ctxt).boolValue(ctxt))
@@ -77,6 +78,8 @@ public class INWhileStatement extends INStatement
 					return rv;
 				}
 			}
+
+			INLoopInvariantAnnotation.after(invariants, ctxt);
 		}
 		catch (ValueException e)
 		{
