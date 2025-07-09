@@ -1,0 +1,86 @@
+module LOOPS
+exports all
+definitions
+operations
+-- Various loop types with loop invarants
+
+	whileLoop: nat ==> real
+	whileLoop(size) ==
+	(
+		dcl ax : nat := size;
+		dcl cx : nat := 0;
+
+		-- @LoopInvariant(ax + cx = size)
+		while ax > 0 do
+		(
+			ax := ax - 1;
+			cx := cx + 1
+		);
+
+		return 1/size
+	);
+
+	indexLoop: nat ==> real
+	indexLoop(size) ==
+	(
+		dcl ax : nat := size;
+		dcl cx : nat := 0;
+
+		-- @LoopInvariant(ax + cx = size)
+		for z = 1 to size do
+		(
+			ax := ax - 1;
+			cx := cx + 1
+		);
+
+		return 1/size
+	);
+
+	forAllLoop: nat ==> real
+	forAllLoop(size) ==
+	(
+		dcl ax : nat := 0;
+
+		-- @LoopInvariant(ax = sums(GHOST$))
+		for all z in set {1,2,3} do
+		(
+			ax := ax + z
+		);
+
+		return 1/ax
+	);
+
+	forPatternLoop: nat ==> real
+	forPatternLoop(size) ==
+	(
+		dcl ax : nat := 0;
+
+		-- @LoopInvariant(ax = sumq(GHOST$))
+		for z in seq [0,1] in [0,1,2,3] do
+		(
+			ax := ax + z
+		);
+
+		return 1/ax
+	);
+
+functions
+
+	-- @NoPOG
+	sumq: seq of nat -> nat
+	sumq(s) ==
+		if s = []
+		then 0
+		else hd s + sumq(tl s)
+	measure len s;
+
+	-- @NoPOG
+	sums: set of nat -> nat
+	sums(s) ==
+		if s = {}
+		then 0
+		else let e in set s in
+			e + sums(s \ {e})
+	measure card s;
+
+end LOOPS
