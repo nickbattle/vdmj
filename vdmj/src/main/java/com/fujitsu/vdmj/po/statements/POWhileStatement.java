@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -65,10 +67,10 @@ public class POWhileStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
-		POLoopInvariantAnnotation annotation = annotations.getInstance(POLoopInvariantAnnotation.class);
+		List<POLoopInvariantAnnotation> invariants = annotations.getInstances(POLoopInvariantAnnotation.class);
 		TCNameSet updates = statement.updatesState();
 		
-		if (annotation == null)		// No loop invariant defined
+		if (invariants.isEmpty())		// No loop invariant defined
 		{
 			obligations.add(new LoopInvariantObligation(location, ctxt));
 			
@@ -92,28 +94,29 @@ public class POWhileStatement extends POStatement
 		}
 		else
 		{
-			// Note: location of first loop check is the @LoopInvariant itself.
-			obligations.addAll(LoopInvariantObligation.getAllPOs(annotation.location, ctxt, annotation.invariant));
+			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
+
+			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before while condition");
 			
 			int popto = ctxt.size();
 			
 			ctxt.push(new POImpliesContext(this.exp));								// while C => ...
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before each while body");
 			ctxt.pop();
 
 			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant, this.exp));		// invariant && while C => ...
+			ctxt.push(new POImpliesContext(invariant, this.exp));					// invariant && while C => ...
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, annotation.invariant));
+			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check after each while body");
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs
 			POExpression negated = new PONotExpression(location, this.exp);
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotation.invariant, negated));			// invariant && not C => ...
+			ctxt.push(new POImpliesContext(invariant, negated));					// invariant && not C => ...
 			
 			return obligations;
 		}

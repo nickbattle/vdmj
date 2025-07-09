@@ -119,8 +119,6 @@ public class INForPatternBindStatement extends INStatement
 						// Ignore mismatches
 					}
 				}
-
-				INLoopInvariantAnnotation.after(invariants, ctxt);
 			}
 			else if (patternBind.bind instanceof INSetBind)
 			{
@@ -214,6 +212,9 @@ public class INForPatternBindStatement extends INStatement
 					}
 				}
 			}
+
+			// Clean up any ghost variables
+			INLoopInvariantAnnotation.after(invariants, ctxt);
 		}
 		catch (ValueException e)
 		{

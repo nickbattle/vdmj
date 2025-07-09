@@ -53,7 +53,7 @@ public class POLoopInvariantAnnotation extends POAnnotation
 	}
 
 	/**
-	 * Find the ghost definition, if any.
+	 * Find the ghost definition, or create a default one.
 	 */
 	public static POAssignmentDefinition getGhost(List<POLoopInvariantAnnotation> invariants)
 	{

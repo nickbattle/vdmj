@@ -121,47 +121,46 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	 */
 	private void setGhost(Environment env, TCStatement stmt, TCExpression inv)
 	{
-		TCNameToken ghostName = null;
+		TCNameToken ghostName = new TCNameToken(inv.location, inv.location.module, "GHOST$");
 
 		for (TCNameToken var: inv.getVariableNames())
 		{
 			if (var.getName().endsWith("$"))
 			{
-				ghostName = var;
+				ghostName = var;	// Override default name
 				break;
 			}
 		}
 
-		if (ghostName != null)
+		if (stmt instanceof TCForAllStatement)
 		{
-			if (stmt instanceof TCForAllStatement)
+			TCForAllStatement fstmt = (TCForAllStatement)stmt;
+			TCSetType st = fstmt.setType.getSet();
+
+			if (st instanceof TCSet1Type)
 			{
-				TCForAllStatement fstmt = (TCForAllStatement)stmt;
-				TCSetType st = fstmt.setType.getSet();
-
-				if (st instanceof TCSet1Type)
-				{
-					st = new TCSetType(st.location, st.setof);
-				}
-
-				ghost = new TCAssignmentDefinition(
-					TCAccessSpecifier.DEFAULT, ghostName, st,
-					new TCSetEnumExpression(inv.location, new TCExpressionList()));
+				st = new TCSetType(st.location, st.setof);
 			}
-			else if (stmt instanceof TCForPatternBindStatement)
+
+			ghost = new TCAssignmentDefinition(
+				TCAccessSpecifier.DEFAULT, ghostName, st,
+				new TCSetEnumExpression(inv.location, new TCExpressionList()));
+
+			ghost.typeCheck(env, NameScope.LOCAL);
+		}
+		else if (stmt instanceof TCForPatternBindStatement)
+		{
+			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
+			TCSeqType st = fstmt.expType.getSeq();
+
+			if (st instanceof TCSeq1Type)
 			{
-				TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
-				TCSeqType st = fstmt.expType.getSeq();
-
-				if (st instanceof TCSeq1Type)
-				{
-					st = new TCSeqType(st.location, st.seqof);
-				}
-
-				ghost = new TCAssignmentDefinition(
-					TCAccessSpecifier.DEFAULT, ghostName, st,
-					new TCSeqEnumExpression(inv.location, new TCExpressionList()));
+				st = new TCSeqType(st.location, st.seqof);
 			}
+
+			ghost = new TCAssignmentDefinition(
+				TCAccessSpecifier.DEFAULT, ghostName, st,
+				new TCSeqEnumExpression(inv.location, new TCExpressionList()));
 
 			ghost.typeCheck(env, NameScope.LOCAL);
 		}
