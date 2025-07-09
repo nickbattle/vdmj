@@ -42,7 +42,8 @@ public class PDFStreamReader implements ExternalFormatReader
 	{
 		try
 		{
-			Process p = Runtime.getRuntime().exec("pdftotext -layout " + file + " -");
+			String[] args = {"pdftotext", "-layout", file.toString(), "-"};
+			Process p = Runtime.getRuntime().exec(args);
 			BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream(), charset));
 			boolean inVDM = false;
 			StringBuilder sb = new StringBuilder();
