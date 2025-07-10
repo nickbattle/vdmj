@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,33 +22,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.mapper.Mappable;
 
-public class INLoopInvariantAnnotation extends INAnnotation
+public class POLoopAnnotations implements Mappable
 {
-	private static final long serialVersionUID = 1L;
+	private final POLoopInvariantList invariants;
 
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args)
+	public POLoopAnnotations(POLoopInvariantList invariants)
 	{
-		super(name, args);
+		this.invariants = invariants;
 	}
 
-	// NOTE: inBefore/inAfter are not used. The check method is called directly by
-	// the various loop INStatements via their INLoopAnnotations.
-	
-	public void check(Context ctxt) throws ValueException
+	public POLoopInvariantList getList()
 	{
-		INExpression inv = args.get(0);
-
-		if (!inv.eval(ctxt).boolValue(ctxt))
-		{
-			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
-		}
+		return invariants;
 	}
 }

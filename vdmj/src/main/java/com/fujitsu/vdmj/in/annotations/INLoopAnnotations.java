@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,31 +24,38 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.values.NameValuePair;
 
-public class INLoopInvariantAnnotation extends INAnnotation
+public class INLoopAnnotations implements Mappable
 {
-	private static final long serialVersionUID = 1L;
+	private final INLoopInvariantList invariants;
 
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args)
+	public INLoopAnnotations(INLoopInvariantList invariants)
 	{
-		super(name, args);
+		this.invariants = invariants;
 	}
 
-	// NOTE: inBefore/inAfter are not used. The check method is called directly by
-	// the various loop INStatements via their INLoopAnnotations.
-	
+	public void before(Context ctxt) throws ValueException
+	{
+		ctxt.putAllNew(invariants.getGhostValue(ctxt));
+	}
+
 	public void check(Context ctxt) throws ValueException
 	{
-		INExpression inv = args.get(0);
-
-		if (!inv.eval(ctxt).boolValue(ctxt))
+		for (INLoopInvariantAnnotation invariant: invariants)
 		{
-			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
+			invariant.check(ctxt);
+		}
+	}
+
+	public void after(Context ctxt) throws ValueException
+	{
+		for (NameValuePair pair: invariants.getGhostValue(ctxt))
+		{
+			ctxt.remove(pair.name);
 		}
 	}
 }

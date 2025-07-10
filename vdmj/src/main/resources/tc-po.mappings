@@ -257,9 +257,9 @@ map TCExitStatement{location, expression, stmttype} to POExitStatement(location,
 map TCExternalClause{mode, identifiers, type} to POExternalClause(mode, identifiers, type);
 map TCExternalClauseList{} to POExternalClauseList(this);
 map TCFieldDesignator{object, field, recType, clsType} to POFieldDesignator(object, field, recType, clsType);
-map TCForAllStatement{location, pattern, set, statement, stmttype} to POForAllStatement(location, pattern, set, statement) set stmttype;
-map TCForIndexStatement{location, var, from, to, by, statement, stmttype, vardef} to POForIndexStatement(location, var, from, to, by, statement, vardef) set stmttype;
-map TCForPatternBindStatement{location, patternBind, reverse, seqexp, expType, statement, stmttype} to POForPatternBindStatement(location, patternBind, reverse, seqexp, expType, statement) set stmttype;
+map TCForAllStatement{location, pattern, set, statement, stmttype, invariants} to POForAllStatement(location, pattern, set, statement, invariants) set stmttype;
+map TCForIndexStatement{location, var, from, to, by, statement, stmttype, vardef, invariants} to POForIndexStatement(location, var, from, to, by, statement, vardef, invariants) set stmttype;
+map TCForPatternBindStatement{location, patternBind, reverse, seqexp, expType, statement, stmttype, invariants} to POForPatternBindStatement(location, patternBind, reverse, seqexp, expType, statement, invariants) set stmttype;
 map TCIdentifierDesignator{name, vardef} to POIdentifierDesignator(name, vardef);
 map TCIfStatement{location, ifExp, thenStmt, elseList, elseStmt, stmttype} to POIfStatement(location, ifExp, thenStmt, elseList, elseStmt) set stmttype;
 map TCLetBeStStatement{location, bind, suchThat, statement, stmttype} to POLetBeStStatement(location, bind, suchThat, statement) set stmttype;
@@ -288,7 +288,7 @@ map TCTixeStatement{location, traps, body, stmttype} to POTixeStatement(location
 map TCTixeStmtAlternative{patternBind, statement} to POTixeStmtAlternative(patternBind, statement);
 map TCTixeStmtAlternativeList{} to POTixeStmtAlternativeList(this);
 map TCTrapStatement{location, patternBind, with, body, stmttype} to POTrapStatement(location, patternBind, with, body) set stmttype;
-map TCWhileStatement{location, exp, statement, stmttype} to POWhileStatement(location, exp, statement) set stmttype;
+map TCWhileStatement{location, exp, statement, stmttype, invariants} to POWhileStatement(location, exp, statement, invariants) set stmttype;
 
 # traces
 package com.fujitsu.vdmj.tc.traces to com.fujitsu.vdmj.po.traces;
@@ -351,7 +351,9 @@ unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 
 # Annotations
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
-map TCLoopInvariantAnnotation{name, args, ghost} to POLoopInvariantAnnotation(name, args, ghost);
+map TCLoopAnnotations{invariants} to POLoopAnnotations(invariants);
+map TCLoopInvariantList{ghostDef} to POLoopInvariantList(this, ghostDef);
+map TCLoopInvariantAnnotation{name, args} to POLoopInvariantAnnotation(name, args);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;

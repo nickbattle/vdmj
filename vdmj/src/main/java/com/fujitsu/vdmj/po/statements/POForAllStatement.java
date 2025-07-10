@@ -24,12 +24,12 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.util.List;
-
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
+import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -68,14 +68,16 @@ public class POForAllStatement extends POStatement
 	public final POPattern pattern;
 	public final POExpression set;
 	public final POStatement statement;
+	public final POLoopAnnotations invariants;
 
 	public POForAllStatement(LexLocation location,
-		POPattern pattern, POExpression set, POStatement stmt)
+		POPattern pattern, POExpression set, POStatement stmt, POLoopAnnotations invariants)
 	{
 		super(location);
 		this.pattern = pattern;
 		this.set = set;
 		this.statement = stmt;
+		this.invariants = invariants;
 	}
 
 	@Override
@@ -89,10 +91,10 @@ public class POForAllStatement extends POStatement
 	{
 		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
 
-		List<POLoopInvariantAnnotation> invariants = annotations.getInstances(POLoopInvariantAnnotation.class);
+		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
 		
-		if (invariants.isEmpty())		// No loop invariants defined
+		if (annotations.isEmpty())		// No loop invariants defined
 		{
 			int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
@@ -113,8 +115,8 @@ public class POForAllStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
-			POAssignmentDefinition ghostDef = POLoopInvariantAnnotation.getGhost(invariants);
+			POExpression invariant = POLoopInvariantAnnotation.combine(annotations, null);
+			POAssignmentDefinition ghostDef = annotations.getGhostDef();
 			TCNameToken ghostName = ghostDef.name;
 
 			/*
@@ -164,7 +166,7 @@ public class POForAllStatement extends POStatement
 			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));								// let GHOST$ = set in
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 			ctxt.push(new POImpliesContext(
-				POLoopInvariantAnnotation.combine(invariants, pattern.getVariableNames())));	// invariant => ...
+				POLoopInvariantAnnotation.combine(annotations, pattern.getVariableNames())));	// invariant => ...
 
 			return obligations;
 		}

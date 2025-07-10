@@ -24,12 +24,9 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
-import java.util.List;
-
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
@@ -43,36 +40,18 @@ public class POLoopInvariantAnnotation extends POAnnotation
 	private static final long serialVersionUID = 1L;
 	
 	public final POExpression invariant;
-	public final POAssignmentDefinition ghost;
 
-	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args, POAssignmentDefinition ghost)
+	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
 		this.invariant = args.firstElement();
-		this.ghost = ghost;
-	}
-
-	/**
-	 * Find the ghost definition, or create a default one.
-	 */
-	public static POAssignmentDefinition getGhost(List<POLoopInvariantAnnotation> invariants)
-	{
-		for (POLoopInvariantAnnotation loopInv: invariants)
-		{
-			if (loopInv.ghost != null)
-			{
-				return loopInv.ghost;
-			}
-		}
-
-		return null;	// No ghosts!
 	}
 
 	/**
 	 * Used to produce an AND expression combining all of the @LoopInvariants passed in, but
 	 * possibly excluding those that refer to a particular loop variable.
 	 */
-	public static POExpression combine(List<POLoopInvariantAnnotation> invariants, TCNameList excludes)
+	public static POExpression combine(POLoopInvariantList invariants, TCNameList excludes)
 	{
 		LexLocation loc = invariants.get(0).location;
 		LexKeywordToken AND = new LexKeywordToken(Token.AND, loc);

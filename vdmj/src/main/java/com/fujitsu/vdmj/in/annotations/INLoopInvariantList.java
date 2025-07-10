@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,31 +24,37 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.INMappedList;
+import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantList;
+import com.fujitsu.vdmj.values.NameValuePairList;
 
-public class INLoopInvariantAnnotation extends INAnnotation
+public class INLoopInvariantList extends INMappedList<TCLoopInvariantAnnotation, INLoopInvariantAnnotation>
 {
-	private static final long serialVersionUID = 1L;
-
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args)
+	private final INAssignmentDefinition ghostDef;
+	
+	public INLoopInvariantList(TCLoopInvariantList from, INAssignmentDefinition ghostDef) throws Exception
 	{
-		super(name, args);
+		super(from);
+		this.ghostDef = ghostDef;
 	}
 
-	// NOTE: inBefore/inAfter are not used. The check method is called directly by
-	// the various loop INStatements via their INLoopAnnotations.
-	
-	public void check(Context ctxt) throws ValueException
+	public INAssignmentDefinition getGhostDef()
 	{
-		INExpression inv = args.get(0);
+		return ghostDef;
+	}
 
-		if (!inv.eval(ctxt).boolValue(ctxt))
+	public NameValuePairList getGhostValue(Context ctxt)
+	{
+		if (ghostDef == null)
 		{
-			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
+			return new NameValuePairList();
+		}
+		else
+		{
+			return ghostDef.getNamedValues(ctxt);
 		}
 	}
 }

@@ -24,9 +24,7 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.in.annotations.INLoopInvariantAnnotation;
+import com.fujitsu.vdmj.in.annotations.INLoopAnnotations;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -40,12 +38,15 @@ public class INWhileStatement extends INStatement
 	private static final long serialVersionUID = 1L;
 	public final INExpression exp;
 	public final INStatement statement;
+	public final INLoopAnnotations invariants;
 
-	public INWhileStatement(LexLocation location, INExpression exp, INStatement body)
+	public INWhileStatement(LexLocation location, INExpression exp,
+		INStatement body, INLoopAnnotations invariants)
 	{
 		super(location);
 		this.exp = exp;
 		this.statement = body;
+		this.invariants = invariants;
 	}
 
 	@Override
@@ -61,17 +62,14 @@ public class INWhileStatement extends INStatement
 		
 		try
 		{
-			List<INLoopInvariantAnnotation> invariants =
-				annotations.getInstances(INLoopInvariantAnnotation.class);
-	
-			INLoopInvariantAnnotation.before(invariants, ctxt);
-			INLoopInvariantAnnotation.check(invariants, ctxt);
+			invariants.before(ctxt);
+			invariants.check(ctxt);
 			
 			while (exp.eval(ctxt).boolValue(ctxt))
 			{
-				INLoopInvariantAnnotation.check(invariants, ctxt);
+				invariants.check(ctxt);
 				Value rv = statement.eval(ctxt);
-				INLoopInvariantAnnotation.check(invariants, ctxt);
+				invariants.check(ctxt);
 
 				if (!rv.isVoid())
 				{
@@ -79,7 +77,7 @@ public class INWhileStatement extends INStatement
 				}
 			}
 
-			INLoopInvariantAnnotation.after(invariants, ctxt);
+			invariants.after(ctxt);
 		}
 		catch (ValueException e)
 		{

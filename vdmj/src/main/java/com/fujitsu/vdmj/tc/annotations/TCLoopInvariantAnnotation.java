@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,41 +24,24 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
-import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
-import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
 import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
-import com.fujitsu.vdmj.tc.types.TCSeq1Type;
-import com.fujitsu.vdmj.tc.types.TCSeqType;
-import com.fujitsu.vdmj.tc.types.TCSet1Type;
-import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLoopInvariantAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private TCAssignmentDefinition ghost = null;
 
 	public TCLoopInvariantAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -100,10 +83,11 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		{
 			name.report(6007, "@LoopInvariant is one boolean condition");
 		}
+
+		/***	Done at collective level because of GHOST symbol creation
 		else
 		{
 			TCExpression inv = args.get(0);
-			setGhost(env, stmt, inv);
 			Environment local = loopEnvironment(stmt, env, inv);
 
 			TCType itype = inv.typeCheck(local, null, scope, null);	// Just checks scope
@@ -113,12 +97,13 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 				inv.report(6007, "Invariant must be a boolean expression");
 			}
 		}
+		***/
 	}
 
 	/**
 	 * Look at the loop invariant and create a definition if it contains a GHOST$ variable.
 	 * We assume there is only for for now.
-	 */
+	 *
 	private void setGhost(Environment env, TCStatement stmt, TCExpression inv)
 	{
 		TCNameToken ghostName = new TCNameToken(inv.location, inv.location.module, "GHOST$");
@@ -165,68 +150,11 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			ghost.typeCheck(env, NameScope.LOCAL);
 		}
 	}
+	***/
 
 	/**
-	 * Some checks have to be performed across all of the @LoopInvariants declared. So this is
-	 * called from the typeCheck of each loop type.
+	 * Check for the various loop types that are allowed for this annotation.
 	 */
-	public static void typeCheck(TCStatement stmt, TCNameList loopVars, TCAnnotationList annotations)
-	{
-		List<TCLoopInvariantAnnotation> loopInvs = annotations.getInstances(TCLoopInvariantAnnotation.class);
-
-		if (!loopInvs.isEmpty())
-		{
-			TCNameSet updates = stmt.updatesState(false);
-			TCNameSet reasonsAbout = new TCNameSet();
-			
-			for (TCLoopInvariantAnnotation inv: loopInvs)
-			{
-				reasonsAbout.addAll(inv.args.get(0).getVariableNames());
-			}
-				
-			if (!reasonsAbout.containsAll(updates))
-			{
-				// Invariant doesn't reason about some variable updated in the loop
-				TCNameList missing = new TCNameList();
-				missing.addAll(updates);
-				missing.removeAll(reasonsAbout);
-				stmt.warning(6007, "@LoopInvariants do not reason about " + missing);
-			}
-
-			if (!loopVars.isEmpty())	// So we must have at least one inv without these
-			{
-				boolean oneOkay = false;
-
-				for (TCLoopInvariantAnnotation loopInv: loopInvs)
-				{
-					boolean hasLoopVars = false;
-
-					for (TCNameToken loopVar: loopVars)
-					{
-						TCNameSet vars = loopInv.args.get(0).getVariableNames();
-
-						if (vars.contains(loopVar))
-						{
-							hasLoopVars = true;
-							break;
-						}
-					}
-
-					if (!hasLoopVars)
-					{
-						oneOkay = true;
-						break;
-					}
-				}
-
-				if (!oneOkay)
-				{
-					stmt.report(6007, "At least one @LoopInvariant must be independent of " + loopVars);
-				}
-			}
-		}
-	}
-	
 	private boolean isLoop(TCStatement stmt)
 	{
 		return
@@ -238,7 +166,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	
 	/**
 	 * The for-loops create local variables, while loops don't.
-	 */
+	 *
 	private Environment loopEnvironment(TCStatement stmt, Environment env, TCExpression inv)
 	{
 		if (stmt instanceof TCWhileStatement)
@@ -281,4 +209,5 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			return env;		// TC error reported elsewhere?
 		}
 	}
+	***/
 }

@@ -24,13 +24,13 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.util.List;
-
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
+import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -81,9 +81,11 @@ public class POForPatternBindStatement extends POStatement
 	public final POExpression sequence;
 	public final TCType expType;
 	public final POStatement statement;
+	public final POLoopAnnotations invariants;
 
 	public POForPatternBindStatement(LexLocation location,
-		POPatternBind patternBind, boolean reverse, POExpression exp, TCType expType, POStatement body)
+		POPatternBind patternBind, boolean reverse, POExpression exp, TCType expType,
+		POStatement body, POLoopAnnotations invariants)
 	{
 		super(location);
 		this.patternBind = patternBind;
@@ -91,6 +93,7 @@ public class POForPatternBindStatement extends POStatement
 		this.sequence = exp;
 		this.expType = expType;
 		this.statement = body;
+		this.invariants = invariants;
 	}
 
 	@Override
@@ -105,10 +108,10 @@ public class POForPatternBindStatement extends POStatement
 	{
 		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
 
-		List<POLoopInvariantAnnotation> invariants = annotations.getInstances(POLoopInvariantAnnotation.class);
+		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
 		
-		if (invariants.isEmpty())		// No loop invariant defined
+		if (annotations.isEmpty())		// No loop invariant defined
 		{
 			int popto = ctxt.size();
 	
@@ -166,8 +169,8 @@ public class POForPatternBindStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
-			POAssignmentDefinition ghostDef = POLoopInvariantAnnotation.getGhost(invariants);
+			POExpression invariant = POLoopInvariantAnnotation.combine(annotations, null);
+			POAssignmentDefinition ghostDef = invariants.getList().getGhostDef();
 
 			/*
 			 * The initial case verifies that the invariant is true for the empty ghost state.
@@ -254,7 +257,7 @@ public class POForPatternBindStatement extends POStatement
 			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));								// let GHOST$ = set in
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 			ctxt.push(new POImpliesContext(
-				POLoopInvariantAnnotation.combine(invariants, getPattern().getVariableNames())));	// invariant => ...
+				POLoopInvariantAnnotation.combine(annotations, getPattern().getVariableNames())));	// invariant => ...
 
 			return obligations;
 		}

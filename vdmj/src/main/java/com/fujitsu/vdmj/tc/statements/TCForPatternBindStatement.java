@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopAnnotations;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -52,6 +53,7 @@ public class TCForPatternBindStatement extends TCStatement
 	public final TCStatement statement;
 	
 	public TCType expType;
+	private TCLoopAnnotations invariants = null;
 
 	public TCForPatternBindStatement(LexLocation location,
 		TCPatternBind patternBind, boolean reverse, TCExpression seqexp, TCStatement body)
@@ -74,6 +76,9 @@ public class TCForPatternBindStatement extends TCStatement
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		expType = seqexp.typeCheck(base, null, scope, null);
+		invariants = TCLoopAnnotations.getLoopAnnotations(this);
+		invariants.typeCheck(base, this);
+
 		Environment local = base;
 
 		if (expType.isSeq(location))
