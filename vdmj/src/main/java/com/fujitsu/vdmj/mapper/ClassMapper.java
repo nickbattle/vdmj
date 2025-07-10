@@ -965,7 +965,6 @@ public class ClassMapper
 				MappedObject mo = (MappedObject)source;
 				converted.put(mo.getMappedId(), result);
 				
-				@SuppressWarnings("deprecation")
 				List<Long> list = marked.get(Thread.currentThread().getId());
 				
 				if (list != null)
@@ -983,7 +982,6 @@ public class ClassMapper
 	 * Save the "converted" map, so that we can later remove conversions
 	 * using restore().
 	 */
-	@SuppressWarnings("deprecation")
 	private void mark()
 	{
 		List<Long> list = marked.get(Thread.currentThread().getId());
@@ -996,7 +994,6 @@ public class ClassMapper
 		marked.put(Thread.currentThread().getId(), new Vector<Long>());
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void restore()
 	{
 		// Remove "converted" mappings from the low tide set by mark() to the
