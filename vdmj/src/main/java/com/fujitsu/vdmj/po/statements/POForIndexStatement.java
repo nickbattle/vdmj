@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
-import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -130,7 +129,7 @@ public class POForIndexStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = POLoopInvariantAnnotation.combine(annotations, null);
+			POExpression invariant = annotations.combine(null);
 
 			/*
 			 * The initial case verifies that the invariant is true for the loop "from" value.
@@ -165,8 +164,7 @@ public class POForIndexStatement extends POStatement
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "var"
 			 */
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(
-				POLoopInvariantAnnotation.combine(annotations, new TCNameList(var))));	// invariant => ...
+			ctxt.push(new POImpliesContext(annotations.combine(new TCNameList(var))));	// invariant => ...
 			
 			return obligations;
 		}

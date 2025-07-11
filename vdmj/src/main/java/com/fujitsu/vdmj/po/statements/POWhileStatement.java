@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
-import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
@@ -96,7 +95,7 @@ public class POWhileStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = POLoopInvariantAnnotation.combine(annotations, null);
+			POExpression invariant = annotations.combine(null);
 
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before while condition");

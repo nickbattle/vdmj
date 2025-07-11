@@ -24,10 +24,18 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
+import com.fujitsu.vdmj.po.expressions.POAndExpression;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 
 public class POLoopInvariantList extends POMappedList<TCLoopInvariantAnnotation, POLoopInvariantAnnotation>
 {
@@ -42,5 +50,49 @@ public class POLoopInvariantList extends POMappedList<TCLoopInvariantAnnotation,
 	public POAssignmentDefinition getGhostDef()
 	{
 		return ghostDef;
+	}
+
+	/**
+	 * Used to produce an AND expression combining all of the @LoopInvariants passed in, but
+	 * possibly excluding those that refer to a particular loop variable.
+	 */
+	public POExpression combine(TCNameList excludes)
+	{
+		LexLocation loc = get(0).location;
+		LexKeywordToken AND = new LexKeywordToken(Token.AND, loc);
+		TCBooleanType BOOL = new TCBooleanType(loc);
+
+		POExpression exp = null;
+
+		for (POLoopInvariantAnnotation loopInv: this)
+		{
+			boolean add = true;
+
+			if (excludes != null)
+			{
+				for (TCNameToken exclude: excludes)
+				{
+					if (loopInv.invariant.getVariableNames().contains(exclude))
+					{
+						add = false;	// Contains an excluded name
+						break;
+					}
+				}
+			}
+
+			if (add)
+			{
+				if (exp == null)
+				{
+					exp = loopInv.invariant;
+				}
+				else
+				{
+					exp = new POAndExpression(exp, AND, loopInv.invariant, BOOL, BOOL);
+				}
+			}
+		}
+
+		return exp;
 	}
 }

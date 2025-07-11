@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
-import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -169,7 +168,7 @@ public class POForPatternBindStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = POLoopInvariantAnnotation.combine(annotations, null);
+			POExpression invariant = annotations.combine(null);
 			POAssignmentDefinition ghostDef = invariants.getList().getGhostDef();
 
 			/*
@@ -256,8 +255,7 @@ public class POForPatternBindStatement extends POStatement
 			 */
 			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));								// let GHOST$ = set in
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
-			ctxt.push(new POImpliesContext(
-				POLoopInvariantAnnotation.combine(annotations, getPattern().getVariableNames())));	// invariant => ...
+			ctxt.push(new POImpliesContext(annotations.combine(getPattern().getVariableNames())));	// invariant => ...
 
 			return obligations;
 		}
