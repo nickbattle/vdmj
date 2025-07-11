@@ -38,6 +38,10 @@ public class INLoopAnnotations implements Mappable
 		this.invariants = invariants;
 	}
 
+	// These methods are called by the various loop INStatements. Note that
+	// the inBefore/inAfter methods in INLoopInvariantAnnotation are not
+	// used, because all the invariants need to be treated as a whole.
+
 	public void before(Context ctxt) throws ValueException
 	{
 		ctxt.putAllNew(invariants.getGhostValue(ctxt));

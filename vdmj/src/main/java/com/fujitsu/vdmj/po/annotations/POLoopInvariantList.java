@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 
@@ -68,11 +69,13 @@ public class POLoopInvariantList extends POMappedList<TCLoopInvariantAnnotation,
 		{
 			boolean add = true;
 
-			if (excludes != null)
+			if (excludes != null && !excludes.isEmpty())
 			{
+				TCNameSet vars = loopInv.invariant.getVariableNames();
+
 				for (TCNameToken exclude: excludes)
 				{
-					if (loopInv.invariant.getVariableNames().contains(exclude))
+					if (vars.contains(exclude))
 					{
 						add = false;	// Contains an excluded name
 						break;

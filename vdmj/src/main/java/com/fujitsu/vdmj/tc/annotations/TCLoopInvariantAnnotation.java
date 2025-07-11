@@ -84,73 +84,9 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			name.report(6007, "@LoopInvariant is one boolean condition");
 		}
 
-		/***	Done at collective level because of GHOST symbol creation
-		else
-		{
-			TCExpression inv = args.get(0);
-			Environment local = loopEnvironment(stmt, env, inv);
-
-			TCType itype = inv.typeCheck(local, null, scope, null);	// Just checks scope
-			
-			if (!(itype instanceof TCBooleanType))
-			{
-				inv.report(6007, "Invariant must be a boolean expression");
-			}
-		}
-		***/
+		// Further checks are performed across the collection of all LoopInvariants on
+		// a particular loop statement. See TCLoopAnnotations.typeCheck().
 	}
-
-	/**
-	 * Look at the loop invariant and create a definition if it contains a GHOST$ variable.
-	 * We assume there is only for for now.
-	 *
-	private void setGhost(Environment env, TCStatement stmt, TCExpression inv)
-	{
-		TCNameToken ghostName = new TCNameToken(inv.location, inv.location.module, "GHOST$");
-
-		for (TCNameToken var: inv.getVariableNames())
-		{
-			if (var.getName().endsWith("$"))
-			{
-				ghostName = var;	// Override default name
-				break;
-			}
-		}
-
-		if (stmt instanceof TCForAllStatement)
-		{
-			TCForAllStatement fstmt = (TCForAllStatement)stmt;
-			TCSetType st = fstmt.setType.getSet();
-
-			if (st instanceof TCSet1Type)
-			{
-				st = new TCSetType(st.location, st.setof);
-			}
-
-			ghost = new TCAssignmentDefinition(
-				TCAccessSpecifier.DEFAULT, ghostName, st,
-				new TCSetEnumExpression(inv.location, new TCExpressionList()));
-
-			ghost.typeCheck(env, NameScope.LOCAL);
-		}
-		else if (stmt instanceof TCForPatternBindStatement)
-		{
-			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
-			TCSeqType st = fstmt.expType.getSeq();
-
-			if (st instanceof TCSeq1Type)
-			{
-				st = new TCSeqType(st.location, st.seqof);
-			}
-
-			ghost = new TCAssignmentDefinition(
-				TCAccessSpecifier.DEFAULT, ghostName, st,
-				new TCSeqEnumExpression(inv.location, new TCExpressionList()));
-
-			ghost.typeCheck(env, NameScope.LOCAL);
-		}
-	}
-	***/
 
 	/**
 	 * Check for the various loop types that are allowed for this annotation.
@@ -163,51 +99,4 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			(stmt instanceof TCForAllStatement) ||
 			(stmt instanceof TCForPatternBindStatement);
 	}
-	
-	/**
-	 * The for-loops create local variables, while loops don't.
-	 *
-	private Environment loopEnvironment(TCStatement stmt, Environment env, TCExpression inv)
-	{
-		if (stmt instanceof TCWhileStatement)
-		{
-			return env;		// No loop variable
-		}
-		else if (stmt instanceof TCForIndexStatement)
-		{
-			TCForIndexStatement fstmt = (TCForIndexStatement)stmt;
-			return new FlatEnvironment(fstmt.vardef, env);
-		}
-		else if (stmt instanceof TCForAllStatement)
-		{
-			TCForAllStatement fstmt = (TCForAllStatement)stmt;
-			TCSetType st = fstmt.setType.getSet();
-			TCDefinitionList defs = fstmt.pattern.getDefinitions(st.setof, NameScope.LOCAL);
-
-			if (ghost != null)
-			{
-				defs.add(ghost);
-			}
-
-			return new FlatEnvironment(defs, env);
-		}
-		else if (stmt instanceof TCForPatternBindStatement)
-		{
-			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
-			TCSeqType st = fstmt.expType.getSeq();
-			TCDefinitionList defs = fstmt.getPattern().getDefinitions(st.seqof, NameScope.LOCAL);
-
-			if (ghost != null)
-			{
-				defs.add(ghost);
-			}
-
-			return new FlatEnvironment(defs, env);
-		}
-		else
-		{
-			return env;		// TC error reported elsewhere?
-		}
-	}
-	***/
 }
