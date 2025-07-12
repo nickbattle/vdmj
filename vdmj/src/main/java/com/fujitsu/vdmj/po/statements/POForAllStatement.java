@@ -114,7 +114,7 @@ public class POForAllStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = annotations.combine(null);
+			POExpression invariant = annotations.combine(false);
 			POAssignmentDefinition ghostDef = annotations.getGhostDef();
 			TCNameToken ghostName = ghostDef.name;
 
@@ -162,9 +162,9 @@ public class POForAllStatement extends POStatement
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
 			 * and GHOST$ set to the original set value.
 			 */
-			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));								// let GHOST$ = set in
-			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotations.combine(pattern.getVariableNames())));	// invariant => ...
+			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));						// let GHOST$ = set in
+			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
 
 			return obligations;
 		}

@@ -108,12 +108,11 @@ public class TCLoopAnnotations implements Mappable
 				for (TCLoopInvariantAnnotation loopInv: invariants)
 				{
 					boolean hasLoopVars = false;
+					TCNameSet invVars = loopInv.args.get(0).getVariableNames();
 
 					for (TCNameToken loopVar: loopVars)
 					{
-						TCNameSet vars = loopInv.args.get(0).getVariableNames();
-
-						if (vars.contains(loopVar))
+						if (invVars.contains(loopVar))
 						{
 							hasLoopVars = true;
 							break;

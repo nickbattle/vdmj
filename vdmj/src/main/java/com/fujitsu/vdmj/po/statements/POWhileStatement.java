@@ -95,7 +95,7 @@ public class POWhileStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = annotations.combine(null);
+			POExpression invariant = annotations.combine(false);
 
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before while condition");

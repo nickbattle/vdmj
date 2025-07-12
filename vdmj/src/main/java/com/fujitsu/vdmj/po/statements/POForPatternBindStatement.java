@@ -168,7 +168,7 @@ public class POForPatternBindStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = annotations.combine(null);
+			POExpression invariant = annotations.combine(false);
 			POAssignmentDefinition ghostDef = invariants.getList().getGhostDef();
 
 			/*
@@ -253,9 +253,9 @@ public class POForPatternBindStatement extends POStatement
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
 			 * and GHOST$ set to the original sequence value.
 			 */
-			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));								// let GHOST$ = set in
-			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotations.combine(getPattern().getVariableNames())));	// invariant => ...
+			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));						// let GHOST$ = set in
+			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
+			ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
 
 			return obligations;
 		}

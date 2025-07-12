@@ -353,7 +353,7 @@ unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
 map TCLoopAnnotations{invariants} to POLoopAnnotations(invariants);
 map TCLoopInvariantList{ghostDef} to POLoopInvariantList(this, ghostDef);
-map TCLoopInvariantAnnotation{name, args} to POLoopInvariantAnnotation(name, args);
+map TCLoopInvariantAnnotation{name, args, hasLoopVars} to POLoopInvariantAnnotation(name, args, hasLoopVars);
 map TCLoopGhostAnnotation{name, args} to POLoopGhostAnnotation(name, args);
 
 # Java - usually unmappeds

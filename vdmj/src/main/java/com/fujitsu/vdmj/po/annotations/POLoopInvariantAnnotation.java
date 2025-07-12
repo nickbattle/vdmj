@@ -32,11 +32,13 @@ public class POLoopInvariantAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	
-	public final POExpression invariant;
+	public final boolean hasLoopVars;
+	public final POExpression expression;
 
-	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args)
+	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args, boolean hasLoopVars)
 	{
 		super(name, args);
-		this.invariant = args.firstElement();
+		this.hasLoopVars = hasLoopVars;
+		this.expression = args.firstElement();
 	}
 }

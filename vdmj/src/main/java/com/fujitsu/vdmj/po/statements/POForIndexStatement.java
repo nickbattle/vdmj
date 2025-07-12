@@ -53,7 +53,6 @@ import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
@@ -129,7 +128,7 @@ public class POForIndexStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = annotations.combine(null);
+			POExpression invariant = annotations.combine(false);
 
 			/*
 			 * The initial case verifies that the invariant is true for the loop "from" value.
@@ -164,7 +163,7 @@ public class POForIndexStatement extends POStatement
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "var"
 			 */
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotations.combine(new TCNameList(var))));	// invariant => ...
+			ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
 			
 			return obligations;
 		}
