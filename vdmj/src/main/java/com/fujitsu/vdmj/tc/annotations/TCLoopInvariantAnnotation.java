@@ -101,8 +101,18 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			(stmt instanceof TCForPatternBindStatement);
 	}
 
+	/**
+	 * Mark this invariant, if it reasons about the loop variable(s) that are bound
+	 * by the for-loop statements. These cannot be used outside the loop body, because
+	 * the variables are not in scope.
+	 */
 	public void setHasLoopVars()
 	{
 		hasLoopVars = true;
+	}
+
+	public boolean hasLoopVars()
+	{
+		return hasLoopVars;
 	}
 }
