@@ -60,6 +60,19 @@ public class TCLoopAnnotations implements Mappable
 
 	public void typeCheck(Environment env, TCStatement stmt, TCNameList loopVars)
 	{
+		if (!invariants.getGhostNames().isEmpty())
+		{
+			if (invariants.isEmpty())
+			{
+				stmt.report(6007, "@LoopGhost must also have @LoopInvariant(s)");
+			}
+
+			if (invariants.getGhostNames().size() > 1)
+			{
+				stmt.report(6007, "Only one @LoopGhost allowed");
+			}
+		}
+
 		if (!invariants.isEmpty())
 		{
 			TCNameSet updates = stmt.updatesState(false);
@@ -75,7 +88,7 @@ public class TCLoopAnnotations implements Mappable
 				
 				if (!(itype instanceof TCBooleanType))
 				{
-					exp.report(6007, "Invariant must be a boolean expression");
+					exp.report(6007, "@LoopInvariant must be a boolean expression");
 				}
 			}
 				
