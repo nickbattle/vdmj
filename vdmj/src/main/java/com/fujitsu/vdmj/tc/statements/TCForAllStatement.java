@@ -72,7 +72,7 @@ public class TCForAllStatement extends TCStatement
 		pattern.typeResolve(base);
 		
 		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(base, this);
+		invariants.typeCheck(base, this, pattern.getVariableNames());
 
 		if (setType.isSet(location))
 		{

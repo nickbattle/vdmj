@@ -77,7 +77,7 @@ public class TCForPatternBindStatement extends TCStatement
 	{
 		expType = seqexp.typeCheck(base, null, scope, null);
 		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(base, this);
+		invariants.typeCheck(base, this, getPattern().getVariableNames());
 
 		Environment local = base;
 
