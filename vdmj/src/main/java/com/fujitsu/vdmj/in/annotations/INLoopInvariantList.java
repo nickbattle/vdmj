@@ -29,7 +29,9 @@ import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantList;
-import com.fujitsu.vdmj.values.NameValuePairList;
+import com.fujitsu.vdmj.values.SeqValue;
+import com.fujitsu.vdmj.values.SetValue;
+import com.fujitsu.vdmj.values.Value;
 
 public class INLoopInvariantList extends INMappedList<TCLoopInvariantAnnotation, INLoopInvariantAnnotation>
 {
@@ -46,15 +48,42 @@ public class INLoopInvariantList extends INMappedList<TCLoopInvariantAnnotation,
 		return ghostDef;
 	}
 
-	public NameValuePairList getGhostValue(Context ctxt)
+	public void setGhostValue(Context ctxt)
 	{
-		if (ghostDef == null)
+		if (ghostDef != null)
 		{
-			return new NameValuePairList();
+			ctxt.putAllNew(ghostDef.getNamedValues(ctxt));	// initial value, {}
 		}
-		else
+	}
+
+	public void updateGhostValue(Context ctxt, Value val)
+	{
+		Value ghost = ctxt.check(ghostDef.name);
+
+		if (ghost == null)
 		{
-			return ghostDef.getNamedValues(ctxt);
+			return;		// No ghost
+		}
+
+		ghost = ghost.deref();	// It's an UpdatableValue
+
+		if (ghost instanceof SetValue)
+		{
+			SetValue set = (SetValue)ghost;
+			set.values.add(val);
+		}
+		else if (ghost instanceof SeqValue)
+		{
+			SeqValue seq = (SeqValue)ghost;
+			seq.values.add(val);
+		}
+	}
+
+	public void removeGhostVariable(Context ctxt)
+	{
+		if (ghostDef != null)
+		{
+			ctxt.remove(ghostDef.name);
 		}
 	}
 }

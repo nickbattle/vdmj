@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCLoopInvariantAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	private boolean hasLoopVars = false;
 
 	public TCLoopInvariantAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -98,5 +99,10 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 			(stmt instanceof TCForIndexStatement) ||
 			(stmt instanceof TCForAllStatement) ||
 			(stmt instanceof TCForPatternBindStatement);
+	}
+
+	public void setHasLoopVars()
+	{
+		hasLoopVars = true;
 	}
 }

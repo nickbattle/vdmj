@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.in.annotations;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.values.NameValuePair;
+import com.fujitsu.vdmj.values.Value;
 
 public class INLoopAnnotations implements Mappable
 {
@@ -44,22 +44,29 @@ public class INLoopAnnotations implements Mappable
 
 	public void before(Context ctxt) throws ValueException
 	{
-		ctxt.putAllNew(invariants.getGhostValue(ctxt));
+		invariants.setGhostValue(ctxt);		// Add any ghost to ctxt
 	}
 
 	public void check(Context ctxt) throws ValueException
 	{
 		for (INLoopInvariantAnnotation invariant: invariants)
 		{
-			invariant.check(ctxt);
+			invariant.check(ctxt, false);	// Outside
+		}
+	}
+
+	public void check(Context ctxt, Value val) throws ValueException
+	{
+		invariants.updateGhostValue(ctxt, val);
+
+		for (INLoopInvariantAnnotation invariant: invariants)
+		{
+			invariant.check(ctxt, true);		// Inside
 		}
 	}
 
 	public void after(Context ctxt) throws ValueException
 	{
-		for (NameValuePair pair: invariants.getGhostValue(ctxt))
-		{
-			ctxt.remove(pair.name);
-		}
+		invariants.removeGhostVariable(ctxt);
 	}
 }

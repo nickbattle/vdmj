@@ -92,7 +92,7 @@ public class INForIndexStatement extends INStatement
 				Context evalContext = new Context(location, "for index", ctxt);
 				evalContext.put(var, new IntegerValue(value));
 
-				invariants.check(ctxt);
+				invariants.check(evalContext);
 				Value rv = statement.eval(evalContext);
 				invariants.check(ctxt);
 

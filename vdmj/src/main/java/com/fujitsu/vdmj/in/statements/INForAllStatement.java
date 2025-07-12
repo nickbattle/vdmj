@@ -69,7 +69,7 @@ public class INForAllStatement extends INStatement
 		{
 			ValueSet values = set.eval(ctxt).setValue(ctxt);
 
-			invariants.before(ctxt);
+			invariants.before(ctxt);	// Add ghost
 			invariants.check(ctxt);
 			
 			for (Value val: values)
@@ -79,7 +79,7 @@ public class INForAllStatement extends INStatement
 					Context evalContext = new Context(location, "for all", ctxt);
 					evalContext.putList(pattern.getNamedValues(val, ctxt));
 
-					invariants.check(ctxt);
+					invariants.check(evalContext, val);
 					Value rv = statement.eval(evalContext);
 					invariants.check(ctxt);
 
@@ -94,7 +94,7 @@ public class INForAllStatement extends INStatement
 				}
 			}
 
-			invariants.after(ctxt);
+			invariants.after(ctxt);		// remove ghost
 		}
 		catch (ValueException e)
 		{

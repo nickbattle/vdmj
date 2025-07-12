@@ -119,11 +119,14 @@ public class TCLoopAnnotations implements Mappable
 							break;
 						}
 					}
-
+					
 					if (!hasLoopVars)
 					{
 						oneOkay = true;
-						break;
+					}
+					else
+					{
+						loopInv.setHasLoopVars();
 					}
 				}
 

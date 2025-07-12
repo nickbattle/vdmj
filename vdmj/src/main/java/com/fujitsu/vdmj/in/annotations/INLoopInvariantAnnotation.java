@@ -33,22 +33,27 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 public class INLoopInvariantAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	private final boolean hasLoopVars;
 
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args)
+	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args, boolean hasLoopVars)
 	{
 		super(name, args);
+		this.hasLoopVars = hasLoopVars;
 	}
 
 	// NOTE: inBefore/inAfter are not used. The check method is called directly by
 	// the various loop INStatements via their INLoopAnnotations.
 	
-	public void check(Context ctxt) throws ValueException
+	public void check(Context ctxt, boolean inside) throws ValueException
 	{
-		INExpression inv = args.get(0);
-
-		if (!inv.eval(ctxt).boolValue(ctxt))
+		if (inside || !hasLoopVars)
 		{
-			throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
+			INExpression inv = args.get(0);
+
+			if (!inv.eval(ctxt).boolValue(ctxt))
+			{
+				throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
+			}
 		}
 	}
 }
