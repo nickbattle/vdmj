@@ -14,3 +14,4 @@ map TCSeparateAnnotation{name, args} to INSeparateAnnotation(name, args);
 map TCDeadlineMetAnnotation{name, args} to INDeadlineMetAnnotation(name, args);
 map TCSepRequireAnnotation{name, args} to INSepRequireAnnotation(name, args);
 map TCDocLinkAnnotation{name, args} to INDocLinkAnnotation(name, args);
+map TCTypeBindAnnotation{name, typebind, expression} to INTypeBindAnnotation(name, typebind, expression);
