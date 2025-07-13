@@ -70,9 +70,24 @@ public class INTypeBindAnnotation extends INAnnotation
 		}
 	}
 
+	@Override
+	public void inAfter(INExpression exp, Value rv, Context ctxt)
+	{
+		if (exp instanceof INForAllExpression)
+		{
+			INForAllExpression forall = (INForAllExpression)exp;
+			forall.globals = null;
+		}
+		else if (exp instanceof INExistsExpression)
+		{
+			INExistsExpression exists = (INExistsExpression)exp;
+			exists.globals = null;
+		}
+	}
+
 	private void setValues(INMultipleBindList bindList, Context ctxt)
 	{
-		INMultipleTypeBind bind = hasTypeBind(bindList);
+		INMultipleTypeBind bind = findTypeBind(bindList);
 		INBindingOverride override = new INBindingOverride(typebind.toString(), typebind.type);
 		override.setBindValues(null);
 		bind.setter = override;
@@ -91,7 +106,7 @@ public class INTypeBindAnnotation extends INAnnotation
 		}
 	}
 
-	private INMultipleTypeBind hasTypeBind(INMultipleBindList bindList)
+	private INMultipleTypeBind findTypeBind(INMultipleBindList bindList)
 	{
 		for (INMultipleBind mbind: bindList)
 		{

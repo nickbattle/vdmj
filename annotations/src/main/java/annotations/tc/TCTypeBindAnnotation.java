@@ -24,6 +24,7 @@
 
 package annotations.tc;
 
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -36,8 +37,11 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class TCTypeBindAnnotation extends TCAnnotation
 {
@@ -57,10 +61,29 @@ public class TCTypeBindAnnotation extends TCAnnotation
 		return "@" + name + " " + typebind + " = " + expression + ";";
 	}
 	
-	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
+	@Override
+	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
 	{
-		typebind.typeCheck(env, scope);
-		expression.typeCheck(env, null, scope, null);
+		TCType mbtype = typebind.typeCheck(env, scope);
+		TCType extype = expression.typeCheck(env, null, scope, null);
+
+		if (TypeChecker.getErrorCount() > 0)
+		{
+			for (VDMError error : TypeChecker.getErrors())
+			{
+				exp.report(error.number, error.message);
+			}
+
+			return;
+		}
+
+		TCType setof = extype.getSet().setof;
+
+		if (!TypeComparator.isSubType(setof, mbtype))
+		{
+			name.report(6001, "Set of " + setof + " not subtype of " + mbtype);
+			return;
+		}
 
 		if (exp instanceof TCForAllExpression)
 		{
