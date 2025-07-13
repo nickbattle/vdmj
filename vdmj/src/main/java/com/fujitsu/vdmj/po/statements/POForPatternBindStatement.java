@@ -168,7 +168,7 @@ public class POForPatternBindStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = annotations.combine(false);
+			POExpression invariant = annotations.combine(true);
 			POAssignmentDefinition ghostDef = invariants.getList().getGhostDef();
 
 			/*
@@ -237,6 +237,7 @@ public class POForPatternBindStatement extends POStatement
 			Environment local = new FlatCheckedEnvironment(tcdefs, env, null);
 			updates.addAll(getPattern().getVariableNames());
 			updates.add(ghostDef.name);
+			invariant = annotations.combine(false);	// Don't exclude loop vars now
 
 			ctxt.push(new POForAllContext(updates, local));
 			ctxt.push(new POImpliesContext(ghostIsPrefix(ghostDef), invariant));
