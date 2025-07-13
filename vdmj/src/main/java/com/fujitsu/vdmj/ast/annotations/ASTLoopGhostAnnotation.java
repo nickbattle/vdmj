@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,23 +22,16 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.annotations;
+package com.fujitsu.vdmj.ast.annotations;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public class POLoopInvariantAnnotation extends POAnnotation
+public class ASTLoopGhostAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	
-	public final boolean hasLoopVars;
-	public final POExpression expression;
 
-	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args, boolean hasLoopVars)
+	public ASTLoopGhostAnnotation(LexIdentifierToken name)
 	{
-		super(name, args);
-		this.hasLoopVars = hasLoopVars;
-		this.expression = args.firstElement();
+		super(name);
 	}
 }

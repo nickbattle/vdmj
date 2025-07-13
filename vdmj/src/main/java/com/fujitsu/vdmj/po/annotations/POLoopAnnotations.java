@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,21 +24,19 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.mapper.Mappable;
 
-public class POLoopInvariantAnnotation extends POAnnotation
+public class POLoopAnnotations implements Mappable
 {
-	private static final long serialVersionUID = 1L;
-	
-	public final boolean hasLoopVars;
-	public final POExpression expression;
+	private final POLoopInvariantList invariants;
 
-	public POLoopInvariantAnnotation(TCIdentifierToken name, POExpressionList args, boolean hasLoopVars)
+	public POLoopAnnotations(POLoopInvariantList invariants)
 	{
-		super(name, args);
-		this.hasLoopVars = hasLoopVars;
-		this.expression = args.firstElement();
+		this.invariants = invariants;
+	}
+
+	public POLoopInvariantList getList()
+	{
+		return invariants;
 	}
 }

@@ -190,7 +190,34 @@ public class PogTest extends TestCase
 			/* 24 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    ((a > 10) =>\n      (-- Throws exception 123\n        (sv > sv$)))))\n",
 			/* 25 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r = (1 / sv) in\n          (sv > sv$))))))\n"
 	};
-	
+
+	private String[] expectedLoops =
+	{
+			/* 1 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax + cx) = size)))\n",
+			/* 2 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax > 0) =>\n      ((ax + cx) = size))))\n",
+			/* 3 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (ax - 1) >= 0))))\n",
+			/* 4 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (let ax : nat = (ax - 1) in\n          (let cx : nat = (cx + 1) in\n            ((ax + cx) = size)))))))\n",
+			/* 5 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (not (ax > 0)) =>\n        size <> 0))))\n",
+			/* 6 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (let z : nat1 = 1 in\n      ((ax + cx) = size))))\n",
+			/* 7 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat, z:nat1 &\n      (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n        (ax - 1) >= 0))))\n",
+			/* 8 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat, z:nat1 &\n      (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n        (let ax : nat = (ax - 1) in\n          (let cx : nat = (cx + 1) in\n            (let z : nat1 = (z + 1) in\n              ((ax + cx) = size))))))))\n",
+			/* 9 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) =>\n        size <> 0))))\n",
+			/* 10 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of (nat1) = {} in\n      (ax = sums(ABC)))))\n",
+			/* 11 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, ABC:set of (nat1), z:nat1 &\n      ((z in set ({1, 2, 3} \\ ABC)) and (ax = sums(ABC)) =>\n        (let ABC : set of (nat1) = (ABC union {z}) in\n          (let ax : nat = (ax + z) in\n            (ax = sums(ABC))))))))\n",
+			/* 12 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of (nat1) = {1, 2, 3} in\n      (forall ax:nat &\n        ((ax = sums(ABC)) =>\n          ax <> 0)))))\n",
+			/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of (nat) = [] in\n      (ax = sumq(GHOST$)))))\n",
+			/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
+			/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, GHOST$:seq of (nat), z:nat &\n      ((GHOST$ = ([0, 1, 2, 3](1, ... ,(len GHOST$)))) and (ax = sumq(GHOST$)) =>\n        (let GHOST$ : seq of (nat) = (GHOST$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(GHOST$))))))))\n",
+			/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of (nat) = [0, 1, 2, 3] in\n      (forall ax:nat &\n        ((ax = sumq(GHOST$)) =>\n          ax <> 0)))))\n",
+			/* 17 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
+			/* 18 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
+			/* 19 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    measure_sumq(s) > measure_sumq(tl s)))\n",
+			/* 20 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
+			/* 21 */ "(forall s:set of nat &\n  is_(measure_sums(s), nat))\n",
+			/* 22 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    exists e in set s & true))\n",
+			/* 23 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    (forall e in set s &\n      measure_sums(s) > measure_sums(s \\ {e}))))\n"
+	};
+
 	public void testVDMSL() throws Exception
 	{
 		runPOG(Dialect.VDM_SL, "/pogtest/pog.vdmsl", expectedSL);
@@ -199,6 +226,14 @@ public class PogTest extends TestCase
 	public void testVDMPP() throws Exception
 	{
 		runPOG(Dialect.VDM_PP, "/pogtest/pog.vdmpp", expectedPP);
+	}
+	
+	public void testLoopsSL() throws Exception
+	{
+		boolean saved = Settings.annotations;
+		Settings.annotations = true;	// for loop invariants
+		runPOG(Dialect.VDM_SL, "/pogtest/loops.vdmsl", expectedLoops);
+		Settings.annotations = saved;	// for loop invariants
 	}
 
 	/**

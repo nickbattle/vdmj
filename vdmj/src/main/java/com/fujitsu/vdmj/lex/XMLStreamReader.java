@@ -134,6 +134,11 @@ abstract public class XMLStreamReader implements ExternalFormatReader
 			boolean capturing = true;
 			int cp = 0;
 
+			if (end == -1)
+			{
+				break;		// No matching end-marker, so exit with what we've got
+			}
+
 			for (int p=start; p<end; p++)
 			{
 				char c = fileText.charAt(p);

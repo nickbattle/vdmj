@@ -24,36 +24,15 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class INLoopInvariantAnnotation extends INAnnotation
+public class INLoopGhostAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private final boolean hasLoopVars;
 
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args, boolean hasLoopVars)
+	public INLoopGhostAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
-		this.hasLoopVars = hasLoopVars;
-	}
-
-	// NOTE: inBefore/inAfter are not used. The check method is called directly by
-	// the various loop INStatements via their INLoopAnnotations.
-	
-	public void check(Context ctxt, boolean inside) throws ValueException
-	{
-		if (inside || !hasLoopVars)
-		{
-			INExpression inv = args.get(0);
-
-			if (!inv.eval(ctxt).boolValue(ctxt))
-			{
-				throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
-			}
-		}
 	}
 }

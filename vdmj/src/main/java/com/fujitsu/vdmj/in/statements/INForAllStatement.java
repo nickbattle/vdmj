@@ -24,9 +24,7 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.in.annotations.INLoopInvariantAnnotation;
+import com.fujitsu.vdmj.in.annotations.INLoopAnnotations;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
@@ -44,14 +42,16 @@ public class INForAllStatement extends INStatement
 	public final INPattern pattern;
 	public final INExpression set;
 	public final INStatement statement;
+	public final INLoopAnnotations invariants;
 
 	public INForAllStatement(LexLocation location,
-		INPattern pattern, INExpression set, INStatement stmt)
+		INPattern pattern, INExpression set, INStatement stmt, INLoopAnnotations invariants)
 	{
 		super(location);
 		this.pattern = pattern;
 		this.set = set;
 		this.statement = stmt;
+		this.invariants = invariants;
 	}
 
 	@Override
@@ -69,10 +69,8 @@ public class INForAllStatement extends INStatement
 		{
 			ValueSet values = set.eval(ctxt).setValue(ctxt);
 
-			List<INLoopInvariantAnnotation> invariants =
-				annotations.getInstances(INLoopInvariantAnnotation.class);
-	
-			INLoopInvariantAnnotation.check(invariants, ctxt);
+			invariants.before(ctxt);	// Add ghost
+			invariants.check(ctxt);
 			
 			for (Value val: values)
 			{
@@ -81,9 +79,9 @@ public class INForAllStatement extends INStatement
 					Context evalContext = new Context(location, "for all", ctxt);
 					evalContext.putList(pattern.getNamedValues(val, ctxt));
 
-					INLoopInvariantAnnotation.check(invariants, ctxt);
+					invariants.check(evalContext, val);
 					Value rv = statement.eval(evalContext);
-					INLoopInvariantAnnotation.check(invariants, ctxt);
+					invariants.check(ctxt);
 
 					if (!rv.isVoid())
 					{
@@ -95,6 +93,8 @@ public class INForAllStatement extends INStatement
 					// Ignore and try others
 				}
 			}
+
+			invariants.after(ctxt);		// remove ghost
 		}
 		catch (ValueException e)
 		{

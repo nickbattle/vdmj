@@ -254,9 +254,9 @@ map TCErrorCaseList{} to INErrorCaseList(this);
 map TCErrorStatement{location} to INErrorStatement(location);
 map TCExitStatement{location, expression} to INExitStatement(location, expression);
 map TCFieldDesignator{object, field, objectfield} to INFieldDesignator(object, field, objectfield);
-map TCForAllStatement{location, pattern, set, statement} to INForAllStatement(location, pattern, set, statement);
-map TCForIndexStatement{location, var, from, to, by, statement} to INForIndexStatement(location, var, from, to, by, statement);
-map TCForPatternBindStatement{location, patternBind, reverse, seqexp, statement} to INForPatternBindStatement(location, patternBind, reverse, seqexp, statement);
+map TCForAllStatement{location, pattern, set, statement, invariants} to INForAllStatement(location, pattern, set, statement, invariants);
+map TCForIndexStatement{location, var, from, to, by, statement, invariants} to INForIndexStatement(location, var, from, to, by, statement, invariants);
+map TCForPatternBindStatement{location, patternBind, reverse, seqexp, statement, invariants} to INForPatternBindStatement(location, patternBind, reverse, seqexp, statement, invariants);
 map TCIdentifierDesignator{name} to INIdentifierDesignator(name);
 map TCIfStatement{location, ifExp, thenStmt, elseList, elseStmt} to INIfStatement(location, ifExp, thenStmt, elseList, elseStmt);
 map TCLetBeStStatement{location, bind, suchThat, statement, def} to INLetBeStStatement(location, bind, suchThat, statement, def);
@@ -286,7 +286,7 @@ map TCTixeStatement{location, traps, body} to INTixeStatement(location, traps, b
 map TCTixeStmtAlternative{patternBind, statement} to INTixeStmtAlternative(patternBind, statement);
 map TCTixeStmtAlternativeList{} to INTixeStmtAlternativeList(this);
 map TCTrapStatement{location, patternBind, with, body} to INTrapStatement(location, patternBind, with, body);
-map TCWhileStatement{location, exp, statement} to INWhileStatement(location, exp, statement);
+map TCWhileStatement{location, exp, statement, invariants} to INWhileStatement(location, exp, statement, invariants);
 
 
 # traces
@@ -350,7 +350,9 @@ unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 
 # Annotations
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.in.annotations;
-map TCLoopInvariantAnnotation{name, args} to INLoopInvariantAnnotation(name, args);
+map TCLoopAnnotations{invariants} to INLoopAnnotations(invariants);
+map TCLoopInvariantList{ghostDef} to INLoopInvariantList(this, ghostDef);
+map TCLoopInvariantAnnotation{name, args, hasLoopVars} to INLoopInvariantAnnotation(name, args, hasLoopVars);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;

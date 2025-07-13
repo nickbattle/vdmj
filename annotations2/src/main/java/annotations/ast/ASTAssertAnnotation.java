@@ -39,17 +39,18 @@ import com.fujitsu.vdmj.syntax.ParserException;
 /**
  * A test of an annotation with an overridden parse function.
  */
-public class ASTGhostAnnotation extends ASTAnnotation
+public class ASTAssertAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public ASTGhostAnnotation(LexIdentifierToken name)
+	public ASTAssertAnnotation(LexIdentifierToken name)
 	{
 		super(name);
 	}
 	
 	/**
 	 * Override the default parse, and look for @Ghost &lt;name&gt; = &lt;exp&gt;;
+	 * This assertion could then be checked in the TC and IN versions of the class.
 	 */
 	@Override
 	public void parse(LexTokenReader ltr) throws LexException, ParserException

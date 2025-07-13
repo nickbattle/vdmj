@@ -28,23 +28,22 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
-import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
-import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCLoopInvariantAnnotation extends TCAnnotation
+public class TCLoopGhostAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private boolean hasLoopVars = false;
 
-	public TCLoopInvariantAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public String ghostName = "GHOST$";		// A default
+
+	public TCLoopGhostAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
@@ -52,37 +51,54 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(6006, "@LoopInvariant only applies to loop statements");
+		name.report(6006, "@LoopGhost only applies to loop statements");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6006, "@LoopInvariant only applies to loop statements");
+		name.report(6006, "@LoopGhost only applies to loop statements");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6006, "@LoopInvariant only applies to loop statements");
+		name.report(6006, "@LoopGhost only applies to loop statements");
 	}
 
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6006, "@LoopInvariant only applies to loop statements");
+		name.report(6006, "@LoopGhost only applies to loop statements");
 	}
 
 	@Override
-	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
 		if (!isLoop(stmt))
 		{
-			name.report(6006, "@LoopInvariant only applies to loop statements");
+			name.report(6006, "@LoopGhost only applies to for-all and for-pattern statements");
 		}
 		else if (args.size() != 1)
 		{
-			name.report(6007, "@LoopInvariant is one boolean condition");
+			name.report(6007, "@LoopGhost expects one argument");
+		}
+		else if (!(args.firstElement() instanceof TCVariableExpression))
+		{
+			name.report(6007, "@LoopGhost expects a variable name");
+		}
+		else
+		{
+			TCVariableExpression ghostExp = (TCVariableExpression)args.firstElement();
+
+			if (env.findName(ghostExp.name, NameScope.NAMESANDSTATE) != null)
+			{
+				name.report(6007, "@LoopGhost variable already exists");
+			}
+			else
+			{
+				ghostName = ghostExp.name.getName();
+			}
 		}
 
 		// Further checks are performed across the collection of all LoopInvariants on
@@ -95,24 +111,9 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	private boolean isLoop(TCStatement stmt)
 	{
 		return
-			(stmt instanceof TCWhileStatement) ||
-			(stmt instanceof TCForIndexStatement) ||
+			// (stmt instanceof TCWhileStatement) ||
+			// (stmt instanceof TCForIndexStatement) ||
 			(stmt instanceof TCForAllStatement) ||
 			(stmt instanceof TCForPatternBindStatement);
-	}
-
-	/**
-	 * Mark this invariant, if it reasons about the loop variable(s) that are bound
-	 * by the for-loop statements. These cannot be used outside the loop body, because
-	 * the variables are not in scope.
-	 */
-	public void setHasLoopVars()
-	{
-		hasLoopVars = true;
-	}
-
-	public boolean hasLoopVars()
-	{
-		return hasLoopVars;
 	}
 }

@@ -22,38 +22,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class INLoopInvariantAnnotation extends INAnnotation
+public class POLoopGhostAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private final boolean hasLoopVars;
+	
+	public final POExpression ghostName;
 
-	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args, boolean hasLoopVars)
+	public POLoopGhostAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
-		this.hasLoopVars = hasLoopVars;
-	}
-
-	// NOTE: inBefore/inAfter are not used. The check method is called directly by
-	// the various loop INStatements via their INLoopAnnotations.
-	
-	public void check(Context ctxt, boolean inside) throws ValueException
-	{
-		if (inside || !hasLoopVars)
-		{
-			INExpression inv = args.get(0);
-
-			if (!inv.eval(ctxt).boolValue(ctxt))
-			{
-				throw new ValueException(4178, "Loop invariant violated: " + inv, ctxt);
-			}
-		}
+		this.ghostName = args.firstElement();
 	}
 }

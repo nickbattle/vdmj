@@ -24,10 +24,9 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.util.List;
 import java.util.ListIterator;
 
-import com.fujitsu.vdmj.in.annotations.INLoopInvariantAnnotation;
+import com.fujitsu.vdmj.in.annotations.INLoopAnnotations;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternBind;
 import com.fujitsu.vdmj.in.patterns.INSeqBind;
@@ -50,15 +49,18 @@ public class INForPatternBindStatement extends INStatement
 	public final boolean reverse;
 	public final INExpression seqexp;
 	public final INStatement statement;
+	public final INLoopAnnotations invariants;
 
 	public INForPatternBindStatement(LexLocation location,
-		INPatternBind patternBind, boolean reverse, INExpression seqexp, INStatement body)
+		INPatternBind patternBind, boolean reverse, INExpression seqexp,
+		INStatement body, INLoopAnnotations invariants)
 	{
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
 		this.seqexp = seqexp;
 		this.statement = body;
+		this.invariants = invariants;
 	}
 
 	@Override
@@ -90,10 +92,8 @@ public class INForPatternBindStatement extends INStatement
 				values = backwards;
 			}
 
-			List<INLoopInvariantAnnotation> invariants =
-				annotations.getInstances(INLoopInvariantAnnotation.class);
-	
-			INLoopInvariantAnnotation.check(invariants, ctxt);
+			invariants.before(ctxt);
+			invariants.check(ctxt);
 
 			if (patternBind.pattern != null)
 			{
@@ -104,9 +104,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for pattern", ctxt);
 						evalContext.putList(patternBind.pattern.getNamedValues(val, ctxt));
 
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(ctxt);
 
 						if (!rv.isVoid())
 						{
@@ -136,9 +136,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for set bind", ctxt);
 						evalContext.putList(setbind.pattern.getNamedValues(val, ctxt));
 
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(ctxt);
 
 						if (!rv.isVoid())
 						{
@@ -168,9 +168,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for seq bind", ctxt);
 						evalContext.putList(seqbind.pattern.getNamedValues(val, ctxt));
 
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(ctxt);
 
 						if (!rv.isVoid())
 						{
@@ -196,9 +196,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for type bind", ctxt);
 						evalContext.putList(typebind.pattern.getNamedValues(converted, ctxt));
 
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						INLoopInvariantAnnotation.check(invariants, ctxt);
+						invariants.check(ctxt);
 
 						if (!rv.isVoid())
 						{
@@ -211,6 +211,9 @@ public class INForPatternBindStatement extends INStatement
 					}
 				}
 			}
+
+			// Clean up any ghost variables
+			invariants.after(ctxt);
 		}
 		catch (ValueException e)
 		{

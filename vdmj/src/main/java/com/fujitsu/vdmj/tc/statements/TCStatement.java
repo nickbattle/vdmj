@@ -224,6 +224,14 @@ public abstract class TCStatement extends TCNode
 	}
 
 	/**
+	 * Get the annotation set on this statement.
+	 */
+	public TCAnnotationList getAnnotations()
+	{
+		return annotations;
+	}
+
+	/**
 	 * Implemented by all statements to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg);

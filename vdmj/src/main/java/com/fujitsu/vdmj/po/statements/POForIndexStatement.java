@@ -31,7 +31,8 @@ import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.annotations.POLoopInvariantAnnotation;
+import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
+import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
@@ -55,7 +56,6 @@ import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
@@ -72,10 +72,11 @@ public class POForIndexStatement extends POStatement
 	public final POExpression by;
 	public final POStatement statement;
 	public final PODefinition vardef;
+	public final POLoopAnnotations invariants;
 
 	public POForIndexStatement(LexLocation location,
 		TCNameToken var, POExpression from, POExpression to, POExpression by, POStatement body,
-		PODefinition vardef)
+		PODefinition vardef, POLoopAnnotations invariants)
 	{
 		super(location);
 		this.var = var;
@@ -84,6 +85,7 @@ public class POForIndexStatement extends POStatement
 		this.by = by;
 		this.statement = body;
 		this.vardef = vardef;
+		this.invariants = invariants;
 	}
 
 	@Override
@@ -104,10 +106,10 @@ public class POForIndexStatement extends POStatement
 			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
 		}
 
-		List<POLoopInvariantAnnotation> invariants = annotations.getInstances(POLoopInvariantAnnotation.class);
+		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
 		
-		if (invariants.isEmpty())		// No loop invariants defined
+		if (annotations.isEmpty())		// No loop invariants defined
 		{
 			int popto = ctxt.pushAt(new POScopeContext());
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
@@ -129,7 +131,7 @@ public class POForIndexStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = POLoopInvariantAnnotation.combine(invariants, null);
+			POExpression invariant = annotations.combine(false);
 
 			/*
 			 * The initial case verifies that the invariant is true for the loop "from" value.
@@ -137,7 +139,7 @@ public class POForIndexStatement extends POStatement
 			POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
 			ctxt.add(new POLetDefContext(def));		// let x = 1 in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check before for-loop");
+			obligations.lastElement().setMessage("check first for-loop");
 			ctxt.pop();
 
 			int popto = ctxt.size();
@@ -164,8 +166,7 @@ public class POForIndexStatement extends POStatement
 			 * Leave implication for following POs, which uses the LoopInvariants that exclude "var"
 			 */
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(
-				POLoopInvariantAnnotation.combine(invariants, new TCNameList(var))));	// invariant => ...
+			ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
 			
 			return obligations;
 		}

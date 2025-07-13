@@ -25,11 +25,10 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCLoopAnnotations;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -45,6 +44,8 @@ public class TCWhileStatement extends TCStatement
 	private static final long serialVersionUID = 1L;
 	public final TCExpression exp;
 	public final TCStatement statement;
+
+	private TCLoopAnnotations invariants = null;
 
 	public TCWhileStatement(LexLocation location, TCExpression exp, TCStatement body)
 	{
@@ -62,7 +63,8 @@ public class TCWhileStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		TCLoopInvariantAnnotation.typeCheck(this, new TCNameList(), annotations);
+		invariants = TCLoopAnnotations.getLoopAnnotations(this);
+		invariants.typeCheck(env, this);
 
 		if (!exp.typeCheck(env, null, scope, null).isType(TCBooleanType.class, location))
 		{
