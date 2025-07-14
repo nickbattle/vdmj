@@ -69,11 +69,6 @@ public class TCTypeBindAnnotation extends TCAnnotation
 
 		if (TypeChecker.getErrorCount() > 0)
 		{
-			for (VDMError error : TypeChecker.getErrors())
-			{
-				exp.report(error.number, error.message);
-			}
-
 			return;
 		}
 
