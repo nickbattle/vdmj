@@ -27,18 +27,23 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
+import com.fujitsu.vdmj.po.annotations.POLoopMeasureAnnotation;
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
+import com.fujitsu.vdmj.pog.LoopMeasureObligation;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
@@ -69,7 +74,40 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 		POLoopInvariantList annotations = invariants.getList();
+		POLoopMeasureAnnotation measure = invariants.getMeasure();
 		TCNameSet updates = statement.updatesState();
+		POExpression invariant = null;
+		
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(false);
+		}
+
+		if (measure != null)
+		{
+			int popto = ctxt.size();
+
+			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
+
+			if (invariant == null)
+			{
+				ctxt.push(new POImpliesContext(this.exp));							// while C => ...
+			}
+			else
+			{
+				ctxt.push(new POImpliesContext(invariant, this.exp));				// while invariant && C => ...
+			}
+
+			TCNaturalType mtype = new TCNaturalType(location);
+			POAssignmentDefinition mdef = new POAssignmentDefinition(measure.measureName, mtype, measure.expression, mtype);
+			ctxt.push(new POLetDefContext(mdef));									// let loop_measure_n = <exp> in ...
+
+			statement.getProofObligations(ctxt, pogState, env);						// build context, ignore POs
+			obligations.addAll(LoopMeasureObligation.getAllPOs(statement.location, ctxt, measure));
+			obligations.lastElement().setMessage("check measure after while body");
+
+			ctxt.popTo(popto);
+		}
 		
 		if (annotations.isEmpty())		// No loop invariant defined
 		{
@@ -95,8 +133,6 @@ public class POWhileStatement extends POStatement
 		}
 		else
 		{
-			POExpression invariant = annotations.combine(false);
-
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check before while condition");
 			
@@ -109,16 +145,18 @@ public class POWhileStatement extends POStatement
 
 			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
 			ctxt.push(new POImpliesContext(invariant, this.exp));					// invariant && while C => ...
+
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 			obligations.lastElement().setMessage("check after each while body");
+
 			ctxt.popTo(popto);
 			
 			// Leave implication for following POs
 			POExpression negated = new PONotExpression(location, this.exp);
 			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
 			ctxt.push(new POImpliesContext(invariant, negated));					// invariant && not C => ...
-			
+
 			return obligations;
 		}
 	}

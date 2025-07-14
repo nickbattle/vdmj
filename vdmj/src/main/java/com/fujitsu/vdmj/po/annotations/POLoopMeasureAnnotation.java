@@ -24,26 +24,29 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class POLoopAnnotations implements Mappable
+public class POLoopMeasureAnnotation extends POAnnotation
 {
-	private final POLoopInvariantList invariants;
-	private final POLoopMeasureAnnotation measure;
+	private static final long serialVersionUID = 1L;
+	
+	public final TCNameToken measureName;
+	public final POExpression expression;
 
-	public POLoopAnnotations(POLoopInvariantList invariants, POLoopMeasureAnnotation measure)
+	public POLoopMeasureAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
-		this.invariants = invariants;
-		this.measure = measure;
+		super(name, args);
+
+		this.expression = args.firstElement();
+		this.measureName = new TCNameToken(location,
+			location.module, "loop_measure_" + location.startLine);
 	}
 
-	public POLoopInvariantList getList()
+	public String getSource()
 	{
-		return invariants;
-	}
-
-	public POLoopMeasureAnnotation getMeasure()
-	{
-		return measure;
+		return expression + " < " + measureName;
 	}
 }
