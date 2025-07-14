@@ -39,7 +39,8 @@ public class INLoopMeasureAnnotation extends INAnnotation
 	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
-		measureName = new TCNameToken(location, name.getLocation().module, "measure$");
+		measureName = new TCNameToken(location,
+			location.module, "loop_measure_" + location.startLine);
 	}
 
 	public void before(Context ctxt)
@@ -62,7 +63,8 @@ public class INLoopMeasureAnnotation extends INAnnotation
 		}
 		else
 		{
-			throw new ValueException(9999, "Loop measure violated", ctxt);
+			throw new ValueException(4179,
+				"Loop measure failed: prev " + previous + ", curr " + current, ctxt);
 		}
 	}
 
