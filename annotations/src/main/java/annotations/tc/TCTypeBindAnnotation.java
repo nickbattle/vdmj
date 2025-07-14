@@ -24,7 +24,6 @@
 
 package annotations.tc;
 
-import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
