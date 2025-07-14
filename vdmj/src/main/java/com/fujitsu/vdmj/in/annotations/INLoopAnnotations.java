@@ -32,10 +32,12 @@ import com.fujitsu.vdmj.values.Value;
 public class INLoopAnnotations implements Mappable
 {
 	private final INLoopInvariantList invariants;
+	private final INLoopMeasureAnnotation measure;
 
-	public INLoopAnnotations(INLoopInvariantList invariants)
+	public INLoopAnnotations(INLoopInvariantList invariants, INLoopMeasureAnnotation measure)
 	{
 		this.invariants = invariants;
+		this.measure = measure;
 	}
 
 	// These methods are called by the various loop INStatements. Note that
@@ -45,6 +47,11 @@ public class INLoopAnnotations implements Mappable
 	public void before(Context ctxt) throws ValueException
 	{
 		invariants.setGhostValue(ctxt);		// Add any ghost to ctxt
+
+		if (measure != null)
+		{
+			measure.before(ctxt);
+		}
 	}
 
 	public void check(Context ctxt) throws ValueException
@@ -52,6 +59,19 @@ public class INLoopAnnotations implements Mappable
 		for (INLoopInvariantAnnotation invariant: invariants)
 		{
 			invariant.check(ctxt, false);	// Outside
+		}
+	}
+
+	public void checkWithMeasure(Context ctxt) throws ValueException
+	{
+		for (INLoopInvariantAnnotation invariant: invariants)
+		{
+			invariant.check(ctxt, false);	// Outside
+		}
+
+		if (measure != null)
+		{
+			measure.check(ctxt);
 		}
 	}
 
@@ -68,5 +88,10 @@ public class INLoopAnnotations implements Mappable
 	public void after(Context ctxt) throws ValueException
 	{
 		invariants.removeGhostVariable(ctxt);
+
+		if (measure != null)
+		{
+			measure.after(ctxt);
+		}
 	}
 }

@@ -22,17 +22,16 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.ast.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public class INLoopGhostAnnotation extends INAnnotation
+public class ASTLoopMeasureAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public INLoopGhostAnnotation(TCIdentifierToken name, INExpressionList args)
+	public ASTLoopMeasureAnnotation(LexIdentifierToken name)
 	{
-		super(name, args);
+		super(name);
 	}
 }

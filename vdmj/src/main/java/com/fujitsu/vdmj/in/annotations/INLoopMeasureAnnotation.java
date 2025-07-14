@@ -25,14 +25,49 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.Value;
 
-public class INLoopGhostAnnotation extends INAnnotation
+public class INLoopMeasureAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	private final TCNameToken measureName;
 
-	public INLoopGhostAnnotation(TCIdentifierToken name, INExpressionList args)
+	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
+		measureName = new TCNameToken(location, name.getLocation().module, "measure$");
+	}
+
+	public void before(Context ctxt)
+	{
+		Value startValue = args.firstElement().eval(ctxt).deref();
+		ctxt.put(measureName, startValue);
+	}
+
+	public void check(Context ctxt) throws ValueException
+	{
+		Value currentValue = args.firstElement().eval(ctxt).deref();	// UpdatableValue
+		long current = currentValue.natValue(ctxt);
+
+		Value previousValue = ctxt.check(measureName);
+		long previous = previousValue.natValue(ctxt);
+
+		if (previous > current)
+		{
+			ctxt.put(measureName, currentValue);	// Fine
+		}
+		else
+		{
+			throw new ValueException(9999, "Loop measure violated", ctxt);
+		}
+	}
+
+	public void after(Context ctxt)
+	{
+		ctxt.remove(measureName);
 	}
 }

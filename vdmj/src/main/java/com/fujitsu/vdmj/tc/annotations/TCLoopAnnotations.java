@@ -38,15 +38,21 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCLoopAnnotations implements Mappable
 {
 	private final TCLoopInvariantList invariants;
+	@SuppressWarnings("unused")
+	private final TCLoopMeasureAnnotation measure;
 
-	public TCLoopAnnotations(TCLoopInvariantList invariants)
+	public TCLoopAnnotations(TCLoopInvariantList invariants, TCLoopMeasureAnnotation measure)
 	{
 		this.invariants = invariants;
+		this.measure = measure;
 	}
 
 	public static TCLoopAnnotations getLoopAnnotations(TCStatement stmt)
 	{
-		return new TCLoopAnnotations(new TCLoopInvariantList(stmt));
+		TCLoopMeasureAnnotation measure =
+			stmt.getAnnotations().getInstance(TCLoopMeasureAnnotation.class);
+
+		return new TCLoopAnnotations(new TCLoopInvariantList(stmt), measure);
 	}
 
 	/**

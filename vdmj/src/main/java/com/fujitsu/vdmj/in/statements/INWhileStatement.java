@@ -69,7 +69,7 @@ public class INWhileStatement extends INStatement
 			{
 				invariants.check(ctxt);
 				Value rv = statement.eval(ctxt);
-				invariants.check(ctxt);
+				invariants.checkWithMeasure(ctxt);
 
 				if (!rv.isVoid())
 				{
