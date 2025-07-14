@@ -179,7 +179,7 @@ public class INModule extends INNode
 			try
 			{
 				// Create a root context to identify the init location for this defn.
-				Context ctxt = new StateContext(d.location, "<init> " + d, initialContext, null); 
+				Context ctxt = new StateContext(d.location, "<init> " + d.name, initialContext, null); 
 				
 				initialContext.putList(d.getNamedValues(ctxt));
 			}

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.values;
 
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
@@ -61,6 +62,11 @@ public class UndefinedValue extends Value
 	@Override
 	protected Value convertValueTo(TCType to, Context ctxt, TCTypeSet done) throws ValueException
 	{
+		if (to instanceof TCBooleanType)
+		{
+			return this;	// "undefined" works within boolean operators
+		}
+		
 		return abort(4132, "Using undefined value", ctxt);
 	}
 
