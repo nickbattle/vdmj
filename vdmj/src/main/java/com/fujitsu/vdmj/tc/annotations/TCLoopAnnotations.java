@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -49,10 +51,16 @@ public class TCLoopAnnotations implements Mappable
 
 	public static TCLoopAnnotations getLoopAnnotations(TCStatement stmt)
 	{
-		TCLoopMeasureAnnotation measure =
-			stmt.getAnnotations().getInstance(TCLoopMeasureAnnotation.class);
+		List<TCLoopMeasureAnnotation> measures =
+			stmt.getAnnotations().getInstances(TCLoopMeasureAnnotation.class);
 
-		return new TCLoopAnnotations(new TCLoopInvariantList(stmt), measure);
+		if (measures.size() > 1)
+		{
+			stmt.report(6007, "Only one @LoopMeasure allowed");
+		}
+
+		return new TCLoopAnnotations(new TCLoopInvariantList(stmt),
+			measures.isEmpty() ? null : measures.get(0));
 	}
 
 	/**

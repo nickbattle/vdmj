@@ -75,7 +75,7 @@ public class INLoopAnnotations implements Mappable
 		}
 	}
 
-	public void check(Context ctxt, Value val) throws ValueException
+	public void checkUpdateGhost(Context ctxt, Value val) throws ValueException
 	{
 		invariants.updateGhostValue(ctxt, val);
 
