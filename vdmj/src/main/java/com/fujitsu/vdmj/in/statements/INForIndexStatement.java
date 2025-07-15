@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.in.statements;
 
 import java.math.BigInteger;
-import java.util.List;
 
 import com.fujitsu.vdmj.in.annotations.INLoopAnnotations;
 import com.fujitsu.vdmj.in.expressions.INExpression;

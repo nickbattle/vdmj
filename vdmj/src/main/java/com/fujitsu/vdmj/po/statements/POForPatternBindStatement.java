@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.math.BigInteger;
-
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
