@@ -34,6 +34,10 @@ public class LexIntegerToken extends LexToken
 	private static final long serialVersionUID = 1L;
 	public final BigInteger value;
 
+	// Useful constants
+	public final static LexIntegerToken ZERO = new LexIntegerToken(BigInteger.ZERO, LexLocation.ANY);
+	public final static LexIntegerToken ONE  = new LexIntegerToken(BigInteger.ONE, LexLocation.ANY);
+
 	public LexIntegerToken(BigInteger value, LexLocation location)
 	{
 		super(location, Token.NUMBER);

@@ -330,7 +330,7 @@ public class POForPatternBindStatement extends POStatement
 			new LexKeywordToken(Token.EQUALS, location),
 			new POSubseqExpression(
 				sequence,
-				new POIntegerLiteralExpression(new LexIntegerToken(BigInteger.ONE, location)),
+				new POIntegerLiteralExpression(LexIntegerToken.ONE),
 				new POLenExpression(location,
 					new POVariableExpression(ghostDef.name, vardef)), ghostDef.type, ghostDef.type),
 			ghostDef.type, ghostDef.type);

@@ -30,6 +30,10 @@ import com.fujitsu.vdmj.lex.Token;
 public class LexBooleanToken extends LexToken
 {
 	private static final long serialVersionUID = 1L;
+
+	public static final LexBooleanToken TRUE  = new LexBooleanToken(true, LexLocation.ANY);
+	public static final LexBooleanToken FALSE = new LexBooleanToken(false, LexLocation.ANY);
+
 	public final boolean value;
 
 	public LexBooleanToken(Token value, LexLocation location)

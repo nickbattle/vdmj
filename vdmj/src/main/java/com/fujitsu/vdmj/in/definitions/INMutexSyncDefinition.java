@@ -102,8 +102,8 @@ public class INMutexSyncDefinition extends INDefinition
 
 		return new INEqualsExpression(
 			new INHistoryExpression(location, Token.ACTIVE, list),
-    		new LexKeywordToken(Token.EQUALS, location),
-    		new INIntegerLiteralExpression(new LexIntegerToken(BigInteger.ZERO, location)));
+			new LexKeywordToken(Token.EQUALS, location),
+			new INIntegerLiteralExpression(LexIntegerToken.ZERO));
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public enum POType
 	RECURSIVE("recursive function"),
 	STATE_INVARIANT("state invariant"),
 	LOOP_INVARIANT("loop invariant"),
-	LOOP_TERMINATION("loop termination"),
+	LOOP_MEASURE("loop measure"),
 	OP_POST_CONDITION("operation post condition"),
 	OPERATION_PATTERNS("operation parameter patterns"),
 	OP_SATISFIABILITY("operation satisfiability", true),

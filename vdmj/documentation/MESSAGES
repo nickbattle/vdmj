@@ -958,6 +958,7 @@ as the expected and actual values.
 4176, "Cannot evaluate power set of size <n>"
 4177, "Not permitted during initialization"
 4178, "Loop invariant violated"
+4179, "Loop measure failed: prev <val>, curr <val>"
 ...
 4998, "Stack overflow"
 4999, "Execution cancelled"

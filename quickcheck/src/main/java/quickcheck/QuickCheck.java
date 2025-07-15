@@ -283,13 +283,13 @@ public class QuickCheck
 			else
 			{
 				// Not checkable, so just use "true"
-				return new INBooleanLiteralExpression(new LexBooleanToken(true, po.location));
+				return new INBooleanLiteralExpression(LexBooleanToken.TRUE);
 			}
 		}
 		catch (Exception e)
 		{
 			errorln("getINExpression: " + e);
-			return new INBooleanLiteralExpression(new LexBooleanToken(false, po.location));
+			return new INBooleanLiteralExpression(LexBooleanToken.FALSE);
 		}
 	}
 	

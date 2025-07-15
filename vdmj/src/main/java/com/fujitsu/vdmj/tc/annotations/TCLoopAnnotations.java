@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -38,15 +40,27 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCLoopAnnotations implements Mappable
 {
 	private final TCLoopInvariantList invariants;
+	@SuppressWarnings("unused")
+	private final TCLoopMeasureAnnotation measure;
 
-	public TCLoopAnnotations(TCLoopInvariantList invariants)
+	public TCLoopAnnotations(TCLoopInvariantList invariants, TCLoopMeasureAnnotation measure)
 	{
 		this.invariants = invariants;
+		this.measure = measure;
 	}
 
 	public static TCLoopAnnotations getLoopAnnotations(TCStatement stmt)
 	{
-		return new TCLoopAnnotations(new TCLoopInvariantList(stmt));
+		List<TCLoopMeasureAnnotation> measures =
+			stmt.getAnnotations().getInstances(TCLoopMeasureAnnotation.class);
+
+		if (measures.size() > 1)
+		{
+			stmt.report(6007, "Only one @LoopMeasure allowed");
+		}
+
+		return new TCLoopAnnotations(new TCLoopInvariantList(stmt),
+			measures.isEmpty() ? null : measures.get(0));
 	}
 
 	/**

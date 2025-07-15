@@ -22,37 +22,35 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.lex;
+package com.fujitsu.vdmj.pog;
 
-import java.math.BigDecimal;
+import java.util.List;
+import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.annotations.POLoopMeasureAnnotation;
 
-public class LexRealToken extends LexToken
+public class LoopMeasureObligation extends ProofObligation
 {
-	private static final long serialVersionUID = 1L;
-	public final BigDecimal value;
-
-	public final static LexRealToken ZERO = new LexRealToken(BigDecimal.ZERO, LexLocation.ANY);
-	public final static LexRealToken ONE  = new LexRealToken(BigDecimal.ONE, LexLocation.ANY);
-
-	public LexRealToken(String real, LexLocation location)
+	private LoopMeasureObligation(LexLocation location, POContextStack ctxt, POLoopMeasureAnnotation measure)
 	{
-		super(location, Token.REALNUMBER);
-		value = new BigDecimal(real, Settings.precision);
+		super(location, POType.LOOP_INVARIANT, ctxt);
+		source = ctxt.getSource(measure.getSource());
 	}
-
-	public LexRealToken(BigDecimal value, LexLocation location)
+	
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(LexLocation location, POContextStack ctxt, POLoopMeasureAnnotation measure)
 	{
-		super(location, Token.REALNUMBER);
-		this.value = value;
-	}
-
-	@Override
-	public String toString()
-	{
-		return value.stripTrailingZeros().toString();
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new LoopMeasureObligation(location, choice, measure));
+		}
+		
+		return results;
 	}
 }

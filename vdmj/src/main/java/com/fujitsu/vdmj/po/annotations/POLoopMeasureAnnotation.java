@@ -22,17 +22,31 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class INLoopGhostAnnotation extends INAnnotation
+public class POLoopMeasureAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	
+	public final TCNameToken measureName;
+	public final POExpression expression;
 
-	public INLoopGhostAnnotation(TCIdentifierToken name, INExpressionList args)
+	public POLoopMeasureAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
+
+		this.expression = args.firstElement();
+		this.measureName = new TCNameToken(location,
+			location.module, "loop_measure_" + location.startLine);
+	}
+
+	public String getSource()
+	{
+		return expression + " < " + measureName;
 	}
 }

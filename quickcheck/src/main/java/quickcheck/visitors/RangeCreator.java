@@ -179,11 +179,11 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		if (ptype.result instanceof TCBooleanType)
 		{
-			body = new INBooleanLiteralExpression(new LexBooleanToken(true, node.location));
+			body = new INBooleanLiteralExpression(LexBooleanToken.TRUE);
 		}
 		else if (ptype.result instanceof TCNumericType)
 		{
-			body = new INIntegerLiteralExpression(new LexIntegerToken(BigInteger.ONE, node.location));
+			body = new INIntegerLiteralExpression(LexIntegerToken.ONE);
 		}
 		else
 		{

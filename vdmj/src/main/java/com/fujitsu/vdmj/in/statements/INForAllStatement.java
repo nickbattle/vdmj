@@ -79,7 +79,7 @@ public class INForAllStatement extends INStatement
 					Context evalContext = new Context(location, "for all", ctxt);
 					evalContext.putList(pattern.getNamedValues(val, ctxt));
 
-					invariants.check(evalContext, val);
+					invariants.checkUpdateGhost(evalContext, val);
 					Value rv = statement.eval(evalContext);
 					invariants.check(ctxt);
 

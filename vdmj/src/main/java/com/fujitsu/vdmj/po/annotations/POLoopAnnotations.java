@@ -29,14 +29,21 @@ import com.fujitsu.vdmj.mapper.Mappable;
 public class POLoopAnnotations implements Mappable
 {
 	private final POLoopInvariantList invariants;
+	private final POLoopMeasureAnnotation measure;
 
-	public POLoopAnnotations(POLoopInvariantList invariants)
+	public POLoopAnnotations(POLoopInvariantList invariants, POLoopMeasureAnnotation measure)
 	{
 		this.invariants = invariants;
+		this.measure = measure;
 	}
 
 	public POLoopInvariantList getList()
 	{
 		return invariants;
+	}
+
+	public POLoopMeasureAnnotation getMeasure()
+	{
+		return measure;
 	}
 }
