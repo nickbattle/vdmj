@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
-import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -40,6 +40,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCLoopMeasureAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
+
+	public TCStatement stmt;	// The annotated while loop
 
 	public TCLoopMeasureAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -73,6 +75,8 @@ public class TCLoopMeasureAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
+		this.stmt = stmt;
+		
 		if (!isLoop(stmt))
 		{
 			name.report(6006, "@LoopMeasure only applies to while statements");
@@ -85,10 +89,17 @@ public class TCLoopMeasureAnnotation extends TCAnnotation
 		{
 			TCType type = args.firstElement().typeCheck(env, null, scope, null);
 
-			if (!(type instanceof TCNaturalType))
+			if (type.isNumeric(type.location))
 			{
-				name.report(6007, "@LoopMeasure argument must be type nat");
+				TCNumericType ntype = type.getNumeric();
+
+				if (ntype.getWeight() < 3)		// nat1, nat or int
+				{
+					return;
+				}
 			}
+
+			name.report(6007, "@LoopMeasure argument must be type nat");
 		}
 	}
 

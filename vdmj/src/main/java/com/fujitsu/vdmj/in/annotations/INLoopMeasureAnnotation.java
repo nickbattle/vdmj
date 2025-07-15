@@ -25,7 +25,12 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INSimpleBlockStatement;
+import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INWhileStatement;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -34,12 +39,15 @@ import com.fujitsu.vdmj.values.Value;
 public class INLoopMeasureAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
+
+	private final INStatement stmt;
 	private final TCNameToken measureName;
 
-	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args)
+	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args, INStatement stmt)
 	{
 		super(name, args);
-		measureName = new TCNameToken(location,
+		this.stmt = stmt;
+		this.measureName = new TCNameToken(location,
 			location.module, "loop_measure_" + location.startLine);
 	}
 
@@ -63,8 +71,30 @@ public class INLoopMeasureAnnotation extends INAnnotation
 		}
 		else
 		{
-			throw new ValueException(4179,
-				"Loop measure failed: prev " + previous + ", curr " + current, ctxt);
+			throw new ContextException(4179,
+				"Loop measure failed: prev " + previous + ", curr " + current, lastLocation(), ctxt);
+		}
+	}
+
+	private LexLocation lastLocation()
+	{
+		if (stmt instanceof INWhileStatement)
+		{
+			INWhileStatement wstmt = (INWhileStatement)stmt;
+			
+			if (wstmt.statement instanceof INSimpleBlockStatement)
+			{
+				INSimpleBlockStatement block = (INSimpleBlockStatement)wstmt.statement;
+				return block.statements.lastElement().location;
+			}
+			else
+			{
+				return wstmt.statement.location;
+			}
+		}
+		else
+		{
+			return location;
 		}
 	}
 
