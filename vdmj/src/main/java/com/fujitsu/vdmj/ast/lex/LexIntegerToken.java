@@ -31,6 +31,11 @@ import com.fujitsu.vdmj.lex.Token;
 public class LexIntegerToken extends LexToken
 {
 	private static final long serialVersionUID = 1L;
+
+	// Useful constants
+	public final static LexIntegerToken ZERO = new LexIntegerToken(0L, LexLocation.ANY);
+	public final static LexIntegerToken ONE  = new LexIntegerToken(1L, LexLocation.ANY);
+
 	public final long value;
 
 	public LexIntegerToken(long value, LexLocation location)

@@ -30,6 +30,10 @@ import com.fujitsu.vdmj.lex.Token;
 public class LexRealToken extends LexToken
 {
 	private static final long serialVersionUID = 1L;
+
+	public final static LexRealToken ZERO = new LexRealToken(0.0, LexLocation.ANY);
+	public final static LexRealToken ONE  = new LexRealToken(1.0, LexLocation.ANY);
+
 	public final double value;
 
 	public LexRealToken(String real, LexLocation location)

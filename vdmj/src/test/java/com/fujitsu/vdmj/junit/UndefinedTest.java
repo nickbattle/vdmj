@@ -57,8 +57,8 @@ import junit.framework.TestCase;
 
 public class UndefinedTest extends TestCase
 {
-	private final INExpression TRUE = new INBooleanLiteralExpression(new LexBooleanToken(true, LexLocation.ANY));
-	private final INExpression FALSE = new INBooleanLiteralExpression(new LexBooleanToken(false, LexLocation.ANY));
+	private final INExpression TRUE = new INBooleanLiteralExpression(LexBooleanToken.TRUE);
+	private final INExpression FALSE = new INBooleanLiteralExpression(LexBooleanToken.FALSE);
 	private final INExpression UNDEFINED = new INUndefinedExpression(LexLocation.ANY);
 
 	private final LexKeywordToken AND = new LexKeywordToken(Token.AND, LexLocation.ANY);

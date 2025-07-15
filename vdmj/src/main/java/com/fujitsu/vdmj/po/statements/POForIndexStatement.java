@@ -182,7 +182,7 @@ public class POForIndexStatement extends POStatement
 		{
 			POExpression diff = new POSubtractExpression(vexp, new LexKeywordToken(Token.MINUS, location), from, real, real);	// (x-A)
 			POExpression rem = new PORemExpression(diff, new LexKeywordToken(Token.REM, location), by, real, real);				// (x-A) rem C
-			POExpression zero = new POIntegerLiteralExpression(new LexIntegerToken(0L, location));
+			POExpression zero = new POIntegerLiteralExpression(LexIntegerToken.ZERO);
 			POExpression equals = new POEqualsExpression(rem, new LexKeywordToken(Token.EQUALS, location), zero, real, real);	// (x-A) rem C == 0
 
 			return new POAndExpression(equals, new LexKeywordToken(Token.AND, location), range, real, real);	// x >= A and x <= B and (x-A) rem C == 0
@@ -196,7 +196,7 @@ public class POForIndexStatement extends POStatement
 	private POExpression varPlusBy()
 	{
 		POExpression vexp = new POVariableExpression(var, vardef);
-		POExpression one = new POIntegerLiteralExpression(new LexIntegerToken(1L, location));
+		POExpression one = new POIntegerLiteralExpression(LexIntegerToken.ONE);
 		POExpression _by = (by == null) ? one : by;
 		return new POPlusExpression(vexp, new LexKeywordToken(Token.PLUS, location), _by, from.getExptype(), new TCIntegerType(location));
 	}
