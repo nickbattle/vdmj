@@ -6,6 +6,6 @@
 package annotations.ast to annotations.tc;
 map ASTChangesAnnotation{name, args} to TCChangesAnnotation(name, args);
 map ASTTestAnnotation{name, args} to TCTestAnnotation(name, args);
-map ASTGhostAnnotation{name, args} to TCNullAnnotation(name, args);
+map ASTAssertAnnotation{name, args} to TCNullAnnotation(name, args);
 map ASTLimitAnnotation{name, args} to TCLimitAnnotation(name, args);
 map ASTWitnessAnnotation{name, args} to TCWitnessAnnotation(name, args);
