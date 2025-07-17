@@ -67,25 +67,30 @@ public class ASTTypeBindAnnotation extends ASTAnnotation
 	{
 		ltr.nextToken();	// Skip "@TypeBind"
 
-		BindReader br = new BindReader(ltr);
-		br.setCurrentModule(ltr.currentModule);
-		ASTMultipleBind mbind = br.readMultipleBind();
-		checkFor(ltr, Token.EQUALS, "Expecting <multiple type bind> '=' <set expression>;");
-
-		ExpressionReader er = new ExpressionReader(ltr);
-		er.setCurrentModule(ltr.currentModule);
-		ASTExpression exp = er.readExpression();
-		checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after <set expression>");
-
-		if (mbind instanceof ASTMultipleTypeBind && exp instanceof ASTSetExpression)
+		try
 		{
-			typebind = (ASTMultipleTypeBind)mbind;
-			expression = exp;
+			BindReader br = new BindReader(ltr);
+			br.setCurrentModule(ltr.currentModule);
+			ASTMultipleBind mbind = br.readMultipleBind();
+			checkFor(ltr, Token.EQUALS, "Expecting <multiple type bind> '=' <set expression>;");
+
+			ExpressionReader er = new ExpressionReader(ltr);
+			er.setCurrentModule(ltr.currentModule);
+			ASTExpression exp = er.readExpression();
+			checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after <set expression>");
+
+			if (mbind instanceof ASTMultipleTypeBind && exp instanceof ASTSetExpression)
+			{
+				typebind = (ASTMultipleTypeBind)mbind;
+				expression = exp;
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			parseException("Expecting <multiple type bind> '=' <set expression>;", name.location);
+			// Handle below
 		}
+
+		parseException("Expecting <multiple type bind> '=' <set expression>;", name.location);
 	}
 	
 	private void checkFor(LexTokenReader reader, Token expected, String message)
