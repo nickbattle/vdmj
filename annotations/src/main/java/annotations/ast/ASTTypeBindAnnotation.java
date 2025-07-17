@@ -83,6 +83,7 @@ public class ASTTypeBindAnnotation extends ASTAnnotation
 			{
 				typebind = (ASTMultipleTypeBind)mbind;
 				expression = exp;
+				return;
 			}
 		}
 		catch (Exception e)
