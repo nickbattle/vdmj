@@ -177,7 +177,7 @@ public class POForPatternBindStatement extends POStatement
 			int popto = ctxt.size();
 			ctxt.push(new POLetDefContext(ghostDef));		// let ghost = [] in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check before for-loop");
+			obligations.lastElement().setMessage("check invariant before for-loop");
 			ctxt.pop();
 
 			if (patternBind.pattern != null)					// for p in [a,b,c] do
@@ -245,7 +245,7 @@ public class POForPatternBindStatement extends POStatement
 
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("preservation for next for-loop");
+			obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
 			updates.remove(ghostDef.name);
 			ctxt.popTo(popto);

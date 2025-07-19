@@ -136,7 +136,7 @@ public class POForIndexStatement extends POStatement
 			POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
 			ctxt.add(new POLetDefContext(def));		// let x = 1 in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check first for-loop");
+			obligations.lastElement().setMessage("check invariant at first loop");
 			ctxt.pop();
 
 			int popto = ctxt.size();
@@ -155,7 +155,7 @@ public class POForIndexStatement extends POStatement
 			def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(), vardef.getType());
 			ctxt.add(new POLetDefContext(def));		// let x = x + 1 in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("preservation for next for-loop");
+			obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
 			ctxt.popTo(popto);
 			
