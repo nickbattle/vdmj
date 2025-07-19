@@ -518,9 +518,13 @@ public class ClassMapper
 			{
 				Field dest = findField(destClass, MAPPED_FROM);
 
-				if (srcClass.isAssignableFrom(dest.getType()))
+				if (dest.getType().isAssignableFrom(srcClass))
 				{
 					mappedFrom = dest;		// We can set mappedFrom to "this" in convert
+				}
+				else
+				{
+					error("Field " + destClassname + ".mappedFrom cannot hold a " + srcClassname);
 				}
 			}
 			catch (NoSuchFieldException e)
