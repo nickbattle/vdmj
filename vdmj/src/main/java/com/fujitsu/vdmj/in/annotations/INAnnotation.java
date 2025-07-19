@@ -52,6 +52,7 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 	private static final List<INAnnotation> instances = new Vector<INAnnotation>();
 	
 	public static boolean suspended = false;
+	private boolean breaks = true;
 
 	public INAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
@@ -129,6 +130,16 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 		}
 		
 		return found;
+	}
+
+	protected void setBreaks(boolean breaks)
+	{
+		this.breaks = breaks;	// INAnnotatedExpression or statements should step-break
+	}
+
+	public boolean shouldBreak()
+	{
+		return breaks;
 	}
 
 	@Override

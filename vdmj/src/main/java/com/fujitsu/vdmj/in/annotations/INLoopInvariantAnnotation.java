@@ -39,6 +39,7 @@ public class INLoopInvariantAnnotation extends INAnnotation
 	{
 		super(name, args);
 		this.hasLoopVars = hasLoopVars;
+		setBreaks(false);	// Break on checks instead
 	}
 
 	// NOTE: inBefore/inAfter are not used. The check method is called directly by
