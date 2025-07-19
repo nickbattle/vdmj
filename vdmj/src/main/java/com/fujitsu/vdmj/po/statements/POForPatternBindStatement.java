@@ -248,6 +248,7 @@ public class POForPatternBindStatement extends POStatement
 			obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
 			updates.remove(ghostDef.name);
+			updates.removeAll(getPattern().getVariableNames());
 			ctxt.popTo(popto);
 
 			/*

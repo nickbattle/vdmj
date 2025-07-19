@@ -156,6 +156,7 @@ public class POForAllStatement extends POStatement
 			obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
 			updates.remove(ghostName);
+			updates.removeAll(pattern.getVariableNames());
 			ctxt.popTo(popto);
 
 			/*

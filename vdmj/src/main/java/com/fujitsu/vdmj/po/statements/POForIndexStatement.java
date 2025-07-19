@@ -157,6 +157,7 @@ public class POForIndexStatement extends POStatement
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 			obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
+			updates.remove(var);
 			ctxt.popTo(popto);
 			
 			/*

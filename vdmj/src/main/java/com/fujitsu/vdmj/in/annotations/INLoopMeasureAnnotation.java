@@ -100,7 +100,7 @@ public class INLoopMeasureAnnotation extends INAnnotation
 		}
 	}
 
-	public void after(Context ctxt)
+	public void removeMeasure(Context ctxt)
 	{
 		ctxt.remove(measureName);
 	}

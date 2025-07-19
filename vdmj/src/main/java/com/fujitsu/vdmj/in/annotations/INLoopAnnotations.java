@@ -85,13 +85,13 @@ public class INLoopAnnotations implements Mappable
 		}
 	}
 
-	public void after(Context ctxt) throws ValueException
+	public void after(Context ctxt)
 	{
 		invariants.removeGhostVariable(ctxt);
 
 		if (measure != null)
 		{
-			measure.after(ctxt);
+			measure.removeMeasure(ctxt);
 		}
 	}
 }

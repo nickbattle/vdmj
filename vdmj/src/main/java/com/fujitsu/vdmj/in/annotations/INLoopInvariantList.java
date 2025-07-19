@@ -27,8 +27,10 @@ package com.fujitsu.vdmj.in.annotations;
 import com.fujitsu.vdmj.in.INMappedList;
 import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCLoopInvariantList;
+import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
@@ -48,22 +50,27 @@ public class INLoopInvariantList extends INMappedList<TCLoopInvariantAnnotation,
 		return ghostDef;
 	}
 
-	public void setGhostValue(Context ctxt)
+	public void setGhostValue(Context ctxt) throws ValueException
 	{
 		if (ghostDef != null)
 		{
-			ctxt.putAllNew(ghostDef.getNamedValues(ctxt));	// initial value, {}
+			// Even if you don't use @LoopGhost, nested loops should not clash here
+			// because the Context passed is a local one for the for-loop. Any
+			// outer loops will retain their own GHOST$ variables.
+
+			NameValuePairList vars = ghostDef.getNamedValues(ctxt);
+			ctxt.putList(vars);		// initial value, {}
 		}
 	}
 
 	public void updateGhostValue(Context ctxt, Value val)
 	{
-		Value ghost = ctxt.check(ghostDef.name);
-
-		if (ghost == null)
+		if (ghostDef == null)
 		{
 			return;		// No ghost
 		}
+
+		Value ghost = ctxt.check(ghostDef.name);
 
 		ghost = ghost.deref();	// It's an UpdatableValue
 

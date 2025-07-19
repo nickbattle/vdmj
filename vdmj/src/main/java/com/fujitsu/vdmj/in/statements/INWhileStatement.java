@@ -58,7 +58,7 @@ public class INWhileStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		breakpoint.check(location, ctxt);
+		// breakpoint.check(location, ctxt);  -- Stops on while condition anyway
 		
 		try
 		{
@@ -76,12 +76,14 @@ public class INWhileStatement extends INStatement
 					return rv;
 				}
 			}
-
-			invariants.after(ctxt);
 		}
 		catch (ValueException e)
 		{
 			abort(e);
+		}
+		finally
+		{
+			invariants.after(ctxt);
 		}
 
 		return new VoidValue();
