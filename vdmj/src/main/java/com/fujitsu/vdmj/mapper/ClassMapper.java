@@ -55,6 +55,9 @@ public class ClassMapper
 
 	/** Resource name for mapping search extensions */
 	private static final String MAPPINGS = "vdmj.mappings";
+
+	/** The target field name that automatically gets set to "this", if present */
+	private static final String MAPPED_FROM = "mappedFrom";
 	
 	/**
 	 * These caches hold the object references converted so far, and keep a stack of
@@ -175,19 +178,21 @@ public class ClassMapper
 		public final Class<?> destClass;
 		public final List<Field> ctorFields;
 		public final List<Field> setterFields;
+		public final Field mappedFrom;
 		public final boolean unmapped;
 
 		public Constructor<?> constructor;
 		public Method[] setters;
 
 		public MapParams(int lineNo, Class<?> srcClass, Class<?> destClass,
-				List<Field> ctorFields, List<Field> setterFields, boolean unmapped)
+				List<Field> ctorFields, List<Field> setterFields, Field mappedFrom, boolean unmapped)
 		{
 			this.lineNo = lineNo;
 			this.srcClass = srcClass;
 			this.destClass = destClass;
 			this.ctorFields = ctorFields;
 			this.setterFields = setterFields;
+			this.mappedFrom = mappedFrom;
 			this.unmapped = unmapped;	
 		}
 		
@@ -401,7 +406,7 @@ public class ClassMapper
 			}
 			// else
 			{
-				mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
+				mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, null, true));
 			}
 		}
 		catch (ClassNotFoundException e)
@@ -433,7 +438,14 @@ public class ClassMapper
 
 			for (String fieldname: srcParams)
 			{
-				srcFields.put(fieldname, findField(srcClass, fieldname));
+				if (fieldname.equals(MAPPED_FROM))
+				{
+					error("Cannot map the " + MAPPED_FROM + " field");
+				}
+				else
+				{
+					srcFields.put(fieldname, findField(srcClass, fieldname));
+				}
 			}
 			
 			if (Modifier.isAbstract(srcClass.getModifiers()))
@@ -500,13 +512,29 @@ public class ClassMapper
 				}
 			}
 
+			Field mappedFrom = null;
+
+			try
+			{
+				Field dest = findField(destClass, MAPPED_FROM);
+
+				if (srcClass.isAssignableFrom(dest.getType()))
+				{
+					mappedFrom = dest;		// We can set mappedFrom to "this" in convert
+				}
+			}
+			catch (NoSuchFieldException e)
+			{
+				// fine...
+			}
+
 			if (mappings.containsKey(srcClass))
 			{
 				errorStream.println("Class is already mapped: " + srcClass.getName());
 			}
 			// else
 			{
-				mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
+				mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, mappedFrom, false));
 			}
 		}
 		catch (ClassNotFoundException e)
@@ -894,6 +922,12 @@ public class ClassMapper
 					
     				mp.setters[s++].invoke(result, arg);
     			}
+
+				if (mp.mappedFrom != null)		// Set this field to "this", if it exists
+				{
+					mp.mappedFrom.setAccessible(true);
+					mp.mappedFrom.set(result, source);
+				}
  
     			for (Field field: mp.ctorFields)
     			{
