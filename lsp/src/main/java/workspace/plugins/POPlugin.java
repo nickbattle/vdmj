@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -42,6 +43,8 @@ import lsp.lspx.POGHandler;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import vdmj.commands.AnalysisCommand;
+import vdmj.commands.PogCommand;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.MessageHub;
@@ -274,5 +277,29 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 		
 		return results;
+	}
+
+	@Override
+	public AnalysisCommand getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "pog":
+				return new PogCommand(line);
+
+			default:
+				return null;
+		}
+	}
+
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList
+		(
+			PogCommand.HELP
+		);	
 	}
 }
