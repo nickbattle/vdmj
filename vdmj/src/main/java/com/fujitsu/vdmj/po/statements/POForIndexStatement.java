@@ -108,6 +108,8 @@ public class POForIndexStatement extends POStatement
 		
 		if (annotations.isEmpty())		// No loop invariants defined
 		{
+			obligations.add(new LoopInvariantObligation(location, ctxt));
+			
 			int popto = ctxt.pushAt(new POScopeContext());
 			ctxt.push(new POForAllSequenceContext(var, from, to, by));
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);

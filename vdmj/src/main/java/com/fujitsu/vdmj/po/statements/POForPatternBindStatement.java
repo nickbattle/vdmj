@@ -112,6 +112,8 @@ public class POForPatternBindStatement extends POStatement
 		
 		if (annotations.isEmpty())		// No loop invariant defined
 		{
+			obligations.add(new LoopInvariantObligation(location, ctxt));
+			
 			int popto = ctxt.size();
 	
 			if (patternBind.pattern != null)

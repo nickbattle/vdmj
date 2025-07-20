@@ -95,6 +95,8 @@ public class POForAllStatement extends POStatement
 		
 		if (annotations.isEmpty())		// No loop invariants defined
 		{
+			obligations.add(new LoopInvariantObligation(location, ctxt));
+			
 			int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
