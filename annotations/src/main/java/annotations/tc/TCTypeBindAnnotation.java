@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -71,11 +72,17 @@ public class TCTypeBindAnnotation extends TCAnnotation
 			return;
 		}
 
-		TCType setof = extype.getSet().setof;
+		TCSetType set = extype.getSet();
 
-		if (!TypeComparator.isSubType(setof, mbtype))
+		if (set == null)
 		{
-			name.report(6001, "Set of " + setof + " not subtype of " + mbtype);
+			name.report(6001, expression + " is not a set");
+			return;
+		}
+
+		if (!TypeComparator.isSubType(set.setof, mbtype))
+		{
+			name.report(6001, set.setof + " not subtype of " + mbtype);
 			return;
 		}
 
@@ -85,7 +92,7 @@ public class TCTypeBindAnnotation extends TCAnnotation
 
 			if (!hasTypeBind(forall.bindList))
 			{
-				name.report(6001, "Forall expression does not have this type bind?");
+				name.report(6001, "Forall expression does not have type bind " + typebind);
 			}
 		}
 		else if (exp instanceof TCExistsExpression)
@@ -94,7 +101,7 @@ public class TCTypeBindAnnotation extends TCAnnotation
 
 			if (!hasTypeBind(exists.bindList))
 			{
-				name.report(6001, "Exists expression does not have this type bind?");
+				name.report(6001, "Exists expression does not have type bind " + typebind);
 			}
 		}
 		else

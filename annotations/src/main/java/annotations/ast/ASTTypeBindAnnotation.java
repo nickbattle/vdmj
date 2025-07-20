@@ -24,6 +24,8 @@
 
 package annotations.ast;
 
+import java.text.ParseException;
+
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSetExpression;
@@ -67,41 +69,33 @@ public class ASTTypeBindAnnotation extends ASTAnnotation
 	{
 		ltr.nextToken();	// Skip "@TypeBind"
 
-		try
-		{
-			BindReader br = new BindReader(ltr);
-			br.setCurrentModule(ltr.currentModule);
-			ASTMultipleBind mbind = br.readMultipleBind();
-			checkFor(ltr, Token.EQUALS, "Expecting <multiple type bind> '=' <set expression>;");
+		BindReader br = new BindReader(ltr);
+		br.setCurrentModule(ltr.currentModule);
+		ASTMultipleBind mbind = br.readMultipleBind();
+		checkFor(ltr, Token.EQUALS, "Expecting <multiple type bind> '=' <set expression>;");
 
-			ExpressionReader er = new ExpressionReader(ltr);
-			er.setCurrentModule(ltr.currentModule);
-			ASTExpression exp = er.readExpression();
-			checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after <set expression>");
+		ExpressionReader er = new ExpressionReader(ltr);
+		er.setCurrentModule(ltr.currentModule);
+		ASTExpression exp = er.readExpression();
+		checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after <set expression>");
 
-			if (mbind instanceof ASTMultipleTypeBind && exp instanceof ASTSetExpression)
-			{
-				typebind = (ASTMultipleTypeBind)mbind;
-				expression = exp;
-				return;
-			}
-		}
-		catch (Exception e)
+		if (mbind instanceof ASTMultipleTypeBind)
 		{
-			// Handle below
+			typebind = (ASTMultipleTypeBind)mbind;
+			expression = exp;
+			return;
 		}
 
 		parseException("Expecting <multiple type bind> '=' <set expression>;", name.location);
 	}
 	
-	private void checkFor(LexTokenReader reader, Token expected, String message)
-		throws LexException, ParserException
+	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException
 	{
 		LexToken last = reader.getLast();
 		
 		if (last.isNot(expected))
 		{
-			throw new ParserException(9000, message, last.location, 0);
+			parseException(message, last.location);
 		}
 		
 		reader.nextToken();
