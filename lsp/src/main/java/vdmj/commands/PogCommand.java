@@ -24,12 +24,12 @@
 
 package vdmj.commands;
 
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import json.JSONObject;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
@@ -107,7 +107,10 @@ public class PogCommand extends AnalysisCommand
 			sb.append("\n");
 			sb.append(list.toString());
 
-			return new DAPMessageList(request, new JSONObject("result", sb.toString()));
+			// Use stdout, to match the QC command output format
+			Console.out.print(sb.toString());
+
+			return null;
 		}
 	}
 
@@ -118,6 +121,12 @@ public class PogCommand extends AnalysisCommand
 
 	@Override
 	public boolean notWhenRunning()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean notWhenDirty()
 	{
 		return true;
 	}
