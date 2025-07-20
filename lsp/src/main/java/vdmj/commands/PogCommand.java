@@ -110,7 +110,7 @@ public class PogCommand extends AnalysisCommand
 			// Use stdout, to match the QC command output format
 			Console.out.print(sb.toString());
 
-			return null;
+			return new DAPMessageList(request);
 		}
 	}
 
