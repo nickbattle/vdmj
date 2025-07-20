@@ -39,7 +39,7 @@ public class INLimitAnnotation extends INAnnotation
 		if (count > limit.value.value)
 		{
 			String msg = String.format("@Limit Value count %d has exceeded the limit of %d", count, limit.value.value);
-			throw new ContextException(9999, msg, aexp.expression.location, ctxt);
+			throw new ContextException(8206, msg, aexp.expression.location, ctxt);
 		}
 	}
 }

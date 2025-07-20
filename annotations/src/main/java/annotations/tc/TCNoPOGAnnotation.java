@@ -78,7 +78,7 @@ public class TCNoPOGAnnotation extends TCAnnotation
 	{
 		if (!args.isEmpty())
 		{
-			name.report(6001, "@NoPOG has no arguments");
+			name.report(6500, "@NoPOG has no arguments");
 		}
 	}
 }

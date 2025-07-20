@@ -58,25 +58,25 @@ public class TCOnFailAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(3359, "@OnFail only applies to expressions");
+		name.report(6200, "@OnFail only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(3359, "@OnFail only applies to expressions");
+		name.report(6201, "@OnFail only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(3359, "@OnFail only applies to expressions");
+		name.report(6202, "@OnFail only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(3359, "@OnFail only applies to expressions");
+		name.report(6203, "@OnFail only applies to expressions");
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6008, "@OnFail([errno,] \"format\", args...)");
+			name.report(6204, "@OnFail([errno,] \"format\", args...)");
 		}
 		else
 		{
@@ -130,7 +130,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@OnFail must only use %[arg$][#][width]s conversions");
+					name.report(6205, "@OnFail must only use %[arg$][#][width]s conversions");
 				}
 				
 				Stack<TCDocLinkAnnotation> enclosing = TCDocLinkAnnotation.enclosing();
@@ -143,7 +143,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 			}
 			else
 			{
-				name.report(6008, "@OnFail([errno,] \"format\", args...)");
+				name.report(6206, "@OnFail([errno,] \"format\", args...)");
 			}
 		}
 	}
@@ -153,7 +153,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 	{
 		if (!type.isType(TCBooleanType.class, exp.location))
 		{
-			name.report(3361, "@OnFail not applied to boolean expression");
+			name.report(6207, "@OnFail not applied to boolean expression");
 		}
 	}
 }

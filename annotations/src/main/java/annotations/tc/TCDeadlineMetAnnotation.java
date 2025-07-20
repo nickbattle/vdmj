@@ -42,7 +42,7 @@ public class TCDeadlineMetAnnotation extends TCConjectureAnnotation
 	{
 		if (args.size() != 5)
 		{
-			name.report(6008, "Expecting @DeadlineMet(e1, [c], e2, d, m)");
+			name.report(6900, "Expecting @DeadlineMet(e1, [c], e2, d, m)");
 		}
 		else
 		{

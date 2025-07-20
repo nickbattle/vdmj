@@ -1,0 +1,37 @@
+VDMJ Error and Warning Messages
+===============================
+
+Messages and warnings are numbered in the following blocks:
+
+0000-0999	Internal errors
+1000-1499	Lexical errors
+1500-1999	Preprocessor errors
+2000-2999	Syntax errors
+3000-3999	Type checking errors
+4000-4999	Runtime errors
+5000-5999	Warnings
+
+The remaining blocks of message numbers are for annotations and annotations2:
+
+6100-6199 Printf
+6200-6299 OnFail
+6300-6399 Trace
+6400-6499 DocLink
+6500-6599 NoPOG
+6600-6699 Warning
+6700-6799 Override
+6800-6899 Conjecture
+6900-6999 DeadlineMet
+7000-7099 Separate
+7100-7199 SepRequire
+7200-7299 TypeBind
+7300-7399 TypeParam
+
+8000-8099 Assert
+8100-8199 Changes
+8200-8299 Limit
+8300-8399 Test
+8400-8499 Witness
+
+There are tools in the annotations/documentation folder to help with renumbering annotation files.
+

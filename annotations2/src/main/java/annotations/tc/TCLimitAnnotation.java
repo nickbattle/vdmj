@@ -48,25 +48,25 @@ public class TCLimitAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Limit only applies to statements");
+		name.report(8200, "@Limit only applies to statements");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(3359, "@Limit only applies to expressions");
+		name.report(8201, "@Limit only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(3359, "@Limit only applies to expressions");
+		name.report(8202, "@Limit only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Limit only applies to expressions");
+		name.report(8203, "@Limit only applies to expressions");
 	}
 
 	@Override
@@ -76,12 +76,12 @@ public class TCLimitAnnotation extends TCAnnotation
 		{
 			if (!(args.get(0) instanceof TCIntegerLiteralExpression))
 			{
-				name.report(3361, "@Limit argument must be a integer literal");
+				name.report(8204, "@Limit argument must be a integer literal");
 			}
 		}
 		else if (args.size() > 1)
 		{
-			name.report(3361, "@Limit has one optional integer argument");
+			name.report(8205, "@Limit has one optional integer argument");
 		}
 	}
 }

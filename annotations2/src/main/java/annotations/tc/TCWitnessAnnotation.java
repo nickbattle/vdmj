@@ -95,7 +95,7 @@ public class TCWitnessAnnotation extends TCAnnotation
 				problems.add(errs.remove(before));	// Always remove this one
 			}
 
-			TypeChecker.report(6666, "Bad witness", name.getLocation());
+			TypeChecker.report(8400, "Bad witness", name.getLocation());
 
 			for (VDMError e: problems)
 			{

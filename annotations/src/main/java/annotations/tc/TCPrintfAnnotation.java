@@ -51,19 +51,19 @@ public class TCPrintfAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(6009, "@Printf only applies to statements and expressions");
+		name.report(6100, "@Printf only applies to statements and expressions");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6009, "@Printf only applies to statements and expressions");
+		name.report(6101, "@Printf only applies to statements and expressions");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6009, "@Printf only applies to statements and expressions");
+		name.report(6102, "@Printf only applies to statements and expressions");
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class TCPrintfAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6008, "@Printf must start with a string argument");
+			name.report(6103, "@Printf must start with a string argument");
 		}
 		else
 		{
@@ -105,12 +105,12 @@ public class TCPrintfAnnotation extends TCAnnotation
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@Printf must use %[arg$][#][width](s|S) conversions");
+					name.report(6104, "@Printf must use %[arg$][#][width](s|S) conversions");
 				}
 			}
 			else
 			{
-				name.report(6008, "@Printf must start with a string argument");
+				name.report(6105, "@Printf must start with a string argument");
 			}
 		}
 	}

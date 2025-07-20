@@ -123,7 +123,7 @@ public class TCDocLinkAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6008, "@DocLink(\"arg\"...)");
+			name.report(6400, "@DocLink(\"arg\"...)");
 		}
 		else
 		{
@@ -131,7 +131,7 @@ public class TCDocLinkAnnotation extends TCAnnotation
 			{
 				if (!(arg instanceof TCStringLiteralExpression))
 				{
-					arg.report(6008, "@DocLink args must be string literals");
+					arg.report(6401, "@DocLink args must be string literals");
 				}
 			}
 		}
