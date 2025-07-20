@@ -24,11 +24,8 @@
 
 package annotations.ast;
 
-import java.text.ParseException;
-
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTSetExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
