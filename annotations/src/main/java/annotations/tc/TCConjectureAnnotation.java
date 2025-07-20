@@ -86,32 +86,32 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 		}
 		else
 		{
-			name.report(6009, "@" + name + " only applies to system class constructors");
+			name.report(6800, "@" + name + " only applies to system class constructors");
 		}
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6009, "@" + name + " only applies to system class constructors");
+		name.report(6801, "@" + name + " only applies to system class constructors");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6009, "@" + name + " only applies to system class constructors");
+		name.report(6802, "@" + name + " only applies to system class constructors");
 	}
 
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6009, "@" + name + " only applies to system class constructors");
+		name.report(6803, "@" + name + " only applies to system class constructors");
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(6009, "@" + name + " only applies to system class constructors");
+		name.report(6804, "@" + name + " only applies to system class constructors");
 	}
 
 	protected boolean checkHistoryExpression(Environment env, TCExpression exp)
@@ -123,12 +123,12 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 			
 			if (!op.isExplicit())
 			{
-				hexp.report(6008, "Name must be explicit '<name>`" + op + "'");
+				hexp.report(6805, "Name must be explicit '<name>`" + op + "'");
 			}
 			
 			if (env.findMatches(op).isEmpty())
 			{
-				hexp.report(6008, "Name '" + op + "' is not in scope");
+				hexp.report(6806, "Name '" + op + "' is not in scope");
 				return false;
 			}
 			
@@ -136,7 +136,7 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 		}
 		else
 		{
-			exp.report(6008, "Expecting history expression (eg. #fin(op))");
+			exp.report(6807, "Expecting history expression (eg. #fin(op))");
 			return false;
 		}
 	}
@@ -153,7 +153,7 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 //		}
 //		else
 //		{
-//			tcExpression.report(6008, "Expecting boolean expression, got " + type);
+//			tcExpression.report(6808, "Expecting boolean expression, got " + type);
 //			return false;
 //		}
 	}
@@ -164,7 +164,7 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 		
 		if (!type.isNumeric(LexLocation.ANY))
 		{
-			exp.report(6008, "Expecting numeric expression, got " + type);
+			exp.report(6809, "Expecting numeric expression, got " + type);
 			return false;
 		}
 		

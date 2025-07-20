@@ -94,6 +94,8 @@ public class QuickCheckThread extends CancellableThread
 			for (ProofObligation po: chosenPOs)
 			{
 				StrategyResults results = qc.getValues(po);
+				long before = System.currentTimeMillis();
+				long after = before;
 				
 				if (!qc.hasErrors())
 				{
@@ -112,10 +114,12 @@ public class QuickCheckThread extends CancellableThread
 						{
 							execTimer.interrupt();
 						}
+
+						after = System.currentTimeMillis();
 					}
 				}
 				
-				list.add(getQCResponse(po, messages));
+				list.add(getQCResponse(po, messages, after-before));
 				count++;
 				
 				if (workDoneToken != null)
@@ -180,11 +184,12 @@ public class QuickCheckThread extends CancellableThread
 		}
 	}
 
-	private JSONObject getQCResponse(ProofObligation po, List<VDMMessage> messages)
+	private JSONObject getQCResponse(ProofObligation po, List<VDMMessage> messages, long duration)
 	{
 		JSONObject json = new JSONObject(
 				"id",		Long.valueOf(po.number),
-				"status",	po.status.toString());
+				"status",	po.status.toString(),
+				"duration",	duration);
 		
 		if (po.counterexample != null)
 		{
@@ -275,6 +280,11 @@ public class QuickCheckThread extends CancellableThread
 		if (po.message != null)
 		{
 			json.put("message", po.message);
+		}
+		
+		if (po.qualifier != null)
+		{
+			json.put("qualifier", po.qualifier);
 		}
 
 		return json;

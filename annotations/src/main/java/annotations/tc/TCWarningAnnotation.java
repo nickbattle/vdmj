@@ -96,7 +96,7 @@ public class TCWarningAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6010, "@Warning must have one or more numeric arguments");
+			name.report(6600, "@Warning must have one or more numeric arguments");
 		}
 		
 		suppressed = new HashSet<Long>();
@@ -105,7 +105,7 @@ public class TCWarningAnnotation extends TCAnnotation
 		{
 			if (!(arg instanceof TCIntegerLiteralExpression))
 			{
-				arg.report(6010, "@Warning arguments must be warning number literals");
+				arg.report(6601, "@Warning arguments must be warning number literals");
 			}
 			else
 			{

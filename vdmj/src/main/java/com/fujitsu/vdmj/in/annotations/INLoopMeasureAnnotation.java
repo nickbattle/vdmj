@@ -51,6 +51,8 @@ public class INLoopMeasureAnnotation extends INAnnotation
 		this.stmt = stmt;
 		this.measureName = new TCNameToken(location,
 			location.module, "loop_measure_" + location.startLine);
+
+		setBreaks(false);	// Break on checks instead
 	}
 
 	public void before(Context ctxt)
@@ -100,7 +102,7 @@ public class INLoopMeasureAnnotation extends INAnnotation
 		}
 	}
 
-	public void after(Context ctxt)
+	public void removeMeasure(Context ctxt)
 	{
 		ctxt.remove(measureName);
 	}

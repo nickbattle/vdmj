@@ -41,8 +41,8 @@ public class LoopInvariantObligation extends ProofObligation
 	public LoopInvariantObligation(LexLocation location, POContextStack ctxt)
 	{
 		super(location, POType.LOOP_INVARIANT, ctxt);
-		source = ctxt.getSource("-- Missing loop invariant");
-		this.markUnchecked("Missing loop invariant");
+		source = ctxt.getSource("-- Missing @LoopInvariant");
+		this.markUnchecked("Missing @LoopInvariant");
 	}
 	
 	/**

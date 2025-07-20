@@ -73,7 +73,7 @@ public class INForPatternBindStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		breakpoint.check(location, ctxt);
+		// breakpoint.check(location, ctxt);	-- Breaks on calculation of sequence
 
 		try
 		{
@@ -211,13 +211,14 @@ public class INForPatternBindStatement extends INStatement
 					}
 				}
 			}
-
-			// Clean up any ghost variables
-			invariants.after(ctxt);
 		}
 		catch (ValueException e)
 		{
 			abort(e);
+		}
+		finally
+		{		
+			invariants.after(ctxt);	// Clean up any ghost variables
 		}
 
 		return new VoidValue();

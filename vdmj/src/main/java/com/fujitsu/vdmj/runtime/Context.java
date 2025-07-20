@@ -164,20 +164,27 @@ public class Context extends HashMap<TCNameToken, Value>
 		}
 	}
 
-	public void putNew(NameValuePair nvp)
+	public boolean putNew(NameValuePair nvp)
 	{
 		if (get(nvp.name) == null)
 		{
 			put(nvp.name, nvp.value);
+			return true;
 		}
+		
+		return false;	// Didn't update existing variable
 	}
 
-	public void putAllNew(NameValuePairList list)
+	public boolean putAllNew(NameValuePairList list)
 	{
+		boolean result = true;
+
 		for (NameValuePair nvp: list)
 		{
-			putNew(nvp);
+			result = result && putNew(nvp);
 		}
+
+		return result;	// All variables updated?
 	}
 
 	/**

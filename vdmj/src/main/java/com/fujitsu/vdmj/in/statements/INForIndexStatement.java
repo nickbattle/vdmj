@@ -70,7 +70,7 @@ public class INForIndexStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		breakpoint.check(location, ctxt);
+		// breakpoint.check(location, ctxt);	-- Breaks on calculation of from/to/by
 
 		try
 		{
@@ -104,12 +104,14 @@ public class INForIndexStatement extends INStatement
 					return rv;
 				}
 			}
-
-			invariants.after(ctxt);
 		}
 		catch (ValueException e)
 		{
 			abort(e);
+		}
+		finally
+		{
+			invariants.after(ctxt);
 		}
 
 		return new VoidValue();

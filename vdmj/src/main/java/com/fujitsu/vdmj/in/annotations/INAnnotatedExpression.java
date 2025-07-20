@@ -60,7 +60,7 @@ public class INAnnotatedExpression extends INExpression
 	@Override
 	public Value eval(Context ctxt)
 	{
-		breakpoint.check(location, ctxt);
+		if (annotation.shouldBreak()) breakpoint.check(location, ctxt);
 		if (!INAnnotation.suspended) annotation.inBefore(base, ctxt);
 		Value rv = expression.eval(ctxt);
 		if (!INAnnotation.suspended) annotation.inAfter(base, rv, ctxt);

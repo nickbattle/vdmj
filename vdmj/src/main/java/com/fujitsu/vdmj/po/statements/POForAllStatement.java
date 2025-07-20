@@ -95,6 +95,8 @@ public class POForAllStatement extends POStatement
 		
 		if (annotations.isEmpty())		// No loop invariants defined
 		{
+			obligations.add(new LoopInvariantObligation(location, ctxt));
+			
 			int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
 			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
 			ctxt.popTo(popto);
@@ -124,7 +126,7 @@ public class POForAllStatement extends POStatement
 			int popto = ctxt.size();
 			ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check before for-loop");
+			obligations.lastElement().setMessage("check invariant before for-loop");
 			ctxt.pop();
 
 			/*
@@ -153,9 +155,10 @@ public class POForAllStatement extends POStatement
 
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("preservation for next for-loop");
+			obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
 			updates.remove(ghostName);
+			updates.removeAll(pattern.getVariableNames());
 			ctxt.popTo(popto);
 
 			/*

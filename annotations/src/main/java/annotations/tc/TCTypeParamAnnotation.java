@@ -76,13 +76,13 @@ public class TCTypeParamAnnotation extends TCAnnotation
 		}
 		else
 		{
-			name.report(6001, "@TypeParam only applies to function definitions");
+			name.report(7300, "@TypeParam only applies to function definitions");
 			return;
 		}
 		
 		if (funcParams == null)
 		{
-			name.report(6001, "@TypeParam only applies to polymorphic definitions");
+			name.report(7301, "@TypeParam only applies to polymorphic definitions");
 		}
 		else
 		{
@@ -96,7 +96,7 @@ public class TCTypeParamAnnotation extends TCAnnotation
 				}
 			}
 			
-			qcParam.report(6001, "@TypeParam " +  qcParam + " is not a parameter of " + def.name);
+			qcParam.report(7302, "@TypeParam " +  qcParam + " is not a parameter of " + def.name);
 		}
 	}
 
@@ -109,24 +109,24 @@ public class TCTypeParamAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(6001, "@TypeParam only applies to function definitions");
+		name.report(7303, "@TypeParam only applies to function definitions");
 	}
 	
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6001, "@TypeParam only applies to function definitions");
+		name.report(7304, "@TypeParam only applies to function definitions");
 	}
 
 	@Override
 	public void tcBefore(TCModule m)
 	{
-		name.report(6001, "@TypeParam only applies to function definitions");
+		name.report(7305, "@TypeParam only applies to function definitions");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition m)
 	{
-		name.report(6001, "@TypeParam only applies to function definitions");
+		name.report(7306, "@TypeParam only applies to function definitions");
 	}
 }

@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.annotations.POLoopMeasureAnnotation;
-import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
@@ -43,7 +42,6 @@ import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
@@ -91,20 +89,18 @@ public class POWhileStatement extends POStatement
 
 			if (invariant == null)
 			{
-				ctxt.push(new POImpliesContext(this.exp));							// while C => ...
+				ctxt.push(new POImpliesContext(this.exp));				// while C => ...
 			}
 			else
 			{
-				ctxt.push(new POImpliesContext(invariant, this.exp));				// while invariant && C => ...
+				ctxt.push(new POImpliesContext(invariant, this.exp));	// while invariant && C => ...
 			}
 
-			TCNaturalType mtype = new TCNaturalType(location);
-			POAssignmentDefinition mdef = new POAssignmentDefinition(measure.measureName, mtype, measure.expression, mtype);
-			ctxt.push(new POLetDefContext(mdef));									// let loop_measure_n = <exp> in ...
+			ctxt.push(new POLetDefContext(measure.getDefinition()));	// let loop_measure_n = <exp> in ...
 
-			statement.getProofObligations(ctxt, pogState, env);						// build context, ignore POs
+			statement.getProofObligations(ctxt, pogState, env);			// build context, ignore POs
 			obligations.addAll(LoopMeasureObligation.getAllPOs(statement.location, ctxt, measure));
-			obligations.lastElement().setMessage("check measure after while body");
+			obligations.lastElement().setMessage("check measure after each while body");
 
 			ctxt.popTo(popto);
 		}
@@ -134,13 +130,13 @@ public class POWhileStatement extends POStatement
 		else
 		{
 			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check before while condition");
+			obligations.lastElement().setMessage("check invariant before while condition");
 			
 			int popto = ctxt.size();
 			
 			ctxt.push(new POImpliesContext(this.exp));								// while C => ...
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check before each while body");
+			obligations.lastElement().setMessage("check invariant before each while body");
 			ctxt.pop();
 
 			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
@@ -148,7 +144,7 @@ public class POWhileStatement extends POStatement
 
 			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check after each while body");
+			obligations.lastElement().setMessage("check invariant after each while body");
 
 			ctxt.popTo(popto);
 			

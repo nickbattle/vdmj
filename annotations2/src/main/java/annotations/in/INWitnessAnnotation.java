@@ -100,7 +100,7 @@ public class INWitnessAnnotation extends INAnnotation
 			}
 			
 			ContextException first = problems.get(0);
-			throw new ContextException(6666, "Bad witness(es)", first.location, witnessCtxt);
+			throw new ContextException(7301, "Bad witness(es)", first.location, witnessCtxt);
 		}
 	}
 	

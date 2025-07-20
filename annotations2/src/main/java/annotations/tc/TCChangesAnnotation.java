@@ -48,25 +48,25 @@ public class TCChangesAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Changes only applies to statements");
+		name.report(8100, "@Changes only applies to statements");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(3359, "@Changes only applies to statements");
+		name.report(8101, "@Changes only applies to statements");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(3359, "@Changes only applies to statements");
+		name.report(8102, "@Changes only applies to statements");
 	}
 
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Changes only applies to statements");
+		name.report(8103, "@Changes only applies to statements");
 	}
 
 	@Override
@@ -76,12 +76,12 @@ public class TCChangesAnnotation extends TCAnnotation
 		{
 			if (!(args.get(0) instanceof TCStringLiteralExpression))
 			{
-				name.report(3361, "@Changes argument must be a string literal");
+				name.report(8104, "@Changes argument must be a string literal");
 			}
 		}
 		else if (args.size() > 1)
 		{
-			name.report(3361, "@Changes has one optional string argument");
+			name.report(8105, "@Changes has one optional string argument");
 		}
 	}
 }

@@ -24,10 +24,12 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
 
 public class POLoopMeasureAnnotation extends POAnnotation
 {
@@ -43,6 +45,12 @@ public class POLoopMeasureAnnotation extends POAnnotation
 		this.expression = args.firstElement();
 		this.measureName = new TCNameToken(location,
 			location.module, "loop_measure_" + location.startLine);
+	}
+
+	public POAssignmentDefinition getDefinition()
+	{
+		TCNaturalType mtype = new TCNaturalType(location);
+		return new POAssignmentDefinition(measureName, mtype, expression, mtype);
 	}
 
 	public String getSource()

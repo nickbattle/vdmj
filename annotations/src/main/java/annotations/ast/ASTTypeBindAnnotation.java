@@ -26,7 +26,6 @@ package annotations.ast;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTSetExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
@@ -77,25 +76,23 @@ public class ASTTypeBindAnnotation extends ASTAnnotation
 		ASTExpression exp = er.readExpression();
 		checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after <set expression>");
 
-		if (mbind instanceof ASTMultipleTypeBind && exp instanceof ASTSetExpression)
+		if (mbind instanceof ASTMultipleTypeBind)
 		{
 			typebind = (ASTMultipleTypeBind)mbind;
 			expression = exp;
+			return;
 		}
-		else
-		{
-			parseException("Expecting <multiple type bind> '=' <set expression>;", name.location);
-		}
+
+		parseException("Expecting <multiple type bind> '=' <set expression>;", name.location);
 	}
 	
-	private void checkFor(LexTokenReader reader, Token expected, String message)
-		throws LexException, ParserException
+	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException
 	{
 		LexToken last = reader.getLast();
 		
 		if (last.isNot(expected))
 		{
-			throw new ParserException(9000, message, last.location, 0);
+			parseException(message, last.location);
 		}
 		
 		reader.nextToken();

@@ -42,7 +42,7 @@ public class TCSepRequireAnnotation extends TCConjectureAnnotation
 	{
 		if (args.size() != 5)
 		{
-			name.report(6008, "Expecting @SepRequire(e1, [c], e2, d, m)");
+			name.report(7100, "Expecting @SepRequire(e1, [c], e2, d, m)");
 		}
 		else
 		{

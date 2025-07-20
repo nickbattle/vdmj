@@ -42,7 +42,7 @@ public class TCSeparateAnnotation extends TCConjectureAnnotation
 	{
 		if (args.size() != 5)
 		{
-			name.report(6008, "Expecting @Separate(e1, [c], e2, d, m)");
+			name.report(7000, "Expecting @Separate(e1, [c], e2, d, m)");
 		}
 		else
 		{

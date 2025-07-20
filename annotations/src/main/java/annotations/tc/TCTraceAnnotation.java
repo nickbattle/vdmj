@@ -48,19 +48,19 @@ public class TCTraceAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(6006, "@Trace only applies to expressions and statements");
+		name.report(6300, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6006, "@Trace only applies to expressions and statements");
+		name.report(6301, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6006, "@Trace only applies to expressions and statements");
+		name.report(6302, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class TCTraceAnnotation extends TCAnnotation
 		{
 			if (!(arg instanceof TCVariableExpression))
 			{
-				arg.report(6007, "@Trace argument must be an identifier");
+				arg.report(6303, "@Trace argument must be an identifier");
 			}
 			else
 			{
