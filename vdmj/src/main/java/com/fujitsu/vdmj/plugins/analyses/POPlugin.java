@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
-import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.plugins.commands.PogCommand;
@@ -166,11 +165,6 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	abstract public <T extends Collection<?>> T getPO();
 
-	protected CommandList commandList = new CommandList
-	(
-		PogCommand.class
-	);
-	
 	@Override
 	public AnalysisCommand getCommand(String line)
 	{
@@ -178,7 +172,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		
 		switch (parts[0])
 		{
-			case "pog":		return new PogCommand(line);
+			case "pog":	
+				return new PogCommand(line);
 
 			default:
 				return null;
