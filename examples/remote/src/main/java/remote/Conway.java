@@ -35,7 +35,7 @@ public class Conway implements RemoteControl
 	private final static int CELL = 10;		// Cell size in pixels
 	private final static int SIZE = 500;	// Display size in pixels
 	private final static String GAME = "GOSPER_GLIDER_GUN";
-	private final static int PAUSE = 100;
+	private final static int PAUSE = 500;
 	
 	@Override
 	public void run(RemoteInterpreter interpreter) throws Exception

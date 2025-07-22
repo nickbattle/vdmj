@@ -73,10 +73,7 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 	protected boolean interactive;			// eg. -i or -simulation, not -e or -cmd
 	protected String expression;			// eg. -e "f(1, 2)"
 	protected String commandline;			// eg. -cmd "qc -s fixed"
-	protected String remoteControlName;
-	protected String remoteSimulationName;
 	protected RemoteControl remoteInstance;
-	protected RemoteSimulation simulationInstance;
 	
 	@Override
 	public String getName()
@@ -87,7 +84,7 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public int getPriority()
 	{
-		return IN_PRIORITY;
+		return CMD_PRIORITY;
 	}
 
 	@Override
@@ -97,8 +94,7 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		interactive = false;
 		expression = null;
 		commandline = null;
-		remoteControlName = null;
-		remoteSimulationName = null;
+		remoteInstance = null;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(StartConsoleEvent.class, this);
@@ -135,6 +131,9 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void processArgs(List<String> argv)
 	{
+		String remoteControlName = null;
+		String remoteSimulationName = null;
+
 		Iterator<String> iter = argv.iterator();
 		
 		while (iter.hasNext())
@@ -213,16 +212,6 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 			}
 		}
 		
-		if (remoteControlName != null && remoteSimulationName != null)
-		{
-			fail("The -remote and -simulation options cannot be used together");
-		}
-		
-		if (remoteSimulationName != null && Settings.dialect != Dialect.VDM_RT)
-		{
-			fail("The -simulation option can only be used with -vdmrt");
-		}
-
 		if (remoteControlName != null)
 		{
 			try
@@ -237,10 +226,16 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (remoteSimulationName != null)
 		{
+			if (Settings.dialect != Dialect.VDM_RT)
+			{
+				fail("The -simulation option can only be used with -vdmrt");
+			}
+
 			try
 			{
 				Class<RemoteSimulation> remoteSimulation = findClass(remoteSimulationName);
-				simulationInstance = remoteSimulation.getDeclaredConstructor().newInstance();
+				remoteSimulation.getDeclaredConstructor().newInstance();
+				// discovered by RemoteSimulation.getInstance()
 			}
 			catch (Exception e)
 			{
