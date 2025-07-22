@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 
@@ -63,7 +62,7 @@ public class INPluginRT extends INPluginPP
 			{
 				try
 				{
-					ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+					ASTPlugin ast = registry.getPlugin("AST");
 					ASTClassList parsedClasses = ast.getAST();
 					rs.setup(parsedClasses);
 				}
@@ -93,7 +92,7 @@ public class INPluginRT extends INPluginPP
 	}
 
 	@Override
-	protected List<VDMMessage> interpreterInit()
+	protected List<VDMMessage> interpreterInit(boolean interactive)
 	{
 		if (logfile != null)
 		{
@@ -109,6 +108,6 @@ public class INPluginRT extends INPluginPP
     		}
 		}
 		
-		return super.interpreterInit();
+		return super.interpreterInit(interactive);
 	}
 }

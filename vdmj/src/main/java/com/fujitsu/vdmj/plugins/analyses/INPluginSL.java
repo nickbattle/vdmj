@@ -28,21 +28,16 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
-import com.fujitsu.vdmj.debug.ConsoleDebugReader;
-import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
-import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.Utils;
@@ -63,76 +58,6 @@ public class INPluginSL extends INPlugin
 		return null;
 	}
 
-	@Override
-	protected List<VDMMessage> interpreterInit()
-	{
-		try
-		{
-   			getInterpreter();
-   			ConsoleDebugReader dbg = null;
-   			ConsoleKeyWatcher watcher = null;
-
-   			try
-   			{
-   				if (interactive)
-   				{
-	   				dbg = new ConsoleDebugReader();
-	   				dbg.start();
-	   				watcher = new ConsoleKeyWatcher("init");
-	   				watcher.start();
-   				}
-   				
-   				interpreter.init();
-   			}
-   			finally
-   			{
-   				if (dbg != null)
-   				{
-   					dbg.interrupt();
-   				}
-   				
-   				if (watcher != null)
-   				{
-   					watcher.interrupt();
-   				}
-   			}
-
-   			if (defaultName != null)
-   			{
-   				interpreter.setDefaultName(defaultName);
-   			}
-		}
-		catch (ContextException e)
-		{
-			println("Initialization: " + e);
-			
-			if (e.isStackOverflow())
-			{
-				e.ctxt.printStackFrames(Console.out);
-			}
-			else
-			{
-				e.ctxt.printStackTrace(Console.out, true);
-			}
-			
-			return errsOf(e);
-		}
-		catch (Throwable e)
-		{
-			while (e instanceof InvocationTargetException)
-			{
-				e = (Exception)e.getCause();
-			}
-			
-			println("Initialization:");
-			println(e);
-
-			return errsOf(e);
-		}
-		
-		return null;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Collection<?>> T getIN()
@@ -140,14 +65,15 @@ public class INPluginSL extends INPlugin
 		return (T)inModuleList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ModuleInterpreter getInterpreter()
+	public <T extends Interpreter> T getInterpreter()
 	{
 		if (interpreter == null)
 		{
 			try
 			{
-				TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+				TCPlugin tc = registry.getPlugin("TC");
 				TCModuleList checkedModules = tc.getTC();
 				long before = System.currentTimeMillis();
 				inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
@@ -161,7 +87,7 @@ public class INPluginSL extends INPlugin
 			}
 		}
 		
-		return interpreter;
+		return (T)interpreter;
 	}
 
 	@Override

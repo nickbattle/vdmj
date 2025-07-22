@@ -69,8 +69,8 @@ import com.fujitsu.vdmj.plugins.events.StartConsoleEvent;
  */
 abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 {
-	protected boolean startInterpreter;		// eg. -e or -remote as well as -i
-	protected boolean interactive;			// eg. -i or -simulation
+	protected boolean startInterpreter;		// eg. -e, -cmd or -remote as well as -i
+	protected boolean interactive;			// eg. -i or -simulation, not -e or -cmd
 	protected String expression;			// eg. -e "f(1, 2)"
 	protected String commandline;			// eg. -cmd "qc -s fixed"
 	protected String remoteControlName;
@@ -96,6 +96,7 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		startInterpreter = false;
 		interactive = false;
 		expression = null;
+		commandline = null;
 		remoteControlName = null;
 		remoteSimulationName = null;
 		remoteClass = null;
@@ -226,11 +227,11 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 
 		if (remoteControlName != null)
 		{
-			remoteClass = getRemoteClass(remoteControlName);
+			remoteClass = findClass(remoteControlName);
 		}
 		else if (remoteSimulationName != null)
 		{
-			remoteSimulation = getRemoteClass(remoteSimulationName);
+			remoteSimulation = findClass(remoteSimulationName);
 			
 			try
 			{
@@ -249,8 +250,18 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		{
 			fail("Only one of: -i, -e, -cmd, -remote, -simulation");
 		}
-
+		
 		startInterpreter = true;
+	}
+	
+	public boolean startInterpreter()
+	{
+		return startInterpreter;
+	}
+	
+	public boolean isInteractive()
+	{
+		return interactive;
 	}
 	
 	@Override
@@ -286,29 +297,24 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 	abstract protected ExitStatus interpreterRun();
 
 	@SuppressWarnings("unchecked")
-	private static <T> T getRemoteClass(String remoteName)
+	private static <T> T findClass(String classname)
 	{
 		try
 		{
-			return (T) ClassLoader.getSystemClassLoader().loadClass(remoteName);
+			return (T) ClassLoader.getSystemClassLoader().loadClass(classname);
 		}
 		catch (ClassNotFoundException e)
 		{
-			fail("Cannot locate " + remoteName + " on the CLASSPATH");
+			fail("Cannot locate " + classname + " on the CLASSPATH");
 		}
 		catch (ClassCastException e)
 		{
-			fail(remoteName + " does not implement interface");
+			fail(classname + " does not implement interface");
 		}
 		
 		return null;
 	}
 
-	public boolean isInteractive()
-	{
-		return interactive;
-	}
-	
 	@Override
 	public AnalysisCommand getCommand(String line)
 	{

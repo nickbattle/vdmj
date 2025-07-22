@@ -28,14 +28,18 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.debug.ConsoleDebugReader;
+import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
@@ -43,6 +47,7 @@ import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 /**
@@ -50,8 +55,6 @@ import com.fujitsu.vdmj.runtime.Interpreter;
  */
 abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
-	protected boolean startInterpreter;		// eg. -e or -remote as well as -i
-	protected boolean interactive;			// eg. -i or -simulation
 	protected String defaultName;
 	protected String logfile;
 	
@@ -70,8 +73,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		startInterpreter = false;
-		interactive = false;
 		defaultName = null;
 		logfile = null;
 		
@@ -119,40 +120,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		{
 			switch(iter.next())
 			{
-				// The first five are also processed in CMDPlugin, so we
-				// don't remove them here, just skip any arguments.
-
-				case "-i":
-					setStartInterpreter();
-					interactive = true;
-					break;
-					
-				case "-e":
-					setStartInterpreter();
-					interactive = false;
-					if (iter.hasNext()) iter.next();	// skip arg
-					break;
-
-				case "-cmd":
-					setStartInterpreter();
-					interactive = false;
-					if (iter.hasNext()) iter.next();	// skip arg
-					break;
-
-	    		case "-remote":
-					setStartInterpreter();
-	    			interactive = false;
-					if (iter.hasNext()) iter.next();	// skip arg
-	    			break;
-	    			
-	    		case "-simulation":
-					setStartInterpreter();
-	    			interactive = true;
-					if (iter.hasNext()) iter.next();	// skip arg
-					break;
-
-				// The remaining arguments are processed here and removed
-
 				case "-default":
 					iter.remove();
 					
@@ -221,37 +188,22 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	private void setStartInterpreter()
-	{
-		if (startInterpreter)	// Already set?
-		{
-			fail("Only one of: -i, -e, -cmd, -remote, -simulation");
-		}
-
-		startInterpreter = true;
-	}
-	
 	@Override
 	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception
 	{
 		if (event instanceof CheckPrepareEvent)
 		{
-			CheckPrepareEvent pevent = (CheckPrepareEvent)event;
-			
-			if (pevent.getFiles().isEmpty() && !interactive)
-			{
-				fail("You did not identify any source files");
-			}
-
 			return interpreterPrepare();
 		}
 		else if (event instanceof CheckCompleteEvent)
 		{
-			if (startInterpreter)
+			CMDPlugin cmd = registry.getPlugin("CMD");
+
+			if (cmd.startInterpreter())
 			{
 				event.setProperty(AbstractCheckFilesEvent.TITLE, "Initialized");
 				event.setProperty(AbstractCheckFilesEvent.KIND, "init");
-				return interpreterInit();
+				return interpreterInit(cmd.isInteractive());
 			}
 			else
 			{
@@ -263,10 +215,77 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			throw new Exception("Unhandled event: " + event);
 		}
 	}
+
+	protected List<VDMMessage> interpreterInit(boolean interactive)
+	{
+		try
+		{
+   			Interpreter interpreter = getInterpreter();
+   			ConsoleDebugReader dbg = null;
+   			ConsoleKeyWatcher watcher = null;
+
+   			try
+   			{
+   				if (interactive)
+   				{
+	   				dbg = new ConsoleDebugReader();
+	   				dbg.start();
+	   				watcher = new ConsoleKeyWatcher("init");
+	   				watcher.start();
+   				}
+   				
+   				interpreter.init();
+   			}
+   			finally
+   			{
+   				if (dbg != null)
+   				{
+   					dbg.interrupt();
+   				}
+   				
+   				if (watcher != null)
+   				{
+   					watcher.interrupt();
+   				}
+   			}
+
+   			if (defaultName != null)
+   			{
+   				interpreter.setDefaultName(defaultName);
+   			}
+		}
+		catch (ContextException e)
+		{
+			println("Initialization: " + e);
+			
+			if (e.isStackOverflow())
+			{
+				e.ctxt.printStackFrames(Console.out);
+			}
+			else
+			{
+				e.ctxt.printStackTrace(Console.out, true);
+			}
+			
+			return errsOf(e);
+		}
+		catch (Throwable e)
+		{
+			while (e instanceof InvocationTargetException)
+			{
+				e = (Exception)e.getCause();
+			}
+			
+			println("Initialization:");
+			println(e);
+
+			return errsOf(e);
+		}
+		
+		return null;
+	}
 	
 	abstract protected List<VDMMessage> interpreterPrepare();
-
-	abstract protected List<VDMMessage> interpreterInit();
 
 	abstract public <T extends Interpreter> T getInterpreter();
 
