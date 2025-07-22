@@ -56,7 +56,6 @@ public class Conway implements RemoteControl
 		g.dispose();
 	}
 	
-	@SuppressWarnings("serial")
 	private static class Grid extends JFrame
 	{
 		private ValueSet data;
