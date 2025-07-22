@@ -29,7 +29,6 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.ExitStatus;
-import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
@@ -70,10 +69,9 @@ public class CMDPluginSL extends CMDPlugin
 					println(result);
 				}
 			}
-			else if (remoteClass != null)
+			else if (remoteInstance != null)
 			{
-				RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
-				remote.run(new RemoteInterpreter(interpreter));
+				remoteInstance.run(new RemoteInterpreter(interpreter));
 			}
 		}
 		catch (ContextException e)

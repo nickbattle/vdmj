@@ -75,8 +75,8 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 	protected String commandline;			// eg. -cmd "qc -s fixed"
 	protected String remoteControlName;
 	protected String remoteSimulationName;
-	protected Class<RemoteControl> remoteClass;
-	protected Class<RemoteSimulation> remoteSimulation;
+	protected RemoteControl remoteInstance;
+	protected RemoteSimulation simulationInstance;
 	
 	@Override
 	public String getName()
@@ -99,8 +99,6 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		commandline = null;
 		remoteControlName = null;
 		remoteSimulationName = null;
-		remoteClass = null;
-		remoteSimulation = null;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(StartConsoleEvent.class, this);
@@ -227,15 +225,22 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 
 		if (remoteControlName != null)
 		{
-			remoteClass = findClass(remoteControlName);
+			try
+			{
+				Class<RemoteControl> remoteClass = findClass(remoteControlName);
+				remoteInstance = remoteClass.getDeclaredConstructor().newInstance();
+			}
+			catch (Exception e)
+			{
+				fail("Cannot instantiate remote: " + e.getMessage());
+			}
 		}
 		else if (remoteSimulationName != null)
 		{
-			remoteSimulation = findClass(remoteSimulationName);
-			
 			try
 			{
-				remoteSimulation.getDeclaredConstructor().newInstance();
+				Class<RemoteSimulation> remoteSimulation = findClass(remoteSimulationName);
+				simulationInstance = remoteSimulation.getDeclaredConstructor().newInstance();
 			}
 			catch (Exception e)
 			{
