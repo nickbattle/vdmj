@@ -54,7 +54,6 @@ import com.fujitsu.vdmj.plugins.commands.LogCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
 import com.fujitsu.vdmj.plugins.commands.PluginsCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
-import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
 import com.fujitsu.vdmj.plugins.commands.ScriptCommand;
 import com.fujitsu.vdmj.plugins.commands.SetCommand;
