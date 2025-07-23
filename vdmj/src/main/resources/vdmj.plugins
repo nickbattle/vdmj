@@ -2,4 +2,5 @@ com.fujitsu.vdmj.plugins.analyses.ASTPlugin
 com.fujitsu.vdmj.plugins.analyses.TCPlugin
 com.fujitsu.vdmj.plugins.analyses.INPlugin
 com.fujitsu.vdmj.plugins.analyses.POPlugin
+com.fujitsu.vdmj.plugins.analyses.CTPlugin
 com.fujitsu.vdmj.plugins.analyses.CMDPlugin

@@ -348,14 +348,6 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 			case "latex":		return new LatexCommand(line);
 			case "word":		return new WordCommand(line);
 			case "save":		return new SaveCommand(line);
-			case "runtrace":
-			case "rt":
-			case "debugtrace":
-			case "dt":
-			case "runalltraces":
-			case "savetrace":
-			case "seedtrace":
-			case "filter":		return new RuntraceCommand(line);
 
 			default:
 				return null;
@@ -382,7 +374,6 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		);
 		
 		list.add(DebugCommand.help());
-		list.add(RuntraceCommand.help());
 		
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
