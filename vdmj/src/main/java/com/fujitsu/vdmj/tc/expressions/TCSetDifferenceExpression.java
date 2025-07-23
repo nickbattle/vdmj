@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -52,11 +53,13 @@ public class TCSetDifferenceExpression extends TCBinaryExpression
 		if (!ltype.isSet(location))
 		{
 			report(3160, "Left hand of '\\' is not a set");
+			ltype = new TCSetType(location, new TCUnknownType(location));
 		}
 
 		if (!rtype.isSet(location))
 		{
 			report(3161, "Right hand of '\\' is not a set");
+			rtype = new TCSetType(location, new TCUnknownType(location));
 		}
 
 		TCSetType sltype = ltype.getSet();

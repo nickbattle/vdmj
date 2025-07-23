@@ -24,6 +24,7 @@
 		<module>pdfreader</module>
 		<module>csvreader</module>
 		<module>simulation</module>
+		<module>remote</module>
 		<module>lspplugin</module>
 		<module>vdmjplugin</module>
 	</modules>

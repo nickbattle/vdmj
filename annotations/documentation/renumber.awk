@@ -3,6 +3,7 @@
 #
 # 1. Assumes four digit err numbers.
 # 2. Send the next number out on stderr at the end.
+# 3. See renumber.sh script.
 #
 
 BEGIN {

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -26,8 +26,6 @@ package com.fujitsu.vdmj.plugins.analyses;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import com.fujitsu.vdmj.RemoteSimulation;
@@ -35,13 +33,14 @@ import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 
 /**
- * VDM-RT IN plugin
+ * VDM-RT command line plugin
  */
-public class INPluginRT extends INPluginPP
+public class CMDPluginRT extends CMDPluginPP
 {
 	@Override
 	public void init()
@@ -62,7 +61,7 @@ public class INPluginRT extends INPluginPP
 			{
 				try
 				{
-					ASTPlugin ast = registry.getPlugin("AST");
+					ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 					ASTClassList parsedClasses = ast.getAST();
 					rs.setup(parsedClasses);
 				}
@@ -89,25 +88,5 @@ public class INPluginRT extends INPluginPP
 		{
 			return super.handleEvent(event);
 		}
-	}
-
-	@Override
-	protected List<VDMMessage> interpreterInit(boolean interactive)
-	{
-		if (logfile != null)
-		{
-    		try
-    		{
-    			RTLogger.setLogfileName(new File(logfile));
-    			printf("Writing RT events to %s\n", logfile);
-    		}
-    		catch (FileNotFoundException e)
-    		{
-    			printf("Cannot create RT event log: %s\n", e.getMessage());
-    			return errsOf(e);
-    		}
-		}
-		
-		return super.interpreterInit(interactive);
 	}
 }

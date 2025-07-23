@@ -25,31 +25,20 @@
 package com.fujitsu.vdmj.plugins.analyses;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
-import com.fujitsu.vdmj.ExitStatus;
-import com.fujitsu.vdmj.RemoteControl;
-import com.fujitsu.vdmj.RemoteInterpreter;
-import com.fujitsu.vdmj.debug.ConsoleDebugReader;
-import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.CommandReader;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
-import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -69,136 +58,6 @@ public class INPluginPP extends INPlugin
 		return null;
 	}
 
-	@Override
-	protected List<VDMMessage> interpreterInit()
-	{
-		try
-		{
-   			getInterpreter();
-   			ConsoleDebugReader dbg = null;
-   			ConsoleKeyWatcher watcher = null;
-
-   			try
-   			{
-   				if (interactive)
-   				{
-	   				dbg = new ConsoleDebugReader();
-	   				dbg.start();
-	   				watcher = new ConsoleKeyWatcher("init");
-	   				watcher.start();
-   				}
-   				
-   				interpreter.init();
-   			}
-   			finally
-   			{
-   				if (dbg != null)
-   				{
-   					dbg.interrupt();
-   				}
-   				
-   				if (watcher != null)
-   				{
-   					watcher.interrupt();
-   				}
-   			}
-
-   			if (defaultName != null)
-   			{
-   				interpreter.setDefaultName(defaultName);
-   			}
-		}
-		catch (ContextException e)
-		{
-			println("Initialization: " + e);
-			
-			if (e.isStackOverflow())
-			{
-				e.ctxt.printStackFrames(Console.out);
-			}
-			else
-			{
-				e.ctxt.printStackTrace(Console.out, true);
-			}
-			
-			return errsOf(e);
-		}
-		catch (Throwable e)
-		{
-			while (e instanceof InvocationTargetException)
-			{
-				e = (Exception)e.getCause();
-			}
-			
-			println("Initialization:");
-			println(e);
-
-			return errsOf(e);
-		}
-		
-		return null;
-	}
-	
-	@Override
-	protected ExitStatus interpreterRun()
-	{
-		try
-		{
-			if (interactive)
-			{
-				infoln("Interpreter started");
-				return new CommandReader().run();
-			}
-			else if (expression != null)
-			{
-				println(interpreter.execute(expression));
-			}
-			else if (commandline != null)
-			{
-				AnalysisCommand command = AnalysisCommand.parse(commandline);
-				String result = command.run(commandline);
-				
-				if (result != null)
-				{
-					println(result);
-				}
-			}
-			else if (remoteClass != null)
-			{
-				RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
-				remote.run(new RemoteInterpreter(interpreter));
-			}
-		}
-		catch (ContextException e)
-		{
-			println("Execution: " + e);
-
-			if (e.isStackOverflow())
-			{
-				e.ctxt.printStackFrames(Console.out);
-			}
-			else
-			{
-				e.ctxt.printStackTrace(Console.out, true);
-			}
-
-			return ExitStatus.EXIT_ERRORS;
-		}
-		catch (Throwable e)
-		{
-			while (e instanceof InvocationTargetException)
-			{
-				e = (Exception)e.getCause();
-			}
-			
-			println("Execution:");
-			println(e);
-			return ExitStatus.EXIT_ERRORS;
-		}
-		
-		return ExitStatus.EXIT_OK;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Collection<?>> T getIN()
@@ -206,14 +65,15 @@ public class INPluginPP extends INPlugin
 		return (T)inClassList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ClassInterpreter getInterpreter()
+	public <T extends Interpreter> T getInterpreter()
 	{
 		if (interpreter == null)
 		{
 			try
 			{
-				TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+				TCPlugin tc = registry.getPlugin("TC");
 				TCClassList checkedClasses = tc.getTC();
 				long before = System.currentTimeMillis();
 				inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedClasses);
@@ -227,7 +87,7 @@ public class INPluginPP extends INPlugin
 			}
 		}
 		
-		return interpreter;
+		return (T)interpreter;
 	}
 
 	@Override
