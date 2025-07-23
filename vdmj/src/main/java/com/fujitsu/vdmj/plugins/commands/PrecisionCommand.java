@@ -34,7 +34,9 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class PrecisionCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: precision [<n>]";
+	private final static String CMD = "precision [<n>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - set arithmetic precision";
 	
 	public PrecisionCommand(String line)
 	{

@@ -53,6 +53,7 @@ import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.LogCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
 import com.fujitsu.vdmj.plugins.commands.PluginsCommand;
+import com.fujitsu.vdmj.plugins.commands.PrecisionCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
@@ -356,6 +357,7 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 			case "savetrace":
 			case "seedtrace":
 			case "filter":		return new RuntraceCommand(line);
+			case "precision":	return new PrecisionCommand(line);
 
 			default:
 				return null;
@@ -378,7 +380,8 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 			CoverageCommand.HELP,
 			LatexCommand.HELP,
 			WordCommand.HELP,
-			SaveCommand.HELP
+			SaveCommand.HELP,
+			PrecisionCommand.HELP
 		);
 		
 		list.add(DebugCommand.help());
