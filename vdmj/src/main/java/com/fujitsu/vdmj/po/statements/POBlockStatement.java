@@ -118,6 +118,8 @@ public class POBlockStatement extends POSimpleBlockStatement
 		{
 			POContext item = ctxt.get(sp);
 			
+			// TODO handle POAltContext blocks here too!
+			
 			if (item instanceof POAssignmentContext)
 			{
 				POAssignmentContext actxt = (POAssignmentContext)item;
