@@ -114,7 +114,7 @@ public class POBlockStatement extends POSimpleBlockStatement
 			toDelete.add(dcls);
 		}
 		
-		for (int sp = dcls + 1; sp < ctxt.size(); sp++)
+		for (int sp = dcls; sp < ctxt.size(); sp++)
 		{
 			POContext item = ctxt.get(sp);
 			

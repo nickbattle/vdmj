@@ -211,7 +211,7 @@ public class POExplicitOperationDefinition extends PODefinition
 
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 			{
-				obligations.add(new OperationPostConditionObligation(this, ctxt));
+				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 			}
 			
 			ctxt.popTo(popto);
