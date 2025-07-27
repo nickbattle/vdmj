@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
-public class POExitContext extends POReturnContext
+public class POExitContext extends POEndContext
 {
 	private final POExpression expression;
 

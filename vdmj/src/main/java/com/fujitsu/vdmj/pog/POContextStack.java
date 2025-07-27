@@ -103,10 +103,10 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
-		return getAlternatives(true);	// exclude return paths by default
+		return getAlternatives(true);	// exclude ending paths by default
 	}
 	
-	public List<POContextStack> getAlternatives(boolean excludeReturns)
+	public List<POContextStack> getAlternatives(boolean excludeEnds)
 	{
 		List<POContextStack> results = new Vector<POContextStack>();
 		results.add(new POContextStack());
@@ -120,7 +120,7 @@ public class POContextStack extends Stack<POContext>
 				
 				for (POContextStack substack: alt.alternatives)
 				{
-					for (POContextStack alternative: substack.getAlternatives(excludeReturns))
+					for (POContextStack alternative: substack.getAlternatives(excludeEnds))
 					{
 						for (POContextStack original: results)
 						{
@@ -137,13 +137,13 @@ public class POContextStack extends Stack<POContext>
 			}
 			else
 			{
-				if (ctxt instanceof POReturnContext)	// Includes POExitContext
+				if (ctxt instanceof POEndContext)	// Includes POReturnContext, POExitContext
 				{
 					// This stack plays no part in further obligations, including any
 					// alternatives it contains. So immediately return nothing if we
-					// are excluding paths that return.
+					// are excluding paths that end.
 					
-					if (excludeReturns)
+					if (excludeEnds)
 					{
 						return new Vector<POContextStack>();
 					}
@@ -153,9 +153,9 @@ public class POContextStack extends Stack<POContext>
 
 				for (POContextStack choice: results)
 				{
-					if (!choice.isEmpty() && choice.lastElement() instanceof POReturnContext)
+					if (!choice.isEmpty() && choice.lastElement() instanceof POEndContext)
 					{
-						continue;	// skip this choice, as it has already returned
+						continue;	// skip this choice, as it has already ended
 					}
 					
 					choice.add(ctxt);

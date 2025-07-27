@@ -24,36 +24,18 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.patterns.POPattern;
-
-public class POReturnContext extends POEndContext
+public class POEndContext extends POContext
 {
-	public final POPattern pattern;
-	public final POExpression result;
-	
-	public POReturnContext(POPattern pattern, POExpression result)
+	public POEndContext()
 	{
-		this.pattern = pattern;
-		this.result = result;
-	}
-	
-	public POReturnContext()
-	{
-		this.pattern = null;
-		this.result = null;
+		// Indicates that this path is complete. Extended by POReturnContext and
+		// POExitContext, but also used in loop invariant processing to separate
+		// loop body behaviour from what follows the loop.
 	}
 
 	@Override
 	public String getSource()
 	{
-		if (result != null)
-		{
-			return "let " + pattern + " = " + result + " in";
-		}
-		else
-		{
-			return "";
-		}
+		return "";
 	}
 }
