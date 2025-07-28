@@ -55,6 +55,17 @@ public class POAltContext extends POContext
 		alternatives.add(stack);
 		return stack;
 	}
+
+	/**
+	 * Add a list of specific context stacks to the list of alternatives.
+	 */
+	public void addAll(List<POContextStack> paths)
+	{
+		for (POContextStack path: paths)
+		{
+			add(path);
+		}
+	}
 	
 	/**
 	 * Create an empty context stack and add it to the alternatives, then return

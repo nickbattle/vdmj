@@ -138,12 +138,7 @@ public class POWhileStatement extends POStatement
 		 */
 		POContextStack stack = new POContextStack();
 		ctxt.popInto(popto, stack);
-		POAltContext reduced = stack.reduce();
-
-		if (reduced != null)	// ie. there are some return paths
-		{
-			altCtxt.add().add(reduced);
-		}
+		altCtxt.addAll(stack.reduce());
 
 		/**
 		 * The context stack beyond the loop just contains the loop invariant and failed loop condition,

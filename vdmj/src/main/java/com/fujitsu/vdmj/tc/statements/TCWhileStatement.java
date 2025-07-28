@@ -86,25 +86,33 @@ public class TCWhileStatement extends TCStatement
 
 		TCType stype = statement.typeCheck(qenv, scope, constraint, mandatory);
 		
-		if (exp instanceof TCBooleanLiteralExpression && stype instanceof TCUnionType)
+		if (exp instanceof TCBooleanLiteralExpression)
 		{
-			TCBooleanLiteralExpression ble = (TCBooleanLiteralExpression)exp;
-			
-			if (ble.value.value)	// while true do...
+			if (stype instanceof TCUnionType)
 			{
-				TCTypeSet edited = new TCTypeSet();
-				TCUnionType original = (TCUnionType)stype;
+				TCBooleanLiteralExpression ble = (TCBooleanLiteralExpression)exp;
 				
-				for (TCType t: original.types)
+				if (ble.value.value)	// while true do...
 				{
-					if (!(t instanceof TCVoidType))
+					TCTypeSet edited = new TCTypeSet();
+					TCUnionType original = (TCUnionType)stype;
+					
+					for (TCType t: original.types)
 					{
-						edited.add(t);
+						if (!(t instanceof TCVoidType))
+						{
+							edited.add(t);
+						}
 					}
+					
+					stype = new TCUnionType(stype.location, edited);
 				}
-				
-				stype = new TCUnionType(stype.location, edited);
 			}
+		}
+		else
+		{
+			// The while condition may never be true, so all while loops can also return void.
+			stype = new TCUnionType(location, stype, new TCVoidType(location));
 		}
 		
 		return setType(stype);

@@ -543,7 +543,7 @@ public class POContextStack extends Stack<POContext>
 	 * loop processing to remove paths from the body, unless they are needed for
 	 * postconditions on every "return".
 	 */
-	public POAltContext reduce()
+	public List<POContextStack> reduce()
 	{
 		List<POContextStack> paths = this.getAlternatives(false);		// Include returns
 		Iterator<POContextStack> iter = paths.iterator();
@@ -558,13 +558,6 @@ public class POContextStack extends Stack<POContext>
 			}
 		}
 
-		if (paths.isEmpty())	// Nothing returned
-		{
-			return null;
-		}
-		else
-		{
-			return new POAltContext(paths);
-		}
+		return paths;
 	}
 }
