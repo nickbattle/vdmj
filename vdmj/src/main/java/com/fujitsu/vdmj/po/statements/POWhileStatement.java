@@ -92,7 +92,7 @@ public class POWhileStatement extends POStatement
 		{
 			int popto = ctxt.size();
 
-			if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
+			ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 			ctxt.push(new POImpliesContext(invariant, this.exp));		// while invariant && C => ...
 			ctxt.push(new POLetDefContext(measure.getDefinition()));	// let loop_measure_n = <exp> in ...
 
@@ -118,13 +118,13 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before while condition");
 		
-		ctxt.push(new POImpliesContext(this.exp));								// while C => ...
+		ctxt.push(new POImpliesContext(this.exp));					// while C => ...
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before each while body");
 		ctxt.pop();
 
-		if (!updates.isEmpty())	ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-		ctxt.push(new POImpliesContext(invariant, this.exp));					// invariant && while C => ...
+		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
+		ctxt.push(new POImpliesContext(invariant, this.exp));		// invariant && while C => ...
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant after each while body");
@@ -145,9 +145,9 @@ public class POWhileStatement extends POStatement
 		 * unless there are return paths from the above.
 		 */
 		POExpression negated = new PONotExpression(location, this.exp);
-		if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-		ctxt.push(new POImpliesContext(invariant, negated));
-		ctxt.popInto(popto, altCtxt.add());		// invariant && not C => ...
+		ctxt.push(new POForAllContext(updates, env));			// forall <changed variables>
+		ctxt.push(new POImpliesContext(invariant, negated));	// invariant && not C => ...
+		ctxt.popInto(popto, altCtxt.add());
 
 		// The two alternatives in one added.
 		ctxt.push(altCtxt);
@@ -158,7 +158,7 @@ public class POWhileStatement extends POStatement
 	/**
 	 * Create the missing @LoopInvariant for substitution into the POs by name.
 	 * 
-	 *   (-- Missing @LoopInvariant at 9:9
+	 *   (-- Missing @LoopInvariant, assuming true at 9:9
 	 *     (let $LoopInvariant : bool = true in
 	 *       ($LoopInvariant and (condition) =>
 	 */
