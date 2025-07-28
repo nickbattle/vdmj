@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 
-public class POReturnContext extends POEndContext
+public class POReturnContext extends POContext
 {
 	public final POPattern pattern;
 	public final POExpression result;
@@ -42,6 +42,12 @@ public class POReturnContext extends POEndContext
 	{
 		this.pattern = null;
 		this.result = null;
+	}
+
+	@Override
+	public boolean returnsEarly()
+	{
+		return true;
 	}
 
 	@Override

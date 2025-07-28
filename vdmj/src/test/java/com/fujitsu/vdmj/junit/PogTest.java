@@ -158,17 +158,17 @@ public class PogTest extends TestCase
 		/* 87 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    ((m(1) < 10) =>\n      1 in set dom m)))\n",
 		/* 88 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (1 = i => \n    (not (m(1) < 10) =>\n      2 in set dom m)))\n",
 		/* 89 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (not 1 = i =>\n    (2 = i => \n      3 in set dom m)))\n",
-		/* 90 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant at 225:9\n      true)))\n",
-		/* 91 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant at 225:9\n      ((x > 0) =>\n        true))))\n",
-		/* 92 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant at 225:9\n      (forall iv:int &\n        (true and (x > 0) =>\n          (let iv : int = (iv + 1) in\n            (iv < 10)))))))\n",
-		/* 93 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant at 225:9\n      (forall iv:int &\n        (true and (x > 0) =>\n          (let iv : int = (iv + 1) in\n            true))))))\n"
+		/* 90 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        $LoopInvariant))))\n",
+		/* 91 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        ((x > 0) =>\n          $LoopInvariant)))))\n",
+		/* 92 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              (iv < 10))))))))\n",
+		/* 93 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              $LoopInvariant)))))))\n"
 	};
 	
 	private String[] expectedSL =
 	{
 		/* 1 */ "(forall z:nat, oldSigma:Sigma &\n  is_(pre_op1(z, oldSigma), bool))\n",
 		/* 2 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma & pre_op1(z, mk_Sigma(sv, xv, si, sr)) =>\n  ((z > 10) =>\n    (let sv : nat = z in\n      (let sv : nat = (sv * 2) in\n        sv <> 0))))\n",
-		/* 3 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let a : nat = 0 in\n    (let a : nat = (a + 1) in\n      (let b : nat = (a + 1) in\n        (let sv : nat = b in\n          sv <> 0)))))\n",
+		/* 3 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let a : nat = 0 in\n    (let a : nat = (a + 1) in\n      (let b : nat = (a + 1) in\n        (let sv : nat = b in\n          (let c : nat = (a + 2) in\n            (let c : nat = (c + 1) in\n              sv <> 0)))))))\n",
 		/* 4 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  1 in set inds sr)\n",
 		/* 5 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sr : seq of R = (sr ++ {1 |-> mu(sr(1), size |-> 456)}) in\n    1 in set inds sr))\n",
 		/* 6 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sr : seq of R = (sr ++ {1 |-> mu(sr(1), size |-> 456)}) in\n    (sr(1).size) <> 0))\n",
@@ -183,10 +183,10 @@ public class PogTest extends TestCase
 		/* 15 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let RESULT = xv in\n          (RESULT > (xv$ + sv$)))))))\n",
 		/* 16 */ "(forall a:nat, r:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7b(a, r, oldSigma, Sigma), bool))\n",
 		/* 17 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let r = xv in\n          (r > (xv$ + sv$)))))))\n",
-		/* 18 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant at 123:7\n        true))))\n",
-		/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant at 123:7\n        ((si <> []) =>\n          true)))))\n",
-		/* 20 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant at 123:7\n        (forall si:seq of (int), count:int &\n          (true and (si <> []) =>\n            si <> []))))))\n",
-		/* 21 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant at 123:7\n        (forall si:seq of (int), count:int &\n          (true and (si <> []) =>\n            (let si : seq of int = (tl si) in\n              (let count : int = (count + 1) in\n                true))))))))\n",
+		/* 18 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          $LoopInvariant)))))\n",
+		/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          ((si <> []) =>\n            $LoopInvariant))))))\n",
+		/* 20 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          (forall si:seq of (int), count:int &\n            ($LoopInvariant and (si <> []) =>\n              si <> [])))))))\n",
+		/* 21 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          (forall si:seq of (int), count:int &\n            ($LoopInvariant and (si <> []) =>\n              (let si : seq of int = (tl si) in\n                (let count : int = (count + 1) in\n                  $LoopInvariant)))))))))\n",
 		/* 22 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous bang throws exceptions, affects (si, sv, xv, sr)? at 135:9\n    a <> 0))\n",
 		/* 23 */ "(forall a:real, r:real, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op10(a, r, oldSigma, Sigma), bool))\n",
 		/* 24 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      is_nat((a + 1)))))\n",

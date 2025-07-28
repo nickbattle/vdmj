@@ -175,4 +175,13 @@ abstract public class POContext
 	{
 		return null;	// See fn/op definition contexts
 	}
+
+	/**
+	 * True if this context causes the flow of control to abort, currently overridden
+	 * for POReturnContext and POExitContexts.
+	 */
+	public boolean returnsEarly()
+	{
+		return false;
+	}
 }

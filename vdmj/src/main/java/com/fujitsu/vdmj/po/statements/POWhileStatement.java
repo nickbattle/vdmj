@@ -29,12 +29,16 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.annotations.POLoopMeasureAnnotation;
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.LoopMeasureObligation;
+import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POCommentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
@@ -43,6 +47,8 @@ import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
@@ -97,13 +103,17 @@ public class POWhileStatement extends POStatement
 			ctxt.popTo(popto);
 		}
 		
-		int popto = ctxt.size();
+		POAltContext altCtxt = new POAltContext();
 
 		if (invariant == null)
 		{
-			ctxt.push(new POCommentContext("Missing @LoopInvariant", location));
-			invariant = new POBooleanLiteralExpression(new LexBooleanToken(true, location));
+			ctxt.push(new POCommentContext("Missing @LoopInvariant, assuming true", location));
+			PODefinition loopinv = getLoopInvDef();
+			ctxt.push(new POLetDefContext(loopinv));
+			invariant = new POVariableExpression(loopinv.name, loopinv);
 		}
+
+		int popto = ctxt.size();	// Includes missing invariant above
 
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before while condition");
@@ -119,13 +129,50 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant after each while body");
 
-		// Leave implication for following POs
-		ctxt.popTo(popto);
+		/**
+		 * The context stack now contains everything from the statement block, but we want to
+		 * suppress this, since context beyond the loop only includes the invariant statement and
+		 * the failed loop condition. But we can't just discard it, because it may include some
+		 * returns, which are subsequently needed by postcondition checks. So we extract the substack,
+		 * and reduce it to just the paths with returnsEarly().
+		 */
+		POContextStack stack = new POContextStack();
+		ctxt.popInto(popto, stack);
+		POAltContext reduced = stack.reduce();
+
+		if (reduced != null)	// ie. there are some return paths
+		{
+			altCtxt.add().add(reduced);
+		}
+
+		/**
+		 * The context stack beyond the loop just contains the loop invariant and failed loop condition,
+		 * unless there are return paths from the above.
+		 */
 		POExpression negated = new PONotExpression(location, this.exp);
 		if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));	// forall <changed variables>
-		ctxt.push(new POImpliesContext(invariant, negated));					// invariant && not C => ...
+		ctxt.push(new POImpliesContext(invariant, negated));
+		ctxt.popInto(popto, altCtxt.add());		// invariant && not C => ...
+
+		// The two alternatives in one added.
+		ctxt.push(altCtxt);
 
 		return obligations;
+	}
+
+	/**
+	 * Create the missing @LoopInvariant for substitution into the POs by name.
+	 * 
+	 *   (-- Missing @LoopInvariant at 9:9
+	 *     (let $LoopInvariant : bool = true in
+	 *       ($LoopInvariant and (condition) =>
+	 */
+	private PODefinition getLoopInvDef()
+	{
+		TCNameToken invname = new TCNameToken(location, location.module, "$LoopInvariant");
+		POExpression invvalue = new POBooleanLiteralExpression(new LexBooleanToken(true, location));
+		TCBooleanType BOOL = new TCBooleanType(location);
+		return new POAssignmentDefinition(invname, BOOL, invvalue, BOOL);
 	}
 
 	@Override

@@ -26,13 +26,19 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
-public class POExitContext extends POEndContext
+public class POExitContext extends POContext
 {
 	private final POExpression expression;
 
 	public POExitContext(POExpression expression)
 	{
 		this.expression = expression;
+	}
+
+	@Override
+	public boolean returnsEarly()
+	{
+		return true;
 	}
 	
 	@Override

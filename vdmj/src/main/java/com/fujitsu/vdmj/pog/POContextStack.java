@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
@@ -106,7 +107,7 @@ public class POContextStack extends Stack<POContext>
 		return getAlternatives(true);	// exclude ending paths by default
 	}
 	
-	public List<POContextStack> getAlternatives(boolean excludeEnds)
+	public List<POContextStack> getAlternatives(boolean excludeReturns)
 	{
 		List<POContextStack> results = new Vector<POContextStack>();
 		results.add(new POContextStack());
@@ -120,7 +121,7 @@ public class POContextStack extends Stack<POContext>
 				
 				for (POContextStack substack: alt.alternatives)
 				{
-					for (POContextStack alternative: substack.getAlternatives(excludeEnds))
+					for (POContextStack alternative: substack.getAlternatives(excludeReturns))
 					{
 						for (POContextStack original: results)
 						{
@@ -137,23 +138,23 @@ public class POContextStack extends Stack<POContext>
 			}
 			else
 			{
-				if (ctxt instanceof POEndContext)	// Includes POReturnContext, POExitContext
+				if (ctxt.returnsEarly())
 				{
 					// This stack plays no part in further obligations, including any
 					// alternatives it contains. So immediately return nothing if we
-					// are excluding paths that end.
+					// are excluding paths that end before they reach the current location.
 					
-					if (excludeEnds)
+					if (excludeReturns)
 					{
 						return new Vector<POContextStack>();
 					}
-					
+
 					// Else add it as usual...
 				}
 
 				for (POContextStack choice: results)
 				{
-					if (!choice.isEmpty() && choice.lastElement() instanceof POEndContext)
+					if (choice.returnsEarly())
 					{
 						continue;	// skip this choice, as it has already ended
 					}
@@ -483,7 +484,7 @@ public class POContextStack extends Stack<POContext>
 	private String indentNewLines(String line, String indent)
 	{
 		StringBuilder sb = new StringBuilder();
-		String[] parts = line.split("\n\\s*");
+		String[] parts = line.split("\\n\\s*");
 		String prefix = "";
 
 		for (int i=0; i<parts.length; i++)
@@ -523,5 +524,47 @@ public class POContextStack extends Stack<POContext>
 		}
 
 		return expected;
+	}
+
+	private boolean returnsEarly()
+	{
+		if (isEmpty())
+		{
+			return false;
+		}
+		else
+		{
+			return lastElement().returnsEarly();
+		}
+	}
+
+	/**
+	 * Reduce this stack to just those paths which returnsEarly(). This is used in
+	 * loop processing to remove paths from the body, unless they are needed for
+	 * postconditions on every "return".
+	 */
+	public POAltContext reduce()
+	{
+		List<POContextStack> paths = this.getAlternatives(false);		// Include returns
+		Iterator<POContextStack> iter = paths.iterator();
+
+		while (iter.hasNext())
+		{
+			POContextStack path = iter.next();
+
+			if (!path.returnsEarly())
+			{
+				iter.remove();
+			}
+		}
+
+		if (paths.isEmpty())	// Nothing returned
+		{
+			return null;
+		}
+		else
+		{
+			return new POAltContext(paths);
+		}
 	}
 }
