@@ -60,6 +60,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class POForAllStatement extends POStatement
 {
@@ -137,7 +138,7 @@ public class POForAllStatement extends POStatement
 		}
 
 		tcdefs.add(new TCLocalDefinition(location, ghostName, ghostDef.type));
-		Environment local = new FlatCheckedEnvironment(tcdefs, env, null);
+		Environment local = new FlatCheckedEnvironment(tcdefs, env, NameScope.NAMES);
 		updates.addAll(pattern.getVariableNames());
 		updates.add(ghostName);
 

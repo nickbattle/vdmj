@@ -46,7 +46,7 @@ public class POMultipleTypeBind extends POMultipleBind
 	@Override
 	public String toString()
 	{
-		return plist + ":" + type;
+		return plist + ":" + type.toExplicitString(location);
 	}
 
 	@Override

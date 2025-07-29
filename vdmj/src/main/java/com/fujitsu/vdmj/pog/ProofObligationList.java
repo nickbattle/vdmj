@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
@@ -233,11 +234,19 @@ public class ProofObligationList extends Vector<ProofObligation>
 			env = new FlatEnvironment(getTypeParamDefinitions(obligation), env);
 		}
 		
-		TCType potype = tcexp.typeCheck(env, null, NameScope.NAMESANDANYSTATE, null);
-		
-		if (!potype.isType(TCBooleanType.class, obligation.location))
+		try
 		{
-			throw new ParserException(2336, "POG: Obligation is not boolean?", obligation.location, 0);
+			TCType potype = tcexp.typeCheck(env, null, NameScope.NAMESANDANYSTATE, null);
+			
+			if (!potype.isType(TCBooleanType.class, obligation.location))
+			{
+				throw new ParserException(2336, "POG: Obligation is not boolean?", obligation.location, 0);
+			}
+		}
+		catch (TypeCheckException e)
+		{
+			// Convert exceptions to reported errors, so we can report them below.
+			TypeChecker.report(2336, "POG: " + e.getMessage(), e.location);
 		}
 		
 		// Weed out errors that we can cope with
