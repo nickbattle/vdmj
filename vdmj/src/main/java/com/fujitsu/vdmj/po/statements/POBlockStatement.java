@@ -79,26 +79,10 @@ public class POBlockStatement extends POSimpleBlockStatement
 
 			ctxt.pushAt(new POAssignmentContext(assignmentDefs));
 			obligations.addAll(super.getProofObligations(ctxt, dclState, locals));
-			
-			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
-			// assignments to outer state within the block, since the dcls/lets are needed
-			// in any POs relating to those updated state values.
-			
-			// cleanStack(ctxt, dclState, dcls);
-			
-			// The dclState goes out of scope here and its localUpdates have no further
-			// effect. But updates made to locals in outer scopes will still be available.
 		}
 		else
 		{
-			// int base = ctxt.size();
 			obligations.addAll(super.getProofObligations(ctxt, pogState, env));
-			
-			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
-			// return values, since the lets may be needed in the postcondition.
-			
-			// POGState dclState = pogState.getLink();		// empty dcls
-			// cleanStack(ctxt, dclState, base);
 		}
 
 		return obligations;

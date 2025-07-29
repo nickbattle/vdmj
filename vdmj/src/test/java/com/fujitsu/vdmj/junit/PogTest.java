@@ -180,9 +180,9 @@ public class PogTest extends TestCase
 		/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (-- Ambiguous operation call to call, affects (si, sv, xv, sr)? at 84:21\n      sv <> 0)))\n",
 		/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
 		/* 14 */ "(forall a:nat, RESULT:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7a(a, RESULT, oldSigma, Sigma), bool))\n",
-		/* 15 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let RESULT = xv in\n          (RESULT > (xv$ + sv$)))))))\n",
+		/* 15 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let RESULT : nat = xv in\n          (RESULT > (xv$ + sv$)))))))\n",
 		/* 16 */ "(forall a:nat, r:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7b(a, r, oldSigma, Sigma), bool))\n",
-		/* 17 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let r = xv in\n          (r > (xv$ + sv$)))))))\n",
+		/* 17 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let r : nat = xv in\n          (r > (xv$ + sv$)))))))\n",
 		/* 18 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          $LoopInvariant)))))\n",
 		/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          ((si <> []) =>\n            $LoopInvariant))))))\n",
 		/* 20 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          (forall si:seq of (int), count:int &\n            ($LoopInvariant and (si <> []) =>\n              si <> [])))))))\n",
@@ -192,7 +192,7 @@ public class PogTest extends TestCase
 		/* 24 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      is_nat((a + 1)))))\n",
 		/* 25 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        sv <> 0))))\n",
 		/* 26 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    ((a > 10) =>\n      (-- Throws exception 123\n        (sv > sv$)))))\n",
-		/* 27 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r = (1 / sv) in\n          (sv > sv$))))))\n"
+		/* 27 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r : real = (1 / sv) in\n          (sv > sv$))))))\n"
 	};
 
 	private String[] expectedLoops =

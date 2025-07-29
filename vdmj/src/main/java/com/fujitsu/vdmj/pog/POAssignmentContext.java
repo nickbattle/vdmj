@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
+import com.fujitsu.vdmj.po.types.visitors.DefaultExpressionCreator;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
@@ -62,20 +63,25 @@ public class POAssignmentContext extends POContext
 		this.pattern = null;
 		this.type = null;
 		this.expression = null;
+
+		DefaultExpressionCreator dvc = new DefaultExpressionCreator();
 		
 		/**
 		 * Filter out things like "dcl x:nat;", which become "let x : nat = (undefined) in"?
 		 * These type check, but they are a problem for QuickCheck and some more complex cases
-		 * do get confused by missing variables.
+		 * do get confused by missing variables. So we add a default expression value here.
 		 */
 		for (PODefinition def: assignmentDefs)
 		{
 			POAssignmentDefinition adef = (POAssignmentDefinition) def;
 
-			if (!(adef.expression instanceof POUndefinedExpression))
+			if (adef.expression instanceof POUndefinedExpression)
 			{
-				this.assignmentDefs.add(adef);
+				POExpression exp = adef.type.apply(dvc, null);
+				adef = new POAssignmentDefinition(adef.name, adef.type, exp, adef.expType);
 			}
+			
+			this.assignmentDefs.add(adef);
 		}
 	}
 

@@ -182,7 +182,7 @@ public class POContextStack extends Stack<POContext>
 				names.add(result);
 				
 				push(new POAmbiguousContext("operation call", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 			}
 			else
 			{
@@ -200,7 +200,7 @@ public class POContextStack extends Stack<POContext>
 				names.add(result);
 				
 				push(new POAmbiguousContext(opname + " throws exceptions", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 			}
 			else
 			{
@@ -250,7 +250,7 @@ public class POContextStack extends Stack<POContext>
 					names.add(result);
 					
 					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 				}
 				else
 				{
@@ -267,7 +267,7 @@ public class POContextStack extends Stack<POContext>
 					names.add(result);
 					
 					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 				}
 				else
 				{
