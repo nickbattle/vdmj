@@ -64,21 +64,28 @@ public class POAssignmentContext extends POContext
 		this.type = null;
 		this.expression = null;
 
+		/**
+		 * Filter out things like "dcl x:nat;", which become "let x : nat = (undefined) in".
+		 * These type check, but they are a problem for QuickCheck and some more complex cases
+		 * get confused by missing variables. So we add a default expression value here.
+		 */
 		DefaultExpressionCreator dvc = new DefaultExpressionCreator();
 		
-		/**
-		 * Filter out things like "dcl x:nat;", which become "let x : nat = (undefined) in"?
-		 * These type check, but they are a problem for QuickCheck and some more complex cases
-		 * do get confused by missing variables. So we add a default expression value here.
-		 */
 		for (PODefinition def: assignmentDefs)
 		{
 			POAssignmentDefinition adef = (POAssignmentDefinition) def;
 
 			if (adef.expression instanceof POUndefinedExpression)
 			{
-				POExpression exp = adef.type.apply(dvc, null);
-				adef = new POAssignmentDefinition(adef.name, adef.type, exp, adef.expType);
+				try
+				{
+					POExpression exp = adef.type.apply(dvc, null);
+					adef = new POAssignmentDefinition(adef.name, adef.type, exp, adef.expType);
+				}
+				catch (Exception e)
+				{
+					// Something we can't default... so just leave as undefined.
+				}
 			}
 			
 			this.assignmentDefs.add(adef);

@@ -72,6 +72,11 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
+/**
+ * A visitor to analyse a type and return a POExpression that is a valid default
+ * value of that type. For example, a "nat1" type might have an expression of "0"
+ * as a POIntegerLiteralExpression.
+ */
 public class DefaultExpressionCreator extends TCTypeVisitor<POExpression, Object>
 {
 	private final LexLocation location;
@@ -263,8 +268,6 @@ public class DefaultExpressionCreator extends TCTypeVisitor<POExpression, Object
 	{
 		POExpressionList values = new POExpressionList();
 		TCTypeList types = new TCTypeList();
-		values.add(node.setof.apply(this, null));
-		types.add(node.setof);
 		return new POSetEnumExpression(location, values, types);
 	}
 
