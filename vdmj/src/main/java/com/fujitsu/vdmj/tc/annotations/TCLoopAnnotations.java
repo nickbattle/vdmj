@@ -87,11 +87,13 @@ public class TCLoopAnnotations implements Mappable
 			}
 		}
 
+		// Called, even if invariants empty, to set ghost definitions.
+		Environment local = invariants.getGhostEnvironment(stmt, env);
+
 		if (!invariants.isEmpty())
 		{
 			TCNameSet updates = stmt.updatesState(false);
 			TCNameSet reasonsAbout = new TCNameSet();
-			Environment local = invariants.getGhostEnvironment(stmt, env);
 			
 			for (TCLoopInvariantAnnotation inv: invariants)
 			{
