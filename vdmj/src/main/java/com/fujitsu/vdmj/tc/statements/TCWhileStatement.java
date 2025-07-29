@@ -63,9 +63,6 @@ public class TCWhileStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(env, this);
-
 		if (!exp.typeCheck(env, null, scope, null).isType(TCBooleanType.class, location))
 		{
 			exp.report(3218, "Expression is not boolean");
@@ -114,6 +111,9 @@ public class TCWhileStatement extends TCStatement
 			// The while condition may never be true, so all while loops can also return void.
 			stype = new TCUnionType(location, stype, new TCVoidType(location));
 		}
+
+		invariants = TCLoopAnnotations.getLoopAnnotations(this);
+		invariants.typeCheck(env, this);
 		
 		return setType(stype);
 	}

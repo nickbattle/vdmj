@@ -76,8 +76,6 @@ public class TCForPatternBindStatement extends TCStatement
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		expType = seqexp.typeCheck(base, null, scope, null);
-		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(base, this, getPattern().getVariableNames());
 
 		Environment local = base;
 
@@ -97,6 +95,8 @@ public class TCForPatternBindStatement extends TCStatement
 			}
 			
 			local.unusedCheck();
+			invariants = TCLoopAnnotations.getLoopAnnotations(this);
+			invariants.typeCheck(base, this, getPattern().getVariableNames());
 			return setType(rt);
 		}
 		else

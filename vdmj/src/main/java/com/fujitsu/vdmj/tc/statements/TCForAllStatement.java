@@ -70,9 +70,6 @@ public class TCForAllStatement extends TCStatement
 	{
 		setType = set.typeCheck(base, null, scope, null);
 		pattern.typeResolve(base);
-		
-		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(base, this, pattern.getVariableNames());
 
 		if (setType.isSet(location))
 		{
@@ -89,6 +86,8 @@ public class TCForAllStatement extends TCStatement
 			}
 			
 			local.unusedCheck();
+			invariants = TCLoopAnnotations.getLoopAnnotations(this);
+			invariants.typeCheck(base, this, pattern.getVariableNames());
 			return setType(rt);
 		}
 		else
