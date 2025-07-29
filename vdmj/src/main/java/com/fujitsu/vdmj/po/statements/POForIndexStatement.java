@@ -43,22 +43,23 @@ import com.fujitsu.vdmj.po.expressions.POSubtractExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
+import com.fujitsu.vdmj.pog.POAltContext;
+import com.fujitsu.vdmj.pog.POCommentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
-import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
-import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class POForIndexStatement extends POStatement
 {
@@ -105,71 +106,74 @@ public class POForIndexStatement extends POStatement
 
 		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
+		POExpression invariant = null;
+
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(false);
+		}
+
+		POAltContext altCtxt = new POAltContext();
+
+		if (invariant == null)
+		{
+			ctxt.push(new POCommentContext("Missing @LoopInvariant, assuming true", location));
+			PODefinition loopinv = getLoopInvDef();
+			ctxt.push(new POLetDefContext(loopinv));
+			invariant = new POVariableExpression(loopinv.name, loopinv);
+		}
+
+		int popto = ctxt.size();	// Includes missing invariant above
+
+		/**
+		 * The initial case verifies that the invariant is true for the loop "from" value.
+		 */
+		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
+		ctxt.push(new POLetDefContext(def));		// eg. let x = 1 in
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant at first for-loop");
+		ctxt.pop();
+
+		/**
+		 * The preservation case verifies that if the invariant is true at X, then it is true at X+by
+		 */
+		TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
+		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
+		updates.add(var);
+
+		ctxt.push(new POForAllContext(updates, local));				// forall <changed values> and vars
+		ctxt.push(new POImpliesContext(varIsValid(), invariant));	// valid index && invariant => ...
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+
+		def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(), vardef.getType());
+		ctxt.add(new POLetDefContext(def));							// let x = x + by in
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
+		obligations.lastElement().setMessage("invariant preservation for next for-loop");
+
+		/**
+		 * The context stack now contains everything from the statement block, but we want to
+		 * suppress this, since context beyond the loop only includes the invariant statement.
+		 * But we can't just discard it, because it may include some returns, which are subsequently
+		 * needed by postcondition checks. So we extract the substack, and reduce it to just the
+		 * paths with returnsEarly().
+		 */
+		POContextStack stack = new POContextStack();
+		ctxt.popInto(popto, stack);
+		altCtxt.addAll(stack.reduce());
+
+		/**
+		 * The context stack beyond the loop just contains the loop invariant unless there are
+		 * return paths from the above. Invariant clauses that mention the loop variable are omitted.
+		 */
+		updates.remove(var);
+		ctxt.push(new POForAllContext(updates, env));								// forall <changed variables>
+		ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The two alternatives in one added.
+		ctxt.push(altCtxt);
 		
-		if (annotations.isEmpty())		// No loop invariants defined
-		{
-			obligations.add(new LoopInvariantObligation(location, ctxt));
-			
-			int popto = ctxt.pushAt(new POScopeContext());
-			ctxt.push(new POForAllSequenceContext(var, from, to, by));
-			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-			ctxt.popTo(popto);
-	
-			if (statement.getStmttype().hasReturn())
-			{
-				updates.add(TCNameToken.getResult(location));
-			}
-			
-			if (!updates.isEmpty())
-			{
-				ctxt.push(new POAmbiguousContext("for loop", updates, location));
-			}
-			
-			obligations.addAll(loops);
-			return obligations;
-		}
-		else
-		{
-			POExpression invariant = annotations.combine(false);
-
-			/*
-			 * The initial case verifies that the invariant is true for the loop "from" value.
-			 */
-			POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
-			ctxt.add(new POLetDefContext(def));		// let x = 1 in
-			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check invariant at first loop");
-			ctxt.pop();
-
-			int popto = ctxt.size();
-
-			/*
-			 * A preservation case verifies that if the invariant is true at X, then it is true at X+1
-			 */
-			TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
-			Environment local = new FlatCheckedEnvironment(tcdef, env, null);
-			updates.add(var);
-
-			ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
-			ctxt.push(new POImpliesContext(varIsValid(), invariant));	// valid index && invariant => ...
-			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-
-			def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(), vardef.getType());
-			ctxt.add(new POLetDefContext(def));		// let x = x + 1 in
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("invariant preservation for next for-loop");
-
-			updates.remove(var);
-			ctxt.popTo(popto);
-			
-			/*
-			 * Leave implication for following POs, which uses the LoopInvariants that exclude "var"
-			 */
-			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
-			
-			return obligations;
-		}
+		return obligations;
 	}
 
 	private POExpression varIsValid()
@@ -199,9 +203,14 @@ public class POForIndexStatement extends POStatement
 	private POExpression varPlusBy()
 	{
 		POExpression vexp = new POVariableExpression(var, vardef);
-		POExpression one = new POIntegerLiteralExpression(LexIntegerToken.ONE);
-		POExpression _by = (by == null) ? one : by;
-		return new POPlusExpression(vexp, new LexKeywordToken(Token.PLUS, location), _by, from.getExptype(), new TCIntegerType(location));
+		TCType bytype = (by == null) ? new TCIntegerType(location) : by.getExptype();
+		POExpression _by = (by == null) ? new POIntegerLiteralExpression(LexIntegerToken.ONE) : by;
+
+		return new POPlusExpression(
+			vexp,
+			new LexKeywordToken(Token.PLUS, location),
+			_by,
+			from.getExptype(), bytype);
 	}
 
 	@Override

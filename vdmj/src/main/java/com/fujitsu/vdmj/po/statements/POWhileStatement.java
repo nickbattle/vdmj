@@ -24,14 +24,11 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.annotations.POLoopMeasureAnnotation;
-import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
@@ -47,8 +44,6 @@ import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
@@ -153,21 +148,6 @@ public class POWhileStatement extends POStatement
 		ctxt.push(altCtxt);
 
 		return obligations;
-	}
-
-	/**
-	 * Create the missing @LoopInvariant for substitution into the POs by name.
-	 * 
-	 *   (-- Missing @LoopInvariant, assuming true at 9:9
-	 *     (let $LoopInvariant : bool = true in
-	 *       ($LoopInvariant and (condition) =>
-	 */
-	private PODefinition getLoopInvDef()
-	{
-		TCNameToken invname = new TCNameToken(location, location.module, "$LoopInvariant");
-		POExpression invvalue = new POBooleanLiteralExpression(new LexBooleanToken(true, location));
-		TCBooleanType BOOL = new TCBooleanType(location);
-		return new POAssignmentDefinition(invname, BOOL, invvalue, BOOL);
 	}
 
 	@Override

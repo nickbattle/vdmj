@@ -33,6 +33,8 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -96,6 +98,9 @@ public class TCForIndexStatement extends TCStatement
 		vardef = new TCLocalDefinition(var.getLocation(), var, ft);
 		Environment local = new FlatCheckedEnvironment(vardef, env, scope);
 		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
+
+		// The from may be greater than the to, so all while loops can also return void.
+		rt = new TCUnionType(location, rt, new TCVoidType(location));
 
 		invariants = TCLoopAnnotations.getLoopAnnotations(this);
 		invariants.typeCheck(env, this, new TCNameList(var));

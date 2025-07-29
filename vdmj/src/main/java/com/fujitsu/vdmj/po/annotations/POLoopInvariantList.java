@@ -54,7 +54,7 @@ public class POLoopInvariantList extends POMappedList<TCLoopInvariantAnnotation,
 	 * Used to produce an AND expression combining all of the @LoopInvariants passed in, but
 	 * possibly excluding those that refer to a loop variables.
 	 */
-	public POExpression combine(boolean excludeLoops)
+	public POExpression combine(boolean exclLoopVars)
 	{
 		LexLocation loc = get(0).location;
 		LexKeywordToken AND = new LexKeywordToken(Token.AND, loc);
@@ -64,7 +64,7 @@ public class POLoopInvariantList extends POMappedList<TCLoopInvariantAnnotation,
 
 		for (POLoopInvariantAnnotation loopInv: this)
 		{
-			if (!excludeLoops || !loopInv.hasLoopVars)
+			if (!exclLoopVars || !loopInv.hasLoopVars)
 			{
 				if (exp == null)
 				{
