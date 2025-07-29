@@ -43,7 +43,7 @@ public class ASTSetRangeExpression extends ASTSetExpression
 	@Override
 	public String toString()
 	{
-		return "{" + first + ", ... ," + last + "}";
+		return "{" + first + ", ..., " + last + "}";
 	}
 
 	@Override

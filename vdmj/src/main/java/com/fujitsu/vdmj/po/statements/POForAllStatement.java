@@ -43,10 +43,10 @@ import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
+import com.fujitsu.vdmj.pog.POAltContext;
+import com.fujitsu.vdmj.pog.POCommentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
-import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
@@ -92,85 +92,89 @@ public class POForAllStatement extends POStatement
 
 		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
+		POExpression invariant = null;
 		
-		if (annotations.isEmpty())		// No loop invariants defined
+		if (!annotations.isEmpty())
 		{
-			obligations.add(new LoopInvariantObligation(location, ctxt));
-			
-			int popto = ctxt.pushAt(new POForAllSequenceContext(pattern, set, " in set "));
-			ProofObligationList loops = statement.getProofObligations(ctxt, pogState, env);
-			ctxt.popTo(popto);
-			
-			if (statement.getStmttype().hasReturn())
-			{
-				updates.add(TCNameToken.getResult(location));
-			}
-			
-			if (!updates.isEmpty())
-			{
-				ctxt.push(new POAmbiguousContext("for all loop", updates, location));
-			}
-			
-			obligations.addAll(loops);
-			return obligations;
+			invariant = annotations.combine(false);
 		}
-		else
+	
+		POAssignmentDefinition ghostDef = annotations.getGhostDef();
+		TCNameToken ghostName = ghostDef.name;
+		POAltContext altCtxt = new POAltContext();
+
+		if (invariant == null)
 		{
-			POExpression invariant = annotations.combine(false);
-			POAssignmentDefinition ghostDef = annotations.getGhostDef();
-			TCNameToken ghostName = ghostDef.name;
-
-			/*
-			 * The initial case verifies that the invariant is true for the empty ax/gx state.
-			 */
-			int popto = ctxt.size();
-			ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
-			obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-			obligations.lastElement().setMessage("check invariant before for-loop");
-			ctxt.pop();
-
-			/*
-			 * A preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
-			 */
-			TCSetType stype = set.getExptype().getSet();
-			PODefinitionList podefs = pattern.getDefinitions(stype.setof);
-			TCDefinitionList tcdefs = new TCDefinitionList();
-
-			for (PODefinition podef: podefs)
-			{
-				if (podef instanceof POLocalDefinition)		// pattern defs will be local
-				{
-					tcdefs.add(new TCLocalDefinition(location, podef.name, podef.getType()));
-				}
-			}
-
-			tcdefs.add(new TCLocalDefinition(location, ghostName, ghostDef.type));
-			Environment local = new FlatCheckedEnvironment(tcdefs, env, null);
-			updates.addAll(pattern.getVariableNames());
-			updates.add(ghostName);
-
-			ctxt.push(new POForAllContext(updates, local));						// forall <changed values> and vars
-			ctxt.push(new POImpliesContext(varsInSet(ghostDef), invariant));	// x in set S \ GHOST$ && invariant => ...
-			ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));				// ghost := ghost union {x}
-
-			obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-			obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-			obligations.lastElement().setMessage("invariant preservation for next for-loop");
-
-			updates.remove(ghostName);
-			updates.removeAll(pattern.getVariableNames());
-			ctxt.popTo(popto);
-
-			/*
-			 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
-			 * and GHOST$ set to the original set value.
-			 */
-			ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));						// let GHOST$ = set in
-			if (!updates.isEmpty()) ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
-
-			return obligations;
+			ctxt.push(new POCommentContext("Missing @LoopInvariant, assuming true", location));
+			PODefinition loopinv = getLoopInvDef();
+			ctxt.push(new POLetDefContext(loopinv));
+			invariant = new POVariableExpression(loopinv.name, loopinv);
 		}
+
+		int popto = ctxt.size();	// Includes missing invariant above
+
+		/**
+		 * The initial case verifies that the invariant is true for the empty ax/gx state.
+		 */
+		ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant before for-loop");
+		ctxt.pop();
+
+		/**
+		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
+		 */
+		TCSetType stype = set.getExptype().getSet();
+		PODefinitionList podefs = pattern.getDefinitions(stype.setof);
+		TCDefinitionList tcdefs = new TCDefinitionList();
+
+		for (PODefinition podef: podefs)
+		{
+			if (podef instanceof POLocalDefinition)		// pattern defs will be local
+			{
+				tcdefs.add(new TCLocalDefinition(location, podef.name, podef.getType()));
+			}
+		}
+
+		tcdefs.add(new TCLocalDefinition(location, ghostName, ghostDef.type));
+		Environment local = new FlatCheckedEnvironment(tcdefs, env, null);
+		updates.addAll(pattern.getVariableNames());
+		updates.add(ghostName);
+
+		ctxt.push(new POForAllContext(updates, local));						// forall <changed values> and vars
+		ctxt.push(new POImpliesContext(varsInSet(ghostDef), invariant));	// x in set S \ GHOST$ && invariant => ...
+		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));				// ghost := ghost union {x}
+
+		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
+		obligations.lastElement().setMessage("invariant preservation for next for-loop");
+
+		/**
+		 * The context stack now contains everything from the statement block, but we want to
+		 * suppress this, since context beyond the loop only includes the invariant. But we can't just
+		 * discard it, because it may include some returns, which are subsequently needed by
+		 * postcondition checks. So we extract the substack, and reduce it to just the paths with
+		 * returnsEarly().
+		 */
+		POContextStack stack = new POContextStack();
+		ctxt.popInto(popto, stack);
+		altCtxt.addAll(stack.reduce());
+		
+		/**
+		 * Leave implication for following POs, which uses the LoopInvariants that exclude "vars",
+		 * and GHOST$ set to the original set value.
+		 */
+		updates.remove(ghostName);
+		updates.removeAll(pattern.getVariableNames());
+		ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));						// let GHOST$ = set in
+		ctxt.push(new POForAllContext(updates, env));								// forall <changed variables>
+		ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The two alternatives in one added.
+		ctxt.push(altCtxt);
+
+		return obligations;
 	}
 
 	/**

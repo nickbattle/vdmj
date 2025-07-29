@@ -54,7 +54,7 @@ public class POSetRangeExpression extends POSetExpression
 	@Override
 	public String toString()
 	{
-		return "{" + first + ", ... ," + last + "}";
+		return "{" + first + ", ..., " + last + "}";
 	}
 
 	@Override
