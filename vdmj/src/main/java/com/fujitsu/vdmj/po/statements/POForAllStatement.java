@@ -166,9 +166,15 @@ public class POForAllStatement extends POStatement
 		 */
 		updates.remove(ghostName);
 		updates.removeAll(pattern.getVariableNames());
-		ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));						// let GHOST$ = set in
-		ctxt.push(new POForAllContext(updates, env));								// forall <changed variables>
-		ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
+
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(true);
+		}
+
+		ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));		// let GHOST$ = set in
+		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
+		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The two alternatives in one added.

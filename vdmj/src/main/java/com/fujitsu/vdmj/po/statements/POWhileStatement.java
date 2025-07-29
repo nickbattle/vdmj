@@ -70,8 +70,7 @@ public class POWhileStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
-		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
 
 		POLoopInvariantList annotations = invariants.getList();
 		POLoopMeasureAnnotation measure = invariants.getMeasure();

@@ -166,8 +166,14 @@ public class POForIndexStatement extends POStatement
 		 * return paths from the above. Invariant clauses that mention the loop variable are omitted.
 		 */
 		updates.remove(var);
-		ctxt.push(new POForAllContext(updates, env));								// forall <changed variables>
-		ctxt.push(new POImpliesContext(annotations.combine(true)));	// invariant => ...
+
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(true);
+		}
+
+		ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
+		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The two alternatives in one added.
