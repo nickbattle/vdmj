@@ -287,23 +287,64 @@ public class PogTest extends TestCase
 			}				
 		}
 
-		// Copy this output to re-generate the expected from the actuals...
+		// Check expected and actual...
+		String msg = null;
+
+		for (ProofObligation po: polist)
+		{
+			if (po.isCheckable && po.getCheckedExpression() == null)
+			{
+				msg = "PO type checked failed";
+				break;
+			}
+		}
+
+		if (expected.length != polist.size())
+		{
+			msg = "Number of POs generated";
+		}
+		else
+		{
+			int i = 0;
+
+			for (ProofObligation po: polist)
+			{
+				if (!expected[i++].equals(po.source))
+				{
+					msg = "POs not as expected";
+					break;
+				}
+			}
+		}
+
+		if (msg != null)
+		{
+			printExpected(msg, polist, testName, expected);
+		}
+
+		assertTrue(msg, msg == null);
+	}
+
+	/**
+	 * Copy this output to re-generate the expected from the actuals...
+	 */
+	private void printExpected(String msg, ProofObligationList polist, String testName, String[] expected)
+	{
 		int i = 0;
 		Console.out.printf("\n\tprivate String[] %s =\n\t{", testName);
 		String sep = "\n";
 
 		for (ProofObligation po: polist)
 		{
-			Console.out.print(sep + "\t\t/* " + ++i + " */ \"" + po.source.replaceAll("\n", "\\\\n") + "\"");
-			assertTrue("PO type checked failed", !po.isCheckable || po.getCheckedExpression() != null);
+			Console.out.print(sep + "\t\t/* " + ++i + " */ \"" +
+				po.source.replaceAll("\n", "\\\\n") + "\"");
+
 			sep = ",\n";
 		}
 
 		Console.out.println("\n\t};");
-		assertEquals("POs generated", expected.length, polist.size());
 
 		i = 0;
-		int errs = 0;
 
 		for (ProofObligation po: polist)
 		{
@@ -312,12 +353,11 @@ public class PogTest extends TestCase
 				Console.out.println("PO# " + (i+1));
 				Console.out.print("Expected: " + expected[i]);
 				Console.out.print("Actual: " + po.source);
-				errs++;
 			}
 
 			i++;
 		}
 
-		assertEquals("POs failed", 0, errs);
+		Console.out.println("\nERROR: " + msg);
 	}
 }
