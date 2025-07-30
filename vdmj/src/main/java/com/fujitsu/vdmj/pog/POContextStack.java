@@ -32,7 +32,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -50,7 +49,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POContextStack extends Stack<POContext>
 {
@@ -345,21 +343,6 @@ public class POContextStack extends Stack<POContext>
 		return result.toString();
 	}
 	
-	public POAnnotationList getAnnotations()
-	{
-		for (POContext ctxt: this)
-		{
-			POAnnotationList annotations = ctxt.getAnnotations();
-			
-			if (annotations != null && !annotations.isEmpty())
-			{
-				return annotations;
-			}
-		}
-		
-		return null;
-	}
-	
 	public PODefinition getDefinition()
 	{
 		for (POContext ctxt: this)
@@ -413,21 +396,6 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return names;
-	}
-
-	public TCTypeList getTypeParams()
-	{
-		for (POContext ctxt: this)
-		{
-			TCTypeList params = ctxt.getTypeParams();
-			
-			if (params != null && !params.isEmpty())
-			{
-				return params;
-			}
-		}
-		
-		return null;
 	}
 	
 	public TCNameSet getReasonsAbout()

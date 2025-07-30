@@ -30,6 +30,8 @@ import java.util.List;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POFreeVariableFinder;
@@ -65,8 +67,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POStatus status;
 	public PODefinition definition;
 	public boolean isCheckable;
-	public TCTypeList typeParams;
-	public POAnnotationList annotations;
 	
 	public String qualifier;
 	public Context counterexample;
@@ -90,8 +90,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.definition = ctxt.getDefinition();
 		this.number = 0;
 		this.isCheckable = true;	// Set false for some operation POs
-		this.typeParams = ctxt.getTypeParams();
-		this.annotations = ctxt.getAnnotations();
 		
 		this.obligationVars = null;
 		this.reasonsAbout = null;
@@ -112,7 +110,35 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	{
 		return source;
 	}
-	
+
+	public PODefinition getDefinition()
+	{
+		return definition;
+	}
+
+	public POAnnotationList getAnnotations()
+	{
+		return definition == null ? null : definition.annotations;
+	}
+
+	public TCTypeList getTypeParams()
+	{
+		if (definition instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition exdef = (POExplicitFunctionDefinition)definition;
+			return exdef.typeParams;
+		}
+		else if (definition instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition imdef = (POImplicitFunctionDefinition)definition;
+			return imdef.typeParams;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 	public void setStatus(POStatus status)
 	{
 		this.status = status;

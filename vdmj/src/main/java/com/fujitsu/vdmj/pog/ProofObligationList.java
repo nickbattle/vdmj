@@ -228,7 +228,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 		TypeChecker.clearErrors();
 		
-		if (obligation.typeParams != null)
+		if (obligation.getTypeParams() != null)
 		{
 			// Add local definitions for the @T parameters in the obligation
 			env = new FlatEnvironment(getTypeParamDefinitions(obligation), env);
@@ -298,7 +298,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 
-		for (TCType ptype: po.typeParams)
+		for (TCType ptype: po.getTypeParams())
 		{
 			TCParameterType param = (TCParameterType)ptype;
 			TCDefinition p = new TCLocalDefinition(param.location, param.name, param);

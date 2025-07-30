@@ -157,7 +157,7 @@ public class FiniteQCStrategy extends QCStrategy
 		
 		// We can only claim to have all values if there are no parameter types.
 		// The current bind may be finite, but others may not be.
-		boolean hasAll = (po.typeParams == null);
+		boolean hasAll = (po.getTypeParams() == null);
 		
 		return new StrategyResults(result, hasAll);
 	}

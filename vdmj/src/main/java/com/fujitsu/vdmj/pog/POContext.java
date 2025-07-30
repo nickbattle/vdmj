@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -65,19 +64,9 @@ abstract public class POContext
 		return "";		// Overridden in PONameContext
 	}
 
-	public POAnnotationList getAnnotations()
-	{
-		return null;
-	}
-	
 	public boolean isExistential()
 	{
 		return false;
-	}
-
-	public TCTypeList getTypeParams()
-	{
-		return null;
 	}
 
 	public TCNameSet reasonsAbout()
