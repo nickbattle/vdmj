@@ -299,20 +299,23 @@ public class PogTest extends TestCase
 			}
 		}
 
-		if (expected.length != polist.size())
+		if (msg == null)
 		{
-			msg = "Number of POs generated";
-		}
-		else
-		{
-			int i = 0;
-
-			for (ProofObligation po: polist)
+			if (expected.length != polist.size())
 			{
-				if (!expected[i++].equals(po.source))
+				msg = "Wrong number of POs generated";
+			}
+			else
+			{
+				int i = 0;
+
+				for (ProofObligation po: polist)
 				{
-					msg = "POs not as expected";
-					break;
+					if (!expected[i++].equals(po.source))
+					{
+						msg = "POs not as expected";
+						break;
+					}
 				}
 			}
 		}
@@ -326,12 +329,13 @@ public class PogTest extends TestCase
 	}
 
 	/**
-	 * Copy this output to re-generate the expected from the actuals...
+	 * Copy this output to update the expected from the actuals...
 	 */
 	private void printExpected(String msg, ProofObligationList polist, String testName, String[] expected)
 	{
-		int i = 0;
 		Console.out.printf("\n\tprivate String[] %s =\n\t{", testName);
+
+		int i = 0;
 		String sep = "\n";
 
 		for (ProofObligation po: polist)
@@ -350,14 +354,14 @@ public class PogTest extends TestCase
 		{
 			if (!expected[i].equals(po.source))
 			{
-				Console.out.println("PO# " + (i+1));
-				Console.out.print("Expected: " + expected[i]);
-				Console.out.print("Actual: " + po.source);
+				Console.out.println("----\nPO# " + (i+1));
+				Console.out.print("Expected:\n" + expected[i]);
+				Console.out.print("Actual:\n" + po.source);
 			}
 
 			i++;
 		}
 
-		Console.out.println("\nERROR: " + msg);
+		Console.out.println("----\nERROR: " + msg);
 	}
 }
