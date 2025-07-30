@@ -277,7 +277,6 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 
-	
 	/**
 	 * The name is typically the name of the top level definition that this context
 	 * belongs to, like the function or operation name. It is only used for labelling.
@@ -318,12 +317,20 @@ public class POContextStack extends Stack<POContext>
 		for (POContext ctxt: this)
 		{
 			String po = ctxt.getSource();
+			String comment = ctxt.getComment();
 
 			if (po.length() > 0)
 			{
 				result.append(indent);
 				result.append("(");
 				result.append(indentNewLines(po, indent));
+
+				if (comment != null)
+				{
+					result.append(" -- ");
+					result.append(comment);
+				}
+
 				result.append("\n");
 				indent = indent + spacing;
 				tail.append(")");

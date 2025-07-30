@@ -81,6 +81,7 @@ public class POAssignmentContext extends POContext
 				{
 					POExpression exp = adef.type.apply(dvc, null);
 					adef = new POAssignmentDefinition(adef.name, adef.type, exp, adef.expType);
+					setComment("Note, default value set");
 				}
 				catch (Exception e)
 				{

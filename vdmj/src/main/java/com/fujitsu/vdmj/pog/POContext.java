@@ -43,11 +43,22 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 abstract public class POContext
 {
 	private Map<POExpression, TCType> knownTypes = new HashMap<POExpression, TCType>();
+	private String comment = null;
 
 	/**
 	 * Generate the VDM source of the context.
 	 */
 	abstract public String getSource();
+
+	public String getComment()
+	{
+		return comment;
+	}
+
+	protected void setComment(String comment)
+	{
+		this.comment = comment;
+	}
 
 	public String getName()
 	{
