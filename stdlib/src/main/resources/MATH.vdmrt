@@ -113,7 +113,12 @@ public static
     fac:nat -> nat1
     fac(a) ==
     is not yet specified
-    -- pre a < 21;
+    ;-- pre a < 21;
+
+public static
+	defined: ? +> bool
+	defined(v) ==
+	is not yet specified;
 
 values
 public

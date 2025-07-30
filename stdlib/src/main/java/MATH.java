@@ -29,6 +29,7 @@ import java.util.Random;
 import com.fujitsu.vdmj.runtime.VDMFunction;
 import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
@@ -144,6 +145,12 @@ public class MATH
 	public static Value fac(Value arg) throws ValueException, Exception
 	{
 		return new NaturalOneValue(factorial(arg.natValue(null)));
+	}
+
+	@VDMFunction
+	public static Value defined(Value arg) throws ValueException, Exception
+	{
+		return new BooleanValue(arg.isDefined());
 	}
 
 	private static long factorial(long n)

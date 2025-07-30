@@ -98,7 +98,11 @@ definitions
     fac:nat -> nat1
     fac(a) ==
     is not yet specified
-    -- pre a < 21;
+    ;-- pre a < 21;
+
+	defined: ? +> bool
+	defined(v) ==
+	is not yet specified;
 
   values
     pi = pi_f();
