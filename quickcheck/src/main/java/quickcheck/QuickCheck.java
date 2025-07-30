@@ -475,7 +475,7 @@ public class QuickCheck
 					ictxt.next();
 					execResult = sresults.inExpression.eval(ictxt);
 				}
-				while (ictxt.hasNext() && !execResult.isUndefined() && execResult.boolValue(ctxt));
+				while (ictxt.hasNext() && execResult.isDefined() && execResult.boolValue(ctxt));
 				
 				execCompleted = true;
 			}

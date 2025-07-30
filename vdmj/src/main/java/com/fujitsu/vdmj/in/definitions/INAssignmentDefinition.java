@@ -68,7 +68,7 @@ public class INAssignmentDefinition extends INDefinition
         {
 	        Value v = expression.eval(ctxt);
 
-	        if (!v.isUndefined())
+	        if (v.isDefined())
 	        {
 	        	v = v.convertTo(type, ctxt);
 	        }

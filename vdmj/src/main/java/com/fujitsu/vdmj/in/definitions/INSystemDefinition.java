@@ -172,7 +172,7 @@ public class INSystemDefinition extends INClassDefinition
 						UpdatableValue v = (UpdatableValue)systemObject.members.get(d.name);
 	    				BUSValue bus = null;
 
-						if (!v.isUndefined())
+						if (v.isDefined())
 						{
 							bus = (BUSValue)v.deref();
 

@@ -119,7 +119,7 @@ public class INForAllExpression extends INExpression
 						Value result = predicate.eval(evalContext);
 						hasUndefined = hasUndefined || result.isUndefined();
 						
-						if (!result.isUndefined() && !result.boolValue(ctxt))
+						if (result.isDefined() && !result.boolValue(ctxt))
 						{
 							if (globals != null)
 							{

@@ -62,7 +62,7 @@ public class INTixeStmtAlternative implements Mappable
 		{
 			if (patternBind.pattern != null)
 			{
-				if (!exval.isUndefined())	// "exit" throws the undefined value
+				if (exval.isDefined())	// "exit" throws the undefined value
 				{
 					evalContext = new Context(location, "tixe pattern", ctxt);
 					evalContext.putList(patternBind.pattern.getNamedValues(exval, ctxt));
