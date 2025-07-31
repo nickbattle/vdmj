@@ -114,7 +114,7 @@ public class POForAllContext extends POContext
 	{
 		this.bindings = new Vector<POMultipleBind>();
 		
-		for (TCNameToken var: updates)
+		for (TCNameToken var: updates)		// Can be empty
 		{
 			TCDefinition def = env.findName(var, NameScope.NAMESANDSTATE);
 			
@@ -138,17 +138,20 @@ public class POForAllContext extends POContext
 	{
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("forall ");
-		String prefix = "";
-
-		for (POMultipleBind mb: bindings)
+		if (!bindings.isEmpty())	// eg. when a loop makes no updates
 		{
-			sb.append(prefix);
-			sb.append(mb);
-			prefix = ", ";
-		}
+			sb.append("forall ");
+			String prefix = "";
 
-		sb.append(" &");
+			for (POMultipleBind mb: bindings)
+			{
+				sb.append(prefix);
+				sb.append(mb);
+				prefix = ", ";
+			}
+
+			sb.append(" &");
+		}
 
 		return sb.toString();
 	}

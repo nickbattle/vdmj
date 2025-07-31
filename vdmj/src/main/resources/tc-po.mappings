@@ -23,8 +23,8 @@ map TCExplicitOperationDefinition{accessSpecifier, annotations, name, type, para
 map TCExternalDefinition{accessSpecifier, state, readOnly, nameScope} to POExternalDefinition(state, readOnly) set nameScope, accessSpecifier;
 map TCImplicitFunctionDefinition{accessSpecifier, annotations, name, typeParams, parameterPatterns, type, result, body, precondition, postcondition, predef, postdef, recursive, isUndefined, actualResult, measureDef, measureName, nameScope} to POImplicitFunctionDefinition(annotations, name, typeParams, parameterPatterns, result, body, precondition, postcondition, type, predef, postdef, recursive, isUndefined, actualResult, measureDef, measureName) set nameScope, accessSpecifier;
 map TCImplicitOperationDefinition{accessSpecifier, annotations, name, parameterPatterns, result, body, externals, precondition, postcondition, errors, type, isConstructor, predef, postdef, state, classDefinition, actualResult, nameScope, possibleExceptions} to POImplicitOperationDefinition(annotations, name, parameterPatterns, result, body, externals, precondition, postcondition, errors, type, predef, postdef, actualResult, state, classDefinition, isConstructor, possibleExceptions) set nameScope, accessSpecifier;
-map TCImportedDefinition{accessSpecifier, location, def, nameScope} to POImportedDefinition(location, def) set nameScope, accessSpecifier;
-map TCInheritedDefinition{accessSpecifier, name, superdef, nameScope} to POInheritedDefinition(name, superdef) set nameScope, accessSpecifier;
+map TCImportedDefinition{accessSpecifier, location, name, def, nameScope} to POImportedDefinition(location, name, def) set nameScope, accessSpecifier;
+map TCInheritedDefinition{accessSpecifier, location, name, superdef, nameScope} to POInheritedDefinition(location, name, superdef) set nameScope, accessSpecifier;
 map TCInstanceVariableDefinition{accessSpecifier, name, type, expression, expType, nameScope} to POInstanceVariableDefinition(name, type, expression, expType) set nameScope, accessSpecifier;
 map TCLocalDefinition{accessSpecifier, location, name, type, nameScope} to POLocalDefinition(location, name, type) set nameScope, accessSpecifier;
 map TCMultiBindListDefinition{accessSpecifier, location, bindings, defs, nameScope} to POMultiBindListDefinition(location, bindings, defs) set nameScope, accessSpecifier;
@@ -38,7 +38,7 @@ map TCThreadDefinition{accessSpecifier, statement, nameScope} to POThreadDefinit
 map TCTypeDefinition{accessSpecifier, annotations, name, type, invPattern, invExpression, invdef, eqPattern1, eqPattern2, eqExpression, eqdef, ordPattern1, ordPattern2, ordExpression, orddef, nameScope} to POTypeDefinition(annotations, name, type, invPattern, invExpression, invdef, eqPattern1, eqPattern2, eqExpression, eqdef, ordPattern1, ordPattern2, ordExpression, orddef) set nameScope, accessSpecifier;
 map TCValueDefinition{accessSpecifier, annotations, pattern, type, exp, expType, defs, nameScope} to POValueDefinition(annotations, pattern, type, exp, expType, defs) set nameScope, accessSpecifier;
 map TCUntypedDefinition{accessSpecifier, location, name, nameScope} to POUntypedDefinition(location, name) set nameScope, accessSpecifier;
-map TCQualifiedDefinition{accessSpecifier, def, type, nameScope} to POQualifiedDefinition(def, type) set nameScope, accessSpecifier;
+map TCQualifiedDefinition{accessSpecifier, location, name, def, type, nameScope} to POQualifiedDefinition(location, name, def, type) set nameScope, accessSpecifier;
 
 # expressions
 package com.fujitsu.vdmj.tc.expressions to com.fujitsu.vdmj.po.expressions;
@@ -239,7 +239,7 @@ map TCAssignmentStatement{location, target, exp, expType, targetType, classDefin
 map TCAssignmentStatementList{} to POAssignmentStatementList(this);
 map TCAtomicStatement{location, assignments, stmttype} to POAtomicStatement(location, assignments) set stmttype;
 map TCBlockStatement{location, assignmentDefs, statements, stmttype} to POBlockStatement(location, assignmentDefs, statements) set stmttype;
-map TCCallObjectStatement{designator, classname, fieldname, args, fdef, stmttype} to POCallObjectStatement(designator, classname, fieldname, args, fdef) set stmttype;
+map TCCallObjectStatement{location, designator, classname, fieldname, args, fdef, stmttype} to POCallObjectStatement(location, designator, classname, fieldname, args, fdef) set stmttype;
 map TCCallStatement{name, args, opdef, stmttype} to POCallStatement(name, args, opdef) set stmttype;
 map TCCasesStatement{location, exp, cases, others, expType, stmttype} to POCasesStatement(location, exp, cases, others, expType) set stmttype;
 map TCCaseStmtAlternative{exp, pattern, statement} to POCaseStmtAlternative(exp, pattern, statement);

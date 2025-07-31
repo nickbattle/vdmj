@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
@@ -31,7 +32,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -49,7 +49,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POContextStack extends Stack<POContext>
 {
@@ -103,7 +102,7 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
-		return getAlternatives(true);	// exclude return paths by default
+		return getAlternatives(true);	// exclude ending paths by default
 	}
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
@@ -137,25 +136,25 @@ public class POContextStack extends Stack<POContext>
 			}
 			else
 			{
-				if (ctxt instanceof POReturnContext)	// Includes POExitContext
+				if (ctxt.returnsEarly())
 				{
 					// This stack plays no part in further obligations, including any
 					// alternatives it contains. So immediately return nothing if we
-					// are excluding paths that return.
+					// are excluding paths that end before they reach the current location.
 					
 					if (excludeReturns)
 					{
 						return new Vector<POContextStack>();
 					}
-					
+
 					// Else add it as usual...
 				}
 
 				for (POContextStack choice: results)
 				{
-					if (!choice.isEmpty() && choice.lastElement() instanceof POReturnContext)
+					if (choice.returnsEarly())
 					{
-						continue;	// skip this choice, as it has already returned
+						continue;	// skip this choice, as it has already ended
 					}
 					
 					choice.add(ctxt);
@@ -181,7 +180,7 @@ public class POContextStack extends Stack<POContext>
 				names.add(result);
 				
 				push(new POAmbiguousContext("operation call", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 			}
 			else
 			{
@@ -199,7 +198,7 @@ public class POContextStack extends Stack<POContext>
 				names.add(result);
 				
 				push(new POAmbiguousContext(opname + " throws exceptions", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 			}
 			else
 			{
@@ -249,7 +248,7 @@ public class POContextStack extends Stack<POContext>
 					names.add(result);
 					
 					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 				}
 				else
 				{
@@ -266,7 +265,7 @@ public class POContextStack extends Stack<POContext>
 					names.add(result);
 					
 					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResultPattern(), new POUndefinedExpression(from)));
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
 				}
 				else
 				{
@@ -276,7 +275,6 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 
-	
 	/**
 	 * The name is typically the name of the top level definition that this context
 	 * belongs to, like the function or operation name. It is only used for labelling.
@@ -317,12 +315,20 @@ public class POContextStack extends Stack<POContext>
 		for (POContext ctxt: this)
 		{
 			String po = ctxt.getSource();
+			String comment = ctxt.getComment();
 
 			if (po.length() > 0)
 			{
 				result.append(indent);
 				result.append("(");
 				result.append(indentNewLines(po, indent));
+
+				if (comment != null)
+				{
+					result.append(" -- ");
+					result.append(comment);
+				}
+
 				result.append("\n");
 				indent = indent + spacing;
 				tail.append(")");
@@ -335,21 +341,6 @@ public class POContextStack extends Stack<POContext>
 		result.append("\n");
 
 		return result.toString();
-	}
-	
-	public POAnnotationList getAnnotations()
-	{
-		for (POContext ctxt: this)
-		{
-			POAnnotationList annotations = ctxt.getAnnotations();
-			
-			if (annotations != null && !annotations.isEmpty())
-			{
-				return annotations;
-			}
-		}
-		
-		return null;
 	}
 	
 	public PODefinition getDefinition()
@@ -405,21 +396,6 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return names;
-	}
-
-	public TCTypeList getTypeParams()
-	{
-		for (POContext ctxt: this)
-		{
-			TCTypeList params = ctxt.getTypeParams();
-			
-			if (params != null && !params.isEmpty())
-			{
-				return params;
-			}
-		}
-		
-		return null;
 	}
 	
 	public TCNameSet getReasonsAbout()
@@ -483,7 +459,7 @@ public class POContextStack extends Stack<POContext>
 	private String indentNewLines(String line, String indent)
 	{
 		StringBuilder sb = new StringBuilder();
-		String[] parts = line.split("\n\\s*");
+		String[] parts = line.split("\\n\\s*");
 		String prefix = "";
 
 		for (int i=0; i<parts.length; i++)
@@ -523,5 +499,40 @@ public class POContextStack extends Stack<POContext>
 		}
 
 		return expected;
+	}
+
+	private boolean returnsEarly()
+	{
+		if (isEmpty())
+		{
+			return false;
+		}
+		else
+		{
+			return lastElement().returnsEarly();
+		}
+	}
+
+	/**
+	 * Reduce this stack to just those paths which returnsEarly(). This is used in
+	 * loop processing to remove paths from the body, unless they are needed for
+	 * postconditions on every "return".
+	 */
+	public List<POContextStack> reduce()
+	{
+		List<POContextStack> paths = this.getAlternatives(false);		// Include returns
+		Iterator<POContextStack> iter = paths.iterator();
+
+		while (iter.hasNext())
+		{
+			POContextStack path = iter.next();
+
+			if (!path.returnsEarly())
+			{
+				iter.remove();
+			}
+		}
+
+		return paths;
 	}
 }

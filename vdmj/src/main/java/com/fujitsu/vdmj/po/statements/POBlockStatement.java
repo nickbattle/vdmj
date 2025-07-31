@@ -77,33 +77,22 @@ public class POBlockStatement extends POSimpleBlockStatement
 
 			Environment locals = new FlatEnvironment(defs, env);
 
-			int dcls = ctxt.pushAt(new POAssignmentContext(assignmentDefs));
+			ctxt.pushAt(new POAssignmentContext(assignmentDefs));
 			obligations.addAll(super.getProofObligations(ctxt, dclState, locals));
-			
-			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
-			// assignments to outer state within the block, since the dcls/lets are needed
-			// in any POs relating to those updated state values.
-			
-			cleanStack(ctxt, dclState, dcls);
-			
-			// The dclState goes out of scope here and its localUpdates have no further
-			// effect. But updates made to locals in outer scopes will still be available.
 		}
 		else
 		{
-			int base = ctxt.size();
 			obligations.addAll(super.getProofObligations(ctxt, pogState, env));
-			
-			// Remove the POAssignmentContext for the dcls/lets, unless they are used in
-			// return values, since the lets may be needed in the postcondition.
-			
-			POGState dclState = pogState.getLink();		// empty dcls
-			cleanStack(ctxt, dclState, base);
 		}
 
 		return obligations;
 	}
 
+	/**
+	 * Early attempt to clean up the context stack. But this became too complex with
+	 * loops that include return paths.
+	 */
+	@SuppressWarnings("unused")
 	private void cleanStack(POContextStack ctxt, POGState dclState, int dcls)
 	{
 		boolean keepLets = false;
@@ -114,9 +103,11 @@ public class POBlockStatement extends POSimpleBlockStatement
 			toDelete.add(dcls);
 		}
 		
-		for (int sp = dcls + 1; sp < ctxt.size(); sp++)
+		for (int sp = dcls; sp < ctxt.size(); sp++)
 		{
 			POContext item = ctxt.get(sp);
+			
+			// handle POAltContext blocks here too?
 			
 			if (item instanceof POAssignmentContext)
 			{

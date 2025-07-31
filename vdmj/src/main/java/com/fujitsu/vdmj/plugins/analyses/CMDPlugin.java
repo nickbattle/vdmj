@@ -55,7 +55,6 @@ import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
 import com.fujitsu.vdmj.plugins.commands.PluginsCommand;
 import com.fujitsu.vdmj.plugins.commands.PrecisionCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
-import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
 import com.fujitsu.vdmj.plugins.commands.ScriptCommand;
 import com.fujitsu.vdmj.plugins.commands.SetCommand;
@@ -349,14 +348,7 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 			case "latex":		return new LatexCommand(line);
 			case "word":		return new WordCommand(line);
 			case "save":		return new SaveCommand(line);
-			case "runtrace":
-			case "rt":
-			case "debugtrace":
-			case "dt":
-			case "runalltraces":
-			case "savetrace":
-			case "seedtrace":
-			case "filter":		return new RuntraceCommand(line);
+
 			case "precision":	return new PrecisionCommand(line);
 
 			default:
@@ -385,7 +377,6 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 		);
 		
 		list.add(DebugCommand.help());
-		list.add(RuntraceCommand.help());
 		
 		if (Settings.dialect == Dialect.VDM_SL)
 		{

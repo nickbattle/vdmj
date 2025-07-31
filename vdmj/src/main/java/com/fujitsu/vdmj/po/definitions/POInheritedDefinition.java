@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -36,9 +37,9 @@ public class POInheritedDefinition extends PODefinition
 	private static final long serialVersionUID = 1L;
 	public final PODefinition superdef;
 
-	public POInheritedDefinition(TCNameToken localname, PODefinition def)
+	public POInheritedDefinition(LexLocation location, TCNameToken localname, PODefinition def)
 	{
-		super(def.location, localname);
+		super(location, localname);
 		this.superdef = def;
 	}
 

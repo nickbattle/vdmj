@@ -59,7 +59,7 @@ public class POTypeBind extends POBind
 	@Override
 	public String toString()
 	{
-		return pattern + ":" + type;
+		return pattern + ":" + type.toExplicitString(location);
 	}
 
 	@Override

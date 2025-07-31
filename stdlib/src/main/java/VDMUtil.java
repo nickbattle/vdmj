@@ -123,6 +123,7 @@ public class VDMUtil
 		}
 	}
 
+	@VDMFunction
 	public static Value get_file_pos(Context ctxt)
 	{
 		try

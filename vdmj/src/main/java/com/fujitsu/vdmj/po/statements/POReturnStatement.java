@@ -93,6 +93,7 @@ public class POReturnStatement extends POStatement
 		if (rtype != null && rtype.isReturn())
 		{
 			POPattern result = pogState.getResultPattern();
+			TCType resultType = pogState.getResultType();
 
 			if (pogState.isAmbiguous())		// expression has ambiguous values
 			{
@@ -100,7 +101,7 @@ public class POReturnStatement extends POStatement
 				pogState.setAmbiguous(false);
 			}
 
-			ctxt.push(new POReturnContext(result, expression));
+			ctxt.push(new POReturnContext(result, resultType, expression));
 		}
 		else
 		{

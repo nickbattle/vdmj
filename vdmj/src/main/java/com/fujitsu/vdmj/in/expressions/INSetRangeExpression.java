@@ -51,7 +51,7 @@ public class INSetRangeExpression extends INSetExpression
 	@Override
 	public String toString()
 	{
-		return "{" + first + ", ... ," + last + "}";
+		return "{" + first + ", ..., " + last + "}";
 	}
 
 	@Override

@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -56,10 +57,10 @@ public class POCallObjectStatement extends POStatement
 
 	public LexNameToken field = null;
 
-	public POCallObjectStatement(POObjectDesignator designator,
+	public POCallObjectStatement(LexLocation location, POObjectDesignator designator,
 		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args, PODefinition fdef)
 	{
-		super(designator.location);
+		super(location);
 
 		this.designator = designator;
 		this.classname = classname;

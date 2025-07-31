@@ -475,7 +475,7 @@ public class QuickCheck
 					ictxt.next();
 					execResult = sresults.inExpression.eval(ictxt);
 				}
-				while (ictxt.hasNext() && execResult.boolValue(ctxt));
+				while (ictxt.hasNext() && execResult.isDefined() && execResult.boolValue(ctxt));
 				
 				execCompleted = true;
 			}
@@ -676,11 +676,11 @@ public class QuickCheck
 	{
 		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);
 
-		if (po.typeParams != null)
+		if (po.getTypeParams() != null)
 		{
-			if (po.annotations != null)
+			if (po.getAnnotations() != null)
 			{
-				for (POAnnotation a: po.annotations)
+				for (POAnnotation a: po.getAnnotations())
 				{
 					if (a instanceof POQuickCheckAnnotation)
 					{
@@ -710,7 +710,7 @@ public class QuickCheck
 				ictxt.newMap(0);	// So something to hold defaults
 			}
 			
-			for (TCType type: po.typeParams)
+			for (TCType type: po.getTypeParams())
 			{
 				TCParameterType ptype = (TCParameterType)type;
 				ictxt.setDefaults(ptype.name, new ParameterValue(new TCRealType(po.location)));
@@ -734,9 +734,9 @@ public class QuickCheck
 				INClassDefinition classdef = in.getDefaultClass();
 				ObjectValue object = null;
 
-				if (po.annotations != null)
+				if (po.getAnnotations() != null)
 				{
-					for (POAnnotation a: po.annotations)
+					for (POAnnotation a: po.getAnnotations())
 					{
 						if (a instanceof POQuickCheckAnnotation)
 						{

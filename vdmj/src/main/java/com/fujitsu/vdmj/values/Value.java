@@ -313,7 +313,12 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	
 	public boolean isUndefined()
 	{
-		return false;
+		return false;	// Overridden in UndefinedValue and ReferenceValues
+	}
+	
+	public boolean isDefined()
+	{
+		return !isUndefined();
 	}
 
 	public boolean isVoid()

@@ -42,11 +42,14 @@ public class POImpliesContext extends POContext
 		
 		for (POExpression precondition: preconditions)
 		{
-			sb.append(sep);
-			sb.append(precondition);
-			sep = " and ";
+			if (precondition != null)	// null for missing loop invariant
+			{
+				sb.append(sep);
+				sb.append(precondition);
+				sep = " and ";
 
-			this.reasonsAbout.addAll(precondition.getVariableNames());
+				this.reasonsAbout.addAll(precondition.getVariableNames());
+			}
 		}
 		
 		this.exp = sb.toString();

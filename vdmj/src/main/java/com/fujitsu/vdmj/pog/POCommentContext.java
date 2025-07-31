@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2025 Nick Battle.
+ *	Copyright (c) 2024 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,26 +24,25 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.lex.LexLocation;
 
-public class POExitContext extends POContext
+/**
+ * A context to add an arbitrary comment to the context stack
+ */
+public class POCommentContext extends POContext
 {
-	private final POExpression expression;
-
-	public POExitContext(POExpression expression)
+	private final String comment;
+	private final LexLocation location;
+	
+	public POCommentContext(String comment, LexLocation location)
 	{
-		this.expression = expression;
-	}
-
-	@Override
-	public boolean returnsEarly()
-	{
-		return true;
+		this.comment = comment;
+		this.location = location;
 	}
 	
 	@Override
 	public String getSource()
 	{
-		return "-- Throws exception " + expression;
+		return "-- " + comment + " at " + location.startLine + ":" + location.startPos;
 	}
 }

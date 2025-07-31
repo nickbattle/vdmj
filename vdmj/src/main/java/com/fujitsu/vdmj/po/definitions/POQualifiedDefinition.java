@@ -24,10 +24,12 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -37,18 +39,11 @@ public class POQualifiedDefinition extends PODefinition
 	public final PODefinition def;
 	private final TCType type;
 
-	public POQualifiedDefinition(PODefinition qualifies, TCType type)
+	public POQualifiedDefinition(LexLocation location, TCNameToken name, PODefinition qualifies, TCType type)
 	{
-		super(qualifies.location, qualifies.name);
+		super(location, name);
 		this.def = qualifies;
 		this.type = type;
-	}
-
-	public POQualifiedDefinition(PODefinition qualifies)
-	{
-		super(qualifies.location, qualifies.name);
-		this.def = qualifies;
-		this.type = qualifies.getType();
 	}
 
 	@Override

@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -43,30 +42,31 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 abstract public class POContext
 {
 	private Map<POExpression, TCType> knownTypes = new HashMap<POExpression, TCType>();
+	private String comment = null;
 
 	/**
 	 * Generate the VDM source of the context.
 	 */
 	abstract public String getSource();
 
+	public String getComment()
+	{
+		return comment;
+	}
+
+	protected void setComment(String comment)
+	{
+		this.comment = comment;
+	}
+
 	public String getName()
 	{
 		return "";		// Overridden in PONameContext
 	}
 
-	public POAnnotationList getAnnotations()
-	{
-		return null;
-	}
-	
 	public boolean isExistential()
 	{
 		return false;
-	}
-
-	public TCTypeList getTypeParams()
-	{
-		return null;
 	}
 
 	public TCNameSet reasonsAbout()
@@ -174,5 +174,14 @@ abstract public class POContext
 	public PODefinition getDefinition()
 	{
 		return null;	// See fn/op definition contexts
+	}
+
+	/**
+	 * True if this context causes the flow of control to abort, currently overridden
+	 * for POReturnContext and POExitContexts.
+	 */
+	public boolean returnsEarly()
+	{
+		return false;
 	}
 }

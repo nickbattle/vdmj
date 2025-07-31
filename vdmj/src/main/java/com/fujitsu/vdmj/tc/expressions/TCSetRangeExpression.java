@@ -52,7 +52,7 @@ public class TCSetRangeExpression extends TCSetExpression
 	@Override
 	public String toString()
 	{
-		return "{" + first + ", ... ," + last + "}";
+		return "{" + first + ", ..., " + last + "}";
 	}
 
 	@Override

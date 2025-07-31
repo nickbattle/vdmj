@@ -41,12 +41,36 @@ public class POAltContext extends POContext
 		alternatives = new Vector<POContextStack>();
 	}
 	
+	public POAltContext(List<POContextStack> paths)
+	{
+		this();
+		alternatives.addAll(paths);
+	}
+
+	/**
+	 * Add a particular context stack to the list of alternatives.
+	 */
 	public POContextStack add(POContextStack stack)
 	{
 		alternatives.add(stack);
 		return stack;
 	}
+
+	/**
+	 * Add a list of specific context stacks to the list of alternatives.
+	 */
+	public void addAll(List<POContextStack> paths)
+	{
+		for (POContextStack path: paths)
+		{
+			add(path);
+		}
+	}
 	
+	/**
+	 * Create an empty context stack and add it to the alternatives, then return
+	 * the new stack to be filled (presumably).
+	 */
 	public POContextStack add()
 	{
 		return add(new POContextStack());
