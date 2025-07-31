@@ -217,7 +217,7 @@ public class DefaultExpressionCreator extends TCTypeVisitor<POExpression, Object
 	@Override
 	public POExpression caseRealType(TCRealType node, Object arg)
 	{
-		return new PORealLiteralExpression(new LexRealToken(0.0, location));
+		return new PORealLiteralExpression(new LexRealToken("0.0", location));
 	}
 
 	@Override
