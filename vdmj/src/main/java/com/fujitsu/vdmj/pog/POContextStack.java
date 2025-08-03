@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POInheritedDefinition;
@@ -41,6 +42,7 @@ import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
 import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
@@ -49,6 +51,8 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POContextStack extends Stack<POContext>
 {
@@ -276,6 +280,116 @@ public class POContextStack extends Stack<POContext>
 	}
 
 	/**
+	 * An operation Call[Object]Statement has been made. The ambiguous names are calculated, and these
+	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
+	 * qualification.
+	 * @param pogState 
+	 * @param args 
+	 */
+	public void makeOperationCall(LexLocation from, PODefinition called, POExpressionList args, POGState pogState, Environment env)
+	{
+		if (called == null || called.accessSpecifier.isPure)
+		{
+			return;		// No updates, by definition
+		}
+		else
+		{
+			String opname = called.name.toExplicitString(from);
+			
+			if (called instanceof PORenamedDefinition)
+			{
+				PORenamedDefinition rdef = (PORenamedDefinition)called;
+				called = rdef.def;
+			}
+			else if (called instanceof POInheritedDefinition)
+			{
+				POInheritedDefinition idef = (POInheritedDefinition)called;
+				called = idef.superdef;
+			}
+			
+			if (called instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+				TCNameList names = getStateVariables();
+				
+				if (imp.externals != null && imp.location.module.equals(from.module))
+				{
+					names.clear();
+					
+					for (POExternalClause ext: imp.externals)
+					{
+						if (ext.mode.is(Token.WRITE))
+						{
+							names.addAll(ext.identifiers);
+						}
+					}
+				}
+
+				if (imp.type.result.isReturn())
+				{
+					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+					names.add(result);
+				}
+				
+				push(new POSaveStateContext(getStateDefinition()));
+				POContext forall = new POForAllContext(names, getQualifier(imp.postdef, args), env);
+				forall.setComment("Ambiguous call to " + opname + ", affects " + names);
+				push(forall);
+
+				if (imp.type.result.isReturn())
+				{
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType()));
+				}
+			}
+			else if (called instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exp = (POExplicitOperationDefinition)called;
+				TCNameList names = getStateVariables();
+
+				if (exp.type.result.isReturn())
+				{
+					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+					names.add(result);
+				}
+					
+				push(new POSaveStateContext(getStateDefinition()));
+				POContext forall = new POForAllContext(names, getQualifier(exp.postdef, args), env);
+				forall.setComment("Ambiguous call to " + opname + ", affects " + names);
+				push(forall);
+
+				if (exp.type.result.isReturn())
+				{
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType()));
+				}
+			}
+		}
+	}
+
+	private String getQualifier(POExplicitFunctionDefinition postdef, POExpressionList args)
+	{
+		if (postdef == null)
+		{
+			return null;	// No "post" implies no qualifier
+		}
+
+		PODefinition def = getStateDefinition();	// No state => null
+		String stateArgs = "";
+
+		if (def instanceof POStateDefinition)
+		{
+			POStateDefinition state = (POStateDefinition)def;
+			stateArgs = ", " + POSaveStateContext.OLDNAME + ", " + state.toPattern(false);
+		}
+		else if (def instanceof POClassDefinition)
+		{
+			// No idea!
+		}
+
+		// Create "post_op(args[, oldstate, newstate])"
+		return postdef.name + "(" + Utils.listToString(args) + stateArgs + ")";
+	}
+
+	/**
 	 * The name is typically the name of the top level definition that this context
 	 * belongs to, like the function or operation name. It is only used for labelling.
 	 */
@@ -355,6 +469,20 @@ public class POContextStack extends Stack<POContext>
 			}
 		}
 		
+		return null;
+	}
+	
+	public PODefinition getStateDefinition()
+	{
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POOperationDefinitionContext)
+			{
+				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
+				return opdef.stateDefinition;
+			}
+		}
+
 		return null;
 	}
 	

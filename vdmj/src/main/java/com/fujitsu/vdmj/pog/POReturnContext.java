@@ -24,7 +24,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -39,6 +41,13 @@ public class POReturnContext extends POContext
 		this.pattern = pattern;
 		this.type = type;
 		this.result = result;
+	}
+	
+	public POReturnContext(POPattern pattern, TCType type)
+	{
+		this.pattern = pattern;
+		this.type = type;
+		this.result = new POUndefinedExpression(LexLocation.ANY);
 	}
 	
 	public POReturnContext()
