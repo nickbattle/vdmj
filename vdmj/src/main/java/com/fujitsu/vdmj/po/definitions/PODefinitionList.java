@@ -136,7 +136,8 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		if (!ambiguous.isEmpty())
 		{
 			// Leave just the ambiguities on the stack
-			ctxt.push(new POAmbiguousContext("definitions", ambiguous, location));
+			String reason = ambiguous.size() > 1 ? "definitions" : "definition";
+			ctxt.push(new POAmbiguousContext(reason, ambiguous, location));
 		}
 
 		return obligations;
