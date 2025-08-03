@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -86,8 +88,14 @@ public class POCallStatement extends POStatement
 			i++;
 		}
 
-		ctxt.addOperationCall(location, pogState, opdef, getStmttype().isReturn());
-		// ctxt.makeOperationCall(location, opdef, args, pogState, env);
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			ctxt.makeOperationCall(location, opdef, args, true, pogState, env);
+		}
+		else
+		{
+			ctxt.addOperationCall(location, pogState, opdef, getStmttype().isReturn());
+		}
 		
 		TCType rtype = pogState.getResultType();
 		

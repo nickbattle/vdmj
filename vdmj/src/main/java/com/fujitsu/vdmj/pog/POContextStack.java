@@ -44,14 +44,17 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POContextStack extends Stack<POContext>
@@ -175,39 +178,14 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public void addOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
-		if (called == null)	// An op called in an expression?
+		if (called == null)		// An op called in an expression?
 		{
-			if (addReturn)
-			{
-				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-				TCNameList names = getStateVariables();
-				names.add(result);
-				
-				push(new POAmbiguousContext("operation call", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
-			}
-			else
-			{
-				push(new POAmbiguousContext("operation call", getStateVariables(), from));
-			}
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
 		}
 		else if (called.getPossibleExceptions() != null)
 		{
 			String opname = called.name.toExplicitString(from);
-			
-			if (addReturn)
-			{
-				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-				TCNameList names = getStateVariables();
-				names.add(result);
-				
-				push(new POAmbiguousContext(opname + " throws exceptions", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
-			}
-			else
-			{
-				push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
-			}
+			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -280,17 +258,21 @@ public class POContextStack extends Stack<POContext>
 	}
 
 	/**
-	 * An operation Call[Object]Statement has been made. The ambiguous names are calculated, and these
+	 * An operation CallStatement has been made. The ambiguous names are calculated, and these
 	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
 	 * qualification.
-	 * @param pogState 
-	 * @param args 
 	 */
-	public void makeOperationCall(LexLocation from, PODefinition called, POExpressionList args, POGState pogState, Environment env)
+	public void makeOperationCall(LexLocation from, PODefinition called,
+		POExpressionList args, boolean canReturn, POGState pogState, Environment env)
 	{
-		if (called == null || called.accessSpecifier.isPure)
+		if (called == null)		// Called from an apply expression?
 		{
-			return;		// No updates, by definition
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+		}
+		else if (called.getPossibleExceptions() != null)
+		{
+			String opname = called.name.toExplicitString(from);
+			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
 		}
 		else
 		{
@@ -310,8 +292,13 @@ public class POContextStack extends Stack<POContext>
 			if (called instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
-				TCNameList names = getStateVariables();
+				TCNameList names = new TCNameList();
 				
+				if (!called.accessSpecifier.isPure)
+				{
+					names.addAll(getStateVariables());
+				}
+
 				if (imp.externals != null && imp.location.module.equals(from.module))
 				{
 					names.clear();
@@ -327,37 +314,42 @@ public class POContextStack extends Stack<POContext>
 
 				if (imp.type.result.isReturn())
 				{
-					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+					TCNameToken result = new TCNameToken(from, from.module, imp.result.pattern.toString());
 					names.add(result);
+					env = new FlatEnvironment(new TCLocalDefinition(from, result, imp.result.type), env);
 				}
 				
 				push(new POSaveStateContext(getStateDefinition()));
-				POContext forall = new POForAllContext(names, getQualifier(imp.postdef, args), env);
-				forall.setComment("Ambiguous call to " + opname + ", affects " + names);
-				push(forall);
+				push(new POForAllContext(names, getPostQualifier(imp.postdef, args), env));
+				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
-				if (imp.type.result.isReturn())
+				if (canReturn && imp.type.result.isReturn())
 				{
-					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType()));
+					push(new POReturnContext(imp.result.pattern, imp.result.type));
 				}
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
 				POExplicitOperationDefinition exp = (POExplicitOperationDefinition)called;
-				TCNameList names = getStateVariables();
+				TCNameList names = new TCNameList();
+
+				if (!called.accessSpecifier.isPure)
+				{
+					names.addAll(getStateVariables());
+				}
 
 				if (exp.type.result.isReturn())
 				{
-					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
+					TCNameToken result = TCNameToken.getResult(from);	// "RESULT"
 					names.add(result);
+					env = new FlatEnvironment(new TCLocalDefinition(from, result, exp.type.result), env);
 				}
 					
 				push(new POSaveStateContext(getStateDefinition()));
-				POContext forall = new POForAllContext(names, getQualifier(exp.postdef, args), env);
-				forall.setComment("Ambiguous call to " + opname + ", affects " + names);
-				push(forall);
+				push(new POForAllContext(names, getPostQualifier(exp.postdef, args), env));
+				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
-				if (exp.type.result.isReturn())
+				if (canReturn && exp.type.result.isReturn())
 				{
 					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType()));
 				}
@@ -365,28 +357,51 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 
-	private String getQualifier(POExplicitFunctionDefinition postdef, POExpressionList args)
+	private String getPostQualifier(POExplicitFunctionDefinition postdef, POExpressionList args)
 	{
 		if (postdef == null)
 		{
 			return null;	// No "post" implies no qualifier
 		}
 
+		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
+
+		if (postdef.type.result.isReturn())			// ie. not ()
+		{
+			// Result pattern is after the args patterns in the post_op definition
+			POPattern result = postdef.paramPatternList.get(0).get(args.size());
+			postArgs.append(", ");
+			postArgs.append(result.toString());
+		}
+
 		PODefinition def = getStateDefinition();	// No state => null
-		String stateArgs = "";
 
 		if (def instanceof POStateDefinition)
 		{
 			POStateDefinition state = (POStateDefinition)def;
-			stateArgs = ", " + POSaveStateContext.OLDNAME + ", " + state.toPattern(false);
+			postArgs.append(", ");
+			postArgs.append(POSaveStateContext.OLDNAME);
+			postArgs.append(", ");
+			postArgs.append(state.toPattern(false));
 		}
 		else if (def instanceof POClassDefinition)
 		{
 			// No idea!
 		}
 
-		// Create "post_op(args[, oldstate, newstate])"
-		return postdef.name + "(" + Utils.listToString(args) + stateArgs + ")";
+		// Create "post_op(args[, result, oldstate, newstate])"
+		return postdef.name + "(" + postArgs.toString() + ")";
+	}
+
+	/**
+	 * Add a comment to the last item on the stack - usually the one last pushed.
+	 */
+	public void setComment(String comment)
+	{
+		if (!isEmpty())
+		{
+			peek().setComment(comment);
+		}
 	}
 
 	/**

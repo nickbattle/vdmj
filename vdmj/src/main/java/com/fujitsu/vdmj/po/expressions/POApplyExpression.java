@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
@@ -173,8 +175,14 @@ public class POApplyExpression extends POExpression
 			
 			if (type.isOperation(location))
 			{
-				// Mark the context stack as ambiguous, if needed. This marks subsequent POs Unchecked.
-				ctxt.addOperationCall(location, pogState, opdef, false);
+				if (Settings.dialect == Dialect.VDM_SL)
+				{
+					ctxt.makeOperationCall(location, opdef, args, false, pogState, env);
+				}
+				else
+				{
+					ctxt.addOperationCall(location, pogState, opdef, false);
+				}
 				
 				// Additionally, op returns are generally ambiguous, so that if this expression
 				// is being used to define something in a "let", we can mark that as ambiguous too.

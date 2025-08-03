@@ -159,13 +159,13 @@ public class POForAllContext extends POContext
 			}
 
 			sb.append(" &");
+		}
 
-			if (qualifier != null)
-			{
-				sb.append(" ");
-				sb.append(qualifier);
-				sb.append(" =>");
-			}
+		if (qualifier != null)
+		{
+			if (sb.length() > 0) sb.append(" ");
+			sb.append(qualifier);
+			sb.append(" =>");
 		}
 
 		return sb.toString();
