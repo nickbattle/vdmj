@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POCommentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
@@ -96,6 +97,7 @@ public class POForIndexStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
+		pogState.setAmbiguous(false);
 		ProofObligationList obligations = from.getProofObligations(ctxt, pogState, env);
 		obligations.addAll(to.getProofObligations(ctxt, pogState, env));
 
@@ -104,6 +106,7 @@ public class POForIndexStatement extends POStatement
 			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
 		}
 
+		boolean varAmbiguous = pogState.isAmbiguous();
 		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
 		POExpression invariant = null;
@@ -114,6 +117,11 @@ public class POForIndexStatement extends POStatement
 		}
 
 		POAltContext altCtxt = new POAltContext();
+
+		if (varAmbiguous)
+		{
+			ctxt.push(new POAmbiguousContext("loop var", var, location));
+		}
 
 		if (invariant == null)
 		{

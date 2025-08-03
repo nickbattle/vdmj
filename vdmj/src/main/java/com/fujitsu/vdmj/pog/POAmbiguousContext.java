@@ -47,6 +47,11 @@ public class POAmbiguousContext extends POContext
 		this.location = location;
 	}
 	
+	public POAmbiguousContext(String reason, TCNameToken var, LexLocation location)
+	{
+		this(reason, new TCNameSet(var), location);
+	}
+
 	@Override
 	public TCNameSet ambiguousVariables()
 	{
