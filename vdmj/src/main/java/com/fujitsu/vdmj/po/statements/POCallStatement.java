@@ -31,9 +31,12 @@ import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -86,6 +89,45 @@ public class POCallStatement extends POStatement
 			}
 
 			i++;
+		}
+
+		if (opdef != null && Settings.dialect == Dialect.VDM_SL)
+		{
+			String prename = null;
+
+			if (opdef instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+				if (exop.predef != null)
+				{
+					prename = exop.predef.name.toExplicitString(location);
+				}
+			}
+			else if (opdef instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+
+				if (imop.predef != null)
+				{
+					prename = imop.predef.name.toExplicitString(location);
+				}
+			}
+
+			if (prename != null)
+			{
+				POExpression root = new POVariableExpression(name, opdef);
+				PODefinition sdef = ctxt.getStateDefinition();
+
+				if (sdef instanceof POStateDefinition)
+				{
+					POStateDefinition state = (POStateDefinition)sdef;
+					POExpressionList preargs = new POExpressionList();
+					preargs.addAll(args);
+					preargs.add(state.getMkExpression());
+					obligations.addAll(FunctionApplyObligation.getAllPOs(root, preargs, prename, ctxt));
+				}
+			}
 		}
 
 		if (Settings.dialect == Dialect.VDM_SL)

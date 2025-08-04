@@ -25,6 +25,8 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POSelfExpression;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 
 public class POObjectSelfDesignator extends POObjectDesignator
@@ -42,5 +44,11 @@ public class POObjectSelfDesignator extends POObjectDesignator
 	public String toString()
 	{
 		return "self";
+	}
+
+	@Override
+	public POExpression getExpression()
+	{
+		return new POSelfExpression(location);
 	}
 }

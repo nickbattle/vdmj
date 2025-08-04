@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 
 /**
  * A class to hold an object assignment designator.
@@ -41,4 +42,6 @@ public abstract class POObjectDesignator extends PONode
 
 	@Override
 	abstract public String toString();
+
+	abstract public POExpression getExpression();
 }
