@@ -181,7 +181,7 @@ public class POApplyExpression extends POExpression
 				}
 				else
 				{
-					ctxt.addOperationCall(location, pogState, opdef, false);
+					ctxt.makeOperationCallPP(location, pogState, opdef, false);
 				}
 				
 				// Additionally, op returns are generally ambiguous, so that if this expression

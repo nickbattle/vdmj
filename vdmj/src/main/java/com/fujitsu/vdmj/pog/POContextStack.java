@@ -179,9 +179,10 @@ public class POContextStack extends Stack<POContext>
 	
 	/**
 	 * Operation calls may cause ambiguities in the state. This is affected by whether
-	 * they are pure or have ext clauses.
+	 * they are pure or have ext clauses. This version is used for PP dialects. The
+	 * equivalent for SL is below.
 	 */
-	public void addOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
+	public void makeOperationCallPP(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
 		if (called == null)		// An op called in an expression?
 		{
@@ -265,7 +266,7 @@ public class POContextStack extends Stack<POContext>
 	/**
 	 * An operation CallStatement has been made. The ambiguous names are calculated, and these
 	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
-	 * qualification.
+	 * qualification, if possible.
 	 */
 	public void makeOperationCall(LexLocation from, PODefinition called,
 		POExpressionList args, boolean canReturn, POGState pogState, Environment env)
@@ -362,6 +363,10 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 
+	/**
+	 * Generate a postcondition function call, passing the arguments given, and calculating the
+	 * names of the preserved state and the new state vector. This is only done for SL!
+	 */
 	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args)
 	{
 		if (postdef == null)
@@ -397,7 +402,7 @@ public class POContextStack extends Stack<POContext>
 		}
 		else if (sdef instanceof POClassDefinition)
 		{
-			// No idea!
+			// No idea! This isn't used for PP dialects currently
 		}
 
 		// Create "post_op(args[, result, oldstate, newstate])"

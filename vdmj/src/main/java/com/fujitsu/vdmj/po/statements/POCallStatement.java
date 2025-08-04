@@ -94,7 +94,7 @@ public class POCallStatement extends POStatement
 		}
 		else
 		{
-			ctxt.addOperationCall(location, pogState, opdef, getStmttype().isReturn());
+			ctxt.makeOperationCallPP(location, pogState, opdef, getStmttype().isReturn());
 		}
 		
 		TCType rtype = pogState.getResultType();
