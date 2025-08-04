@@ -325,7 +325,7 @@ public class POContextStack extends Stack<POContext>
 				}
 				
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(imp.postdef, args), env));
+				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
 				if (canReturn && imp.type.result.isReturn())
@@ -351,7 +351,7 @@ public class POContextStack extends Stack<POContext>
 				}
 					
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(exp.postdef, args), env));
+				push(new POForAllContext(names, getPostQualifier(from, exp.postdef, args), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
 				if (canReturn && exp.type.result.isReturn())
@@ -362,7 +362,7 @@ public class POContextStack extends Stack<POContext>
 		}
 	}
 
-	private String getPostQualifier(POExplicitFunctionDefinition postdef, POExpressionList args)
+	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args)
 	{
 		if (postdef == null)
 		{
@@ -396,7 +396,7 @@ public class POContextStack extends Stack<POContext>
 		}
 
 		// Create "post_op(args[, result, oldstate, newstate])"
-		return postdef.name + "(" + postArgs.toString() + ")";
+		return postdef.name.toExplicitString(from) + "(" + postArgs.toString() + ")";
 	}
 
 	/**
