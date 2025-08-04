@@ -366,7 +366,7 @@ public class POContextStack extends Stack<POContext>
 
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
 
-		if (postdef.type.result.isReturn())			// ie. not ()
+		if (postdef.paramPatternList.size() > args.size() + 2)	// ie. has a RESULT param + 2 states
 		{
 			// Result pattern is after the args patterns in the post_op definition
 			POPattern result = postdef.paramPatternList.get(0).get(args.size());
