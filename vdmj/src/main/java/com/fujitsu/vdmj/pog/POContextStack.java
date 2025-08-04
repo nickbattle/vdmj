@@ -370,7 +370,7 @@ public class POContextStack extends Stack<POContext>
 		{
 			// Result pattern is after the args patterns in the post_op definition
 			POPattern result = postdef.paramPatternList.get(0).get(args.size());
-			postArgs.append(", ");
+			if (postArgs.length() > 0) postArgs.append(", ");
 			postArgs.append(result.toString());
 		}
 
@@ -379,7 +379,7 @@ public class POContextStack extends Stack<POContext>
 		if (def instanceof POStateDefinition)
 		{
 			POStateDefinition state = (POStateDefinition)def;
-			postArgs.append(", ");
+			if (postArgs.length() > 0) postArgs.append(", ");
 			postArgs.append(POSaveStateContext.OLDNAME);
 			postArgs.append(", ");
 			postArgs.append(state.toPattern(false));
