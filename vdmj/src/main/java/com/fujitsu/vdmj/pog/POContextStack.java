@@ -370,8 +370,11 @@ public class POContextStack extends Stack<POContext>
 		}
 
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
+		PODefinition sdef = getStateDefinition();				// No state => null
 
-		if (postdef.paramPatternList.size() > args.size() + 2)	// ie. has a RESULT param + 2 states
+		int noResult = args.size() + (sdef == null ? 0 : 2);	// args, [result], [oldstate, newstate]
+
+		if (postdef.paramPatternList.get(0).size() > noResult)
 		{
 			// Result pattern is after the args patterns in the post_op definition
 			POPattern result = postdef.paramPatternList.get(0).get(args.size());
@@ -379,17 +382,15 @@ public class POContextStack extends Stack<POContext>
 			postArgs.append(result.toString());
 		}
 
-		PODefinition def = getStateDefinition();	// No state => null
-
-		if (def instanceof POStateDefinition)
+		if (sdef instanceof POStateDefinition)
 		{
-			POStateDefinition state = (POStateDefinition)def;
+			POStateDefinition state = (POStateDefinition)sdef;
 			if (postArgs.length() > 0) postArgs.append(", ");
 			postArgs.append(POSaveStateContext.OLDNAME);
 			postArgs.append(", ");
 			postArgs.append(state.toPattern(false));
 		}
-		else if (def instanceof POClassDefinition)
+		else if (sdef instanceof POClassDefinition)
 		{
 			// No idea!
 		}
