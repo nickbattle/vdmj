@@ -369,6 +369,11 @@ public class POContextStack extends Stack<POContext>
 			return null;	// No "post" implies no qualifier
 		}
 
+		if (!postdef.location.module.equals(from.module))
+		{
+			return null;	// We can't create Sigma values for external modules??
+		}
+
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
 		PODefinition sdef = getStateDefinition();				// No state => null
 
@@ -396,7 +401,7 @@ public class POContextStack extends Stack<POContext>
 		}
 
 		// Create "post_op(args[, result, oldstate, newstate])"
-		return postdef.name.toExplicitString(from) + "(" + postArgs.toString() + ")";
+		return postdef.name + "(" + postArgs.toString() + ")";
 	}
 
 	/**
