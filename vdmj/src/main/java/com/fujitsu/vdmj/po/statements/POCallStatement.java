@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.FunctionApplyObligation;
+import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -125,7 +125,7 @@ public class POCallStatement extends POStatement
 					POExpressionList preargs = new POExpressionList();
 					preargs.addAll(args);
 					preargs.add(state.getMkExpression());
-					obligations.addAll(FunctionApplyObligation.getAllPOs(root, preargs, prename, ctxt));
+					obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
 				}
 			}
 		}

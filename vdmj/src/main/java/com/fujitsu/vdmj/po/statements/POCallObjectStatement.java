@@ -131,7 +131,7 @@ public class POCallObjectStatement extends POStatement
 		// 		POExpressionList preargs = new POExpressionList();
 		// 		preargs.addAll(args);
 		// 		preargs.add(new POSelfExpression(location));
-		// 		obligations.addAll(FunctionApplyObligation.getAllPOs(call, preargs, FunctionApplyObligation.UNKNOWN, ctxt));
+		// 		obligations.addAll(OperationPreConditionObligation.getAllPOs(call, preargs, FunctionApplyObligation.UNKNOWN, ctxt));
 		// 	}
 		// }
 
