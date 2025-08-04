@@ -132,7 +132,12 @@ public class POContextStack extends Stack<POContext>
 						{
 							POContextStack combined = new POContextStack();
 							combined.addAll(original);
-							combined.addAll(alternative);
+
+							if (!original.returnsEarly())
+							{
+								combined.addAll(alternative);
+							}
+
 							toAdd.add(combined);
 						}
 					}
