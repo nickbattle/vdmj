@@ -37,6 +37,7 @@ public enum DebugType
 	UP,
 	DOWN,
 	SOURCE,
+	STATE,
 	STOP,
 	THREAD,
 	THREADS,

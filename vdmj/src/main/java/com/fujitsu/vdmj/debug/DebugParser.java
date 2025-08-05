@@ -87,6 +87,10 @@ public class DebugParser
 			{
 				return DebugCommand.SOURCE;
 			}
+			else if (argv[0].equals("state"))
+			{
+				return DebugCommand.STATE;
+			}
 			else if (argv[0].equals("threads"))
 			{
 				return DebugCommand.THREADS;
