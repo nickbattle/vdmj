@@ -182,7 +182,7 @@ public class POContextStack extends Stack<POContext>
 	 * they are pure or have ext clauses. This version is used for PP dialects. The
 	 * equivalent for SL is below.
 	 */
-	public void makeOperationCallPP(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
+	public void makeOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
 		if (called == null)		// An op called in an expression?
 		{

@@ -49,7 +49,7 @@ public class POSaveStateContext extends POContext
 		}
 		else
 		{
-			this.state = null;
+			this.state = null;	// Produces nothing in getSource
 			this.clazz = null;
 		}
 	}
