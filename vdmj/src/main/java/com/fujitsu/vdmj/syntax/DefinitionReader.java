@@ -1349,7 +1349,7 @@ public class DefinitionReader extends SyntaxReader
 
 		if (postMandatory)	// Mandatory for standard implicit operations
 		{
-			checkFor(Token.POST, 2105, "Implicit operation must define a post condition");
+			checkFor(Token.POST, 2105, "Implicit operation must define == <stmt> or post condition");
 			postcondition = expr.readExpression();
 		}
 		else
