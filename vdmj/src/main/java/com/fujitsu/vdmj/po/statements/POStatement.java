@@ -159,7 +159,7 @@ public abstract class POStatement extends PONode
 		}
 		catch (POOperationExtractionException e)
 		{
-			return exp;
+			return exp;		// Caller decides if this is ambiguous
 		}
 	}
 

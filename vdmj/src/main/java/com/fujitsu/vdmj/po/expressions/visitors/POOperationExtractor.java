@@ -28,12 +28,21 @@ import java.util.LinkedHashMap;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
+import com.fujitsu.vdmj.po.expressions.POCharLiteralExpression;
+import com.fujitsu.vdmj.po.expressions.PODivideExpression;
 import com.fujitsu.vdmj.po.expressions.POExists1Expression;
 import com.fujitsu.vdmj.po.expressions.POExistsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POForAllExpression;
+import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
+import com.fujitsu.vdmj.po.expressions.POQuoteLiteralExpression;
+import com.fujitsu.vdmj.po.expressions.PORealLiteralExpression;
+import com.fujitsu.vdmj.po.expressions.POStringLiteralExpression;
+import com.fujitsu.vdmj.po.expressions.POSubtractExpression;
+import com.fujitsu.vdmj.po.expressions.POTimesExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -114,8 +123,52 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 	}
 
 	/**
-	 * Implemented substitutions...
+	 * Implemented substitutions. Each case returns a copy of itself, with any sub-expressions
+	 * processed by the same visitor.
 	 */
+
+	@Override
+	public POExpression caseVariableExpression(POVariableExpression node, Object arg)
+	{
+		return node;	// No subexpresstions
+	}
+
+	@Override
+	public POExpression caseCharLiteralExpression(POCharLiteralExpression node, Object arg)
+	{
+		return node;
+	}
+
+	@Override
+	public POExpression caseRealLiteralExpression(PORealLiteralExpression node, Object arg)
+	{
+		return node;
+	}
+
+	@Override
+	public POExpression caseQuoteLiteralExpression(POQuoteLiteralExpression node, Object arg)
+	{
+		return node;
+	}
+
+	@Override
+	public POExpression caseStringLiteralExpression(POStringLiteralExpression node, Object arg)
+	{
+		return node;
+	}
+
+	@Override
+	public POExpression caseIntegerLiteralExpression(POIntegerLiteralExpression node, Object arg)
+	{
+		return node;
+	}
+
+	@Override
+	public POExpression caseBooleanLiteralExpression(POBooleanLiteralExpression node, Object arg)
+	{
+		return node;
+	}
+
 	@Override
 	public POExpression casePlusExpression(POPlusExpression node, Object arg)
 	{
@@ -123,6 +176,39 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 			node.left.apply(this, arg),
 			new LexKeywordToken(Token.PLUS, node.location),
 			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype);
+	}
+
+	@Override
+	public POExpression caseSubtractExpression(POSubtractExpression node, Object arg)
+	{
+		return new POSubtractExpression(
+			node.left.apply(this, null),
+			new LexKeywordToken(Token.MINUS, node.location),
+			node.right.apply(this, null),
+			node.ltype,
+			node.rtype);
+	}
+
+	@Override
+	public POExpression caseTimesExpression(POTimesExpression node, Object arg)
+	{
+		return new POTimesExpression(
+			node.left.apply(this, null),
+			new LexKeywordToken(Token.TIMES, node.location),
+			node.right.apply(this, null),
+			node.ltype,
+			node.rtype);
+	}
+
+	@Override
+	public POExpression caseDivideExpression(PODivideExpression node, Object arg)
+	{
+		return new PODivideExpression(
+			node.left.apply(this, null),
+			new LexKeywordToken(Token.DIVIDE, node.location),
+			node.right.apply(this, null),
 			node.ltype,
 			node.rtype);
 	}
@@ -156,7 +242,7 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 		}
 		else
 		{
-			throw new POOperationExtractionException(node, "unexpected name?");
+			throw new POOperationExtractionException(node, "no operation name?");
 		}
 	}
 

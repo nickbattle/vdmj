@@ -332,10 +332,10 @@ public class POContextStack extends Stack<POContext>
 				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
-				if (canReturn && imp.type.result.isReturn())
-				{
-					push(new POReturnContext(imp.result.pattern, imp.result.type));
-				}
+				// if (canReturn && imp.type.result.isReturn())
+				// {
+				// 	push(new POReturnContext(imp.result.pattern, imp.result.type));
+				// }
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
@@ -362,10 +362,11 @@ public class POContextStack extends Stack<POContext>
 				push(new POForAllContext(names, getPostQualifier(from, exp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
-				if (canReturn && exp.type.result.isReturn())
-				{
-					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType()));
-				}
+				// if (canReturn && exp.type.result.isReturn())
+				// {
+				// 	POExpression rv = new POVariableExpression(resultVar, null);
+				// 	push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), rv));
+				// }
 			}
 		}
 	}
