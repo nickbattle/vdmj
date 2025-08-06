@@ -430,7 +430,7 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 			node.location,
 			node.exp.apply(this, arg),
 			cases,
-			node.others.apply(this, arg),
+			node.others == null ? null : node.others.apply(this, arg),
 			node.expType));
 	}
 
