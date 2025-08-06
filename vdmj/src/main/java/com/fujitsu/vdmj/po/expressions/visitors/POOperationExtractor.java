@@ -28,47 +28,87 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.annotations.POAnnotatedExpression;
 import com.fujitsu.vdmj.po.expressions.POAbsoluteExpression;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POCardinalityExpression;
+import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
+import com.fujitsu.vdmj.po.expressions.POCaseAlternativeList;
+import com.fujitsu.vdmj.po.expressions.POCasesExpression;
+import com.fujitsu.vdmj.po.expressions.POCompExpression;
 import com.fujitsu.vdmj.po.expressions.PODistConcatExpression;
 import com.fujitsu.vdmj.po.expressions.PODistIntersectExpression;
 import com.fujitsu.vdmj.po.expressions.PODistMergeExpression;
 import com.fujitsu.vdmj.po.expressions.PODistUnionExpression;
 import com.fujitsu.vdmj.po.expressions.PODivExpression;
 import com.fujitsu.vdmj.po.expressions.PODivideExpression;
+import com.fujitsu.vdmj.po.expressions.PODomainResByExpression;
+import com.fujitsu.vdmj.po.expressions.PODomainResToExpression;
 import com.fujitsu.vdmj.po.expressions.POElementsExpression;
+import com.fujitsu.vdmj.po.expressions.POElseIfExpression;
+import com.fujitsu.vdmj.po.expressions.POElseIfExpressionList;
+import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POEquivalentExpression;
 import com.fujitsu.vdmj.po.expressions.POExists1Expression;
 import com.fujitsu.vdmj.po.expressions.POExistsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POFieldExpression;
+import com.fujitsu.vdmj.po.expressions.POFieldNumberExpression;
 import com.fujitsu.vdmj.po.expressions.POFloorExpression;
 import com.fujitsu.vdmj.po.expressions.POForAllExpression;
 import com.fujitsu.vdmj.po.expressions.POGreaterEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POGreaterExpression;
 import com.fujitsu.vdmj.po.expressions.POHeadExpression;
+import com.fujitsu.vdmj.po.expressions.POIfExpression;
 import com.fujitsu.vdmj.po.expressions.POImpliesExpression;
+import com.fujitsu.vdmj.po.expressions.POInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POIndicesExpression;
 import com.fujitsu.vdmj.po.expressions.POIotaExpression;
+import com.fujitsu.vdmj.po.expressions.POIsExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
 import com.fujitsu.vdmj.po.expressions.POLessEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POLessExpression;
+import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POMapDomainExpression;
+import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapInverseExpression;
 import com.fujitsu.vdmj.po.expressions.POMapRangeExpression;
+import com.fujitsu.vdmj.po.expressions.POMapUnionExpression;
+import com.fujitsu.vdmj.po.expressions.POMapletExpression;
+import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
+import com.fujitsu.vdmj.po.expressions.POMkBasicExpression;
+import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.POModExpression;
+import com.fujitsu.vdmj.po.expressions.POMuExpression;
+import com.fujitsu.vdmj.po.expressions.PONarrowExpression;
+import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
+import com.fujitsu.vdmj.po.expressions.PONotInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POOrExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
+import com.fujitsu.vdmj.po.expressions.POPlusPlusExpression;
 import com.fujitsu.vdmj.po.expressions.POPowerSetExpression;
+import com.fujitsu.vdmj.po.expressions.POProperSubsetExpression;
+import com.fujitsu.vdmj.po.expressions.PORangeResByExpression;
+import com.fujitsu.vdmj.po.expressions.PORangeResToExpression;
+import com.fujitsu.vdmj.po.expressions.PORecordModifier;
+import com.fujitsu.vdmj.po.expressions.PORecordModifierList;
 import com.fujitsu.vdmj.po.expressions.PORemExpression;
 import com.fujitsu.vdmj.po.expressions.POReverseExpression;
+import com.fujitsu.vdmj.po.expressions.POSeqCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqEnumExpression;
+import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
+import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
+import com.fujitsu.vdmj.po.expressions.POSetIntersectExpression;
+import com.fujitsu.vdmj.po.expressions.POSetRangeExpression;
 import com.fujitsu.vdmj.po.expressions.POSetUnionExpression;
+import com.fujitsu.vdmj.po.expressions.POStarStarExpression;
+import com.fujitsu.vdmj.po.expressions.POSubseqExpression;
+import com.fujitsu.vdmj.po.expressions.POSubsetExpression;
 import com.fujitsu.vdmj.po.expressions.POSubtractExpression;
 import com.fujitsu.vdmj.po.expressions.POTailExpression;
 import com.fujitsu.vdmj.po.expressions.POTimesExpression;
@@ -101,9 +141,9 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 	}
 
 	/**
-	 * The base case catches all of the expression types that have not been implemented
-	 * so far. We return the unchecked expression, unless the type has POExpression fields,
-	 * which indicates a missing visitor method.
+	 * The base case catches all of the expression types that do not have special handling.
+	 * We return the unchecked expression, unless the type has POExpression fields, which
+	 * indicates a missing visitor method.
 	 */
 	@Override
 	public POExpression caseExpression(POExpression node, Object arg)
@@ -170,10 +210,288 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 		throw new POOperationExtractionException(node, "iota quantifier");
 	}
 
+	@Override
+	public POExpression caseSeqCompExpression(POSeqCompExpression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "seq comprehension");
+	}
+
+	@Override
+	public POExpression caseSetCompExpression(POSetCompExpression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "set comprehension");
+	}
+
+	@Override
+	public POExpression caseMapCompExpression(POMapCompExpression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "map comprehension");
+	}
+
 	/**
 	 * Implemented substitutions. Each case returns a copy of itself, with any sub-expressions
 	 * processed by the same visitor.
 	 */
+
+	@Override
+	public POExpression caseAnnotatedExpression(POAnnotatedExpression node, Object arg)
+	{
+		return setType(node, new POAnnotatedExpression(
+			node.location, node.annotation, node.expression));
+	}
+
+	@Override
+	public POExpression caseCompExpression(POCompExpression node, Object arg)
+	{
+		return setType(node, new POCompExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.COMPOSE, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseDomainResByExpression(PODomainResByExpression node, Object arg)
+	{
+		return setType(node, new PODomainResByExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.DOMRESBY, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseDomainResToExpression(PODomainResToExpression node, Object arg)
+	{
+		return setType(node, new PODomainResToExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.DOMRESTO, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseRangeResByExpression(PORangeResByExpression node, Object arg)
+	{
+		return setType(node, new PORangeResByExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.RANGERESBY, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseRangeResToExpression(PORangeResToExpression node, Object arg)
+	{
+		return setType(node, new PORangeResToExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.RANGERESTO, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseEqualsExpression(POEqualsExpression node, Object arg)
+	{
+		return setType(node, new POEqualsExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.EQUALS, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseNotEqualExpression(PONotEqualExpression node, Object arg)
+	{
+		return setType(node, new PONotEqualExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.NE, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseInSetExpression(POInSetExpression node, Object arg)
+	{
+		return setType(node, new POInSetExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.INSET, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseNotInSetExpression(PONotInSetExpression node, Object arg)
+	{
+		return setType(node, new PONotInSetExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.NOTINSET, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseMapUnionExpression(POMapUnionExpression node, Object arg)
+	{
+		return setType(node, new POMapUnionExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.MUNION, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression casePlusPlusExpression(POPlusPlusExpression node, Object arg)
+	{
+		return setType(node, new POPlusPlusExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.PLUSPLUS, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseProperSubsetExpression(POProperSubsetExpression node, Object arg)
+	{
+		return setType(node, new POProperSubsetExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.PSUBSET, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseSubsetExpression(POSubsetExpression node, Object arg)
+	{
+		return setType(node, new POSubsetExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.SUBSET, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseSetDifferenceExpression(POSetDifferenceExpression node, Object arg)
+	{
+		return setType(node, new POSetDifferenceExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.SETDIFF, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseSetIntersectExpression(POSetIntersectExpression node, Object arg)
+	{
+		return setType(node, new POSetIntersectExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.INTER, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseStarStarExpression(POStarStarExpression node, Object arg)
+	{
+		return setType(node, new POStarStarExpression(
+			node.left.apply(this, arg),
+			new LexKeywordToken(Token.STARSTAR, node.location),
+			node.right.apply(this, arg),
+			node.ltype,
+			node.rtype));
+	}
+
+	@Override
+	public POExpression caseCasesExpression(POCasesExpression node, Object arg)
+	{
+		POCaseAlternativeList cases = new POCaseAlternativeList();
+
+		for (POCaseAlternative alt: node.cases)
+		{
+			cases.add(new POCaseAlternative(alt.cexp.apply(this, arg), alt.pattern, alt.result));
+		}
+
+		return setType(node, new POCasesExpression(
+			node.location,
+			node.exp.apply(this, arg),
+			cases,
+			node.others.apply(this, arg),
+			node.expType));
+	}
+
+	@Override
+	public POExpression caseElseIfExpression(POElseIfExpression node, Object arg)
+	{
+		return setType(node, new POElseIfExpression(
+			node.location,
+			node.elseIfExp.apply(this, arg),
+			node.thenExp.apply(this, arg)));
+	}
+
+	@Override
+	public POExpression caseIfExpression(POIfExpression node, Object arg)
+	{
+		POElseIfExpressionList list = new POElseIfExpressionList();
+
+		for (POElseIfExpression elseIf: node.elseList)
+		{
+			list.add(new POElseIfExpression(
+				elseIf.location,
+				elseIf.elseIfExp.apply(this, arg),
+				elseIf.thenExp.apply(this, arg)));
+		}
+
+		return setType(node, new POIfExpression(
+			node.location,
+			node.ifExp.apply(this, arg),
+			node.thenExp.apply(this, arg),
+			list,
+			node.elseExp.apply(this, arg)));
+	}
+
+	@Override
+	public POExpression caseIsExpression(POIsExpression node, Object arg)
+	{
+		return setType(node, new POIsExpression(
+			node.location,
+			node.basictype,
+			node.typename,
+			node.test.apply(this, arg),
+			node.typedef));
+	}
+
+	@Override
+	public POExpression caseFieldExpression(POFieldExpression node, Object arg)
+	{
+		return setType(node, new POFieldExpression(
+			node.object.apply(this, arg),
+			node.field,
+			node.memberName));
+	}
+
+	@Override
+	public POExpression caseFieldNumberExpression(POFieldNumberExpression node, Object arg)
+	{
+		return setType(node, new POFieldNumberExpression(
+			node.tuple.apply(this, arg),
+			node.field,
+			node.type));
+	}
 
 	@Override
 	public POExpression casePlusExpression(POPlusExpression node, Object arg)
@@ -360,6 +678,28 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 	}
 
 	@Override
+	public POExpression caseSetRangeExpression(POSetRangeExpression node, Object arg)
+	{
+		return setType(node, new POSetRangeExpression(
+			node.location,
+			node.first.apply(this, arg),
+			node.last.apply(this, arg),
+			node.ftype,
+			node.ltype));
+	}
+
+	@Override
+	public POExpression caseSubseqExpression(POSubseqExpression node, Object arg)
+	{
+		return setType(node, new POSubseqExpression(
+			node.seq.apply(this, arg),
+			node.from.apply(this, arg),
+			node.to.apply(this, arg),
+			node.ftype,
+			node.ttype));
+	}
+
+	@Override
 	public POExpression caseSeqConcatExpression(POSeqConcatExpression node, Object arg)
 	{
 		return setType(node, new POSeqConcatExpression(
@@ -382,6 +722,67 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 	{
 		return setType(node, new POSetEnumExpression(
 			node.location, applyList(node.members, arg), node.types));
+	}
+
+	@Override
+	public POExpression caseMapEnumExpression(POMapEnumExpression node, Object arg)
+	{
+		POMapletExpressionList list = new POMapletExpressionList();
+
+		for (POMapletExpression maplet: node.members)
+		{
+			list.add(new POMapletExpression(
+				maplet.location,
+				maplet.left.apply(this, arg),
+				maplet.right.apply(this, arg)));
+		}
+
+		return setType(node, new POMapEnumExpression(
+			node.location, list, node.domtypes, node.rngtypes));
+	}
+
+	@Override
+	public POExpression caseMkBasicExpression(POMkBasicExpression node, Object arg)
+	{
+		return setType(node, new POMkBasicExpression(
+			node.type, node.arg.apply(this, arg)));
+	}
+
+	@Override
+	public POExpression caseMkTypeExpression(POMkTypeExpression node, Object arg)
+	{
+		return setType(node, new POMkTypeExpression(
+			node.typename, applyList(node.args, arg), node.recordType, node.argTypes));
+	}
+
+	@Override
+	public POExpression caseMuExpression(POMuExpression node, Object arg)
+	{
+		PORecordModifierList list = new PORecordModifierList();
+
+		for (PORecordModifier modifier: node.modifiers)
+		{
+			list.add(new PORecordModifier(modifier.tag, modifier.value.apply(this, arg)));
+		}
+
+		return setType(node, new POMuExpression(
+			node.location,
+			node.record.apply(this, arg),
+			list,
+			node.recordType,
+			node.modTypes));
+	}
+
+	@Override
+	public POExpression caseNarrowExpression(PONarrowExpression node, Object arg)
+	{
+		return setType(node, new PONarrowExpression(
+			node.location,
+			node.basictype,
+			node.typename,
+			node.test.apply(this, arg),
+			node.typedef,
+			node.testtype));
 	}
 
 	@Override
@@ -537,11 +938,12 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 			POVariableExpression root = (POVariableExpression)node.root;
 
 			name = new TCNameToken(node.location, root.name.getModule(), "$" + root.name.getName());
-			int count = 1;
+			String ext = "abcdefghijklmnopqrstuvwxyz";	// Should be enough :)
+			int count = 0;
 
 			while (substitutions.containsKey(name))
 			{
-				name = new TCNameToken(node.location, root.name.getModule(), "$" + root.name.getName() + "_" + count);
+				name = new TCNameToken(node.location, root.name.getModule(), "$" + root.name.getName() + ext.charAt(count));
 				count++;
 			}
 
