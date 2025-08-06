@@ -114,7 +114,7 @@ public class POAssignmentStatement extends POStatement
 		else
 		{
 			// Updated a variable with an ambiguous value, so it becomes ambiguous
-			// ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
+			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
 		}
 
 		if (!inConstructor &&

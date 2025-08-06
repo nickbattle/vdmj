@@ -38,7 +38,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 public class POTailExpression extends POUnaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	private final TCType etype;
+	public final TCType etype;
 
 	public POTailExpression(LexLocation location, POExpression exp, TCType etype)
 	{
