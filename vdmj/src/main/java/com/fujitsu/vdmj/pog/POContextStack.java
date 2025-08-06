@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
-import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
@@ -269,7 +268,7 @@ public class POContextStack extends Stack<POContext>
 	 * qualification, if possible.
 	 */
 	public void makeOperationCall(LexLocation from, PODefinition called,
-		POExpressionList args, boolean canReturn, POGState pogState, Environment env)
+		POExpressionList args, TCNameToken resultVar, boolean canReturn, POGState pogState, Environment env)
 	{
 		if (called == null)		// Called from an apply expression?
 		{
@@ -320,13 +319,17 @@ public class POContextStack extends Stack<POContext>
 
 				if (imp.type.result.isReturn())
 				{
-					TCNameToken result = new TCNameToken(from, from.module, imp.result.pattern.toString());
-					names.add(result);
-					env = new FlatEnvironment(new TCLocalDefinition(from, result, imp.result.type), env);
+					if (resultVar == null)
+					{
+						resultVar = new TCNameToken(from, from.module, imp.result.pattern.toString());
+					}
+
+					names.add(resultVar);
+					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, imp.result.type), env);
 				}
 				
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args), env));
+				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
 				if (canReturn && imp.type.result.isReturn())
@@ -346,13 +349,17 @@ public class POContextStack extends Stack<POContext>
 
 				if (exp.type.result.isReturn())
 				{
-					TCNameToken result = TCNameToken.getResult(from);	// "RESULT"
-					names.add(result);
-					env = new FlatEnvironment(new TCLocalDefinition(from, result, exp.type.result), env);
+					if (resultVar == null)
+					{
+						resultVar = TCNameToken.getResult(from);	// "RESULT"
+					}
+
+					names.add(resultVar);
+					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exp.type.result), env);
 				}
 					
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, exp.postdef, args), env));
+				push(new POForAllContext(names, getPostQualifier(from, exp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
 
 				if (canReturn && exp.type.result.isReturn())
@@ -367,7 +374,7 @@ public class POContextStack extends Stack<POContext>
 	 * Generate a postcondition function call, passing the arguments given, and calculating the
 	 * names of the preserved state and the new state vector. This is only done for SL!
 	 */
-	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args)
+	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
 	{
 		if (postdef == null)
 		{
@@ -382,14 +389,10 @@ public class POContextStack extends Stack<POContext>
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
 		PODefinition sdef = getStateDefinition();				// No state => null
 
-		int noResult = args.size() + (sdef == null ? 0 : 2);	// args, [result], [oldstate, newstate]
-
-		if (postdef.paramPatternList.get(0).size() > noResult)
+		if (resultVar != null)
 		{
-			// Result pattern is after the args patterns in the post_op definition
-			POPattern result = postdef.paramPatternList.get(0).get(args.size());
 			if (postArgs.length() > 0) postArgs.append(", ");
-			postArgs.append(result.toString());
+			postArgs.append(resultVar.getName());
 		}
 
 		if (sdef instanceof POStateDefinition)

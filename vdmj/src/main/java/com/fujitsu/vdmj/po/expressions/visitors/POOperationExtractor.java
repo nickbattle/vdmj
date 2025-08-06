@@ -24,14 +24,15 @@
 
 package com.fujitsu.vdmj.po.expressions.visitors;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.LinkedHashMap;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.expressions.POExists1Expression;
+import com.fujitsu.vdmj.po.expressions.POExistsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POForAllExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -41,27 +42,36 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
  * replacing them with variable expressions and creating a table of variables
  * and their operation calls. This is used by the POG to generate contexts
  * for expressions that contain operation calls.
+ * 
+ * Failing expressions throw a POOperationExtractionException.
  */
 public class POOperationExtractor extends POExpressionVisitor<POExpression, Object>
 {
-	private final Map<TCNameToken, POApplyExpression> substitutions;
+	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
 
 	public POOperationExtractor()
 	{
-		this.substitutions = new HashMap<TCNameToken, POApplyExpression>();
+		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
 	}
 
-	public Map<TCNameToken, POApplyExpression> getSubstitutions()
+	public LinkedHashMap<TCNameToken, POApplyExpression> getSubstitutions()
 	{
 		return substitutions;
 	}
 
+	/**
+	 * The base case catches all of the expression types that have not been implemented
+	 * so far.
+	 */
 	@Override
 	public POExpression caseExpression(POExpression node, Object arg)
 	{
-		return node;
+		throw new POOperationExtractionException(node, "unsupported");
 	}
 
+	/**
+	 * Apply expressions are substituted if they relate to operation calls.
+	 */
 	@Override
 	public POExpression caseApplyExpression(POApplyExpression node, Object arg)
 	{
@@ -81,6 +91,31 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 		}
 	}
 
+	/**
+	 * The following expressions cannot be substituted, because they have an unknown
+	 * number of operation calls.
+	 */
+	@Override
+	public POExpression caseForAllExpression(POForAllExpression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "forall quantifier");
+	}
+
+	@Override
+	public POExpression caseExistsExpression(POExistsExpression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "exists quantifier");
+	}
+
+	@Override
+	public POExpression caseExists1Expression(POExists1Expression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "exists1 quantifier");
+	}
+
+	/**
+	 * Implemented substitutions...
+	 */
 	@Override
 	public POExpression casePlusExpression(POPlusExpression node, Object arg)
 	{
@@ -121,10 +156,13 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 		}
 		else
 		{
-			return node;	// Never happens with op calls?
+			throw new POOperationExtractionException(node, "unexpected name?");
 		}
 	}
 
+	/**
+	 * Apply the visitor to a list of expressions.
+	 */
 	private POExpressionList applyList(POExpressionList arglist, Object arg)
 	{
 		POExpressionList result = new POExpressionList();

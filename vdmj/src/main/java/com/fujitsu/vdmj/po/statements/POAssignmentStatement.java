@@ -82,13 +82,16 @@ public class POAssignmentStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 		pogState.setAmbiguous(false);
 
+		// Attempt to extract operation calls from the RHS
+		POExpression extracted = extractOpCalls(exp, pogState, ctxt, env);
+
 		obligations.addAll(target.getProofObligations(ctxt));
-		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{
 			obligations.addAll(
-				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
+				SubTypeObligation.getAllPOs(extracted, targetType, expType, ctxt));
 		}
 		
 		TCNameToken update = target.updatedVariableName();
@@ -97,7 +100,7 @@ public class POAssignmentStatement extends POStatement
 		
 		if (!pogState.isAmbiguous())
 		{
-			ctxt.push(new POAssignmentContext(target, targetType, exp));
+			ctxt.push(new POAssignmentContext(target, targetType, extracted));
 			
 			// We can disambiguate variables in an assignment that assigns unambiguous values,
 			// like constants or variables that are unambiguous, but only if the entire value
