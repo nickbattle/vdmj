@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -58,6 +59,18 @@ public class POExpressionList extends POMappedList<TCExpression, POExpression>
 		for (POExpression e: this)
 		{
 			list.addAll(e.getProofObligations(ctxt, pogState, env));
+		}
+
+		return list;
+	}
+
+	public TCTypeList getTypes()
+	{
+		TCTypeList list = new TCTypeList();
+
+		for (POExpression exp: this)
+		{
+			list.add(exp.getExptype());
 		}
 
 		return list;

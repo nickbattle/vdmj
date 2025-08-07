@@ -64,10 +64,15 @@ public class POReturnStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 		TCType rtype = null;
 
+		POExpression extracted = null;
+		
 		if (expression != null)
 		{
+			// Attempt to extract operation calls from the RHS
+			extracted = extractOpCalls(expression, obligations, pogState, ctxt, env);
+
 			pogState.setAmbiguous(false);
-			obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
 			
 			PODefinition definition = ctxt.getDefinition();
 			
@@ -84,7 +89,7 @@ public class POReturnStatement extends POStatement
 			
 			if (rtype != null && !TypeComparator.isSubType(getStmttype(), rtype))
 			{
-				obligations.addAll(SubTypeObligation.getAllPOs(expression, rtype, getStmttype(), ctxt));
+				obligations.addAll(SubTypeObligation.getAllPOs(extracted, rtype, getStmttype(), ctxt));
 			}
 		}
 		
@@ -95,13 +100,13 @@ public class POReturnStatement extends POStatement
 			POPattern result = pogState.getResultPattern();
 			TCType resultType = pogState.getResultType();
 
-			if (pogState.isAmbiguous())		// expression has ambiguous values
+			if (pogState.isAmbiguous())		// extracted still has ambiguous values
 			{
 				ctxt.push(new POAmbiguousContext("return", result.getVariableNames(), location));
 				pogState.setAmbiguous(false);
 			}
 
-			ctxt.push(new POReturnContext(result, resultType, expression));
+			ctxt.push(new POReturnContext(result, resultType, extracted));
 		}
 		else
 		{

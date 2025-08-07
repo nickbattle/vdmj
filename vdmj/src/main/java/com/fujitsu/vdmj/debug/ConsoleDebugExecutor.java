@@ -29,12 +29,15 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.Value;
@@ -127,6 +130,10 @@ public class ConsoleDebugExecutor implements DebugExecutor
 					
 				case SOURCE:
 					result = doSource();
+					break;
+					
+				case STATE:
+					result = doState();
 					break;
 					
 				case PRINT:
@@ -298,6 +305,18 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		return new DebugCommand(DebugType.SOURCE, sb.toString());
 	}
 
+	private DebugCommand doState()
+	{
+		if (Settings.dialect != Dialect.VDM_SL)
+		{
+			return new DebugCommand(DebugType.ERROR, "Command is only availble for VDM-SL");
+		}
+
+		ModuleInterpreter interpreter = (ModuleInterpreter)this.interpreter;
+		Context c = interpreter.getStateContext();
+		return new DebugCommand(DebugType.STATE, c == null ? "(no state)\n" : c.toString());
+	}
+
 	private DebugCommand doStop()
 	{
 		return DebugCommand.STOP;
@@ -317,6 +336,7 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		sb.append("out - run to the return of functions or operations\n");
 		sb.append("continue - resume execution of all threads\n");
 		sb.append("stack - display the current stack frame context\n");
+		sb.append("state - display the current module state\n");
 		sb.append("up - move the stack frame context up one frame\n");
 		sb.append("down - move the stack frame context down one frame\n");
 		sb.append("source - list VDM source code around the current breakpoint\n");

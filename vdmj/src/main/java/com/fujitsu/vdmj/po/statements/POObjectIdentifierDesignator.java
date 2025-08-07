@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POObjectIdentifierDesignator extends POObjectDesignator
@@ -41,5 +43,11 @@ public class POObjectIdentifierDesignator extends POObjectDesignator
 	public String toString()
 	{
 		return name.toString();
+	}
+
+	@Override
+	public POExpression getExpression()
+	{
+		return new POVariableExpression(name, null);
 	}
 }

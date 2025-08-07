@@ -38,6 +38,7 @@ public class DebugCommand
 	public static final DebugCommand UP			= new DebugCommand(DebugType.UP);
 	public static final DebugCommand DOWN		= new DebugCommand(DebugType.DOWN);
 	public static final DebugCommand SOURCE		= new DebugCommand(DebugType.SOURCE);
+	public static final DebugCommand STATE		= new DebugCommand(DebugType.STATE);
 	public static final DebugCommand STOP		= new DebugCommand(DebugType.STOP);
 	public static final DebugCommand THREADS	= new DebugCommand(DebugType.THREADS);
 	public static final DebugCommand QUIT		= new DebugCommand(DebugType.QUIT);

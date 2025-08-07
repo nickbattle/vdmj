@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -122,7 +121,7 @@ public class TCThreadDefinition extends TCDefinition
 		local.setEnclosingDefinition(this);
 		TCType rt = statement.typeCheck(local, NameScope.NAMESANDSTATE, null, false);
 
-		if (!(rt instanceof TCVoidType) && !(rt instanceof TCUnknownType))
+		if (rt.hasReturn())
 		{
 			report(3049, "Thread statement/operation must not return a value");
 		}

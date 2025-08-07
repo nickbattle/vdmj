@@ -55,6 +55,7 @@ public enum POType
 	STATE_INVARIANT("state invariant"),
 	LOOP_INVARIANT("loop invariant"),
 	LOOP_MEASURE("loop measure"),
+	OP_PRE_CONDITION("operation pre condition"),
 	OP_POST_CONDITION("operation post condition"),
 	OPERATION_PATTERNS("operation parameter patterns"),
 	OP_SATISFIABILITY("operation satisfiability", true),
