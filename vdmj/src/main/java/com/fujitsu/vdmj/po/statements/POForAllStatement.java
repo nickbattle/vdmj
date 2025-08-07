@@ -90,8 +90,11 @@ public class POForAllStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
+		ProofObligationList obligations = new ProofObligationList();
+
 		pogState.setAmbiguous(false);
-		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
+		POExpression eset = extractOpCalls(set, obligations, pogState, ctxt, env);
+		obligations.addAll(eset.getProofObligations(ctxt, pogState, env));
 
 		boolean varAmbiguous = pogState.isAmbiguous();
 		POLoopInvariantList annotations = invariants.getList();
@@ -133,7 +136,7 @@ public class POForAllStatement extends POStatement
 		/**
 		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
 		 */
-		TCSetType stype = set.getExptype().getSet();
+		TCSetType stype = eset.getExptype().getSet();
 		PODefinitionList podefs = pattern.getDefinitions(stype.setof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
@@ -150,9 +153,9 @@ public class POForAllStatement extends POStatement
 		updates.addAll(pattern.getVariableNames());
 		updates.add(ghostName);
 
-		ctxt.push(new POForAllContext(updates, local));						// forall <changed values> and vars
-		ctxt.push(new POImpliesContext(varsInSet(ghostDef), invariant));	// x in set S \ GHOST$ && invariant => ...
-		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));				// ghost := ghost union {x}
+		ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
+		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eset), invariant));	// x in set S \ GHOST$ && invariant => ...
+		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
 
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
@@ -181,7 +184,7 @@ public class POForAllStatement extends POStatement
 			invariant = annotations.combine(true);
 		}
 
-		ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));		// let GHOST$ = set in
+		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eset)));	// let GHOST$ = set in
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
@@ -214,15 +217,15 @@ public class POForAllStatement extends POStatement
 	/**
 	 * Produce "ghost := <set>"
 	 */
-	private POAssignmentDefinition ghostFinal(POAssignmentDefinition ghostDef)
+	private POAssignmentDefinition ghostFinal(POAssignmentDefinition ghostDef, POExpression eset)
 	{
-		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, set, ghostDef.type);
+		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, eset, ghostDef.type);
 	}
 
 	/**
 	 * Produce "x in set (ax \ gx)"
 	 */
-	private POExpression varsInSet(POAssignmentDefinition ghostDef)
+	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eset)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
 		TCType setof = ghostDef.type.getSet().setof;
@@ -231,7 +234,7 @@ public class POForAllStatement extends POStatement
 			pattern.getMatchingExpression(),				// eg mk_(x, y)
 			new LexKeywordToken(Token.INSET, location),
 			new POSetDifferenceExpression(
-				set,
+				eset,
 				new LexKeywordToken(Token.SETDIFF, location),
 				new POVariableExpression(ghostDef.name, vardef), ghostDef.type, ghostDef.type),
 			setof, ghostDef.type);

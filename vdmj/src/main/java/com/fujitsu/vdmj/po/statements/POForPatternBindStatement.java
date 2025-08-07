@@ -108,7 +108,10 @@ public class POForPatternBindStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		pogState.setAmbiguous(false);
-		ProofObligationList obligations = sequence.getProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = new ProofObligationList();
+
+		POExpression eseq = extractOpCalls(sequence, obligations, pogState, ctxt, env);
+		obligations.addAll(eseq.getProofObligations(ctxt, pogState, env));
 
 		boolean varAmbiguous = pogState.isAmbiguous();
 		POLoopInvariantList annotations = invariants.getList();
@@ -157,7 +160,7 @@ public class POForPatternBindStatement extends POStatement
 			
 			if (s != null && !TypeComparator.isSubType(s.seqof, bind.type))
 			{
-				ctxt.push(new POForAllSequenceContext(bind, sequence));
+				ctxt.push(new POForAllSequenceContext(bind, eseq));
 				obligations.addAll(SubTypeObligation.getAllPOs(
 					bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
 				ctxt.pop();
@@ -168,7 +171,7 @@ public class POForPatternBindStatement extends POStatement
 			POSetBind bind = (POSetBind)patternBind.bind;
 			obligations.addAll(bind.set.getProofObligations(ctxt, pogState, env));
 
-			ctxt.push(new POForAllSequenceContext(bind, sequence));
+			ctxt.push(new POForAllSequenceContext(bind, eseq));
 			obligations.addAll(SetMemberObligation.getAllPOs(
 				bind.pattern.getMatchingExpression(), bind.set, ctxt));
 			ctxt.pop();
@@ -178,7 +181,7 @@ public class POForPatternBindStatement extends POStatement
 			POSeqBind bind = (POSeqBind)patternBind.bind;
 			obligations.addAll(bind.sequence.getProofObligations(ctxt, pogState, env));
 
-			ctxt.push(new POForAllSequenceContext(bind, sequence));
+			ctxt.push(new POForAllSequenceContext(bind, eseq));
 			obligations.addAll(SeqMemberObligation.getAllPOs(
 				bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 			ctxt.pop();
@@ -187,7 +190,7 @@ public class POForPatternBindStatement extends POStatement
 		/**
 		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ {x}
 		 */
-		TCSeqType stype = sequence.getExptype().getSeq();
+		TCSeqType stype = eseq.getExptype().getSeq();
 		PODefinitionList podefs = getPattern().getDefinitions(stype.seqof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
@@ -210,7 +213,7 @@ public class POForPatternBindStatement extends POStatement
 		}
 
 		ctxt.push(new POForAllContext(updates, local));
-		ctxt.push(new POImpliesContext(ghostIsPrefix(ghostDef), invariant));
+		ctxt.push(new POImpliesContext(ghostIsPrefix(ghostDef, eseq), invariant));
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
 
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
@@ -240,9 +243,9 @@ public class POForPatternBindStatement extends POStatement
 			invariant = annotations.combine(true);
 		}
 
-		ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));		// let GHOST$ = set in
-		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
-		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
+		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eseq)));		// let GHOST$ = set in
+		ctxt.push(new POForAllContext(updates, env));					// forall <changed variables>
+		ctxt.push(new POImpliesContext(invariant));						// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The two alternatives in one added.
@@ -300,15 +303,15 @@ public class POForPatternBindStatement extends POStatement
 	/**
 	 * Produce "ghost := <sequence>"
 	 */
-	private POAssignmentDefinition ghostFinal(POAssignmentDefinition ghostDef)
+	private POAssignmentDefinition ghostFinal(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
-		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, sequence, ghostDef.type);
+		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, eseq, ghostDef.type);
 	}
 
 	/**
 	 * Produce "GHOST$ = sequence(1, ..., len GHOST$)"
 	 */
-	private POExpression ghostIsPrefix(POAssignmentDefinition ghostDef)
+	private POExpression ghostIsPrefix(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
 		
@@ -316,7 +319,7 @@ public class POForPatternBindStatement extends POStatement
 			new POVariableExpression(ghostDef.name, vardef),
 			new LexKeywordToken(Token.EQUALS, location),
 			new POSubseqExpression(
-				sequence,
+				eseq,
 				new POIntegerLiteralExpression(LexIntegerToken.ONE),
 				new POLenExpression(location,
 					new POVariableExpression(ghostDef.name, vardef)), ghostDef.type, ghostDef.type),
