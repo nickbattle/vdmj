@@ -186,7 +186,8 @@ public class POApplyExpression extends POExpression
 		{
 			obligations.addAll(FunctionApplyObligation.getAllPOs(root, args, prename, ctxt));
 		}
-		else if (type.isOperation(location) && Settings.dialect == Dialect.VDM_SL)
+		else if (Settings.dialect == Dialect.VDM_SL &&
+			type.isOperation(location) && prename != null && !prename.isEmpty())
 		{
 			PODefinition sdef = ctxt.getStateDefinition();
 
