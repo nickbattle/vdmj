@@ -140,7 +140,8 @@ public abstract class POStatement extends PONode
 	 * Analyse an expression to extract the operation apply calls, and add context to the stack,
 	 * before returning the substituted expression. Exceptions lead to an ambiguous context.
 	 */
-	protected POExpression extractOpCalls(POExpression exp, POGState pogState, POContextStack ctxt, Environment env)
+	protected POExpression extractOpCalls(POExpression exp,
+		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
 	{
 		try
 		{
@@ -152,6 +153,14 @@ public abstract class POStatement extends PONode
 			{
 				TCNameToken var = entry.getKey();
 				POApplyExpression apply = entry.getValue();
+
+				// Get any obligations from the preconditions or arguments passed to the apply,
+				// without the rest of the ApplyExpression processing here, because we've removed
+				// the apply calls from the exp.
+				apply.getFuncOpObligations(ctxt, obligations);
+
+				// Then add the "forall" version of the ambiguity for the apply call, which cannot
+				// return at this point (within an expression).
 				ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env);
 			}
 

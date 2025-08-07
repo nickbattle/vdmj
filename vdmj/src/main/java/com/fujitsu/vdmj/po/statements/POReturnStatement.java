@@ -69,7 +69,7 @@ public class POReturnStatement extends POStatement
 		if (expression != null)
 		{
 			// Attempt to extract operation calls from the RHS
-			extracted = extractOpCalls(expression, pogState, ctxt, env);
+			extracted = extractOpCalls(expression, obligations, pogState, ctxt, env);
 
 			pogState.setAmbiguous(false);
 			obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));

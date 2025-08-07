@@ -83,7 +83,7 @@ public class POAssignmentStatement extends POStatement
 		pogState.setAmbiguous(false);
 
 		// Attempt to extract operation calls from the RHS
-		POExpression extracted = extractOpCalls(exp, pogState, ctxt, env);
+		POExpression extracted = extractOpCalls(exp, obligations, pogState, ctxt, env);
 
 		obligations.addAll(target.getProofObligations(ctxt));
 		obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
