@@ -26,6 +26,9 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
@@ -39,6 +42,7 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -106,6 +110,20 @@ public class POStateDefinition extends PODefinition
 		return sb.toString();
 	}
 
+	public POMkTypeExpression getMkExpression()
+	{
+		POExpressionList args = new POExpressionList();
+		TCTypeList argTypes = new TCTypeList();
+
+		for (TCField f: fields)
+		{
+			args.add(new POVariableExpression(f.tagname, null));
+			argTypes.add(f.type);
+		}
+
+		return new POMkTypeExpression(name, args, recordType, argTypes);
+	}
+
 	@Override
 	public TCType getType()
 	{
@@ -142,4 +160,5 @@ public class POStateDefinition extends PODefinition
 	{
 		return visitor.caseStateDefinition(this, arg);
 	}
+
 }

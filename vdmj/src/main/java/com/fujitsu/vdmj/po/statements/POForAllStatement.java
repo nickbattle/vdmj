@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POCommentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
@@ -89,8 +90,13 @@ public class POForAllStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = set.getProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = new ProofObligationList();
 
+		pogState.setAmbiguous(false);
+		POExpression eset = extractOpCalls(set, obligations, pogState, ctxt, env);
+		obligations.addAll(eset.getProofObligations(ctxt, pogState, env));
+
+		boolean varAmbiguous = pogState.isAmbiguous();
 		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
 		POExpression invariant = null;
@@ -103,6 +109,11 @@ public class POForAllStatement extends POStatement
 		POAssignmentDefinition ghostDef = annotations.getGhostDef();
 		TCNameToken ghostName = ghostDef.name;
 		POAltContext altCtxt = new POAltContext();
+
+		if (varAmbiguous)
+		{
+			ctxt.push(new POAmbiguousContext("loop var", pattern.getVariableNames(), location));
+		}
 
 		if (invariant == null)
 		{
@@ -125,7 +136,7 @@ public class POForAllStatement extends POStatement
 		/**
 		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
 		 */
-		TCSetType stype = set.getExptype().getSet();
+		TCSetType stype = eset.getExptype().getSet();
 		PODefinitionList podefs = pattern.getDefinitions(stype.setof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
@@ -142,9 +153,9 @@ public class POForAllStatement extends POStatement
 		updates.addAll(pattern.getVariableNames());
 		updates.add(ghostName);
 
-		ctxt.push(new POForAllContext(updates, local));						// forall <changed values> and vars
-		ctxt.push(new POImpliesContext(varsInSet(ghostDef), invariant));	// x in set S \ GHOST$ && invariant => ...
-		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));				// ghost := ghost union {x}
+		ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
+		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eset), invariant));	// x in set S \ GHOST$ && invariant => ...
+		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
 
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
@@ -173,7 +184,7 @@ public class POForAllStatement extends POStatement
 			invariant = annotations.combine(true);
 		}
 
-		ctxt.push(new POLetDefContext(ghostFinal(ghostDef)));		// let GHOST$ = set in
+		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eset)));	// let GHOST$ = set in
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
@@ -206,15 +217,15 @@ public class POForAllStatement extends POStatement
 	/**
 	 * Produce "ghost := <set>"
 	 */
-	private POAssignmentDefinition ghostFinal(POAssignmentDefinition ghostDef)
+	private POAssignmentDefinition ghostFinal(POAssignmentDefinition ghostDef, POExpression eset)
 	{
-		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, set, ghostDef.type);
+		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, eset, ghostDef.type);
 	}
 
 	/**
 	 * Produce "x in set (ax \ gx)"
 	 */
-	private POExpression varsInSet(POAssignmentDefinition ghostDef)
+	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eset)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
 		TCType setof = ghostDef.type.getSet().setof;
@@ -223,7 +234,7 @@ public class POForAllStatement extends POStatement
 			pattern.getMatchingExpression(),				// eg mk_(x, y)
 			new LexKeywordToken(Token.INSET, location),
 			new POSetDifferenceExpression(
-				set,
+				eset,
 				new LexKeywordToken(Token.SETDIFF, location),
 				new POVariableExpression(ghostDef.name, vardef), ghostDef.type, ghostDef.type),
 			setof, ghostDef.type);

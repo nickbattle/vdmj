@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONewExpression;
 
 public class POObjectNewDesignator extends POObjectDesignator
@@ -41,5 +42,11 @@ public class POObjectNewDesignator extends POObjectDesignator
 	public String toString()
 	{
 		return expression.toString();
+	}
+
+	@Override
+	public POExpression getExpression()
+	{
+		return expression;
 	}
 }

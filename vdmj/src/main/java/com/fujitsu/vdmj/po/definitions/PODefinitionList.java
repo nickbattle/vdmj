@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -32,6 +33,7 @@ import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -96,6 +98,8 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		int count = 0;
+		TCNameList ambiguous = new TCNameList();
+		LexLocation location = LexLocation.ANY;
 
 		for (PODefinition d: this)
 		{
@@ -113,7 +117,8 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 				
 				if (pogState.isAmbiguous())		// Definition defined with ambiguous values
 				{
-					ctxt.push(new POAmbiguousContext("definition", d.getVariableNames(), d.location));
+					ambiguous.addAll(d.getVariableNames());
+					location = d.location;
 					pogState.setAmbiguous(false);
 				}
 				
@@ -126,6 +131,13 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		for (int i=0; i<count; i++)
 		{
 			ctxt.pop();
+		}
+
+		if (!ambiguous.isEmpty())
+		{
+			// Leave just the ambiguities on the stack
+			String reason = ambiguous.size() > 1 ? "definitions" : "definition";
+			ctxt.push(new POAmbiguousContext(reason, ambiguous, location));
 		}
 
 		return obligations;

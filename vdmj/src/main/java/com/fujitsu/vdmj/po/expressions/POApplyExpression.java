@@ -24,12 +24,16 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
+import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -110,30 +114,7 @@ public class POApplyExpression extends POExpression
 			
 			if (type.isFunction(location) || type.isOperation(location))
 			{
-				String prename = root.getPreName();
-	
-				if (type.isFunction(location) && prename != null && !prename.isEmpty())
-				{
-					obligations.addAll(FunctionApplyObligation.getAllPOs(root, args, prename, ctxt));
-				}
-				
-				TCTypeList paramTypes = type.isFunction(location) ?
-						type.getFunction().parameters : type.getOperation().parameters;
-					
-				int i=0;
-	
-				for (TCType at: argtypes)
-				{
-					at = ctxt.checkType(args.get(i), at);
-					TCType pt = paramTypes.get(i);
-	
-					if (!TypeComparator.isSubType(at, pt))
-					{
-						obligations.addAll(SubTypeObligation.getAllPOs(args.get(i), pt, at, ctxt));
-					}
-	
-					i++;
-				}
+				getFuncOpObligations(ctxt, obligations);	// Below
 			}
 	
 			if (type.isFunction(location))
@@ -173,8 +154,9 @@ public class POApplyExpression extends POExpression
 			
 			if (type.isOperation(location))
 			{
-				// Mark the context stack as ambiguous, if needed. This marks subsequent POs Unchecked.
-				ctxt.addOperationCall(location, pogState, opdef, false);
+				// Create an ambiguous context for the operation call. Note that this is not
+				// included in the getFuncOpObligations method below, which is called separately.
+				ctxt.makeOperationCall(location, pogState, opdef, false);
 				
 				// Additionally, op returns are generally ambiguous, so that if this expression
 				// is being used to define something in a "let", we can mark that as ambiguous too.
@@ -190,6 +172,58 @@ public class POApplyExpression extends POExpression
 		}
 
 		return obligations;
+	}
+
+	/**
+	 * This processing is split-out here, and called during the extraction of operation calls
+	 * from expressions (see POStatement.extractOpCalls()).
+	 */
+	public void getFuncOpObligations(POContextStack ctxt, ProofObligationList obligations)
+	{
+		String prename = root.getPreName();
+
+		if (type.isFunction(location) && prename != null && !prename.isEmpty())
+		{
+			obligations.addAll(FunctionApplyObligation.getAllPOs(root, args, prename, ctxt));
+		}
+		else if (Settings.dialect == Dialect.VDM_SL &&
+			type.isOperation(location) && prename != null && !prename.isEmpty())
+		{
+			PODefinition sdef = ctxt.getStateDefinition();
+
+			if (sdef instanceof POStateDefinition)
+			{
+				POStateDefinition state = (POStateDefinition)sdef;
+				POExpressionList preargs = new POExpressionList();
+				preargs.addAll(args);
+				preargs.add(state.getMkExpression());
+				obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+			}
+			else	// No state
+			{
+				POExpressionList preargs = new POExpressionList();
+				preargs.addAll(args);
+				obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+			}
+		}
+		
+		TCTypeList paramTypes = type.isFunction(location) ?
+				type.getFunction().parameters : type.getOperation().parameters;
+			
+		int i=0;
+
+		for (TCType at: argtypes)
+		{
+			at = ctxt.checkType(args.get(i), at);
+			TCType pt = paramTypes.get(i);
+
+			if (!TypeComparator.isSubType(at, pt))
+			{
+				obligations.addAll(SubTypeObligation.getAllPOs(args.get(i), pt, at, ctxt));
+			}
+
+			i++;
+		}
 	}
 	
 	public String getMeasureApply(String measure)

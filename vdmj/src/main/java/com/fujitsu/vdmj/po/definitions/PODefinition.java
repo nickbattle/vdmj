@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import java.util.Iterator;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -36,6 +38,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -170,6 +173,30 @@ public abstract class PODefinition extends PONode implements Comparable<PODefini
 	public TCTypeSet getPossibleExceptions()
 	{
 		return null;
+	}
+
+	/**
+	 * Eliminate the TCUnknownTypes from the possible exceptions. These are added for uncertain cases,
+	 * leaving the set that we are sure of(?).
+	 */
+	public TCTypeSet getDefiniteExceptions()
+	{
+		TCTypeSet set = getPossibleExceptions();
+
+		if (set != null)
+		{
+			Iterator<TCType> iter = set.iterator();
+
+			while (iter.hasNext())
+			{
+				if (iter.next() instanceof TCUnknownType)
+				{
+					iter.remove();
+				}
+			}
+		}
+
+		return set == null || set.isEmpty() ? null : set;
 	}
 
 	/**

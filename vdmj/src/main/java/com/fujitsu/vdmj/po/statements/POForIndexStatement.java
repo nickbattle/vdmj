@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POCommentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
@@ -96,14 +97,23 @@ public class POForIndexStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = from.getProofObligations(ctxt, pogState, env);
-		obligations.addAll(to.getProofObligations(ctxt, pogState, env));
+		pogState.setAmbiguous(false);
+		ProofObligationList obligations = new ProofObligationList();
+
+		POExpression efrom = extractOpCalls(from, obligations, pogState, ctxt, env);
+		POExpression eto   = extractOpCalls(to, obligations, pogState, ctxt, env);
+		POExpression eby   = null;
+
+		obligations.addAll(efrom.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(eto.getProofObligations(ctxt, pogState, env));
 
 		if (by != null)
 		{
-			obligations.addAll(by.getProofObligations(ctxt, pogState, env));
+			eby = extractOpCalls(by, obligations, pogState, ctxt, env);
+			obligations.addAll(eby.getProofObligations(ctxt, pogState, env));
 		}
 
+		boolean varAmbiguous = pogState.isAmbiguous();
 		POLoopInvariantList annotations = invariants.getList();
 		TCNameSet updates = statement.updatesState();
 		POExpression invariant = null;
@@ -114,6 +124,11 @@ public class POForIndexStatement extends POStatement
 		}
 
 		POAltContext altCtxt = new POAltContext();
+
+		if (varAmbiguous)
+		{
+			ctxt.push(new POAmbiguousContext("loop var", var, location));
+		}
 
 		if (invariant == null)
 		{
@@ -128,7 +143,7 @@ public class POForIndexStatement extends POStatement
 		/**
 		 * The initial case verifies that the invariant is true for the loop "from" value.
 		 */
-		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), from, vardef.getType());
+		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
 		ctxt.push(new POLetDefContext(def));		// eg. let x = 1 in
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant at first for-loop");
@@ -142,10 +157,10 @@ public class POForIndexStatement extends POStatement
 		updates.add(var);
 
 		ctxt.push(new POForAllContext(updates, local));				// forall <changed values> and vars
-		ctxt.push(new POImpliesContext(varIsValid(), invariant));	// valid index && invariant => ...
+		ctxt.push(new POImpliesContext(varIsValid(efrom, eto, eby), invariant));	// valid index && invariant => ...
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
-		def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(), vardef.getType());
+		def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(eby), vardef.getType());
 		ctxt.add(new POLetDefContext(def));							// let x = x + by in
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("invariant preservation for next for-loop");
@@ -182,19 +197,19 @@ public class POForIndexStatement extends POStatement
 		return obligations;
 	}
 
-	private POExpression varIsValid()
+	private POExpression varIsValid(POExpression efrom, POExpression eto, POExpression eby)
 	{
 		TCRealType real = new TCRealType(location);
 		POExpression vexp = new POVariableExpression(var, vardef);
 		
-		POExpression ge = new POLessEqualExpression(vexp, new LexKeywordToken(Token.GE, location), from, real, real);		// x >= A
-		POExpression le = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), to, real, real);			// x <= B
+		POExpression ge = new POLessEqualExpression(vexp, new LexKeywordToken(Token.GE, location), efrom, real, real);		// x >= A
+		POExpression le = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), eto, real, real);		// x <= B
 		POExpression range = new POAndExpression(ge, new LexKeywordToken(Token.AND, location), le, real, real);				// x >= A and x <= B
 		
-		if (by != null)
+		if (eby != null)
 		{
 			POExpression diff = new POSubtractExpression(vexp, new LexKeywordToken(Token.MINUS, location), from, real, real);	// (x-A)
-			POExpression rem = new PORemExpression(diff, new LexKeywordToken(Token.REM, location), by, real, real);				// (x-A) rem C
+			POExpression rem = new PORemExpression(diff, new LexKeywordToken(Token.REM, location), eby, real, real);			// (x-A) rem C
 			POExpression zero = new POIntegerLiteralExpression(LexIntegerToken.ZERO);
 			POExpression equals = new POEqualsExpression(rem, new LexKeywordToken(Token.EQUALS, location), zero, real, real);	// (x-A) rem C == 0
 
@@ -206,11 +221,11 @@ public class POForIndexStatement extends POStatement
 		}
 	}
 
-	private POExpression varPlusBy()
+	private POExpression varPlusBy(POExpression eby)
 	{
 		POExpression vexp = new POVariableExpression(var, vardef);
-		TCType bytype = (by == null) ? new TCIntegerType(location) : by.getExptype();
-		POExpression _by = (by == null) ? new POIntegerLiteralExpression(LexIntegerToken.ONE) : by;
+		TCType bytype = (eby == null) ? new TCIntegerType(location) : eby.getExptype();
+		POExpression _by = (eby == null) ? new POIntegerLiteralExpression(LexIntegerToken.ONE) : eby;
 
 		return new POPlusExpression(
 			vexp,

@@ -99,7 +99,43 @@ public class POCallObjectStatement extends POStatement
 			i++;
 		}
 
-		ctxt.addOperationCall(location, pogState, fdef, getStmttype().isReturn());
+		// Precondition calling is not defined for PP dialects...
+
+		// if (fdef != null && Settings.dialect != Dialect.VDM_SL)
+		// {
+		// 	TCIdentifierToken prename = null;
+
+		// 	if (fdef instanceof POExplicitOperationDefinition)
+		// 	{
+		// 		POExplicitOperationDefinition exop = (POExplicitOperationDefinition)fdef;
+
+		// 		if (exop.predef != null)
+		// 		{
+		// 			prename = new TCIdentifierToken(location, exop.predef.name.getName(), false);
+		// 		}
+		// 	}
+		// 	else if (fdef instanceof POImplicitOperationDefinition)
+		// 	{
+		// 		POImplicitOperationDefinition imop = (POImplicitOperationDefinition)fdef;
+
+		// 		if (imop.predef != null)
+		// 		{
+		// 			prename = new TCIdentifierToken(location, imop.predef.name.getName(), false);
+		// 		}
+		// 	}
+
+		// 	if (prename != null)
+		// 	{
+		// 		POExpression root = designator.getExpression();
+		// 		POFieldExpression call = new POFieldExpression(root, prename, null);
+		// 		POExpressionList preargs = new POExpressionList();
+		// 		preargs.addAll(args);
+		// 		preargs.add(new POSelfExpression(location));
+		// 		obligations.addAll(OperationPreConditionObligation.getAllPOs(call, preargs, FunctionApplyObligation.UNKNOWN, ctxt));
+		// 	}
+		// }
+
+		ctxt.makeOperationCall(location, pogState, fdef, getStmttype().isReturn());
 		
 		TCType rtype = pogState.getResultType();
 		

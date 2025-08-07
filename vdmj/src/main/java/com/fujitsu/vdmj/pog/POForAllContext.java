@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -51,6 +52,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class POForAllContext extends POContext
 {
 	public final List<POMultipleBind> bindings;
+	private String qualifier;
 
 	public POForAllContext(POMapCompExpression exp)
 	{
@@ -110,7 +112,7 @@ public class POForAllContext extends POContext
 		this.bindings = stmt.bind.getMultipleBindList();
 	}
 
-	public POForAllContext(TCNameSet updates, Environment env)
+	public POForAllContext(Collection<? extends TCNameToken> updates, Environment env)
 	{
 		this.bindings = new Vector<POMultipleBind>();
 		
@@ -125,6 +127,12 @@ public class POForAllContext extends POContext
 				bindings.add(new POMultipleTypeBind(plist, def.getType()));
 			}
 		}
+	}
+
+	public POForAllContext(Collection<? extends TCNameToken> updates, String qualifier, Environment env)
+	{
+		this(updates, env);
+		this.qualifier = qualifier;
 	}
 
 	@Override
@@ -151,6 +159,13 @@ public class POForAllContext extends POContext
 			}
 
 			sb.append(" &");
+		}
+
+		if (qualifier != null)
+		{
+			if (sb.length() > 0) sb.append(" ");
+			sb.append(qualifier);
+			sb.append(" =>");
 		}
 
 		return sb.toString();

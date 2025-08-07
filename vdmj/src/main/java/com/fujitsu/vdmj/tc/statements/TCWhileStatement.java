@@ -109,7 +109,9 @@ public class TCWhileStatement extends TCStatement
 		else
 		{
 			// The while condition may never be true, so all while loops can also return void.
-			stype = new TCUnionType(location, stype, new TCVoidType(location));
+			// BUT this catches too many cases that are actually safe, so we don't add ()...
+
+			// stype = new TCUnionType(location, stype, new TCVoidType(location));
 		}
 
 		invariants = TCLoopAnnotations.getLoopAnnotations(this);

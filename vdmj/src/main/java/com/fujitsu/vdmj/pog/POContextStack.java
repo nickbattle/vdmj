@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POInheritedDefinition;
@@ -41,14 +42,19 @@ import com.fujitsu.vdmj.po.definitions.POInstanceVariableDefinition;
 import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POContextStack extends Stack<POContext>
 {
@@ -125,7 +131,12 @@ public class POContextStack extends Stack<POContext>
 						{
 							POContextStack combined = new POContextStack();
 							combined.addAll(original);
-							combined.addAll(alternative);
+
+							if (!original.returnsEarly())
+							{
+								combined.addAll(alternative);
+							}
+
 							toAdd.add(combined);
 						}
 					}
@@ -167,43 +178,19 @@ public class POContextStack extends Stack<POContext>
 	
 	/**
 	 * Operation calls may cause ambiguities in the state. This is affected by whether
-	 * they are pure or have ext clauses.
+	 * they are pure or have ext clauses. This version is used for PP dialects. The
+	 * equivalent for SL is below.
 	 */
-	public void addOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
+	public void makeOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
-		if (called == null)	// An op called in an expression?
+		if (called == null)		// An op called in an expression?
 		{
-			if (addReturn)
-			{
-				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-				TCNameList names = getStateVariables();
-				names.add(result);
-				
-				push(new POAmbiguousContext("operation call", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
-			}
-			else
-			{
-				push(new POAmbiguousContext("operation call", getStateVariables(), from));
-			}
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
 		}
-		else if (called.getPossibleExceptions() != null)
+		else if (called.getDefiniteExceptions() != null)
 		{
 			String opname = called.name.toExplicitString(from);
-			
-			if (addReturn)
-			{
-				TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-				TCNameList names = getStateVariables();
-				names.add(result);
-				
-				push(new POAmbiguousContext(opname + " throws exceptions", names, from));
-				push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
-			}
-			else
-			{
-				push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
-			}
+			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
 		}
 		else if (called.accessSpecifier.isPure)
 		{
@@ -272,6 +259,168 @@ public class POContextStack extends Stack<POContext>
 					push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
 				}
 			}
+		}
+	}
+
+	/**
+	 * An operation CallStatement has been made. The ambiguous names are calculated, and these
+	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
+	 * qualification, if possible.
+	 */
+	public void makeOperationCall(LexLocation from, PODefinition called,
+		POExpressionList args, TCNameToken resultVar, boolean canReturn, POGState pogState, Environment env)
+	{
+		if (called == null)		// Called from an apply expression?
+		{
+			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+		}
+		else if (called.getDefiniteExceptions() != null)
+		{
+			String opname = called.name.toExplicitString(from);
+			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+		}
+		else
+		{
+			String opname = called.name.toExplicitString(from);
+			
+			if (called instanceof PORenamedDefinition)
+			{
+				PORenamedDefinition rdef = (PORenamedDefinition)called;
+				called = rdef.def;
+			}
+			else if (called instanceof POInheritedDefinition)
+			{
+				POInheritedDefinition idef = (POInheritedDefinition)called;
+				called = idef.superdef;
+			}
+			
+			if (called instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
+				TCNameList names = new TCNameList();
+				
+				if (!called.accessSpecifier.isPure)
+				{
+					names.addAll(getStateVariables());
+				}
+
+				if (imp.externals != null && imp.location.module.equals(from.module))
+				{
+					names.clear();
+					
+					for (POExternalClause ext: imp.externals)
+					{
+						if (ext.mode.is(Token.WRITE))
+						{
+							names.addAll(ext.identifiers);
+						}
+					}
+				}
+
+				if (imp.type.result.isReturn())
+				{
+					if (resultVar == null)
+					{
+						resultVar = new TCNameToken(from, from.module, imp.result.pattern.toString());
+					}
+
+					names.add(resultVar);
+					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, imp.result.type), env);
+				}
+				
+				push(new POSaveStateContext(getStateDefinition()));
+				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
+				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
+
+				// if (canReturn && imp.type.result.isReturn())
+				// {
+				// 	push(new POReturnContext(imp.result.pattern, imp.result.type));
+				// }
+			}
+			else if (called instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exp = (POExplicitOperationDefinition)called;
+				TCNameList names = new TCNameList();
+
+				if (!called.accessSpecifier.isPure)
+				{
+					names.addAll(getStateVariables());
+				}
+
+				if (exp.type.result.isReturn())
+				{
+					if (resultVar == null)
+					{
+						resultVar = TCNameToken.getResult(from);	// "RESULT"
+					}
+
+					names.add(resultVar);
+					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exp.type.result), env);
+				}
+					
+				push(new POSaveStateContext(getStateDefinition()));
+				push(new POForAllContext(names, getPostQualifier(from, exp.postdef, args, resultVar), env));
+				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
+
+				// if (canReturn && exp.type.result.isReturn())
+				// {
+				// 	POExpression rv = new POVariableExpression(resultVar, null);
+				// 	push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), rv));
+				// }
+			}
+		}
+	}
+
+	/**
+	 * Generate a postcondition function call, passing the arguments given, and calculating the
+	 * names of the preserved state and the new state vector. This is only done for SL!
+	 */
+	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
+	{
+		if (postdef == null)
+		{
+			return null;	// No "post" implies no qualifier
+		}
+
+		if (!postdef.location.module.equals(from.module))
+		{
+			return null;	// We can't create Sigma values for external modules??
+		}
+
+		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
+		PODefinition sdef = getStateDefinition();				// No state => null
+
+		if (resultVar != null)
+		{
+			if (postArgs.length() > 0) postArgs.append(", ");
+			postArgs.append(resultVar.getName());
+		}
+
+		if (sdef instanceof POStateDefinition)
+		{
+			POStateDefinition state = (POStateDefinition)sdef;
+			if (postArgs.length() > 0) postArgs.append(", ");
+			postArgs.append(POSaveStateContext.OLDNAME);
+			postArgs.append(", ");
+			postArgs.append(state.toPattern(false));
+		}
+		else if (sdef instanceof POClassDefinition)
+		{
+			// No idea! This isn't used for PP dialects currently
+		}
+
+		// Create "post_op(args[, result, oldstate, newstate])"
+		return postdef.name + "(" + postArgs.toString() + ")";
+	}
+
+	/**
+	 * Add a comment to the last item on the stack - usually the one last pushed.
+	 */
+	public void setComment(String comment)
+	{
+		if (!isEmpty())
+		{
+			peek().setComment(comment);
 		}
 	}
 
@@ -355,6 +504,20 @@ public class POContextStack extends Stack<POContext>
 			}
 		}
 		
+		return null;
+	}
+	
+	public PODefinition getStateDefinition()
+	{
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POOperationDefinitionContext)
+			{
+				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
+				return opdef.stateDefinition;
+			}
+		}
+
 		return null;
 	}
 	
