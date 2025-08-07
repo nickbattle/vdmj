@@ -937,13 +937,14 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 		{
 			POVariableExpression root = (POVariableExpression)node.root;
 
-			name = new TCNameToken(node.location, root.name.getModule(), "$" + root.name.getName());
+			// Note: the name is module-local to the node, not the called operation
+			name = new TCNameToken(node.location, node.location.module, "$" + root.name.getName());
 			String ext = "abcdefghijklmnopqrstuvwxyz";	// Should be enough :)
 			int count = 0;
 
 			while (substitutions.containsKey(name))
 			{
-				name = new TCNameToken(node.location, root.name.getModule(), "$" + root.name.getName() + ext.charAt(count));
+				name = new TCNameToken(node.location, node.location.module, "$" + root.name.getName() + ext.charAt(count));
 				count++;
 			}
 
