@@ -166,19 +166,23 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 	@Override
 	public POExpression caseApplyExpression(POApplyExpression node, Object arg)
 	{
-		if (node.type.isOperation(node.location))
-		{
-			return substitute(node);
-		}
-		else
-		{
-			return setType(node, new POApplyExpression(
+		POApplyExpression extracted = new POApplyExpression(
 				node.root.apply(this, arg),
 				applyList(node.args, arg),
 				node.type,
 				node.argtypes,
 				node.recursiveCycles,
-				node.opdef));
+				node.opdef);
+
+		extracted.setExptype(node.getExptype());
+
+		if (node.type.isOperation(node.location))
+		{
+			return substitute(extracted);
+		}
+		else
+		{
+			return extracted;
 		}
 	}
 
