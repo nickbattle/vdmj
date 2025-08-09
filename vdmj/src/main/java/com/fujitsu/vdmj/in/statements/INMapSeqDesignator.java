@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.values.InvariantValue;
+import com.fujitsu.vdmj.values.InvariantValueListener;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.UpdatableValue;
@@ -82,8 +84,17 @@ public class INMapSeqDesignator extends INStateDesignator
 					// in order to have it updated.
 
 					UpdatableValue ur = (UpdatableValue)root;
-					result = UpdatableValue.factory(ur.listeners, mapType.to);
-					map.put(index, result);
+					UpdatableValue uresult = UpdatableValue.factory(ur.listeners, mapType.to);
+					map.put(index, uresult);
+
+					if (ur.getValue() instanceof InvariantValue)
+					{
+						InvariantValueListener listener = new InvariantValueListener();
+						listener.setValue(ur);			// Check root map...
+						uresult.addListener(listener);	// when this index is updated
+					}
+
+					result = uresult;
 				}
 			}
 			else if (root.isType(SeqValue.class))
@@ -99,7 +110,15 @@ public class INMapSeqDesignator extends INStateDesignator
 						// creates the value in order to have it updated.
 
 						UpdatableValue ur = (UpdatableValue)root;
-						seq.add(UpdatableValue.factory(ur.listeners, seqType.seqof));
+						UpdatableValue uresult = UpdatableValue.factory(ur.listeners, seqType.seqof);
+						seq.add(uresult);
+
+						if (ur.getValue() instanceof InvariantValue)
+						{
+							InvariantValueListener listener = new InvariantValueListener();
+							listener.setValue(ur);			// Check root seq...
+							uresult.addListener(listener);	// when this index is updated
+						}
 					}
 					else
 					{
