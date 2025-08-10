@@ -161,9 +161,10 @@ public class PogTest extends TestCase
 		/* 90 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        $LoopInvariant))))\n",
 		/* 91 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        ((x > 0) =>\n          $LoopInvariant)))))\n",
 		/* 92 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              (iv < 10))))))))\n",
-		/* 93 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              $LoopInvariant)))))))\n"
+		/* 93 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              $LoopInvariant)))))))\n",
+		/* 94 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (not (x > 0)) =>\n            $LoopInvariant))))))\n"
 	};
-	
+
 	private String[] expectedSL =
 	{
 		/* 1 */ "(forall z:nat, oldSigma:Sigma &\n  is_(pre_op1(z, oldSigma), bool))\n",
@@ -177,7 +178,8 @@ public class PogTest extends TestCase
 		/* 9 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not (z > 10) =>\n    (let sv : nat = (z + 1) in\n      sv <> 0)))\n",
 		/* 10 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let $oldState = mk_Sigma(sv, xv, si, sr) in\n    (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n      sv <> 0)))\n",
 		/* 11 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let $oldState = mk_Sigma(sv, xv, si, sr) in\n    (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n      (let sv : nat = 999 in\n        sv <> 0))))\n",
-		/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (let $oldState = mk_Sigma(sv, xv, si, sr) in\n      (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n        sv <> 0))))\n",		/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
+		/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (let $oldState = mk_Sigma(sv, xv, si, sr) in\n      (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n        sv <> 0))))\n",
+		/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
 		/* 14 */ "(forall a:nat, RESULT:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7a(a, RESULT, oldSigma, Sigma), bool))\n",
 		/* 15 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let RESULT : nat = xv in\n          (RESULT > (xv$ + sv$)))))))\n",
 		/* 16 */ "(forall a:nat, r:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7b(a, r, oldSigma, Sigma), bool))\n",
@@ -186,12 +188,13 @@ public class PogTest extends TestCase
 		/* 19 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          ((si <> []) =>\n            $LoopInvariant))))))\n",
 		/* 20 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          (forall si:seq of int, count:int &\n            ($LoopInvariant and (si <> []) =>\n              si <> [])))))))\n",
 		/* 21 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          (forall si:seq of int, count:int &\n            ($LoopInvariant and (si <> []) =>\n              (let si : seq of int = (tl si) in\n                (let count : int = (count + 1) in\n                  $LoopInvariant)))))))))\n",
-		/* 22 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous bang throws exceptions, affects (si, sv, xv, sr)? at 135:9\n    a <> 0))\n",
-		/* 23 */ "(forall a:real, r:real, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op10(a, r, oldSigma, Sigma), bool))\n",
-		/* 24 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      is_nat((a + 1)))))\n",
-		/* 25 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        sv <> 0))))\n",
-		/* 26 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    ((a > 10) =>\n      (-- Throws exception 123\n        (sv > sv$)))))\n",
-		/* 27 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r : real = (1 / sv) in\n          (sv > sv$))))))\n"
+		/* 22 */ "(forall data:seq of int, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let count : int = 0 in\n    (let si : seq of int = data in\n      (-- Missing @LoopInvariant, assuming true at 123:7\n        (let $LoopInvariant : bool = true in\n          (forall si:seq of int, count:int &\n            ($LoopInvariant and (not (si <> [])) =>\n              $LoopInvariant)))))))\n",
+		/* 23 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (-- Ambiguous bang throws exceptions, affects (si, sv, xv, sr)? at 135:9\n    a <> 0))\n",
+		/* 24 */ "(forall a:real, r:real, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op10(a, r, oldSigma, Sigma), bool))\n",
+		/* 25 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      is_nat((a + 1)))))\n",
+		/* 26 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        sv <> 0))))\n",
+		/* 27 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    ((a > 10) =>\n      (-- Throws exception 123\n        (sv > sv$)))))\n",
+		/* 28 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r : real = (1 / sv) in\n          (sv > sv$))))))\n"
 	};
 
 	private String[] expectedLoops =
@@ -200,25 +203,26 @@ public class PogTest extends TestCase
 		/* 2 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax > 0) =>\n      ((ax + cx) = size))))\n",
 		/* 3 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (ax - 1) >= 0))))\n",
 		/* 4 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (let ax : nat = (ax - 1) in\n          (let cx : nat = (cx + 1) in\n            ((ax + cx) = size)))))))\n",
-		/* 5 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (not (ax > 0)) =>\n        size <> 0))))\n",
-		/* 6 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (let z : nat1 = 1 in\n      ((ax + cx) = size))))\n",
-		/* 7 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat, z:nat1 &\n      (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n        (ax - 1) >= 0))))\n",
-		/* 8 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat, z:nat1 &\n      (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n        (let ax : nat = (ax - 1) in\n          (let cx : nat = (cx + 1) in\n            (let z : nat1 = (z + 1) in\n              ((ax + cx) = size))))))))\n",
-		/* 9 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) =>\n        size <> 0))))\n",
-		/* 10 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {} in\n      (ax = sums(ABC)))))\n",
-		/* 11 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, ABC:set of nat1, z:nat1 &\n      ((z in set ({1, 2, 3} \\ ABC)) and (ax = sums(ABC)) =>\n        (let ABC : set of nat1 = (ABC union {z}) in\n          (let ax : nat = (ax + z) in\n            (ax = sums(ABC))))))))\n",
-		/* 12 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {1, 2, 3} in\n      (forall ax:nat &\n        ((ax = sums(ABC)) =>\n          ax <> 0)))))\n",
-		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of nat = [] in\n      (ax = sumq(GHOST$)))))\n",
-		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
-		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, GHOST$:seq of nat, z:nat &\n      ((GHOST$ = ([0, 1, 2, 3](1, ... ,(len GHOST$)))) and (ax = sumq(GHOST$)) =>\n        (let GHOST$ : seq of nat = (GHOST$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(GHOST$))))))))\n",
-		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of nat = [0, 1, 2, 3] in\n      (forall ax:nat &\n        ((ax = sumq(GHOST$)) =>\n          ax <> 0)))))\n",
-		/* 17 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
-		/* 18 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
-		/* 19 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    measure_sumq(s) > measure_sumq(tl s)))\n",
-		/* 20 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
-		/* 21 */ "(forall s:set of nat &\n  is_(measure_sums(s), nat))\n",
-		/* 22 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    exists e in set s & true))\n",
-		/* 23 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    (forall e in set s &\n      measure_sums(s) > measure_sums(s \\ {e}))))\n"
+		/* 5 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (not (ax > 0)) =>\n        ((ax + cx) = size)))))\n",
+		/* 6 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (not (ax > 0)) =>\n        size <> 0))))\n",
+		/* 7 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (let z : nat1 = 1 in\n      ((ax + cx) = size))))\n",
+		/* 8 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat, z:nat1 &\n      (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n        (ax - 1) >= 0))))\n",
+		/* 9 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat, z:nat1 &\n      (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n        (let ax : nat = (ax - 1) in\n          (let cx : nat = (cx + 1) in\n            (let z : nat1 = (z + 1) in\n              ((ax + cx) = size))))))))\n",
+		/* 10 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) =>\n        size <> 0))))\n",
+		/* 11 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {} in\n      (ax = sums(ABC)))))\n",
+		/* 12 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, ABC:set of nat1, z:nat1 &\n      ((z in set ({1, 2, 3} \\ ABC)) and (ax = sums(ABC)) =>\n        (let ABC : set of nat1 = (ABC union {z}) in\n          (let ax : nat = (ax + z) in\n            (ax = sums(ABC))))))))\n",
+		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {1, 2, 3} in\n      (forall ax:nat &\n        ((ax = sums(ABC)) =>\n          ax <> 0)))))\n",
+		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of nat = [] in\n      (ax = sumq(GHOST$)))))\n",
+		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
+		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, GHOST$:seq of nat, z:nat &\n      ((GHOST$ = ([0, 1, 2, 3](1, ... ,(len GHOST$)))) and (ax = sumq(GHOST$)) =>\n        (let GHOST$ : seq of nat = (GHOST$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(GHOST$))))))))\n",
+		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of nat = [0, 1, 2, 3] in\n      (forall ax:nat &\n        ((ax = sumq(GHOST$)) =>\n          ax <> 0)))))\n",
+		/* 18 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
+		/* 19 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
+		/* 20 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    measure_sumq(s) > measure_sumq(tl s)))\n",
+		/* 21 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
+		/* 22 */ "(forall s:set of nat &\n  is_(measure_sums(s), nat))\n",
+		/* 23 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    exists e in set s & true))\n",
+		/* 24 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    (forall e in set s &\n      measure_sums(s) > measure_sums(s \\ {e}))))\n"
 	};
 
 	public void testVDMSL() throws Exception
@@ -351,7 +355,7 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			if (!expected[i].equals(po.source))
+			if (i < expected.length && !expected[i].equals(po.source))
 			{
 				Console.out.println("----\nPO# " + (i+1));
 				Console.out.print("Expected:\n" + expected[i]);
