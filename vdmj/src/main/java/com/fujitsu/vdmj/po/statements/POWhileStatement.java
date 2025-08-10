@@ -141,6 +141,8 @@ public class POWhileStatement extends POStatement
 		POExpression negated = new PONotExpression(location, this.exp);
 		ctxt.push(new POForAllContext(updates, env));			// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant, negated));	// invariant && not C => ...
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant after while loop");
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The two alternatives in one added.

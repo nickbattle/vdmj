@@ -137,13 +137,21 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, TrivialQCKnow
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
 					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
+					TCVariableExpression var = new TCVariableExpression(id.location, id.name, id.toString());
 
 					TCEqualsExpression exp = new TCEqualsExpression(
-							new TCVariableExpression(id.location, id.name, id.toString()),
+							var,
 							new LexKeywordToken(Token.EQUALS, id.location),
 							vdef.exp);
 
 					truths = new TrivialQCKnown(exp, truths, id.name);
+
+					// Special case. "var = true" also defines "var"
+
+					if (vdef.exp.toString().equals("true"))
+					{
+						truths = new TrivialQCKnown(var, truths, id.name);
+					}
 				}
 			}
 		}
