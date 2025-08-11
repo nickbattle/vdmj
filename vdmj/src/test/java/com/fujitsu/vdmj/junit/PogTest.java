@@ -163,7 +163,7 @@ public class PogTest extends TestCase
 		/* 92 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              (iv < 10))))))))\n",
 		/* 93 */ "(forall obj_A(iv |-> iv):A &\n  (let x : int = 10 in\n    (-- Missing @LoopInvariant, assuming true at 225:9\n      (let $LoopInvariant : bool = true in\n        (forall iv:int &\n          ($LoopInvariant and (x > 0) =>\n            (let iv : int = (iv + 1) in\n              $LoopInvariant)))))))\n"
 	};
-	
+
 	private String[] expectedSL =
 	{
 		/* 1 */ "(forall z:nat, oldSigma:Sigma &\n  is_(pre_op1(z, oldSigma), bool))\n",
@@ -177,7 +177,8 @@ public class PogTest extends TestCase
 		/* 9 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not (z > 10) =>\n    (let sv : nat = (z + 1) in\n      sv <> 0)))\n",
 		/* 10 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let $oldState = mk_Sigma(sv, xv, si, sr) in\n    (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n      sv <> 0)))\n",
 		/* 11 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let $oldState = mk_Sigma(sv, xv, si, sr) in\n    (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n      (let sv : nat = 999 in\n        sv <> 0))))\n",
-		/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (let $oldState = mk_Sigma(sv, xv, si, sr) in\n      (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n        sv <> 0))))\n",		/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
+		/* 12 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (123 = z => \n    (let $oldState = mk_Sigma(sv, xv, si, sr) in\n      (forall sv:nat, xv:nat, si:seq of int, sr:seq of R & -- Call to call, affects sv, xv, si, sr\n        sv <> 0))))\n",
+		/* 13 */ "(forall z:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (not 123 = z =>\n    (let sv : nat = z in\n      sv <> 0)))\n",
 		/* 14 */ "(forall a:nat, RESULT:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7a(a, RESULT, oldSigma, Sigma), bool))\n",
 		/* 15 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv, xv$ = xv in\n    (let sv : nat = (a + 1) in\n      (let xv : nat = (sv + a) in\n        (let RESULT : nat = xv in\n          (RESULT > (xv$ + sv$)))))))\n",
 		/* 16 */ "(forall a:nat, r:nat, oldSigma:Sigma, Sigma:Sigma &\n  is_(post_op7b(a, r, oldSigma, Sigma), bool))\n",
@@ -351,7 +352,7 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			if (!expected[i].equals(po.source))
+			if (i < expected.length && !expected[i].equals(po.source))
 			{
 				Console.out.println("----\nPO# " + (i+1));
 				Console.out.print("Expected:\n" + expected[i]);

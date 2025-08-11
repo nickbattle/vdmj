@@ -73,7 +73,7 @@ public class INForPatternBindStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		// breakpoint.check(location, ctxt);	-- Breaks on calculation of sequence
+		breakpoint.check(location, ctxt);
 
 		try
 		{
