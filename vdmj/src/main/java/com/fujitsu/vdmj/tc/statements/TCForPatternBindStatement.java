@@ -94,9 +94,9 @@ public class TCForPatternBindStatement extends TCStatement
 				rt = new TCUnionType(location, rt, new TCVoidType(location));
 			}
 			
-			local.unusedCheck();
 			invariants = TCLoopAnnotations.getLoopAnnotations(this);
-			invariants.typeCheck(base, this, getPattern().getVariableNames());
+			invariants.typeCheck(local, this, getPattern().getVariableNames());
+			local.unusedCheck();
 			return setType(rt);
 		}
 		else

@@ -103,7 +103,7 @@ public class TCForIndexStatement extends TCStatement
 		rt = new TCUnionType(location, rt, new TCVoidType(location));
 
 		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(env, this, new TCNameList(var));
+		invariants.typeCheck(local, this, new TCNameList(var));
 
 		local.unusedCheck();
 
