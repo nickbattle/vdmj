@@ -95,7 +95,7 @@ public class POSpecificationStatement extends POStatement
 			
 			if (Settings.dialect == Dialect.VDM_SL && Settings.release == Release.VDM_10)
 			{
-				obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt));
+				obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt, env));
 			}
 		}
 
