@@ -68,7 +68,7 @@ public class INForIndexStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		// breakpoint.check(location, ctxt);	-- Breaks on calculation of from/to/by
+		breakpoint.check(location, ctxt);
 
 		try
 		{

@@ -63,7 +63,7 @@ public class INForAllStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		// breakpoint.check(location, ctxt);	-- Breaks on calculation of set
+		breakpoint.check(location, ctxt);
 
 		try
 		{

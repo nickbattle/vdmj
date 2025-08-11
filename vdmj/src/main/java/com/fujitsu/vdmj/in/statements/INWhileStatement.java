@@ -58,7 +58,7 @@ public class INWhileStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
-		// breakpoint.check(location, ctxt);  -- Stops on while condition anyway
+		breakpoint.check(location, ctxt);
 		
 		try
 		{
