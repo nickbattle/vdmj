@@ -134,12 +134,12 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 
 	protected void setBreaks(boolean breaks)
 	{
-		this.breaks = breaks;	// INAnnotatedExpression or statements should step-break
+		this.breaks = breaks;	// See INAnnotatedExpression and INAnnotatedStatement
 	}
 
 	public boolean shouldBreak()
 	{
-		return breaks;
+		return breaks;			// See INAnnotatedExpression and INAnnotatedStatement
 	}
 
 	@Override

@@ -83,7 +83,7 @@ public class INForIndexStatement extends INStatement
 			}
 
 			invariants.before(ctxt);
-			invariants.check(ctxt);
+			invariants.check(ctxt, false);
 
 			for (long value = fval;
 				 (bval > 0 && value <= tval) || (bval < 0 && value >= tval);
@@ -92,9 +92,9 @@ public class INForIndexStatement extends INStatement
 				Context evalContext = new Context(location, "for index", ctxt);
 				evalContext.put(var, new IntegerValue(value));
 
-				invariants.check(evalContext);
+				invariants.check(evalContext, true);
 				Value rv = statement.eval(evalContext);
-				invariants.check(ctxt);
+				invariants.check(evalContext, true);
 
 				if (!rv.isVoid())
 				{

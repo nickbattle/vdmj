@@ -63,11 +63,11 @@ public class INWhileStatement extends INStatement
 		try
 		{
 			invariants.before(ctxt);
-			invariants.check(ctxt);
+			invariants.check(ctxt, false);
 			
 			while (exp.eval(ctxt).boolValue(ctxt))
 			{
-				invariants.check(ctxt);
+				invariants.check(ctxt, true);
 				Value rv = statement.eval(ctxt);
 				invariants.checkWithMeasure(ctxt);
 

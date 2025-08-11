@@ -349,18 +349,17 @@ public class PogTest extends TestCase
 
 		Console.out.println("\n\t};");
 
-		i = 0;
-
-		for (ProofObligation po: polist)
+		if (polist.size() == expected.length)	// Otherwise no point
 		{
-			if (i < expected.length && !expected[i].equals(po.source))
+			for (i=0; i<expected.length; i++)
 			{
-				Console.out.println("----\nPO# " + (i+1));
-				Console.out.print("Expected:\n" + expected[i]);
-				Console.out.print("Actual:\n" + po.source);
+				if (!expected[i].equals(polist.get(i).source))
+				{
+					Console.out.println("----\nPO# " + (i+1));
+					Console.out.print("Expected:\n" + expected[i]);
+					Console.out.print("Actual:\n" + polist.get(i).source);
+				}
 			}
-
-			i++;
 		}
 
 		Console.out.println("----\nERROR: " + msg);
