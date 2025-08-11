@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -98,6 +99,8 @@ public class POSpecificationStatement extends POStatement
 				obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt, env));
 			}
 		}
+
+		ctxt.push(new POAmbiguousContext("specification statement", ctxt.getStateVariables(), location));
 
 		return obligations;
 	}
