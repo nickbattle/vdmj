@@ -85,9 +85,9 @@ public class TCForAllStatement extends TCStatement
 				rt = new TCUnionType(location, rt, new TCVoidType(location));
 			}
 			
-			local.unusedCheck();
 			invariants = TCLoopAnnotations.getLoopAnnotations(this);
-			invariants.typeCheck(base, this, pattern.getVariableNames());
+			invariants.typeCheck(local, this, pattern.getVariableNames());
+			local.unusedCheck();
 			return setType(rt);
 		}
 		else

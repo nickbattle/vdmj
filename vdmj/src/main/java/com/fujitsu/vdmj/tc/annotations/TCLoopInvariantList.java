@@ -30,7 +30,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
@@ -130,42 +129,19 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 	{
 		if (stmt instanceof TCWhileStatement)
 		{
-			return env;		// No loop variable
+			return env;		// No ghost variable
 		}
 		else if (stmt instanceof TCForIndexStatement)
 		{
-			TCForIndexStatement fstmt = (TCForIndexStatement)stmt;
-			return new FlatEnvironment(fstmt.vardef, env);
+			return env;		// No ghost variable
 		}
 		else if (stmt instanceof TCForAllStatement)
 		{
-			TCForAllStatement fstmt = (TCForAllStatement)stmt;
-			TCSetType st = fstmt.setType.getSet();
-
-			if (st instanceof TCSet1Type)
-			{
-				st = new TCSetType(st.location, st.setof);
-			}
-
-			TCDefinitionList defs = fstmt.pattern.getDefinitions(st.setof, NameScope.LOCAL);
-			defs.add(getGhostDefinition(fstmt, env));
-
-			return new FlatEnvironment(defs, env);
+			return new FlatEnvironment(getGhostDefinition(stmt, env), env);
 		}
 		else if (stmt instanceof TCForPatternBindStatement)
 		{
-			TCForPatternBindStatement fstmt = (TCForPatternBindStatement)stmt;
-			TCSeqType st = fstmt.expType.getSeq();
-
-			if (st instanceof TCSeq1Type)
-			{
-				st = new TCSeqType(st.location, st.seqof);
-			}
-
-			TCDefinitionList defs = fstmt.getPattern().getDefinitions(st.seqof, NameScope.LOCAL);
-			defs.add(getGhostDefinition(fstmt, env));
-
-			return new FlatEnvironment(defs, env);
+			return new FlatEnvironment(getGhostDefinition(stmt, env), env);
 		}
 		else
 		{

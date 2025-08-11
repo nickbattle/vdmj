@@ -93,7 +93,7 @@ public class INForPatternBindStatement extends INStatement
 			}
 
 			invariants.before(ctxt);
-			invariants.check(ctxt);
+			invariants.check(ctxt, false);
 
 			if (patternBind.pattern != null)
 			{
@@ -106,7 +106,7 @@ public class INForPatternBindStatement extends INStatement
 
 						invariants.checkUpdateGhost(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						invariants.check(ctxt);
+						invariants.check(evalContext, true);
 
 						if (!rv.isVoid())
 						{
@@ -138,7 +138,7 @@ public class INForPatternBindStatement extends INStatement
 
 						invariants.checkUpdateGhost(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						invariants.check(ctxt);
+						invariants.check(evalContext, true);
 
 						if (!rv.isVoid())
 						{
@@ -170,7 +170,7 @@ public class INForPatternBindStatement extends INStatement
 
 						invariants.checkUpdateGhost(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						invariants.check(ctxt);
+						invariants.check(evalContext, true);
 
 						if (!rv.isVoid())
 						{
@@ -198,7 +198,7 @@ public class INForPatternBindStatement extends INStatement
 
 						invariants.checkUpdateGhost(evalContext, val);
 						Value rv = statement.eval(evalContext);
-						invariants.check(ctxt);
+						invariants.check(evalContext, true);
 
 						if (!rv.isVoid())
 						{

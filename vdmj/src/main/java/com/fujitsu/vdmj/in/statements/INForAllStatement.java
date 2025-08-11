@@ -70,7 +70,7 @@ public class INForAllStatement extends INStatement
 			ValueSet values = set.eval(ctxt).setValue(ctxt);
 
 			invariants.before(ctxt);	// Add ghost
-			invariants.check(ctxt);
+			invariants.check(ctxt, false);
 			
 			for (Value val: values)
 			{
@@ -81,7 +81,7 @@ public class INForAllStatement extends INStatement
 
 					invariants.checkUpdateGhost(evalContext, val);
 					Value rv = statement.eval(evalContext);
-					invariants.check(ctxt);
+					invariants.check(evalContext, true);
 
 					if (!rv.isVoid())
 					{

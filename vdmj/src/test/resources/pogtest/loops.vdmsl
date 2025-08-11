@@ -11,6 +11,7 @@ operations
 		dcl cx : nat := 0;
 
 		-- @LoopInvariant(ax + cx = size)
+		-- @LoopMeasure(ax)
 		while ax > 0 do
 		(
 			ax := ax - 1;

@@ -54,20 +54,17 @@ public class INLoopAnnotations implements Mappable
 		}
 	}
 
-	public void check(Context ctxt) throws ValueException
+	public void check(Context ctxt, boolean inside) throws ValueException
 	{
 		for (INLoopInvariantAnnotation invariant: invariants)
 		{
-			invariant.check(ctxt, false);	// Outside
+			invariant.check(ctxt, inside);
 		}
 	}
 
 	public void checkWithMeasure(Context ctxt) throws ValueException
 	{
-		for (INLoopInvariantAnnotation invariant: invariants)
-		{
-			invariant.check(ctxt, false);	// Outside
-		}
+		check(ctxt, true);	// Measures always inside
 
 		if (measure != null)
 		{
@@ -81,7 +78,7 @@ public class INLoopAnnotations implements Mappable
 
 		for (INLoopInvariantAnnotation invariant: invariants)
 		{
-			invariant.check(ctxt, true);		// Inside
+			invariant.check(ctxt, true);		// Always inside
 		}
 	}
 

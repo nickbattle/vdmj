@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 public class INLoopInvariantAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private final boolean hasLoopVars;
+	private final boolean hasLoopVars;	// Invariant uses loop variables
 
 	public INLoopInvariantAnnotation(TCIdentifierToken name, INExpressionList args, boolean hasLoopVars)
 	{
@@ -43,11 +43,13 @@ public class INLoopInvariantAnnotation extends INAnnotation
 	}
 
 	// NOTE: inBefore/inAfter are not used. The check method is called directly by
-	// the various loop INStatements via their INLoopAnnotations.
+	// the various loop INStatements via their INLoopAnnotations. The "inside" param
+	// means we're called from inside the loop, so any loop variables are in scope.
+	// The hasLoopVars means that the invariant expression uses the loop variable(s).
 	
 	public void check(Context ctxt, boolean inside) throws ValueException
 	{
-		if (inside || !hasLoopVars)
+		if (inside || !hasLoopVars)		// within loop, or outside but not using loop vars
 		{
 			INExpression inv = args.get(0);
 

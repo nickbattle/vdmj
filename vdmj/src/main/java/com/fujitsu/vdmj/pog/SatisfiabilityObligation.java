@@ -28,6 +28,7 @@ import java.util.List;
 
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -35,7 +36,12 @@ import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.statements.POSpecificationStatement;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.po.types.POPatternTypePair;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class SatisfiabilityObligation extends ProofObligation
 {
@@ -110,7 +116,7 @@ public class SatisfiabilityObligation extends ProofObligation
 	}
 
 	public SatisfiabilityObligation(POSpecificationStatement spec,
-		PODefinition stateDefinition, POContextStack ctxt)
+		PODefinition stateDefinition, POContextStack ctxt, Environment env)
 	{
 		super(spec.location, POType.OP_SATISFIABILITY, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -118,12 +124,73 @@ public class SatisfiabilityObligation extends ProofObligation
 		if (spec.precondition != null)
 		{
     		sb.append(spec.precondition);
-    		sb.append(" =>\n");
+    		sb.append(" => ");
+		}
+
+		TCNameSet names = spec.precondition.getVariableNames();
+		names.addAll(spec.postcondition.getVariableNames());
+
+		if (!names.isEmpty())
+		{
+			sb.append("exists ");
+			String sep = "";
+
+			for (TCNameToken name: names)
+			{
+				TCDefinition def = env.findName(name, NameScope.NAMESANDSTATE);
+				sb.append(sep);
+
+				if (def != null)
+				{
+					sb.append(def.name);
+					sb.append(":");
+					sb.append(def.getType());
+				}
+				else
+				{
+					PODefinition podef = ctxt.getDefinition();
+
+					if (podef instanceof POExplicitOperationDefinition)
+					{
+						POExplicitOperationDefinition exop = (POExplicitOperationDefinition)podef;
+
+						for (PODefinition pdef: exop.paramDefinitions)
+						{
+							if (pdef.name.equals(name))
+							{
+								sb.append(pdef.name);
+								sb.append(":");
+								sb.append(pdef.getType());
+								break;
+							}
+						}
+					}
+					else if (podef instanceof POImplicitOperationDefinition)
+					{
+						POImplicitOperationDefinition imop = (POImplicitOperationDefinition)podef;
+
+						for (POPatternListTypePair pdef: imop.parameterPatterns)
+						{
+							if (pdef.patterns.getAllVariableNames().contains(name))
+							{
+								sb.append(name);
+								sb.append(":");
+								sb.append(pdef.type);
+								break;
+							}
+						}
+					}
+				}
+
+				sep = ", ";
+			}
+
+			sb.append(" & ");
 		}
 
 		sb.append(spec.postcondition);
 
-		source = ctxt.getSource(sb.toString());
+		source = ctxt.getSource(sb.toString().replaceAll("~", "\\$"));
 		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
