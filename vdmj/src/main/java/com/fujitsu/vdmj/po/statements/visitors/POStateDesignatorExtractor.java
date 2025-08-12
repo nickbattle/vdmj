@@ -24,32 +24,31 @@
 
 package com.fujitsu.vdmj.po.statements.visitors;
 
+import java.util.LinkedHashMap;
+
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractor;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
-import com.fujitsu.vdmj.po.statements.POStatement;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POGState;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POStateDesignatorExtractor extends POStateDesignatorVisitor<POStateDesignator, Object>
 {
-	private POStatement stmt;
-	private ProofObligationList obligations;
-	private POGState pogState;
-	private POContextStack ctxt;
-	private Environment env;
+	private final POOperationExtractor extractor;
+	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
 
-	public POStateDesignatorExtractor(POStatement stmt,
-		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
+	public POStateDesignatorExtractor()
 	{
-		this.stmt = stmt;
-		this.obligations = obligations;
-		this.pogState = pogState;
-		this.ctxt = ctxt;
-		this.env = env;
+		this.extractor = new POOperationExtractor("$");
+		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
+	}
+
+	public LinkedHashMap<TCNameToken, POApplyExpression> getSubstitutions()
+	{
+		return substitutions;
 	}
 
 	public POStateDesignator caseIdentifierDesignator(POIdentifierDesignator node, Object arg)
@@ -69,9 +68,14 @@ public class POStateDesignatorExtractor extends POStateDesignatorVisitor<POState
 
 	public POStateDesignator caseMapSeqDesignator(POMapSeqDesignator node, Object arg)
 	{
+		POStateDesignator mapseq = node.mapseq.apply(this, arg);	// depth first
+
+		POExpression subs = node.exp.apply(extractor, null);
+		substitutions.putAll(extractor.getSubstitutions());
+
 		return new POMapSeqDesignator(
-			node.mapseq.apply(this, arg),
-			stmt.extractOpCalls(node.exp, obligations, pogState, ctxt, env),
+			mapseq,
+			subs,
 			node.seqType
 		);
 	}
@@ -79,6 +83,6 @@ public class POStateDesignatorExtractor extends POStateDesignatorVisitor<POState
 	@Override
 	POStateDesignator caseStateDesignator(POStateDesignator node)
 	{
-		return node;	// Not processed yet?
+		return node;	// Not expected?
 	}
 }

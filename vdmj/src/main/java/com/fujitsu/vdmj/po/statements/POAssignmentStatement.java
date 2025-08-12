@@ -82,10 +82,11 @@ public class POAssignmentStatement extends POStatement
 		ProofObligationList obligations = new ProofObligationList();
 		pogState.setAmbiguous(false);
 
-		// Attempt to extract operation calls from the RHS
+		// Attempt to extract operation calls from the LHS and RHS
+		POStateDesignator designator = extractOpCalls(target, obligations, pogState, ctxt, env);
 		POExpression extracted = extractOpCalls(exp, obligations, pogState, ctxt, env);
 
-		obligations.addAll(target.getProofObligations(ctxt));
+		obligations.addAll(designator.getProofObligations(ctxt));
 		obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
@@ -94,19 +95,19 @@ public class POAssignmentStatement extends POStatement
 				SubTypeObligation.getAllPOs(extracted, targetType, expType, ctxt));
 		}
 		
-		TCNameToken update = target.updatedVariableName();
+		TCNameToken update = designator.updatedVariableName();
 		
 		// If the expression is unambiguous, we can disambiguate the state being updated.
 		
 		if (!pogState.isAmbiguous())
 		{
-			ctxt.push(new POAssignmentContext(target, targetType, extracted));
+			ctxt.push(new POAssignmentContext(designator, targetType, extracted));
 			
 			// We can disambiguate variables in an assignment that assigns unambiguous values,
 			// like constants or variables that are unambiguous, but only if the entire value
 			// is being replaced. So we check that we are assigning to an IdentifierDesignator.
 			
-			if (target instanceof POIdentifierDesignator && ctxt.isAmbiguous(update))
+			if (designator instanceof POIdentifierDesignator && ctxt.isAmbiguous(update))
 			{
 				ctxt.push(new POResolveContext(update, location));
 			}

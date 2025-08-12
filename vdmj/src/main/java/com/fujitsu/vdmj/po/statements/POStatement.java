@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractionException;
 import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractor;
+import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -169,6 +170,38 @@ public abstract class POStatement extends PONode
 		catch (POOperationExtractionException e)
 		{
 			return exp;		// Caller decides if this is ambiguous
+		}
+	}
+
+	public POStateDesignator extractOpCalls(POStateDesignator designator,
+		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
+	{
+		try
+		{
+			POStateDesignatorExtractor visitor = new POStateDesignatorExtractor();
+			POStateDesignator subs = designator.apply(visitor, null);
+			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
+
+			for (Entry<TCNameToken, POApplyExpression> entry: table.entrySet())	// In order
+			{
+				TCNameToken var = entry.getKey();
+				POApplyExpression apply = entry.getValue();
+
+				// Get any obligations from the preconditions or arguments passed to the apply,
+				// without the rest of the ApplyExpression processing here, because we've removed
+				// the apply calls from the exp.
+				apply.getFuncOpObligations(ctxt, obligations);
+
+				// Then add the "forall" version of the ambiguity for the apply call, which cannot
+				// return at this point (within an expression).
+				ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env);
+			}
+
+			return subs;
+		}
+		catch (POOperationExtractionException e)
+		{
+			return designator;		// Caller decides if this is ambiguous
 		}
 	}
 
