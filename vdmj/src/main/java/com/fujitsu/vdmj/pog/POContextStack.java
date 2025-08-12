@@ -299,12 +299,13 @@ public class POContextStack extends Stack<POContext>
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 				TCNameList names = new TCNameList();
 				
-				if (!called.accessSpecifier.isPure)
+				if (!imp.accessSpecifier.isPure)
 				{
 					names.addAll(getStateVariables());
 				}
 
-				if (imp.externals != null && imp.location.module.equals(from.module))
+				if (imp.externals != null &&
+					imp.location.module.equals(from.module))	// Only local exts!
 				{
 					names.clear();
 					
@@ -330,24 +331,19 @@ public class POContextStack extends Stack<POContext>
 				
 				push(new POSaveStateContext(getStateDefinition()));
 				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
-
-				// if (canReturn && imp.type.result.isReturn())
-				// {
-				// 	push(new POReturnContext(imp.result.pattern, imp.result.type));
-				// }
+				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
-				POExplicitOperationDefinition exp = (POExplicitOperationDefinition)called;
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)called;
 				TCNameList names = new TCNameList();
 
-				if (!called.accessSpecifier.isPure)
+				if (!exop.accessSpecifier.isPure)
 				{
 					names.addAll(getStateVariables());
 				}
 
-				if (exp.type.result.isReturn())
+				if (exop.type.result.isReturn())
 				{
 					if (resultVar == null)
 					{
@@ -355,18 +351,12 @@ public class POContextStack extends Stack<POContext>
 					}
 
 					names.add(resultVar);
-					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exp.type.result), env);
+					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exop.type.result), env);
 				}
 					
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, exp.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname + ", affects " + names);
-
-				// if (canReturn && exp.type.result.isReturn())
-				// {
-				// 	POExpression rv = new POVariableExpression(resultVar, null);
-				// 	push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), rv));
-				// }
+				push(new POForAllContext(names, getPostQualifier(from, exop.postdef, args, resultVar), env));
+				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 			}
 		}
 	}
