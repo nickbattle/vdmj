@@ -192,7 +192,9 @@ public class PogTest extends TestCase
 		/* 24 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      is_nat((a + 1)))))\n",
 		/* 25 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        sv <> 0))))\n",
 		/* 26 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    ((a > 10) =>\n      (-- Throws exception 123\n        (sv > sv$)))))\n",
-		/* 27 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r : real = (1 / sv) in\n          (sv > sv$))))))\n"
+		/* 27 */ "(forall a:real, mk_Sigma(sv, xv, si, sr):Sigma &\n  (let sv$ = sv in\n    (not (a > 10) =>\n      (let sv : nat = (a + 1) in\n        (let r : real = (1 / sv) in\n          (sv > sv$))))))\n",
+		/* 28 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (sv < a) => exists a:nat, sv:nat & (sv > 100))\n",
+		/* 29 */ "(forall a:nat, mk_Sigma(sv, xv, si, sr):Sigma &\n  (forall sv:nat &\n    ((sv > 100) =>\n      sv <> 0)))\n"
 	};
 
 	private String[] expectedLoops =
