@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
@@ -125,5 +126,11 @@ public class POMapSeqDesignator extends POStateDesignator
 		POExpressionList list = mapseq.getExpressions();
 		list.add(exp);
 		return list;
+	}
+
+	@Override
+	public <R, S> R apply(POStateDesignatorVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapSeqDesignator(this, arg);
 	}
 }
