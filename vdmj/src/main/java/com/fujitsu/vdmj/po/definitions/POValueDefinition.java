@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -56,8 +55,6 @@ public class POValueDefinition extends PODefinition
 	public final TCType expType;
 	public final PODefinitionList defs;
 
-	private POExpression extracted = null;	// With removed operations
-
 	public POValueDefinition(POAnnotationList annotations, POPattern p, TCType type, POExpression exp, TCType expType, PODefinitionList defs)
 	{
 		super(p.location, null);
@@ -79,8 +76,7 @@ public class POValueDefinition extends PODefinition
 	@Override
 	public String toExplicitString(LexLocation from)
 	{
-		return pattern + (type == null ? "" : " : " + type.apply(new TCExplicitTypeVisitor(), from.module)) +
-			 " = " + (extracted != null ? extracted : exp);
+		return pattern + (type == null ? "" : " : " + type.apply(new TCExplicitTypeVisitor(), from.module)) + " = " + exp;
 	}
 
 	@Override
@@ -113,8 +109,7 @@ public class POValueDefinition extends PODefinition
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		this.extracted = POStatement.extractOpCalls(exp, list, pogState, ctxt, env);
-		list.addAll(extracted.getProofObligations(ctxt, pogState, env));
+		list.addAll(exp.getProofObligations(ctxt, pogState, env));
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&
@@ -139,14 +134,14 @@ public class POValueDefinition extends PODefinition
     			if (!TypeComparator.isSubType(type, compatible))
     			{
     				list.add(new ValueBindingObligation(this, ctxt));
-    				list.addAll(SubTypeObligation.getAllPOs(extracted, compatible, type, ctxt));
+    				list.addAll(SubTypeObligation.getAllPOs(exp, compatible, type, ctxt));
     			}
 			}
 		}
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), type))
 		{
-			list.addAll(SubTypeObligation.getAllPOs(extracted, type, expType, ctxt));
+			list.addAll(SubTypeObligation.getAllPOs(exp, type, expType, ctxt));
 		}
 		
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
