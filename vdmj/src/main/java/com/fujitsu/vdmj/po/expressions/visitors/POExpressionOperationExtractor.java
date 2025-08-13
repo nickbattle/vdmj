@@ -126,17 +126,17 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
  * 
  * Failing expressions throw a POOperationExtractionException.
  */
-public class POOperationExtractor extends POExpressionVisitor<POExpression, Object>
+public class POExpressionOperationExtractor extends POExpressionVisitor<POExpression, Object>
 {
 	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
 	private final String prefix;
 
-	public POOperationExtractor()
+	public POExpressionOperationExtractor()
 	{
 		this("");
 	}
 
-	public POOperationExtractor(String prefix)
+	public POExpressionOperationExtractor(String prefix)
 	{
 		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
 		this.prefix = prefix;

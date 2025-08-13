@@ -24,13 +24,13 @@
 
 package com.fujitsu.vdmj.po.expressions.visitors;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.PONode;
 
 public class POOperationExtractionException extends UnsupportedOperationException
 {
-	public final POExpression node;
+	public final PONode node;
 
-	public POOperationExtractionException(POExpression node, String reason)
+	public POOperationExtractionException(PONode node, String reason)
 	{
 		super(reason);
 		this.node = node;

@@ -38,8 +38,8 @@ import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractionException;
-import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractor;
-import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorExtractor;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
+import com.fujitsu.vdmj.po.statements.visitors.PODesignatorOperationExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -146,7 +146,7 @@ public abstract class POStatement extends PONode
 	{
 		try
 		{
-			POOperationExtractor visitor = new POOperationExtractor();
+			POExpressionOperationExtractor visitor = new POExpressionOperationExtractor();
 			POExpression subs = exp.apply(visitor, null);
 			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
 
@@ -182,7 +182,7 @@ public abstract class POStatement extends PONode
 	{
 		try
 		{
-			POStateDesignatorExtractor visitor = new POStateDesignatorExtractor();
+			PODesignatorOperationExtractor visitor = new PODesignatorOperationExtractor();
 			POStateDesignator subs = designator.apply(visitor, null);
 			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
 
@@ -213,4 +213,9 @@ public abstract class POStatement extends PONode
 	 * Implemented by all definitions to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg);
+
+	public <R, S> R apply(POStatementVisitor<R, S> visitor)
+	{
+		return apply(visitor, null);
+	}
 }
