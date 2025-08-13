@@ -78,7 +78,8 @@ public class POCasesStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
+		POExpression extracted = extractOpCalls(exp, null, pogState, ctxt, env);
+		ProofObligationList obligations = extracted.getProofObligations(ctxt, pogState, env);
 		
 		POAltContext altContext = new POAltContext();
 		boolean hasEffect = false;

@@ -146,4 +146,16 @@ operations
    	)
    	post sv > sv~;
 
+	op11 : nat ==> real
+	op11 (a) ==
+	(
+		[
+			ext wr sv : nat
+			pre sv < a
+			post sv > 100
+		];
+
+		return 1/sv
+	);
+
 end VDMSL

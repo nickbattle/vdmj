@@ -24,18 +24,27 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSpecificationStatement extends POStatement
@@ -75,6 +84,18 @@ public class POSpecificationStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		TCNameList writeList = new TCNameList();
+
+		if (externals != null)
+		{
+			for (POExternalClause ext: externals)
+			{
+				if (ext.mode.is(Token.WRITE))
+				{
+					writeList.addAll(ext.identifiers);
+				}
+			}
+		}
 
 		if (errors != null)
 		{
@@ -90,19 +111,55 @@ public class POSpecificationStatement extends POStatement
 			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
 		}
 
-		if (postcondition != null)
+		obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
+		
+		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
-			
-			if (Settings.dialect == Dialect.VDM_SL && Settings.release == Release.VDM_10)
-			{
-				obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt, env));
-			}
+			obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt, env));
 		}
 
-		ctxt.push(new POAmbiguousContext("specification statement", ctxt.getStateVariables(), location));
+		if (errors != null)
+		{
+			ctxt.push(new POAmbiguousContext("statement throws exceptions", ctxt.getStateVariables(), location));
+		}
+		else if (!writeList.isEmpty())
+		{
+			addOldContext(ctxt);
+			ctxt.push(new POForAllContext(writeList, env));		// forall <changed variables>
+			ctxt.push(new POImpliesContext(postcondition));		// post => ...
+		}
+		else
+		{
+			addOldContext(ctxt);
+			ctxt.push(new POForAllContext(ctxt.getStateVariables(), env));		// forall <changed variables>
+			ctxt.push(new POImpliesContext(postcondition));						// post => ...
+		}
 
 		return obligations;
+	}
+
+	private void addOldContext(POContextStack ctxt)
+	{
+		if (postcondition != null)
+		{
+			PODefinitionList olddefs = new PODefinitionList();
+			
+			for (TCNameToken name: postcondition.getVariableNames())
+			{
+				if (name.isOld())
+				{
+					TCNameToken varname = new TCNameToken(name.getLocation(), name.getModule(), name.getName() + "$");
+					
+					olddefs.add(new POValueDefinition(null, new POIdentifierPattern(varname), null,
+							new POVariableExpression(name.getNewName(), null), null, null));
+				}
+			}
+			
+			if (!olddefs.isEmpty())
+			{
+				ctxt.push(new POLetDefContext(olddefs));
+			}
+		}
 	}
 
 	@Override

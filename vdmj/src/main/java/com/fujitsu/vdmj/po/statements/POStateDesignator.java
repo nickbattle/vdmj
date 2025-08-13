@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -82,4 +83,9 @@ public abstract class POStateDesignator extends PONode
 	{
 		return new ProofObligationList();
 	}
+
+	/**
+	 * Implemented by all state designators to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(POStateDesignatorVisitor<R, S> visitor, S arg);
 }

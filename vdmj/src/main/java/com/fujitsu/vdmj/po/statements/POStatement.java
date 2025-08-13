@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractionException;
 import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractor;
+import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -140,13 +141,49 @@ public abstract class POStatement extends PONode
 	 * Analyse an expression to extract the operation apply calls, and add context to the stack,
 	 * before returning the substituted expression. Exceptions lead to an ambiguous context.
 	 */
-	protected POExpression extractOpCalls(POExpression exp,
+	public static POExpression extractOpCalls(POExpression exp,
 		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
 	{
 		try
 		{
 			POOperationExtractor visitor = new POOperationExtractor();
 			POExpression subs = exp.apply(visitor, null);
+			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
+
+			for (Entry<TCNameToken, POApplyExpression> entry: table.entrySet())	// In order
+			{
+				TCNameToken var = entry.getKey();
+				POApplyExpression apply = entry.getValue();
+
+				// Get any obligations from the preconditions or arguments passed to the apply,
+				// without the rest of the ApplyExpression processing here, because we've removed
+				// the apply calls from the exp.
+				apply.getFuncOpObligations(ctxt, obligations);
+
+				// Then add the "forall" version of the ambiguity for the apply call, which cannot
+				// return at this point (within an expression).
+				ctxt.makeOperationCall(exp.location, apply.opdef, apply.args, var, false, pogState, env);
+			}
+
+			return subs;
+		}
+		catch (POOperationExtractionException e)
+		{
+			return exp;		// Caller decides if this is ambiguous
+		}
+	}
+
+	/**
+	 * This version of the extraction is used inside assignment statements to analyse the LHS
+	 * for operation calls within map/seq designators.
+	 */
+	protected POStateDesignator extractOpCalls(POStateDesignator designator,
+		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
+	{
+		try
+		{
+			POStateDesignatorExtractor visitor = new POStateDesignatorExtractor();
+			POStateDesignator subs = designator.apply(visitor, null);
 			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
 
 			for (Entry<TCNameToken, POApplyExpression> entry: table.entrySet())	// In order
@@ -168,7 +205,7 @@ public abstract class POStatement extends PONode
 		}
 		catch (POOperationExtractionException e)
 		{
-			return exp;		// Caller decides if this is ambiguous
+			return designator;		// Caller decides if this is ambiguous
 		}
 	}
 

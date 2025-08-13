@@ -45,7 +45,7 @@ public class POImpliesContext extends POContext
 			if (precondition != null)	// null for missing loop invariant
 			{
 				sb.append(sep);
-				sb.append(precondition);
+				sb.append(precondition.toString().replaceAll("~", "\\$"));
 				sep = " and ";
 
 				this.reasonsAbout.addAll(precondition.getVariableNames());

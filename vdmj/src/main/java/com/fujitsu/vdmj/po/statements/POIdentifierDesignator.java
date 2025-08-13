@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -102,5 +103,11 @@ public class POIdentifierDesignator extends POStateDesignator
 		POExpressionList list = new POExpressionList();
 		list.add(new POVariableExpression(name, vardef));
 		return list;
+	}
+
+	@Override
+	public <R, S> R apply(POStateDesignatorVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIdentifierDesignator(this, arg);
 	}
 }

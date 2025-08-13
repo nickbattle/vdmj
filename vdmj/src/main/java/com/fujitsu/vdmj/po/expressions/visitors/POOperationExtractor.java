@@ -129,10 +129,17 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 public class POOperationExtractor extends POExpressionVisitor<POExpression, Object>
 {
 	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
+	private final String prefix;
 
 	public POOperationExtractor()
 	{
+		this("");
+	}
+
+	public POOperationExtractor(String prefix)
+	{
 		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
+		this.prefix = prefix;
 	}
 
 	public LinkedHashMap<TCNameToken, POApplyExpression> getSubstitutions()
@@ -942,12 +949,12 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 			POVariableExpression root = (POVariableExpression)node.root;
 
 			// Note: the name is module-local to the node, not the called operation
-			name = new TCNameToken(node.location, node.location.module, "$" + root.name.getName());
+			name = new TCNameToken(node.location, node.location.module, "$" + prefix + root.name.getName());
 			int count = 0;
 
 			while (substitutions.containsKey(name))
 			{
-				name = new TCNameToken(node.location, node.location.module, "$" + root.name.getName() + base26(count));
+				name = new TCNameToken(node.location, node.location.module, "$" + prefix + root.name.getName() + base26(count));
 				count++;
 			}
 

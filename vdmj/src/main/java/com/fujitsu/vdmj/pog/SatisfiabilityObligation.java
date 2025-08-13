@@ -120,14 +120,15 @@ public class SatisfiabilityObligation extends ProofObligation
 	{
 		super(spec.location, POType.OP_SATISFIABILITY, ctxt);
 		StringBuilder sb = new StringBuilder();
+		TCNameSet names = new TCNameSet();
 
 		if (spec.precondition != null)
 		{
     		sb.append(spec.precondition);
     		sb.append(" => ");
+			names.addAll(spec.precondition.getVariableNames());
 		}
 
-		TCNameSet names = spec.precondition.getVariableNames();
 		names.addAll(spec.postcondition.getVariableNames());
 
 		if (!names.isEmpty())

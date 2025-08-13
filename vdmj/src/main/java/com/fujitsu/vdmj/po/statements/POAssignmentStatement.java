@@ -56,6 +56,10 @@ public class POAssignmentStatement extends POStatement
 	public final POStateDefinition stateDefinition;
 	public final boolean inConstructor;
 
+	private POStateDesignator designator;	// With operation calls removed
+	private POExpression expression;		// Ditto.
+
+
 	public POAssignmentStatement(LexLocation location, POStateDesignator target, POExpression exp,
 		TCType targetType, TCType expType, POClassDefinition classDefinition,
 		POStateDefinition stateDefinition, boolean inConstructor)
@@ -76,37 +80,46 @@ public class POAssignmentStatement extends POStatement
 		return target + " := " + exp;
 	}
 
+	private ProofObligationList extractOperations(POContextStack ctxt, POGState pogState, Environment env)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+
+		this.designator = extractOpCalls(target, obligations, pogState, ctxt, env);
+		this.expression = extractOpCalls(exp, obligations, pogState, ctxt, env);
+
+		return obligations;
+	}
+
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
 		pogState.setAmbiguous(false);
 
-		// Attempt to extract operation calls from the RHS
-		POExpression extracted = extractOpCalls(exp, obligations, pogState, ctxt, env);
+		// Attempt to extract operation calls from the LHS and RHS
+		ProofObligationList obligations = extractOperations(ctxt, pogState, env);
 
-		obligations.addAll(target.getProofObligations(ctxt));
-		obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(designator.getProofObligations(ctxt));
+		obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{
 			obligations.addAll(
-				SubTypeObligation.getAllPOs(extracted, targetType, expType, ctxt));
+				SubTypeObligation.getAllPOs(expression, targetType, expType, ctxt));
 		}
 		
-		TCNameToken update = target.updatedVariableName();
+		TCNameToken update = designator.updatedVariableName();
 		
 		// If the expression is unambiguous, we can disambiguate the state being updated.
 		
 		if (!pogState.isAmbiguous())
 		{
-			ctxt.push(new POAssignmentContext(target, targetType, extracted));
+			ctxt.push(new POAssignmentContext(designator, targetType, expression));
 			
 			// We can disambiguate variables in an assignment that assigns unambiguous values,
 			// like constants or variables that are unambiguous, but only if the entire value
 			// is being replaced. So we check that we are assigning to an IdentifierDesignator.
 			
-			if (target instanceof POIdentifierDesignator && ctxt.isAmbiguous(update))
+			if (designator instanceof POIdentifierDesignator && ctxt.isAmbiguous(update))
 			{
 				ctxt.push(new POResolveContext(update, location));
 			}
@@ -132,15 +145,16 @@ public class POAssignmentStatement extends POStatement
 	 */
 	public ProofObligationList prepareAssignment(POContextStack ctxt, POGState pogState, Environment env, int var)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		// Attempt to extract operation calls from the LHS and RHS
+		ProofObligationList obligations = extractOperations(ctxt, pogState, env);
 
-		obligations.addAll(target.getProofObligations(ctxt));
-		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+		obligations.addAll(designator.getProofObligations(ctxt));
+		obligations.addAll(expression.getProofObligations(ctxt, pogState, env));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(exp, expType), targetType))
 		{
 			obligations.addAll(
-				SubTypeObligation.getAllPOs(exp, targetType, expType, ctxt));
+				SubTypeObligation.getAllPOs(expression, targetType, expType, ctxt));
 		}
 		
 		// Create a temporary name, which is used in the completeObligations call
@@ -152,7 +166,7 @@ public class POAssignmentStatement extends POStatement
 		if (ctxt.hasAmbiguous(exp.getVariableNames()))
 		{
 			// Updated a variable with an ambiguous value, so it becomes ambiguous
-			TCNameToken update = target.updatedVariableName();
+			TCNameToken update = designator.updatedVariableName();
 			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
 		}
 
@@ -169,7 +183,7 @@ public class POAssignmentStatement extends POStatement
 		// Create a temporary name, which was created in the completeObligations call
 		TCNameToken temp = new TCNameToken(location, location.module, "$atomic" + var);
 		POVariableExpression tempExp = new POVariableExpression(temp, null);
-		ctxt.push(new POAssignmentContext(target, targetType, tempExp));
+		ctxt.push(new POAssignmentContext(designator, targetType, tempExp));
 
 		return obligations;
 	}
