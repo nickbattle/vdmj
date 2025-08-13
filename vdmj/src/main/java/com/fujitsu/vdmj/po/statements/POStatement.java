@@ -141,7 +141,7 @@ public abstract class POStatement extends PONode
 	 * Analyse an expression to extract the operation apply calls, and add context to the stack,
 	 * before returning the substituted expression. Exceptions lead to an ambiguous context.
 	 */
-	public static POExpression extractOpCalls(POExpression exp,
+	public POExpression extractOpCalls(POExpression exp,
 		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
 	{
 		try
