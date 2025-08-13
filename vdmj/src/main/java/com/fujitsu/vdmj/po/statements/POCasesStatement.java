@@ -95,7 +95,7 @@ public class POCasesStatement extends POStatement
 			}
 
 			// Pushes PONotCaseContext and altContext updated
-			obligations.addAll(alt.getProofObligations(ctxt, altContext, base, pogState, expType, env));
+			obligations.addAll(alt.getProofObligations(extracted, ctxt, altContext, base, pogState, expType, env));
 			hasEffect = hasEffect || alt.hasEffect();
 		}
 
