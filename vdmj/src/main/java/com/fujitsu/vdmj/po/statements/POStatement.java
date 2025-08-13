@@ -141,7 +141,7 @@ public abstract class POStatement extends PONode
 	 * Analyse an expression to extract the operation apply calls, and add context to the stack,
 	 * before returning the substituted expression. Exceptions lead to an ambiguous context.
 	 */
-	public POExpression extractOpCalls(POExpression exp,
+	public static POExpression extractOpCalls(POExpression exp,
 		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
 	{
 		try
@@ -162,7 +162,7 @@ public abstract class POStatement extends PONode
 
 				// Then add the "forall" version of the ambiguity for the apply call, which cannot
 				// return at this point (within an expression).
-				ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env);
+				ctxt.makeOperationCall(exp.location, apply.opdef, apply.args, var, false, pogState, env);
 			}
 
 			return subs;
@@ -173,7 +173,11 @@ public abstract class POStatement extends PONode
 		}
 	}
 
-	public POStateDesignator extractOpCalls(POStateDesignator designator,
+	/**
+	 * This version of the extraction is used inside assignment statements to analyse the LHS
+	 * for operation calls within map/seq designators.
+	 */
+	protected POStateDesignator extractOpCalls(POStateDesignator designator,
 		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
 	{
 		try
