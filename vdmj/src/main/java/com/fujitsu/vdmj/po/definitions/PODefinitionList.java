@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionOperationExtractor;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
@@ -147,9 +148,9 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	/**
 	 * Apply operation extraction to the list of definitions.
 	 */
-	public PODefinitionList extractOperations()
+	public PODefinitionList extractOperations(POExpressionOperationExtractor extractor)
 	{
-		PODefinitionOperationExtractor visitor = new PODefinitionOperationExtractor();
+		PODefinitionOperationExtractor visitor = new PODefinitionOperationExtractor(extractor);
 		PODefinitionList list = new PODefinitionList();
 
 		for (PODefinition def: this)

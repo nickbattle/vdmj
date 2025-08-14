@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternativeList;
 import com.fujitsu.vdmj.po.expressions.POCasesExpression;
 import com.fujitsu.vdmj.po.expressions.POCompExpression;
+import com.fujitsu.vdmj.po.expressions.PODefExpression;
 import com.fujitsu.vdmj.po.expressions.PODistConcatExpression;
 import com.fujitsu.vdmj.po.expressions.PODistIntersectExpression;
 import com.fujitsu.vdmj.po.expressions.PODistMergeExpression;
@@ -70,6 +71,7 @@ import com.fujitsu.vdmj.po.expressions.POIsExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
 import com.fujitsu.vdmj.po.expressions.POLessEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POLessExpression;
+import com.fujitsu.vdmj.po.expressions.POLetDefExpression;
 import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POMapDomainExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
@@ -243,6 +245,24 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 	 * Implemented substitutions. Each case returns a copy of itself, with any sub-expressions
 	 * processed by the same visitor.
 	 */
+
+	@Override
+	public POExpression caseLetDefExpression(POLetDefExpression node, Object arg)
+	{
+		return setType(node, new POLetDefExpression(
+			node.location,
+			node.localDefs.extractOperations(this),
+			node.expression.apply(this)));
+	}
+
+	@Override
+	public POExpression caseDefExpression(PODefExpression node, Object arg)
+	{
+		return setType(node, new PODefExpression(
+			node.location,
+			node.localDefs.extractOperations(this),
+			node.expression.apply(this)));
+	}
 
 	@Override
 	public POExpression caseAnnotatedExpression(POAnnotatedExpression node, Object arg)
