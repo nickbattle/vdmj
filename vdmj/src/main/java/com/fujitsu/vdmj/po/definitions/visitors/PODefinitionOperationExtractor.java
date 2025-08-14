@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POEqualsDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
@@ -42,16 +43,21 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
  */
 public class PODefinitionOperationExtractor extends PODefinitionVisitor<PODefinition, Object>
 {
-	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
+	private final POExpressionOperationExtractor expExtractor;
+
+	public PODefinitionOperationExtractor(POExpressionOperationExtractor expExtractor)
+	{
+		this.expExtractor = expExtractor;
+	}
 
 	public PODefinitionOperationExtractor()
 	{
-		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
+		this(new POExpressionOperationExtractor());
 	}
 
 	public LinkedHashMap<TCNameToken, POApplyExpression> getSubstitutions()
 	{
-		return substitutions;
+		return expExtractor.getSubstitutions();
 	}
 
 	@Override
@@ -67,35 +73,39 @@ public class PODefinitionOperationExtractor extends PODefinitionVisitor<PODefini
 	}
 
 	@Override
+	public PODefinition caseEqualsDefinition(POEqualsDefinition node, Object arg)
+	{
+		return new POEqualsDefinition(
+			node.location,
+			node.pattern,
+			node.typebind,
+			node.bind,
+			node.test.apply(expExtractor),
+			node.expType,
+			node.defType,
+			node.defs);
+	}
+
+	@Override
 	public PODefinition caseAssignmentDefinition(POAssignmentDefinition node, Object arg)
 	{
-		POExpressionOperationExtractor visitor = new POExpressionOperationExtractor();
-
-		POAssignmentDefinition result = new POAssignmentDefinition(
+		return new POAssignmentDefinition(
 			node.name,
 			node.type,
-			node.expression.apply(visitor),
+			node.expression.apply(expExtractor),
 			node.expType);
-
-		substitutions.putAll(visitor.getSubstitutions());
-		return result;
 	}
 
 	@Override
 	public PODefinition caseValueDefinition(POValueDefinition node, Object arg)
 	{
-		POExpressionOperationExtractor visitor = new POExpressionOperationExtractor();
-
-		POValueDefinition result = new POValueDefinition(
+		return new POValueDefinition(
 			node.annotations,
 			node.pattern,
 			node.type,
-			node.exp.apply(visitor),
+			node.exp.apply(expExtractor),
 			node.expType,
 			node.defs);
-
-		substitutions.putAll(visitor.getSubstitutions());
-		return result;
 	}
 
 	@Override

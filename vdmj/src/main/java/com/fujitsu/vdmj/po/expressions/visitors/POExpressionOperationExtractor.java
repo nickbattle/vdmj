@@ -949,12 +949,16 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 			POVariableExpression root = (POVariableExpression)node.root;
 
 			// Note: the name is module-local to the node, not the called operation
-			name = new TCNameToken(node.location, node.location.module, "$" + prefix + root.name.getName());
-			int count = 0;
+			name = new TCNameToken(node.location, node.location.module,
+				"$" + prefix + root.name.getName());
+
+			int count = 1;		// eg. $op becomes $op$1, $op$2 etc...
 
 			while (substitutions.containsKey(name))
 			{
-				name = new TCNameToken(node.location, node.location.module, "$" + prefix + root.name.getName() + base26(count));
+				name = new TCNameToken(node.location, node.location.module,
+					"$" + prefix + root.name.getName() + "$" + count);
+
 				count++;
 			}
 
@@ -966,27 +970,6 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 		{
 			throw new POOperationExtractionException(node, "no operation name?");
 		}
-	}
-
-	private static final String alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-	/**
-	 * Generate a base26 extension for repeated op calls, like op1a, op1b etc.
-	 */
-	private String base26(int count)
-	{
-		StringBuilder sb = new StringBuilder();
-
-		do
-		{
-			int r = count % 26;
-			count = count / 26;
-
-			sb.append(alphabet.charAt(r));
-		}
-		while (count > 0);
-
-		return sb.toString();
 	}
 
 	/**
