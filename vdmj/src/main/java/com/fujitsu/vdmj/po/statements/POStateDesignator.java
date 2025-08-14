@@ -88,4 +88,9 @@ public abstract class POStateDesignator extends PONode
 	 * Implemented by all state designators to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(POStateDesignatorVisitor<R, S> visitor, S arg);
+
+	public <R, S> R apply(POStateDesignatorVisitor<R, S> visitor)
+	{
+		return apply(visitor, null);
+	}
 }

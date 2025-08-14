@@ -62,17 +62,18 @@ public class POCaseStmtAlternative extends PONode
 		return "case " + pattern + " -> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt, POAltContext alt, int base, POGState pogState, TCType type, Environment env)
+	public ProofObligationList getProofObligations(POExpression extracted,
+		POContextStack ctxt, POAltContext alt, int base, POGState pogState, TCType type, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		int popto = ctxt.pushAt(new POCaseContext(pattern, type, cexp));
+		int popto = ctxt.pushAt(new POCaseContext(pattern, type, extracted));
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		hasEffect = ctxt.size() > popto + 1;
 		ctxt.copyInto(base, alt.add());
 		ctxt.popTo(popto);
 		
-		ctxt.push(new PONotCaseContext(pattern, type, cexp));
+		ctxt.push(new PONotCaseContext(pattern, type, extracted));
 		return obligations;
 	}
 

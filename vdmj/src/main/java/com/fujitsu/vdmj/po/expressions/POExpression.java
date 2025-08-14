@@ -199,4 +199,9 @@ public abstract class POExpression extends PONode
 	 * Implemented by all expressions to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg);
+
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor)
+	{
+		return apply(visitor, null);
+	}
 }

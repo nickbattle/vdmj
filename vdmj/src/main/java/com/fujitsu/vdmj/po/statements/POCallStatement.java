@@ -133,7 +133,7 @@ public class POCallStatement extends POStatement
 
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			ctxt.makeOperationCall(location, opdef, args, null, true, pogState, env);
+			ctxt.makeOperationCall(location, opdef, args, null, getStmttype().isReturn(), pogState, env);
 		}
 		else
 		{

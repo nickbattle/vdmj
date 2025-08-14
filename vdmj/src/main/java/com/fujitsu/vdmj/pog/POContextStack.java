@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
@@ -332,6 +333,12 @@ public class POContextStack extends Stack<POContext>
 				push(new POSaveStateContext(getStateDefinition()));
 				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
+
+				if (canReturn)
+				{
+					POExpression result = new POVariableExpression(resultVar, null);
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), result));
+				}
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
@@ -357,6 +364,12 @@ public class POContextStack extends Stack<POContext>
 				push(new POSaveStateContext(getStateDefinition()));
 				push(new POForAllContext(names, getPostQualifier(from, exop.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
+
+				if (canReturn)
+				{
+					POExpression result = new POVariableExpression(resultVar, null);
+					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), result));
+				}
 			}
 		}
 	}

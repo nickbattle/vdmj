@@ -28,21 +28,21 @@ import java.util.LinkedHashMap;
 
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractor;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
 import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class POStateDesignatorExtractor extends POStateDesignatorVisitor<POStateDesignator, Object>
+public class PODesignatorOperationExtractor extends POStateDesignatorVisitor<POStateDesignator, Object>
 {
-	private final POOperationExtractor extractor;
+	private final POExpressionOperationExtractor extractor;
 	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
 
-	public POStateDesignatorExtractor()
+	public PODesignatorOperationExtractor()
 	{
-		this.extractor = new POOperationExtractor("$");
+		this.extractor = new POExpressionOperationExtractor("$");
 		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
 	}
 

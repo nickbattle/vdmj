@@ -34,12 +34,14 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionOperationExtractor;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractionException;
-import com.fujitsu.vdmj.po.expressions.visitors.POOperationExtractor;
-import com.fujitsu.vdmj.po.statements.visitors.POStateDesignatorExtractor;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
+import com.fujitsu.vdmj.po.statements.visitors.PODesignatorOperationExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -141,13 +143,13 @@ public abstract class POStatement extends PONode
 	 * Analyse an expression to extract the operation apply calls, and add context to the stack,
 	 * before returning the substituted expression. Exceptions lead to an ambiguous context.
 	 */
-	public static POExpression extractOpCalls(POExpression exp,
+	public POExpression extractOpCalls(POExpression exp,
 		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
 	{
 		try
 		{
-			POOperationExtractor visitor = new POOperationExtractor();
-			POExpression subs = exp.apply(visitor, null);
+			POExpressionOperationExtractor visitor = new POExpressionOperationExtractor();
+			POExpression subs = exp.apply(visitor);
 			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
 
 			for (Entry<TCNameToken, POApplyExpression> entry: table.entrySet())	// In order
@@ -182,8 +184,8 @@ public abstract class POStatement extends PONode
 	{
 		try
 		{
-			POStateDesignatorExtractor visitor = new POStateDesignatorExtractor();
-			POStateDesignator subs = designator.apply(visitor, null);
+			PODesignatorOperationExtractor visitor = new PODesignatorOperationExtractor();
+			POStateDesignator subs = designator.apply(visitor);
 			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
 
 			for (Entry<TCNameToken, POApplyExpression> entry: table.entrySet())	// In order
@@ -209,8 +211,57 @@ public abstract class POStatement extends PONode
 		}
 	}
 
+	
+	/**
+	 * This version of the extraction is used inside let def statements to analyse the definitions
+	 * for operation calls.
+	 */
+	protected PODefinitionList extractOpCalls(PODefinitionList definitions,
+		ProofObligationList obligations, POGState pogState, POContextStack ctxt, Environment env)
+	{
+		try
+		{
+			PODefinitionList subs = new PODefinitionList();
+			PODefinitionOperationExtractor visitor = new PODefinitionOperationExtractor();
+
+			for (PODefinition definition: definitions)
+			{
+				PODefinition sub = definition.apply(visitor);
+				subs.add(sub);
+			}
+
+			LinkedHashMap<TCNameToken, POApplyExpression> table = visitor.getSubstitutions();
+
+			for (Entry<TCNameToken, POApplyExpression> entry: table.entrySet())	// In order
+			{
+				TCNameToken var = entry.getKey();
+				POApplyExpression apply = entry.getValue();
+
+				// Get any obligations from the preconditions or arguments passed to the apply,
+				// without the rest of the ApplyExpression processing here, because we've removed
+				// the apply calls from the exp.
+				apply.getFuncOpObligations(ctxt, obligations);
+
+				// Then add the "forall" version of the ambiguity for the apply call, which cannot
+				// return at this point (within an expression).
+				ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env);
+			}
+
+			return subs;
+		}
+		catch (POOperationExtractionException e)
+		{
+			return definitions;		// Caller decides if this is ambiguous
+		}
+	}
+
 	/**
 	 * Implemented by all definitions to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg);
+
+	public <R, S> R apply(POStatementVisitor<R, S> visitor)
+	{
+		return apply(visitor, null);
+	}
 }

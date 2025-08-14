@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternativeList;
 import com.fujitsu.vdmj.po.expressions.POCasesExpression;
 import com.fujitsu.vdmj.po.expressions.POCompExpression;
+import com.fujitsu.vdmj.po.expressions.PODefExpression;
 import com.fujitsu.vdmj.po.expressions.PODistConcatExpression;
 import com.fujitsu.vdmj.po.expressions.PODistIntersectExpression;
 import com.fujitsu.vdmj.po.expressions.PODistMergeExpression;
@@ -70,6 +71,7 @@ import com.fujitsu.vdmj.po.expressions.POIsExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
 import com.fujitsu.vdmj.po.expressions.POLessEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POLessExpression;
+import com.fujitsu.vdmj.po.expressions.POLetDefExpression;
 import com.fujitsu.vdmj.po.expressions.POMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POMapDomainExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
@@ -126,17 +128,17 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
  * 
  * Failing expressions throw a POOperationExtractionException.
  */
-public class POOperationExtractor extends POExpressionVisitor<POExpression, Object>
+public class POExpressionOperationExtractor extends POExpressionVisitor<POExpression, Object>
 {
 	private final LinkedHashMap<TCNameToken, POApplyExpression> substitutions;
 	private final String prefix;
 
-	public POOperationExtractor()
+	public POExpressionOperationExtractor()
 	{
 		this("");
 	}
 
-	public POOperationExtractor(String prefix)
+	public POExpressionOperationExtractor(String prefix)
 	{
 		this.substitutions = new LinkedHashMap<TCNameToken, POApplyExpression>();
 		this.prefix = prefix;
@@ -243,6 +245,24 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 	 * Implemented substitutions. Each case returns a copy of itself, with any sub-expressions
 	 * processed by the same visitor.
 	 */
+
+	@Override
+	public POExpression caseLetDefExpression(POLetDefExpression node, Object arg)
+	{
+		return setType(node, new POLetDefExpression(
+			node.location,
+			node.localDefs.extractOperations(this),
+			node.expression.apply(this)));
+	}
+
+	@Override
+	public POExpression caseDefExpression(PODefExpression node, Object arg)
+	{
+		return setType(node, new PODefExpression(
+			node.location,
+			node.localDefs.extractOperations(this),
+			node.expression.apply(this)));
+	}
 
 	@Override
 	public POExpression caseAnnotatedExpression(POAnnotatedExpression node, Object arg)
@@ -949,12 +969,16 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 			POVariableExpression root = (POVariableExpression)node.root;
 
 			// Note: the name is module-local to the node, not the called operation
-			name = new TCNameToken(node.location, node.location.module, "$" + prefix + root.name.getName());
-			int count = 0;
+			name = new TCNameToken(node.location, node.location.module,
+				"$" + prefix + root.name.getName());
+
+			int count = 1;		// eg. $op becomes $op$1, $op$2 etc...
 
 			while (substitutions.containsKey(name))
 			{
-				name = new TCNameToken(node.location, node.location.module, "$" + prefix + root.name.getName() + base26(count));
+				name = new TCNameToken(node.location, node.location.module,
+					"$" + prefix + root.name.getName() + "$" + count);
+
 				count++;
 			}
 
@@ -966,27 +990,6 @@ public class POOperationExtractor extends POExpressionVisitor<POExpression, Obje
 		{
 			throw new POOperationExtractionException(node, "no operation name?");
 		}
-	}
-
-	private static final String alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-	/**
-	 * Generate a base26 extension for repeated op calls, like op1a, op1b etc.
-	 */
-	private String base26(int count)
-	{
-		StringBuilder sb = new StringBuilder();
-
-		do
-		{
-			int r = count % 26;
-			count = count / 26;
-
-			sb.append(alphabet.charAt(r));
-		}
-		while (count > 0);
-
-		return sb.toString();
 	}
 
 	/**
