@@ -78,8 +78,10 @@ public class POIfStatement extends POStatement
 	{
 		POAltContext altContext = new POAltContext();
 		boolean hasEffect = false;
+		ProofObligationList obligations = new ProofObligationList();
 
-		ProofObligationList obligations = ifExp.getProofObligations(ctxt, pogState, env);
+		POExpression extracted = extractOpCalls(ifExp, obligations, pogState, ctxt, env);
+		obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
 		
 		int base = ctxt.pushAt(new POImpliesContext(ifExp));
 		obligations.addAll(thenStmt.getProofObligations(ctxt, pogState, env));
@@ -90,16 +92,17 @@ public class POIfStatement extends POStatement
 
 		for (POElseIfStatement stmt: elseList)
 		{
-			ProofObligationList oblist = stmt.elseIfExp.getProofObligations(ctxt, pogState, env);
+			extracted = extractOpCalls(stmt.elseIfExp, obligations, pogState, ctxt, env);
+			ProofObligationList oblist = extracted.getProofObligations(ctxt, pogState, env);
 
-			int popto = ctxt.pushAt(new POImpliesContext(stmt.elseIfExp));
+			int popto = ctxt.pushAt(new POImpliesContext(extracted));
 			oblist.addAll(stmt.thenStmt.getProofObligations(ctxt, pogState, env));
 			hasEffect = hasEffect || ctxt.size() > popto + 1;
 			ctxt.copyInto(base, altContext.add());
 			ctxt.popTo(popto);
 			obligations.addAll(oblist);
 
-			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
+			ctxt.push(new PONotImpliesContext(extracted));
 		}
 
 		if (elseStmt != null)
