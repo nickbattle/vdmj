@@ -61,14 +61,17 @@ public class POBlockStatement extends POSimpleBlockStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
-		ProofObligationList obligations = assignmentDefs.getDefProofObligations(ctxt, pogState, env);
+		ProofObligationList obligations = new ProofObligationList();
 		
-		if (!assignmentDefs.isEmpty())
+		PODefinitionList extracted = extractOpCalls(assignmentDefs, obligations, pogState, ctxt, env);
+		extracted.getDefProofObligations(ctxt, pogState, env);
+		
+		if (!extracted.isEmpty())
 		{
 			POGState dclState = pogState.getLink();
 			TCDefinitionList defs = new TCDefinitionList();
 			
-			for (PODefinition dcl: assignmentDefs)
+			for (PODefinition dcl: extracted)
 			{
 				POAssignmentDefinition adef = (POAssignmentDefinition)dcl;
 				dclState.addDclLocal(adef.name);
@@ -77,7 +80,7 @@ public class POBlockStatement extends POSimpleBlockStatement
 
 			Environment locals = new FlatEnvironment(defs, env);
 
-			ctxt.pushAt(new POAssignmentContext(assignmentDefs));
+			ctxt.pushAt(new POAssignmentContext(extracted));
 			obligations.addAll(super.getProofObligations(ctxt, dclState, locals));
 		}
 		else
