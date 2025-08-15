@@ -250,7 +250,7 @@ public class DirectQCStrategy extends QCStrategy
 		{
 			po.setStatus(proved ? POStatus.PROVABLE : POStatus.FAILED);
 			po.setProvedBy(getName());
-			po.setQualifier(qualifier);
+			po.setQualifier("by " + getName() + " " + qualifier);
 		}
 	}
 }

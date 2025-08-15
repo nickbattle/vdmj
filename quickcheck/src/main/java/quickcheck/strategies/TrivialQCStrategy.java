@@ -92,7 +92,7 @@ public class TrivialQCStrategy extends QCStrategy
 		{
 			po.setStatus(POStatus.PROVABLE);
 			po.setProvedBy(getName());
-			po.setQualifier(qualifier);
+			po.setQualifier("by " + getName() + " " + qualifier);
 		}
 	}
 }
