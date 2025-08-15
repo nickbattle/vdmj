@@ -225,6 +225,12 @@ public class QuickCheckThread extends CancellableThread
 				cexample.put("launch", launch);
 				pog.addCodeLens(po);
 			}
+
+			if (po.counterexample.location.startLine != 1)
+			{
+				// The location of the "forall" in the PO
+				cexample.put("startLine", po.counterexample.location.startLine);
+			}
 			
 			json.put("counterexample", cexample);
 			
@@ -268,7 +274,13 @@ public class QuickCheckThread extends CancellableThread
 			{
 				witness.put("launch", launch);
 			}
-			
+
+			if (po.counterexample.location.startLine != 1)
+			{
+				// The location of the "exists" in the PO
+				witness.put("startLine", po.witness.location.startLine);
+			}
+
 			json.put("witness", witness);
 		}
 		

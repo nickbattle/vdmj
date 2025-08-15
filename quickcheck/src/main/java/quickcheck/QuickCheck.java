@@ -426,48 +426,13 @@ public class QuickCheck
 			po.setMessage(e.getMessage());
 			errorCount++;
 		}
-		finally		// Clear everything, to be safe
-		{
-			if (sresults.binds != null)
-			{
-				for (INBindingOverride mbind: sresults.binds)
-				{
-					mbind.setBindValues(null);
-				}
-			}
-			
-			INBindingGlobals.getInstance().clear();
-		}
 	}
 
-	private void tryPossibleValues(ProofObligation po, StrategyResults sresults)
-		throws Exception, ValueException
+	private void tryPossibleValues(ProofObligation po, StrategyResults sresults) throws Exception
 	{
 		INBindingGlobals globals = INBindingGlobals.getInstance();
 		globals.clear();		// Clear before each obligation run
 
-		for (INBindingOverride mbind: sresults.binds)
-		{
-			ValueList values = sresults.possibleValues.get(mbind.toString());
-			
-			if (values != null)
-			{
-				verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-				mbind.setBindValues(values);
-			}
-			else
-			{
-				errorln("PO #" + po.number + ": No bind values defined for " + mbind);
-				errorCount++;
-			}
-		}
-		
-		globals.setAllValues(sresults.hasAllValues);
-		Context ctxt = Interpreter.getInstance().getInitialContext();
-		Interpreter.getInstance().setDefaultName(po.location.module);
-		
-		ctxt = addSelf(po, ctxt);
-		IterableContext ictxt = addTypeParams(po, ctxt);
 		Value execResult = new BooleanValue(false);
 		ContextException execException = null;
 		boolean execCompleted = false;
@@ -475,6 +440,29 @@ public class QuickCheck
 
 		try
 		{
+			for (INBindingOverride mbind: sresults.binds)
+			{
+				ValueList values = sresults.possibleValues.get(mbind.toString());
+				
+				if (values != null)
+				{
+					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
+					mbind.setBindValues(values);
+				}
+				else
+				{
+					errorln("PO #" + po.number + ": No bind values defined for " + mbind);
+					errorCount++;
+				}
+			}
+			
+			globals.setAllValues(sresults.hasAllValues);
+			Context ctxt = Interpreter.getInstance().getInitialContext();
+			Interpreter.getInstance().setDefaultName(po.location.module);
+			
+			ctxt = addSelf(po, ctxt);
+			IterableContext ictxt = addTypeParams(po, ctxt);
+
 			verbose("PO #%d, starting evaluation...\n", po.number);
 			
 			// Suspend annotation execution by the interpreter, because the
@@ -512,12 +500,20 @@ public class QuickCheck
 		}
 		finally
 		{
+			analyseResult(po, sresults, globals,
+				execResult, execException, execCompleted, timedOut);
+
+			// Clear everything, to be safe
+			
+			for (INBindingOverride mbind: sresults.binds)
+			{
+				mbind.setBindValues(null);
+			}
+			
+			INBindingGlobals.getInstance().clear();
 			verbose("PO #%d, stopped evaluation.\n", po.number);
 			INAnnotation.suspend(false);
 		}
-		
-		analyseResult(po, sresults, globals,
-			execResult, execException, execCompleted, timedOut);
 	}
 
 	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
