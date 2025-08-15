@@ -30,6 +30,7 @@ import static quickcheck.commands.QCConsole.verbose;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 
@@ -68,12 +69,30 @@ public class TrivialQCStrategy extends QCStrategy
 
 			if (po.getCheckedExpression().apply(visitor, new TrivialQCKnown()))
 			{
-				return new StrategyResults(getName(), visitor.getMessage(), null);
+				return new StrategyResults(new TrivialUpdater(visitor.getMessage()));
 			}
 			
 			verbose("No trivial patterns found\n");
 		}
 		
 		return new StrategyResults();	// Got nothing!
+	}
+
+	private class TrivialUpdater extends StrategyUpdater
+	{
+		private final String qualifier;
+
+		public TrivialUpdater(String qualifier)
+		{
+			this.qualifier = qualifier;
+		}
+
+		@Override
+		public void updateProofObligation(ProofObligation po)
+		{
+			po.setStatus(POStatus.PROVABLE);
+			po.setProvedBy(getName());
+			po.setQualifier(qualifier);
+		}
 	}
 }

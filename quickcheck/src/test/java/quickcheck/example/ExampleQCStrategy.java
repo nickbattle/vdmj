@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
@@ -38,6 +39,7 @@ import com.fujitsu.vdmj.values.ValueList;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
+import quickcheck.strategies.StrategyUpdater;
 
 public class ExampleQCStrategy extends QCStrategy
 {
@@ -98,8 +100,7 @@ public class ExampleQCStrategy extends QCStrategy
 		
 		if (provedResult)
 		{
-			Context witness = null;		// Could have witness values set
-			return new StrategyResults(getName(), "Just an example", witness);
+			return new StrategyResults(new ExampleUpdater("Just an example"));
 		}
 		else
 		{
@@ -118,4 +119,28 @@ public class ExampleQCStrategy extends QCStrategy
 	{
 		return false;	// Not used if no -s options given
 	}
+
+	/**
+	 * An updater can be returned in a StrategyResults object, which is then used
+	 * to make arbitrary updates to the PO's state.
+	 */
+	private class ExampleUpdater extends StrategyUpdater
+	{
+		private final String qualifier;
+
+		public ExampleUpdater(String qualifier)
+		{
+			this.qualifier = qualifier;
+		}
+
+		@Override
+		public void updateProofObligation(ProofObligation po)
+		{
+			// In general, this can do anything to a PO...
+			po.setStatus(POStatus.PROVABLE);
+			po.setProvedBy(getName());
+			po.setQualifier(qualifier);
+		}
+	}
+
 }

@@ -341,15 +341,14 @@ public class QuickCheck
 					INAnnotation.suspend(false);
 				}
 				
-				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
+				if (sresults.updater != null)	// No need to go further
 				{
-					verbose("Obligation resolved by %s\n", strategy.getName());
-					sresults.setBinds(binds);
-					sresults.setInExpression(poexp);
+					verbose("Obligation resolved by %s updater\n", strategy.getName());
+					sresults.setDetails(poexp, binds);
 					return sresults;
 				}
 
-				Map<String, ValueList> cexamples = sresults.counterexamples;
+				Map<String, ValueList> cexamples = sresults.possibleValues;
 
 				if (cexamples.isEmpty())
 				{
@@ -394,143 +393,136 @@ public class QuickCheck
 		}
 		
 		StrategyResults results = new StrategyResults(union, hasAllValues);
-		results.setBinds(binds);
-		results.setInExpression(poexp);
+		results.setDetails(poexp, binds);
 		return results;
 	}
 	
 	public void checkObligation(ProofObligation po, StrategyResults sresults)
 	{
-		verbose("------------------------ Checking PO #%d\n", po.number);
-		resetErrors();		// Only flag fatal errors
-		
-		INBindingGlobals globals = INBindingGlobals.getInstance();
-		globals.clear();	// Clear before each obligation run
-
-		if (!po.isCheckable)
-		{
-			verbose("PO is UNCHECKED");
-			return;
-		}
-		else if (sresults.provedBy != null)
-		{
-			po.setStatus(POStatus.PROVABLE);
-			po.setProvedBy(sresults.provedBy);
-			po.setQualifier("by " + sresults.provedBy + " " + sresults.qualifier);
-			po.setMessage(null);
-			po.setWitness(sresults.witness);
-			po.setCounterexample(null);
-			return;
-		}
-		else if (sresults.disprovedBy != null)
-		{
-			po.setStatus(POStatus.FAILED);
-			po.setProvedBy(sresults.disprovedBy);
-			po.setQualifier("by " + sresults.disprovedBy + " " + sresults.qualifier);
-			po.setMessage(null);
-			po.setWitness(null);
-			po.setCounterexample(sresults.witness);		// Note: set in counterexample
-			return;
-		}
-		
 		try
 		{
-			for (INBindingOverride mbind: sresults.binds)
-			{
-				ValueList values = sresults.counterexamples.get(mbind.toString());
-				
-				if (values != null)
-				{
-					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-					mbind.setBindValues(values);
-				}
-				else
-				{
-					errorln("PO #" + po.number + ": No bind values defined for " + mbind);
-					errorCount++;
-				}
-			}
-			
-			globals.setAllValues(sresults.hasAllValues);
-			Context ctxt = Interpreter.getInstance().getInitialContext();
-			Interpreter.getInstance().setDefaultName(po.location.module);
-			
-			ctxt = addSelf(po, ctxt);
-			IterableContext ictxt = addTypeParams(po, ctxt);
-			Value execResult = new BooleanValue(false);
-			ContextException execException = null;
-			boolean execCompleted = false;
-			boolean timedOut = false;
+			verbose("------------------------ Checking PO #%d\n", po.number);
+			resetErrors();			// Only flag fatal errors
+			po.clearAnalysis();		// Clears fields to be set by QC
 
-			try
+			if (!po.isCheckable)
 			{
-				verbose("PO #%d, starting evaluation...\n", po.number);
-				
-				// Suspend annotation execution by the interpreter, because the
-				// expressions and statements in the PO can invoke them.
-				INAnnotation.suspend(true);
-				
-				do
-				{
-					ictxt.next();
-					execResult = sresults.inExpression.eval(ictxt);
-				}
-				while (ictxt.hasNext() && execResult.isDefined() && execResult.boolValue(ctxt));
-				
-				execCompleted = true;
+				verbose("PO is UNCHECKED");
 			}
-			catch (ContextException e)
+			else if (sresults.updater != null)
 			{
-				verbose("PO #%d, exception %s.\n", po.number, e.getMessage());
-
-				if (e.isUserCancel())
-				{
-					execResult = new BooleanValue(false);
-					timedOut = true;
-				}
-				else if (e.number == 4024)	// 'not yet specified' expression reached
-				{
-					// MAYBE, in effect - execCompleted will be false
-					execResult = new BooleanValue(!po.isExistential());
-				}
-				else
-				{
-					execResult = new BooleanValue(false);
-					execException = e;
-				}
+				verbose("Calling updater");
+				sresults.updater.updateProofObligation(po);	
 			}
-			finally
+			else
 			{
-				verbose("PO #%d, stopped evaluation.\n", po.number);
-				INAnnotation.suspend(false);
+				verbose("Trying possible values from strategies");
+				tryPossibleValues(po, sresults);
 			}
-			
-			analyseResult(po, sresults, globals,
-				execResult, execException, execCompleted, timedOut);
 		}
 		catch (Exception e)
 		{
 			po.setStatus(POStatus.FAILED);
-			po.setCounterexample(null);
 			po.setMessage(e.getMessage());
 			errorCount++;
 		}
 		finally		// Clear everything, to be safe
 		{
-			for (INBindingOverride mbind: sresults.binds)
+			if (sresults.binds != null)
 			{
-				mbind.setBindValues(null);
+				for (INBindingOverride mbind: sresults.binds)
+				{
+					mbind.setBindValues(null);
+				}
 			}
 			
-			globals.clear();
+			INBindingGlobals.getInstance().clear();
 		}
+	}
+
+	private void tryPossibleValues(ProofObligation po, StrategyResults sresults)
+		throws Exception, ValueException
+	{
+		INBindingGlobals globals = INBindingGlobals.getInstance();
+		globals.clear();		// Clear before each obligation run
+
+		for (INBindingOverride mbind: sresults.binds)
+		{
+			ValueList values = sresults.possibleValues.get(mbind.toString());
+			
+			if (values != null)
+			{
+				verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
+				mbind.setBindValues(values);
+			}
+			else
+			{
+				errorln("PO #" + po.number + ": No bind values defined for " + mbind);
+				errorCount++;
+			}
+		}
+		
+		globals.setAllValues(sresults.hasAllValues);
+		Context ctxt = Interpreter.getInstance().getInitialContext();
+		Interpreter.getInstance().setDefaultName(po.location.module);
+		
+		ctxt = addSelf(po, ctxt);
+		IterableContext ictxt = addTypeParams(po, ctxt);
+		Value execResult = new BooleanValue(false);
+		ContextException execException = null;
+		boolean execCompleted = false;
+		boolean timedOut = false;
+
+		try
+		{
+			verbose("PO #%d, starting evaluation...\n", po.number);
+			
+			// Suspend annotation execution by the interpreter, because the
+			// expressions and statements in the PO can invoke them.
+			INAnnotation.suspend(true);
+			
+			do
+			{
+				ictxt.next();
+				execResult = sresults.inExpression.eval(ictxt);
+			}
+			while (ictxt.hasNext() && execResult.isDefined() && execResult.boolValue(ctxt));
+			
+			execCompleted = true;
+		}
+		catch (ContextException e)
+		{
+			verbose("PO #%d, exception %s.\n", po.number, e.getMessage());
+
+			if (e.isUserCancel())
+			{
+				execResult = new BooleanValue(false);
+				timedOut = true;
+			}
+			else if (e.number == 4024)	// 'not yet specified' expression reached
+			{
+				// MAYBE, in effect - execCompleted will be false
+				execResult = new BooleanValue(!po.isExistential());
+			}
+			else
+			{
+				execResult = new BooleanValue(false);
+				execException = e;
+			}
+		}
+		finally
+		{
+			verbose("PO #%d, stopped evaluation.\n", po.number);
+			INAnnotation.suspend(false);
+		}
+		
+		analyseResult(po, sresults, globals,
+			execResult, execException, execCompleted, timedOut);
 	}
 
 	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
 		Value execResult, ContextException execException, boolean execCompleted, boolean timedOut)
 	{
-		po.clearAnalysis();
-		
 		if (execResult.isUndefined())
 		{
 			po.setStatus(POStatus.MAYBE);
