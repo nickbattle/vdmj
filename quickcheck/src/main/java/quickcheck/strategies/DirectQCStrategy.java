@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.expressions.visitors.POTotalExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -153,13 +154,11 @@ public class DirectQCStrategy extends QCStrategy
 						verbose("Value %s does not match any case patterns\n", value);
 						
 						TCNameToken name = new TCNameToken(po.location, po.location.module, po.exp.exp.toString());
-						Context cex = new Context(po.location, "Counterexample", Interpreter.getInstance().getInitialContext());
-						cex.put(name, value);
-						return new StrategyResults(getName(), cex, "(case unmatched)");
+						return new StrategyResults(new DirectUpdater("(case " + name + " = " + value + " unmatched)", false));
 					}
 				}
 				
-				return new StrategyResults(getName(), "(patterns match all type values)", null);
+				return new StrategyResults(new DirectUpdater("(patterns match all type values)", true));
 			}
 			else
 			{
@@ -187,7 +186,7 @@ public class DirectQCStrategy extends QCStrategy
 				
 				if (unique.size() == typeSize.longValue())
 				{
-					return new StrategyResults(getName(), "(patterns match all type values)", null);
+					return new StrategyResults(new DirectUpdater("(patterns match all type values)", true));
 				}
 			}
 		}
@@ -227,12 +226,32 @@ public class DirectQCStrategy extends QCStrategy
 		if (visitor.isTotal())
 		{
 			verboseln("Function body has no partial operators");
-			return new StrategyResults(getName(), "(body is total)", null);
+			return new StrategyResults(new DirectUpdater("(body is total)", true));
 		}
 		else
 		{
 			verboseln("But function body contains some partial operators");
 			return new StrategyResults();
+		}
+	}
+
+	private class DirectUpdater extends StrategyUpdater
+	{
+		private final String qualifier;
+		private final boolean proved;
+
+		public DirectUpdater(String qualifier, boolean proved)
+		{
+			this.qualifier = qualifier;
+			this.proved = proved;
+		}
+
+		@Override
+		public void updateProofObligation(ProofObligation po)
+		{
+			po.setStatus(proved ? POStatus.PROVABLE : POStatus.FAILED);
+			po.setProvedBy(getName());
+			po.setQualifier("by " + getName() + " " + qualifier);
 		}
 	}
 }

@@ -149,7 +149,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	private long getParamArgs(RPCRequest request,
 			Vector<Integer> poList, Vector<String> poNames)
 	{
-		long timeout = 1000L;	// faster default for GUI?
+		long timeout = 3000L;	// faster default for GUI?
 		
 		if (request.get("params") != null)
 		{

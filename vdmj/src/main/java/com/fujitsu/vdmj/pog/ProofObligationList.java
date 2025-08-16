@@ -108,9 +108,11 @@ public class ProofObligationList extends Vector<ProofObligation>
 				sb.append(po.qualifier);
 			}
 
+			sb.append(")\n");
+
 			if (po.counterexample != null && !po.counterexample.isEmpty())
 			{
-				sb.append(", Counterexample: ");
+				sb.append("Counterexample: ");
 				String sep = "";
 				
 				for (TCNameToken name: po.counterexample.keySet())
@@ -121,9 +123,25 @@ public class ProofObligationList extends Vector<ProofObligation>
 					sb.append(po.counterexample.get(name));
 					sep = ", ";
 				}
+
+				sb.append("\n");
 			}
-			
-			sb.append(")\n");
+			else if (po.witness != null && !po.witness.isEmpty())
+			{
+				sb.append("Witness: ");
+				String sep = "";
+				
+				for (TCNameToken name: po.witness.keySet())
+				{
+					sb.append(sep);
+					sb.append(name);
+					sb.append(" = ");
+					sb.append(po.witness.get(name));
+					sep = ", ";
+				}
+
+				sb.append("\n");
+			}
 			
 			if (po.message != null)
 			{

@@ -30,7 +30,6 @@ import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
 
 /**
@@ -43,73 +42,37 @@ import com.fujitsu.vdmj.values.ValueList;
  */
 public class StrategyResults
 {
-	public final String provedBy;			// If set, provable by the strategy
-	public final String disprovedBy;		// If set, disproved by the strategy
-	public final String qualifier;			// Any qualifier along with the result
-	public final String message;			// Any message along with the result
-	public final Context witness;			// Any witness found (can be a disproof witness)
-	
-	public final Map<String, ValueList> counterexamples;
+	public final Map<String, ValueList> possibleValues;
+	public final StrategyUpdater updater;	// Explicitly set PO fields
 	public final boolean hasAllValues;		// Contains all possible values from all binds
 	
-	public INExpression inExpression;		// The INExpression
-	public List<INBindingOverride> binds;	// The binds used	
+	public INExpression inExpression;		// The INExpression of the PO
+	public List<INBindingOverride> binds;	// The binds used from the PO
 
 	public StrategyResults()
 	{
-		this.provedBy = null;
-		this.disprovedBy = null;
-		this.qualifier = null;
-		this.message = null;
-		this.witness = null;
-		
-		this.counterexamples = new HashMap<String, ValueList>();
+		this.possibleValues = new HashMap<String, ValueList>();
+		this.updater = null;
 		this.hasAllValues = false;
 	}
 
-	public StrategyResults(String disprovedBy, Context witness, String qualifier)
+	public StrategyResults(StrategyUpdater updater)
 	{
-		this.provedBy = null;
-		this.disprovedBy = disprovedBy;
-		this.qualifier = qualifier;
-		this.message = null;
-		this.witness = witness;
-
-		this.counterexamples = new HashMap<String, ValueList>();;
+		this.possibleValues = new HashMap<String, ValueList>();
+		this.updater = updater;
 		this.hasAllValues = false;
 	}
 
-	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues)
+	public StrategyResults(Map<String, ValueList> possibleValues, boolean hasAllValues)
 	{
-		this.provedBy = null;
-		this.disprovedBy = null;
-		this.qualifier = null;
-		this.message = null;
-		this.witness = null;
-
-		this.counterexamples = counterexamples;
+		this.possibleValues = possibleValues;
+		this.updater = null;
 		this.hasAllValues = hasAllValues;
 	}
 
-	public StrategyResults(String provedBy, String qualifier, Context witness)
-	{
-		this.provedBy = provedBy;
-		this.disprovedBy = null;
-		this.qualifier = qualifier;
-		this.message = null;
-		this.witness = witness;
-
-		this.counterexamples = new HashMap<String, ValueList>();
-		this.hasAllValues = false;
-	}
-
-	public void setInExpression(INExpression inExpression)
+	public void setDetails(INExpression inExpression, List<INBindingOverride> binds)
 	{
 		this.inExpression = inExpression;
-	}
-
-	public void setBinds(List<INBindingOverride> binds)
-	{
 		this.binds = binds;
 	}
 }
