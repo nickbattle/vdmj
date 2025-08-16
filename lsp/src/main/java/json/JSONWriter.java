@@ -59,7 +59,7 @@ public class JSONWriter
 		writer.print(" }");
 	}
 	
-	private void writeArray(JSONArray value) throws IOException
+	public void writeArray(JSONArray value) throws IOException
 	{
 		writer.print("[ ");
 		String sep = "";
@@ -102,7 +102,7 @@ public class JSONWriter
 		writer.print('"');
 	}
 
-	private void writeValue(Object value) throws IOException
+	public void writeValue(Object value) throws IOException
 	{
 		if (value == null)
 		{

@@ -44,10 +44,13 @@ public class JSONFileTest extends TestCase
 	{
 		FileReader reader = new FileReader(new File(args[0]));
 		JSONReader in = new JSONReader(reader);
-		JSONObject data = in.readObject();
+
+		// JSONObject data = in.readObject();
+		// JSONArray data = in.readArray();
+		Object data = in.readValue();
 		
 		JSONWriter writer = new JSONWriter(new PrintWriter(System.out));
-		writer.writeObject(data);
+		writer.writeValue(data);
 		writer.flush();
 	}
 }

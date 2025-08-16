@@ -351,12 +351,15 @@ public class JSONReader
 	 *
 	 * @throws IOException
 	 */
-	private Object readValue() throws IOException
+	public Object readValue() throws IOException
 	{
 		skipWhitespace();
 		
 		switch (ch)
 		{
+			case EOF:
+				throw new IOException("Unexpected EOF");
+
 			case '{':
 				return readObject();
 			
@@ -404,7 +407,7 @@ public class JSONReader
 	 *
 	 * @throws IOException
 	 */
-	private JSONArray readArray() throws IOException
+	public JSONArray readArray() throws IOException
 	{
 		checkFor('[', "Expecting '[' at start of array");
 		JSONArray array = new JSONArray();
