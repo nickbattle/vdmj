@@ -193,7 +193,7 @@ public class POContextStack extends Stack<POContext>
 	 * Patch the return points in a context stack. This is to implement "always" behaviour,
 	 * where something always happens, even after return points from a block.
 	 */
-	public void patchReturns(POContextStack always)
+	public boolean patchReturns(POContextStack always)
 	{
 		if (!always.isEmpty())
 		{
@@ -208,17 +208,23 @@ public class POContextStack extends Stack<POContext>
 						alt.patchReturns(always);
 					}
 				}
-				else if (this.get(item).returnsEarly())
-				{
-					for (int a = always.size() - 1; a >= 0; a--)
-					{
-						this.insertElementAt(always.elementAt(a), item);
-					}
+			}
 
-					break;	// Because this line returns now
+			if (this.lastElement().returnsEarly())
+			{
+				POContext ret = this.pop();
+				this.pushAll(always);
+
+				if (!always.lastElement().returnsEarly())
+				{
+					push(ret);		// Put the old return back
 				}
+
+				return true;
 			}
 		}
+
+		return false;	// Didn't patch this level
 	}
 	
 	/**

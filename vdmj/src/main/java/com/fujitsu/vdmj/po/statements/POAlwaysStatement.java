@@ -61,8 +61,10 @@ public class POAlwaysStatement extends POStatement
 		POContextStack alwaysContext = new POContextStack();
 		ctxt.popInto(popto, alwaysContext);
 
-		ctxt.patchReturns(alwaysContext);	// Note, without the always on the end, which may return
-		ctxt.pushAll(alwaysContext);		// Add on the end.
+		if (!ctxt.patchReturns(alwaysContext))
+		{
+			ctxt.pushAll(alwaysContext);	// Add on the end, otherwise it was patched above
+		}
 
 		return obligations;
 	}
