@@ -70,6 +70,18 @@ public class POContextStack extends Stack<POContext>
 		push(ctxt);
 		return size;
 	}
+
+	public int pushAll(POContextStack stack)
+	{
+		int size = this.size();
+
+		for (POContext item: stack)
+		{
+			push(item);
+		}
+
+		return size;
+	}
 	
 	public void popTo(int size)
 	{
@@ -175,6 +187,38 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return results;
+	}
+
+	/**
+	 * Patch the return points in a context stack. This is to implement "always" behaviour,
+	 * where something always happens, even after return points from a block.
+	 */
+	public void patchReturns(POContextStack always)
+	{
+		if (!always.isEmpty())
+		{
+			for (int item = 0; item < this.size(); item++)
+			{
+				if (this.get(item) instanceof POAltContext)
+				{
+					POAltContext actxt = (POAltContext)this.get(item);
+
+					for (POContextStack alt: actxt.alternatives)
+					{
+						alt.patchReturns(always);
+					}
+				}
+				else if (this.get(item).returnsEarly())
+				{
+					for (int a = always.size() - 1; a >= 0; a--)
+					{
+						this.insertElementAt(always.elementAt(a), item);
+					}
+
+					break;	// Because this line returns now
+				}
+			}
+		}
 	}
 	
 	/**

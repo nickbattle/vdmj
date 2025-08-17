@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExitException;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.VoidValue;
 
 public class INAlwaysStatement extends INStatement
 {
@@ -71,7 +72,12 @@ public class INAlwaysStatement extends INStatement
 		}
 		finally
 		{
-			always.eval(ctxt);
+			Value arv = always.eval(ctxt);
+
+			if (!(arv instanceof VoidValue))
+			{
+				rv = arv;	// eg. the always clause has a return
+			}
 
 			if (bodyRaised != null)
 			{

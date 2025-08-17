@@ -55,7 +55,15 @@ public class POAlwaysStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations = body.getProofObligations(ctxt, pogState, env);
+
+		int popto = ctxt.size();
 		obligations.addAll(always.getProofObligations(ctxt, pogState, env));
+		POContextStack alwaysContext = new POContextStack();
+		ctxt.popInto(popto, alwaysContext);
+
+		ctxt.patchReturns(alwaysContext);	// Note, without the always on the end, which may return
+		ctxt.pushAll(alwaysContext);		// Add on the end.
+
 		return obligations;
 	}
 
