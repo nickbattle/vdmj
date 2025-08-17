@@ -114,7 +114,7 @@ if which rlwrap >/dev/null 2>&1
 then
 	# Keep rlwrap output in a separate folder
 	export RLWRAP_HOME=~/.vdmj
-	eval exec rlwrap "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
+	eval exec rlwrap --no-warnings "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
 else
 	eval exec "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
 fi
