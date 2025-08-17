@@ -218,6 +218,14 @@
         <developerConnection>scm:git:https://github.com/nickbattle</developerConnection>
     </scm>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/nickbattle/vdmj</url>
+		</repository>
+	</distributionManagement>
+
     <url>https://github.com/nickbattle/vdmj</url>
 
     <description>VDMJ provides basic tool support for the VDM-SL, VDM++ and VDM-RT specification languages, written in
