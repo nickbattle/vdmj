@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionExitChecker;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindExitChecker;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
@@ -114,13 +113,8 @@ public class TCStatementExitChecker extends TCLeafStatementVisitor<TCType, TCTyp
 	@Override
 	public TCTypeSet caseCallObjectStatement(TCCallObjectStatement node, Environment base)
 	{
-		TCTypeSet result = new TCTypeSet();
+		TCTypeSet result = super.caseCallObjectStatement(node, base);
 		
-		for (TCExpression arg : node.args)
-		{
-			result.addAll(visitorSet.applyExpressionVisitor(arg, base));
-		}
-
 		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
 				node.fdef != null && !node.fdef.accessSpecifier.access.equals(Token.PRIVATE);
 
@@ -168,13 +162,7 @@ public class TCStatementExitChecker extends TCLeafStatementVisitor<TCType, TCTyp
 	@Override
 	public TCTypeSet caseCallStatement(TCCallStatement node, Environment base)
 	{
-		TCTypeSet result = new TCTypeSet();
-		
-		for (TCExpression arg : node.args)
-		{
-			result.addAll(visitorSet.applyExpressionVisitor(arg, base));
-		}
-
+		TCTypeSet result = super.caseCallStatement(node, base);
 
 		TCDefinition opdef = base.findName(node.name, NameScope.GLOBAL);
 		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
