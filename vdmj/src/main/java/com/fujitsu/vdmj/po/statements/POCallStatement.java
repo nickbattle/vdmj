@@ -131,7 +131,7 @@ public class POCallStatement extends POStatement
 					ProofObligationList checks = new ProofObligationList();
 					checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
 
-					if (opdef.location.module.equals(location.module))
+					if (!opdef.location.module.equals(location.module))
 					{
 						checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
 					}
