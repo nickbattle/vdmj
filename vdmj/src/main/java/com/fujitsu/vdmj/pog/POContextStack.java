@@ -381,7 +381,7 @@ public class POContextStack extends Stack<POContext>
 				}
 				
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
+				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 
 				if (canReturn)
@@ -412,7 +412,7 @@ public class POContextStack extends Stack<POContext>
 				}
 					
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, exop.postdef, args, resultVar), env));
+				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 
 				if (canReturn)
@@ -428,19 +428,12 @@ public class POContextStack extends Stack<POContext>
 	 * Generate a postcondition function call, passing the arguments given, and calculating the
 	 * names of the preserved state and the new state vector. This is only done for SL!
 	 */
-	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
+	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition predef,
+		POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
 	{
-		if (postdef == null)
-		{
-			return null;	// No "post" implies no qualifier
-		}
-
-		if (!postdef.location.module.equals(from.module))
-		{
-			return null;	// We can't create Sigma values for external modules??
-		}
-
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
+		StringBuilder preArgs = new StringBuilder(Utils.listToString(args));
+		
 		PODefinition sdef = getStateDefinition();				// No state => null
 
 		if (resultVar != null)
@@ -456,14 +449,31 @@ public class POContextStack extends Stack<POContext>
 			postArgs.append(POSaveStateContext.OLDNAME);
 			postArgs.append(", ");
 			postArgs.append(state.toPattern(false));
+
+			if (preArgs.length() > 0) preArgs.append(", ");
+			preArgs.append(POSaveStateContext.OLDNAME);
 		}
 		else if (sdef instanceof POClassDefinition)
 		{
 			// No idea! This isn't used for PP dialects currently
 		}
 
-		// Create "post_op(args[, result, oldstate, newstate])"
-		return postdef.name + "(" + postArgs.toString() + ")";
+		// Create "pre_op(args[, oldstate]) and post_op(args[, result, oldstate, newstate])"
+		String result = null;
+
+		if (predef != null)
+		{
+			// Comment this in to include preconditions
+			result = ""; // predef.name + "(" + preArgs.toString() + ")";
+		}
+
+		if (postdef != null && postdef.location.module.equals(from.module))
+		{
+			if (result != null) result = result + " and ";
+			result = postdef.name + "(" + postArgs.toString() + ")";
+		}
+
+		return result;
 	}
 
 	/**
