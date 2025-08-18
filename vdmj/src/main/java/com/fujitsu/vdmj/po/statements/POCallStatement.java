@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -34,6 +35,7 @@ import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
@@ -96,6 +98,7 @@ public class POCallStatement extends POStatement
 		if (opdef != null && Settings.dialect == Dialect.VDM_SL)
 		{
 			String prename = null;
+			PODefinition stateDef = null;
 
 			if (opdef instanceof POExplicitOperationDefinition)
 			{
@@ -104,6 +107,8 @@ public class POCallStatement extends POStatement
 				if (exop.predef != null)
 				{
 					prename = exop.predef.name.toExplicitString(location);
+					PODefinitionListList plist = exop.predef.paramDefinitionList;
+					stateDef = plist.firstElement().lastElement();
 				}
 			}
 			else if (opdef instanceof POImplicitOperationDefinition)
@@ -113,6 +118,8 @@ public class POCallStatement extends POStatement
 				if (imop.predef != null)
 				{
 					prename = imop.predef.name.toExplicitString(location);
+					PODefinitionListList plist = imop.predef.paramDefinitionList;
+					stateDef = plist.firstElement().lastElement();
 				}
 			}
 
@@ -125,15 +132,19 @@ public class POCallStatement extends POStatement
 				{
 					POStateDefinition state = (POStateDefinition)sdef;
 					POExpressionList preargs = new POExpressionList();
-
 					preargs.addAll(args);
-					preargs.add(state.getMkExpression());
 					ProofObligationList checks = new ProofObligationList();
-					checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
-
+					
 					if (!opdef.location.module.equals(location.module))
 					{
+						preargs.add(getRemoteState(stateDef, env));
+						checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
 						checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
+					}
+					else
+					{
+						preargs.add(state.getMkExpression());
+						checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
 					}
 
 					obligations.addAll(checks);
@@ -162,6 +173,15 @@ public class POCallStatement extends POStatement
 		}
 
 		return obligations;
+	}
+
+	/**
+	 * Attempt to get a state mk_Sigma for another module, based on the pre_op arg definition.
+	 */
+	private POExpression getRemoteState(PODefinition stateDef, Environment env)
+	{
+		// TODO Lookup the remote state record?
+		return new POMkTypeExpression(stateDef.name.getNewName(), args, null, getParamTypes());
 	}
 
 	private TCTypeList getParamTypes()
