@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.statements.visitors.TCExitChecker;
+import com.fujitsu.vdmj.tc.statements.visitors.TCStatementExitChecker;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementStateUpdates;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
@@ -119,7 +119,7 @@ public abstract class TCStatement extends TCNode
 			possible.add(new TCQuoteType(location, "RuntimeError"));
 		}
 		
-		possible.addAll(apply(new TCExitChecker(), base));
+		possible.addAll(apply(new TCStatementExitChecker(), base));
 		return possible;
 	}
 

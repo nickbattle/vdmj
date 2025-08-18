@@ -35,8 +35,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCBindExpressionsVisitor;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCMultiBindExpressionsVisitor;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionExitChecker;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindExitChecker;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
@@ -55,32 +54,30 @@ import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Environment>
+public class TCStatementExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Environment>
 {
-	public TCExitChecker()
+	public TCStatementExitChecker()
 	{
 		visitorSet = new TCVisitorSet<TCType, TCTypeSet, Environment>()
 		{
 			@Override
 			protected void setVisitors()
 			{
-				expressionVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCExitChecker(this);
+				expressionVisitor = new TCExpressionExitChecker(this);
 				bindVisitor = new TCBindExitChecker(this);
 				multiBindVisitor = new TCMultipleBindExitChecker(this);
-				statementVisitor = TCExitChecker.this;
-				bindVisitor = new TCBindExpressionsVisitor<TCType, TCTypeSet, Environment>(this);
-				multiBindVisitor = new TCMultiBindExpressionsVisitor<TCType, TCTypeSet, Environment>(this);
+				statementVisitor = TCStatementExitChecker.this;
 			}
 
 			@Override
 			protected TCTypeSet newCollection()
 			{
-				return TCExitChecker.this.newCollection();
+				return TCStatementExitChecker.this.newCollection();
 			}
 		};
 	}
 	
-	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	public TCStatementExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
 	{
 		this.visitorSet = visitors;
 	}
