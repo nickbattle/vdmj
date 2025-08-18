@@ -33,9 +33,13 @@ import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POFieldExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.FunctionApplyObligation;
+import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -100,40 +104,11 @@ public class POCallObjectStatement extends POStatement
 		}
 
 		// Precondition calling is not defined for PP dialects...
-
-		// if (fdef != null && Settings.dialect != Dialect.VDM_SL)
-		// {
-		// 	TCIdentifierToken prename = null;
-
-		// 	if (fdef instanceof POExplicitOperationDefinition)
-		// 	{
-		// 		POExplicitOperationDefinition exop = (POExplicitOperationDefinition)fdef;
-
-		// 		if (exop.predef != null)
-		// 		{
-		// 			prename = new TCIdentifierToken(location, exop.predef.name.getName(), false);
-		// 		}
-		// 	}
-		// 	else if (fdef instanceof POImplicitOperationDefinition)
-		// 	{
-		// 		POImplicitOperationDefinition imop = (POImplicitOperationDefinition)fdef;
-
-		// 		if (imop.predef != null)
-		// 		{
-		// 			prename = new TCIdentifierToken(location, imop.predef.name.getName(), false);
-		// 		}
-		// 	}
-
-		// 	if (prename != null)
-		// 	{
-		// 		POExpression root = designator.getExpression();
-		// 		POFieldExpression call = new POFieldExpression(root, prename, null);
-		// 		POExpressionList preargs = new POExpressionList();
-		// 		preargs.addAll(args);
-		// 		preargs.add(new POSelfExpression(location));
-		// 		obligations.addAll(OperationPreConditionObligation.getAllPOs(call, preargs, FunctionApplyObligation.UNKNOWN, ctxt));
-		// 	}
-		// }
+		ProofObligationList checks = new ProofObligationList();
+		POFieldExpression field = new POFieldExpression(designator.getExpression(), fieldname, null);
+		checks.addAll(OperationPreConditionObligation.getAllPOs(field, args, FunctionApplyObligation.UNKNOWN, ctxt));
+		checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+		obligations.addAll(checks);
 
 		ctxt.makeOperationCall(location, pogState, fdef, getStmttype().isReturn());
 		

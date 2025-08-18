@@ -425,14 +425,14 @@ public class POContextStack extends Stack<POContext>
 	}
 
 	/**
-	 * Generate a postcondition function call, passing the arguments given, and calculating the
+	 * Generate a pre/postcondition call pair, passing the arguments given, and calculating the
 	 * names of the preserved state and the new state vector. This is only done for SL!
 	 */
 	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition predef,
 		POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
 	{
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
-		StringBuilder preArgs = new StringBuilder(Utils.listToString(args));
+		StringBuilder preArgs  = new StringBuilder(Utils.listToString(args));
 		
 		PODefinition sdef = getStateDefinition();				// No state => null
 
@@ -445,6 +445,7 @@ public class POContextStack extends Stack<POContext>
 		if (sdef instanceof POStateDefinition)
 		{
 			POStateDefinition state = (POStateDefinition)sdef;
+
 			if (postArgs.length() > 0) postArgs.append(", ");
 			postArgs.append(POSaveStateContext.OLDNAME);
 			postArgs.append(", ");
@@ -455,25 +456,37 @@ public class POContextStack extends Stack<POContext>
 		}
 		else if (sdef instanceof POClassDefinition)
 		{
-			// No idea! This isn't used for PP dialects currently
+			return null;	// Can't handle VDM++/RT
 		}
 
-		// Create "pre_op(args[, oldstate]) and post_op(args[, result, oldstate, newstate])"
-		String result = null;
+		/*
+		 * Create "pre_op(args[, oldstate]) and post_op(args[, result][, oldstate, newstate])"
+		 * Note that we can't call the pre/post of operations in external modules, because
+		 * we can't calculate their state vectors to pass. So external calls can only quantify
+		 * over all local state and the result, without help from the pre/post.
+		 */
 
-		if (predef != null)
+		StringBuilder result = new StringBuilder();
+
+		if (predef != null && predef.location.module.equals(from.module))
 		{
-			// Comment this in to include preconditions
-			result = ""; // predef.name + "(" + preArgs.toString() + ")";
+			// Comment this in/out to include preconditions
+			result.append(predef.name);
+			result.append("(");
+			result.append(preArgs);
+			result.append(")");
 		}
 
 		if (postdef != null && postdef.location.module.equals(from.module))
 		{
-			if (result != null) result = result + " and ";
-			result = postdef.name + "(" + postArgs.toString() + ")";
+			if (result.length() > 0) result.append(" and ");
+			result.append(postdef.name);
+			result.append("(");
+			result.append(postArgs);
+			result.append(")");
 		}
 
-		return result;
+		return result.length() == 0 ? null : result.toString();
 	}
 
 	/**

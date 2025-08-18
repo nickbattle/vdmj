@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -124,9 +125,22 @@ public class POCallStatement extends POStatement
 				{
 					POStateDefinition state = (POStateDefinition)sdef;
 					POExpressionList preargs = new POExpressionList();
+
 					preargs.addAll(args);
 					preargs.add(state.getMkExpression());
-					obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+					ProofObligationList checks = new ProofObligationList();
+					checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+
+					if (opdef.location.module.equals(location.module))
+					{
+						checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
+					}
+
+					obligations.addAll(checks);
+				}
+				else
+				{
+					// Can't handle VDM++/RT state? SL only currently
 				}
 			}
 		}
