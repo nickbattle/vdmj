@@ -24,6 +24,8 @@
 
 package quickcheck.commands;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -131,6 +133,11 @@ public class QuickCheckExecutor extends AsyncExecutor
 				{
 					break;
 				}
+			}
+
+			if (chosen.size() != all.size())
+			{
+				infoln("(Use 'qc .*' to check all POs)");
 			}
 		}
 		
