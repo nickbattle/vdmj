@@ -26,6 +26,7 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.Arrays;
@@ -236,6 +237,11 @@ public class QuickCheckCommand extends AnalysisCommand
 						}
 					}
 				}
+			}
+
+			if (chosen.size() != all.size())
+			{
+				infoln("(Use 'qc .*' to check all POs)");
 			}
 		}
 		
