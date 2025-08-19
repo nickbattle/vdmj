@@ -24,16 +24,13 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
-import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
-import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -154,6 +151,8 @@ public class POApplyExpression extends POExpression
 			
 			if (type.isOperation(location))
 			{
+				// Preconditions were handled above in getFuncOpObligations.
+
 				// Create an ambiguous context for the operation call. Note that this is not
 				// included in the getFuncOpObligations method below, which is called separately.
 				ctxt.makeOperationCall(location, pogState, opdef, false);
@@ -186,25 +185,9 @@ public class POApplyExpression extends POExpression
 		{
 			obligations.addAll(FunctionApplyObligation.getAllPOs(root, args, prename, ctxt));
 		}
-		else if (Settings.dialect == Dialect.VDM_SL &&
-			type.isOperation(location) && prename != null && !prename.isEmpty())
+		else if (type.isOperation(location))
 		{
-			PODefinition sdef = ctxt.getStateDefinition();
-
-			if (sdef instanceof POStateDefinition)
-			{
-				POStateDefinition state = (POStateDefinition)sdef;
-				POExpressionList preargs = new POExpressionList();
-				preargs.addAll(args);
-				preargs.add(state.getMkExpression());
-				obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
-			}
-			else	// No state
-			{
-				POExpressionList preargs = new POExpressionList();
-				preargs.addAll(args);
-				obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
-			}
+			obligations.addAll(POCallStatement.checkPrecondition(location, opdef, args, ctxt));
 		}
 		
 		TCTypeList paramTypes = type.isFunction(location) ?
