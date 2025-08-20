@@ -46,7 +46,7 @@ public class Lock implements Serializable
 
 	public void lock(Context ctxt, LexLocation location)
 	{
-		SchedulableThread th = (SchedulableThread)Thread.currentThread();
+		SchedulableThread th = SchedulableThread.getSchedulableThread(location, ctxt);
 
 		while (lockedBy != null && lockedBy != th)
 		{
@@ -73,7 +73,7 @@ public class Lock implements Serializable
 
 	public void block(Context ctxt, LexLocation location)
 	{
-		SchedulableThread th = (SchedulableThread)Thread.currentThread();
+		SchedulableThread th = SchedulableThread.getSchedulableThread(location, ctxt);
 
 		if (lockedBy != null && lockedBy != th)
 		{
@@ -124,7 +124,7 @@ public class Lock implements Serializable
 
 	public void unlock()
 	{
-		SchedulableThread th = (SchedulableThread)Thread.currentThread();
+		SchedulableThread th = SchedulableThread.getSchedulableThread(LexLocation.ANY, null);
 
 		if (lockedBy != null && lockedBy != th)
 		{

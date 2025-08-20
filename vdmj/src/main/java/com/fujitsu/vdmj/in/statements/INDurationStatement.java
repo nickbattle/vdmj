@@ -58,7 +58,7 @@ public class INDurationStatement extends INStatement
 		duration.location.hit();
 
 		assertNotInit(ctxt);
-		SchedulableThread me = (SchedulableThread)Thread.currentThread();
+		SchedulableThread me = SchedulableThread.getSchedulableThread(location, ctxt);
 
 		if (me.inOuterTimestep())
 		{

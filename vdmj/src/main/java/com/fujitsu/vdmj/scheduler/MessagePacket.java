@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.values.BUSValue;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.ObjectValue;
@@ -48,7 +49,7 @@ public abstract class MessagePacket implements Serializable
 		ObjectValue target, OperationValue operation)
 	{
 		this.msgId = getNextId();
-		this.thread = (SchedulableThread)Thread.currentThread();
+		this.thread = SchedulableThread.getSchedulableThread(LexLocation.ANY, null);
 		this.bus = bus;
 		this.from = from;
 		this.to = to;

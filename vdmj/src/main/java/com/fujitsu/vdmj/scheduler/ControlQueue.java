@@ -47,7 +47,7 @@ public class ControlQueue implements Serializable
 
 	public void join(Context ctxt, LexLocation location)
 	{
-		SchedulableThread th = (SchedulableThread)Thread.currentThread();
+		SchedulableThread th = SchedulableThread.getSchedulableThread(location, ctxt);
 
 		if (joined != null && joined != th)
 		{

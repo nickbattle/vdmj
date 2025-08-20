@@ -297,7 +297,7 @@ public class ConsoleDebugLink extends DebugLink
 			return;
 		}
 		
-		SchedulableThread thread = (SchedulableThread)Thread.currentThread();
+		SchedulableThread thread = SchedulableThread.getSchedulableThread(location, ctxt);
 		
 		synchronized(stopped)
 		{
@@ -387,7 +387,7 @@ public class ConsoleDebugLink extends DebugLink
 	{
 		if (debugging && !suspendBreaks)
 		{
-			SchedulableThread thread = (SchedulableThread)Thread.currentThread();
+			SchedulableThread thread = SchedulableThread.getSchedulableThread(ctxt.location, ctxt);
 			breakpoints.put(thread, bp);
 			stopped(ctxt, bp.location, null);
 			
