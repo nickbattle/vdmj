@@ -510,7 +510,7 @@ public class QuickCheck
 		catch (Exception e)
 		{
 			execResult = new BooleanValue(false);
-			execException = new ContextException(1, e.getMessage(), po.location, null);
+			execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
 		}
 		finally
 		{
