@@ -59,6 +59,7 @@ import com.fujitsu.vdmj.po.expressions.POFieldExpression;
 import com.fujitsu.vdmj.po.expressions.POFieldNumberExpression;
 import com.fujitsu.vdmj.po.expressions.POFloorExpression;
 import com.fujitsu.vdmj.po.expressions.POForAllExpression;
+import com.fujitsu.vdmj.po.expressions.POFuncInstantiationExpression;
 import com.fujitsu.vdmj.po.expressions.POGreaterEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POGreaterExpression;
 import com.fujitsu.vdmj.po.expressions.POHeadExpression;
@@ -814,6 +815,17 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 			node.test.apply(this, arg),
 			node.typedef,
 			node.testtype));
+	}
+
+	@Override
+	public POExpression caseFuncInstantiationExpression(POFuncInstantiationExpression node, Object arg)
+	{
+		return setType(node, new POFuncInstantiationExpression(
+			node.function.apply(this, arg),
+			node.actualTypes,
+			node.type,
+			node.expdef,
+			node.impdef));
 	}
 
 	@Override
