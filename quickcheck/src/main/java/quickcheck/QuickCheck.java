@@ -498,6 +498,11 @@ public class QuickCheck
 				execException = e;
 			}
 		}
+		catch (Exception e)
+		{
+			execResult = new BooleanValue(false);
+			execException = new ContextException(1, e.getMessage(), po.location, null);
+		}
 		finally
 		{
 			analyseResult(po, sresults, globals,
@@ -810,17 +815,20 @@ public class QuickCheck
 				infoln(po.message);
 			}
 			
-			if (po.status == POStatus.FAILED && po.counterexample != null)
+			if (po.status == POStatus.FAILED)
 			{
-				String cex = stringOfContext(po.counterexample);
-				
-				if (cex == null)
+				if (po.counterexample != null)
 				{
-					infoln("No counterexample");
-				}
-				else
-				{
-					infoln("Counterexample: " + cex);
+					String cex = stringOfContext(po.counterexample);
+					
+					if (cex == null)
+					{
+						infoln("No counterexample");
+					}
+					else
+					{
+						infoln("Counterexample: " + cex);
+					}
 				}
 				
 				infof("----\n%s\n", po.source);

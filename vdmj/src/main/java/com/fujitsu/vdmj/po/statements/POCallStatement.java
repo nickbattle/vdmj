@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -39,6 +40,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -92,44 +94,7 @@ public class POCallStatement extends POStatement
 			i++;
 		}
 
-		if (opdef != null && Settings.dialect == Dialect.VDM_SL)
-		{
-			String prename = null;
-
-			if (opdef instanceof POExplicitOperationDefinition)
-			{
-				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
-
-				if (exop.predef != null)
-				{
-					prename = exop.predef.name.toExplicitString(location);
-				}
-			}
-			else if (opdef instanceof POImplicitOperationDefinition)
-			{
-				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
-
-				if (imop.predef != null)
-				{
-					prename = imop.predef.name.toExplicitString(location);
-				}
-			}
-
-			if (prename != null)
-			{
-				POExpression root = new POVariableExpression(name, opdef);
-				PODefinition sdef = ctxt.getStateDefinition();
-
-				if (sdef instanceof POStateDefinition)
-				{
-					POStateDefinition state = (POStateDefinition)sdef;
-					POExpressionList preargs = new POExpressionList();
-					preargs.addAll(args);
-					preargs.add(state.getMkExpression());
-					obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
-				}
-			}
-		}
+		obligations.addAll(checkPrecondition(location, opdef, args, ctxt));
 
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
@@ -145,6 +110,80 @@ public class POCallStatement extends POStatement
 		if (rtype != null && getStmttype().isReturn() && !TypeComparator.isSubType(getStmttype(), rtype))
 		{
 			obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
+		}
+
+		return obligations;
+	}
+
+	public static ProofObligationList checkPrecondition(LexLocation location, PODefinition opdef, POExpressionList args, POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (opdef != null && Settings.dialect == Dialect.VDM_SL)
+		{
+			String prename = null;
+			PODefinition targetState = null;
+
+			if (opdef instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+				if (exop.predef != null)
+				{
+					prename = exop.predef.name.toExplicitString(location);
+					targetState = exop.stateDefinition;
+				}
+			}
+			else if (opdef instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+
+				if (imop.predef != null)
+				{
+					prename = imop.predef.name.toExplicitString(location);
+					targetState = imop.stateDefinition;
+				}
+			}
+
+			if (prename != null)
+			{
+				POExpression root = new POVariableExpression(opdef.name, opdef);
+
+				if (opdef.location.module.equals(location.module))		// Local?
+				{
+					POStateDefinition state = (POStateDefinition)ctxt.getStateDefinition();
+					POExpressionList preargs = new POExpressionList();
+					preargs.addAll(args);
+
+					if (state != null)
+					{
+						preargs.add(state.getMkExpression());
+					}
+
+					obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+				}
+				else	// target is another module
+				{
+					POStateDefinition state = (POStateDefinition)targetState;
+					POExpressionList preargs = new POExpressionList();
+					preargs.addAll(args);
+					
+					if (state != null)
+					{
+						preargs.add(state.getMkExpression());
+					}
+					
+					ProofObligationList checks = new ProofObligationList();
+					checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+
+					if (state != null)	// So pre_op is malformed, for external state
+					{
+						checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
+					}
+
+					obligations.addAll(checks);
+				}
+			}
 		}
 
 		return obligations;

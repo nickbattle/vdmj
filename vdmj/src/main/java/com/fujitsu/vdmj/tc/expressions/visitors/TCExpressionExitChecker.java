@@ -39,9 +39,9 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, Environment>
+public class TCExpressionExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, Environment>
 {
-	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	public TCExpressionExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
 	{
 		visitorSet = visitors;
 	}
@@ -56,6 +56,11 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, En
 	public TCTypeSet caseApplyExpression(TCApplyExpression node, Environment base)
 	{
 		TCTypeSet result = super.caseApplyExpression(node, base);
+
+		if (node.type != null && !node.type.isOperation(node.location))
+		{
+			return result;		// We only care about operation calls
+		}
 
 		if (node.root instanceof TCVariableExpression)
 		{

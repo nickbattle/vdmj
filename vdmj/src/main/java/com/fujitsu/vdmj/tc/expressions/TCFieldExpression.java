@@ -191,7 +191,7 @@ public class TCFieldExpression extends TCExpression
 				{
 					TCDefinition encl = env.getEnclosingDefinition();
 					
-					if (!encl.isPure())
+					if (encl != null && !encl.isPure())
 					{
 						if (env.isFunctionalError())
 						{

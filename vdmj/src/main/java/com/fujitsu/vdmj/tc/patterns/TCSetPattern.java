@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.tc.patterns;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
+import com.fujitsu.vdmj.tc.types.TCSetType;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -68,9 +70,20 @@ public class TCSetPattern extends TCPattern
 	@Override
 	public boolean matches(TCType type)
 	{
-		if (type instanceof TCSet1Type && plist.isEmpty())
+		if (plist.isEmpty())
 		{
-			return false;	// Can't match "{}" with a set1
+			if (type instanceof TCUnionType)
+			{
+				if (type.isType(TCSetType.class, location))
+				{
+					return true;	// Union contains a plain set, so OK
+				}
+			}
+
+			if (type.isType(TCSet1Type.class, location))
+			{
+				return false;	// Can't match "{}" with a set1
+			}
 		}
 		
 		return super.matches(type);

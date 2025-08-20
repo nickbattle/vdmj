@@ -70,6 +70,18 @@ public class POContextStack extends Stack<POContext>
 		push(ctxt);
 		return size;
 	}
+
+	public int pushAll(POContextStack stack)
+	{
+		int size = this.size();
+
+		for (POContext item: stack)
+		{
+			push(item);
+		}
+
+		return size;
+	}
 	
 	public void popTo(int size)
 	{
@@ -175,6 +187,44 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return results;
+	}
+
+	/**
+	 * Patch the return points in a context stack. This is to implement "always" behaviour,
+	 * where something always happens, even after return points from a block.
+	 */
+	public boolean patchReturns(POContextStack always)
+	{
+		if (!always.isEmpty())
+		{
+			for (int item = 0; item < this.size(); item++)
+			{
+				if (this.get(item) instanceof POAltContext)
+				{
+					POAltContext actxt = (POAltContext)this.get(item);
+
+					for (POContextStack alt: actxt.alternatives)
+					{
+						alt.patchReturns(always);
+					}
+				}
+			}
+
+			if (this.lastElement().returnsEarly())
+			{
+				POContext ret = this.pop();
+				this.pushAll(always);
+
+				if (!always.lastElement().returnsEarly())
+				{
+					push(ret);		// Put the old return back
+				}
+
+				return true;
+			}
+		}
+
+		return false;	// Didn't patch this level
 	}
 	
 	/**
@@ -331,7 +381,7 @@ public class POContextStack extends Stack<POContext>
 				}
 				
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, imp.postdef, args, resultVar), env));
+				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 
 				if (canReturn)
@@ -362,7 +412,7 @@ public class POContextStack extends Stack<POContext>
 				}
 					
 				push(new POSaveStateContext(getStateDefinition()));
-				push(new POForAllContext(names, getPostQualifier(from, exop.postdef, args, resultVar), env));
+				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 
 				if (canReturn)
@@ -375,22 +425,15 @@ public class POContextStack extends Stack<POContext>
 	}
 
 	/**
-	 * Generate a postcondition function call, passing the arguments given, and calculating the
+	 * Generate a pre/postcondition call pair, passing the arguments given, and calculating the
 	 * names of the preserved state and the new state vector. This is only done for SL!
 	 */
-	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
+	private String getPostQualifier(LexLocation from, POExplicitFunctionDefinition predef,
+		POExplicitFunctionDefinition postdef, POExpressionList args, TCNameToken resultVar)
 	{
-		if (postdef == null)
-		{
-			return null;	// No "post" implies no qualifier
-		}
-
-		if (!postdef.location.module.equals(from.module))
-		{
-			return null;	// We can't create Sigma values for external modules??
-		}
-
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
+		StringBuilder preArgs  = new StringBuilder(Utils.listToString(args));
+		
 		PODefinition sdef = getStateDefinition();				// No state => null
 
 		if (resultVar != null)
@@ -402,18 +445,48 @@ public class POContextStack extends Stack<POContext>
 		if (sdef instanceof POStateDefinition)
 		{
 			POStateDefinition state = (POStateDefinition)sdef;
+
 			if (postArgs.length() > 0) postArgs.append(", ");
 			postArgs.append(POSaveStateContext.OLDNAME);
 			postArgs.append(", ");
 			postArgs.append(state.toPattern(false));
+
+			if (preArgs.length() > 0) preArgs.append(", ");
+			preArgs.append(POSaveStateContext.OLDNAME);
 		}
 		else if (sdef instanceof POClassDefinition)
 		{
-			// No idea! This isn't used for PP dialects currently
+			return null;	// Can't handle VDM++/RT
 		}
 
-		// Create "post_op(args[, result, oldstate, newstate])"
-		return postdef.name + "(" + postArgs.toString() + ")";
+		/*
+		 * Create "pre_op(args[, oldstate]) and post_op(args[, result][, oldstate, newstate])"
+		 * Note that we can't call the pre/post of operations in external modules, because
+		 * we can't calculate their state vectors to pass. So external calls can only quantify
+		 * over all local state and the result, without help from the pre/post.
+		 */
+
+		StringBuilder result = new StringBuilder();
+
+		if (predef != null && predef.location.module.equals(from.module))
+		{
+			// Comment this in/out to include preconditions
+			result.append(predef.name);
+			result.append("(");
+			result.append(preArgs);
+			result.append(")");
+		}
+
+		if (postdef != null && postdef.location.module.equals(from.module))
+		{
+			if (result.length() > 0) result.append(" and ");
+			result.append(postdef.name);
+			result.append("(");
+			result.append(postArgs);
+			result.append(")");
+		}
+
+		return result.length() == 0 ? null : result.toString();
 	}
 
 	/**
