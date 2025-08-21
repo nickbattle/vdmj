@@ -54,6 +54,7 @@ as the expected and actual values.
 0075, "Maplet getAllNamedValues called"
 0076, "Native method parameter <method>.<param> should be type <type>"
 0077, "Native methods expects <n> Value arguments"
+0078, "Exception: <Java exception message>"
 
 
 1000, "Malformed quoted character"

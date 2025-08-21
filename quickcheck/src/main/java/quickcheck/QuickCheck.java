@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.PatternSyntaxException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -261,12 +262,20 @@ public class QuickCheck
 			
 			for (String name: poNames)
 			{
-				for (ProofObligation po: all)
+				try
 				{
-					if (po.location.module.matches(name) || po.name.matches(name))
+					for (ProofObligation po: all)
 					{
-						chosenPOs.add(po);
+						if (po.location.module.matches(name) || po.name.matches(name))
+						{
+							chosenPOs.add(po);
+						}
 					}
+				}
+				catch (PatternSyntaxException e)
+				{
+					errorln("Pattern syntax error: " + name);
+					errorCount++;
 				}
 			}
 			
@@ -507,7 +516,7 @@ public class QuickCheck
 		catch (Exception e)
 		{
 			execResult = new BooleanValue(false);
-			execException = new ContextException(1, e.getMessage(), po.location, null);
+			execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
 		}
 		finally
 		{
