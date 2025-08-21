@@ -49,11 +49,11 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 
 		try
 		{
-			Value lv = left.eval(ctxt);
+			Value lv = left.undefinedEval(ctxt);
 
 			if (lv.isUndefined())
 			{
-				Value rv = right.eval(ctxt);
+				Value rv = right.undefinedEval(ctxt);
 
 				if (rv.isUndefined())
 				{
@@ -70,7 +70,7 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 			}
 			else if (lv.boolValue(ctxt))
 			{
-				Value rv = right.eval(ctxt);
+				Value rv = right.undefinedEval(ctxt);
 
 				if (rv.isUndefined())
 				{

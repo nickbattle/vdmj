@@ -108,20 +108,24 @@ public class Properties
 	public static boolean rt_diags_timestep = false;
 
 	
-	/** The class name for the DebugLink */
-	public static String debug_link_class = null;
-	
 	/** The size limit for power set expressions */
 	public static int in_powerset_limit = 30;
 	
 	/** The size limit for type bind expansions */
 	public static long in_typebind_limit = 100000;
 	
-	/** The maximum stack to dump via println(Throwable) */
-	public static int diag_max_stack = 1;
-
 	/** Whether to do checks during initialization */
 	public static boolean in_init_checks = true;
+	
+	/** Whether to treat some errors as undefined values */
+	public static boolean in_undefined_evals = false;
+	
+	
+	/** The class name for the DebugLink */
+	public static String debug_link_class = null;
+	
+	/** The maximum stack to dump via println(Throwable) */
+	public static int diag_max_stack = 1;
 
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
@@ -210,6 +214,7 @@ public class Properties
 		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
 		in_typebind_limit = get(vdmj, "vdmj.in.typebind_limit", 100000);
 		in_init_checks = get (vdmj, "vdmj.in.init_checks", true);
+		in_undefined_evals = get (vdmj, "vdmj.in.undefined_evals", false);
 
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
 		diag_max_stack = get(vdmj, "vdmj.diag.max_stack", 1);

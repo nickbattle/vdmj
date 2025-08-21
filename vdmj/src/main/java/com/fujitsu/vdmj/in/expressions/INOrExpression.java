@@ -49,11 +49,11 @@ public class INOrExpression extends INBooleanBinaryExpression
 
 		try
 		{
-			Value lv = left.eval(ctxt);
+			Value lv = left.undefinedEval(ctxt);
 
 			if (lv.isUndefined())
 			{
-				Value rv = right.eval(ctxt);
+				Value rv = right.undefinedEval(ctxt);
 
 				if (rv.isUndefined())
 				{
@@ -74,7 +74,7 @@ public class INOrExpression extends INBooleanBinaryExpression
 			}
 			else
 			{
-				Value rv = right.eval(ctxt);
+				Value rv = right.undefinedEval(ctxt);
 
 				if (rv.isUndefined())
 				{

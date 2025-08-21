@@ -49,7 +49,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-t <msecs>][-i <status>]* [-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q|-v|-n][-e|-u][-t <msecs>][-i <status>]* [-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - lightweight PO verification";
@@ -114,6 +114,14 @@ public class QuickCheckCommand extends AnalysisCommand
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
+						break;
+
+					case "-e":
+						qc.setUndefinedEvals(false);
+						break;
+						
+					case "-u":
+						qc.setUndefinedEvals(true);
 						break;
 						
 					case "-i":

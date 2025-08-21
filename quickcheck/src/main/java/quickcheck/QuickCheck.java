@@ -41,6 +41,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
@@ -88,6 +89,8 @@ public class QuickCheck
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosenPOs = null;
+
+	private boolean undefinedEvals = false;			// Use undefinedEval for bools?
 	
 	public QuickCheck()
 	{
@@ -468,6 +471,9 @@ public class QuickCheck
 			// Suspend annotation execution by the interpreter, because the
 			// expressions and statements in the PO can invoke them.
 			INAnnotation.suspend(true);
+
+			// Allow some error cases in booleans to return undefined?
+			Properties.in_undefined_evals = undefinedEvals;
 			
 			do
 			{
@@ -518,6 +524,7 @@ public class QuickCheck
 			INBindingGlobals.getInstance().clear();
 			verbose("PO #%d, stopped evaluation.\n", po.number);
 			INAnnotation.suspend(false);
+			Properties.in_undefined_evals = false;		// Always disable on restore
 		}
 	}
 
@@ -880,6 +887,7 @@ public class QuickCheck
 		println("");
 		println("  -?|-help           - show command help");
 		println("  -q|-v|-n           - run with minimal, verbose, basic output");
+		println("  -e|-u              - show eval errors, or use undefined");
 		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");
@@ -905,5 +913,10 @@ public class QuickCheck
 				println("  " + strategy.help());
 			}
 		}
+	}
+
+	public void setUndefinedEvals(boolean undefinedEvals)
+	{
+		this.undefinedEvals = undefinedEvals;
 	}
 }

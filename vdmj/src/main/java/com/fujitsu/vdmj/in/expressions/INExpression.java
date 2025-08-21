@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.scheduler.InitThread;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -116,6 +117,37 @@ public abstract class INExpression extends INNode
 	 * @return	The value of the expression.
 	 */
 	abstract public Value eval(Context ctxt);
+
+	/**
+	 * In some circumstances, we want to treat failed evaluations as undefined results.
+	 * This is used by QuickCheck and boolean expressions only, so that most "real"
+	 * errors continue to be reported as such, rather than obscuring the error with an
+	 * "undefined" answer. The effect is controlled by the property "vdmj.in.undefined_evals".
+	 * 
+	 * @param ctxt	The context in which to evaluate the expression.
+	 * @return	The value of the expression, or "undefined" if an error occurs.
+	 */
+	protected Value undefinedEval(Context ctxt)
+	{
+		try
+		{
+			return eval(ctxt);
+		}
+		catch (ContextException e)
+		{
+			// If the property is set, we still check for certain critical errors, which
+			// are always thrown.
+
+			if (Properties.in_undefined_evals &&
+				!e.isStackOverflow() && !e.isUserCancel() &&
+				e.number >= 1000)
+			{
+				return new UndefinedValue();
+			}
+
+			throw e;
+		}
+	}
 
 	/**
 	 * Find an expression starting on the given line. Single expressions just
