@@ -37,7 +37,7 @@ public interface EventListener
 	public final static int TC_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.tc", 200);
 	public final static int IN_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.in", 300);
 	public final static int PO_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.po", 400);
-	public final static int CT_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.po", 500);
+	public final static int CT_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.ct", 500);
 	public final static int CMD_PRIORITY = Integer.getInteger("vdmj.plugin.priority.cmd", 600);
 
 	public final static int USER_PRIORITY = Integer.getInteger("vdmj.plugin.priority.user", 1000);
