@@ -127,7 +127,8 @@ public class DAPPlugin extends AnalysisPlugin
 		"vdmj.rt.diags_guards",
 		"vdmj.rt.diags_timestep",
 		"vdmj.in.powerset_limit",
-		"vdmj.in.typebind_limit"
+		"vdmj.in.typebind_limit",
+		"vdmj.in.undefined_evals"
 	);
 	
 	protected DAPPlugin()

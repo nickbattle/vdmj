@@ -180,6 +180,13 @@ public class Properties
 		}
 	}
 
+	/**
+	 * Set the values of the Properties constants. This will be set from the current
+	 * System properties if present, or the "vdmj" properties passed, and last of all
+	 * the default value for each entry.
+	 * 
+	 * @param vdmj A (possibly empty) set of loaded properties.
+	 */
 	private static void setValues(java.util.Properties vdmj)
 	{
 		parser_tabstop = get(vdmj, "vdmj.parser.tabstop", 4);
@@ -213,8 +220,8 @@ public class Properties
 		
 		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
 		in_typebind_limit = get(vdmj, "vdmj.in.typebind_limit", 100000);
-		in_init_checks = get (vdmj, "vdmj.in.init_checks", true);
-		in_undefined_evals = get (vdmj, "vdmj.in.undefined_evals", false);
+		in_init_checks = get(vdmj, "vdmj.in.init_checks", true);
+		in_undefined_evals = get(vdmj, "vdmj.in.undefined_evals", false);
 
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
 		diag_max_stack = get(vdmj, "vdmj.diag.max_stack", 1);
