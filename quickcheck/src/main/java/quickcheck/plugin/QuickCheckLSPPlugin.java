@@ -137,7 +137,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		}
 		else if (qc.initStrategies())
 		{
-			qc.setUndefinedEvals(config.get("undefinedEvals", false));
+			qc.setUndefinedEvals(config.get("undefined_evals", false));
 			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen, config.get("timeout"));
 			executor.start();
 			return null;
