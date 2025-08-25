@@ -53,7 +53,7 @@ public class INNotExpression extends INUnaryExpression
 
 		try
 		{
-			Value v = exp.undefinedEval(ctxt);
+			Value v = exp.eval(ctxt);
 			return v.isUndefined() ? v : new BooleanValue(!v.boolValue(ctxt));
 		}
 		catch (ValueException e)

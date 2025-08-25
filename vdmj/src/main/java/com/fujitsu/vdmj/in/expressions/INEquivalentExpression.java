@@ -49,7 +49,7 @@ public class INEquivalentExpression extends INBooleanBinaryExpression
 
 		try
 		{
-			Value lv = left.undefinedEval(ctxt);
+			Value lv = left.eval(ctxt);
 
 			if (lv.isUndefined())
 			{
@@ -57,7 +57,7 @@ public class INEquivalentExpression extends INBooleanBinaryExpression
 			}
 			else if (lv.boolValue(ctxt))
 			{
-				Value rv = right.undefinedEval(ctxt);
+				Value rv = right.eval(ctxt);
 
 				if (rv.isUndefined())
 				{
@@ -74,7 +74,7 @@ public class INEquivalentExpression extends INBooleanBinaryExpression
 			}
 			else
 			{
-				Value rv = right.undefinedEval(ctxt);
+				Value rv = right.eval(ctxt);
 
 				if (rv.isUndefined())
 				{

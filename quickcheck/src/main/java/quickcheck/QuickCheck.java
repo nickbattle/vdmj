@@ -91,7 +91,7 @@ public class QuickCheck
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosenPOs = null;
 
-	private boolean undefinedEvals = false;			// Use undefinedEval for bools?
+	private boolean undefinedEvals = true;			// Use undefinedEval for some bools, by default
 	
 	public QuickCheck()
 	{
@@ -896,7 +896,7 @@ public class QuickCheck
 		println("");
 		println("  -?|-help           - show command help");
 		println("  -q|-v|-n           - run with minimal, verbose, basic output");
-		println("  -e|-u              - show eval errors, or use undefined");
+	//	println("  -e|-u              - show eval errors, or use undefined");
 		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");

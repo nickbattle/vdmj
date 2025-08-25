@@ -49,10 +49,14 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 
 		try
 		{
-			Value lv = left.undefinedEval(ctxt);
+			Value lv = left.eval(ctxt);
 
 			if (lv.isUndefined())
 			{
+				// Use undefinedEval here, because the LHS undefined may *cause* errors that
+				// are not real. This happens in POs, where A => B => C, where B may fail because
+				// A was not completely evaluated. We have to treat this as MAYBE rather than error.
+
 				Value rv = right.undefinedEval(ctxt);
 
 				if (rv.isUndefined())
@@ -70,7 +74,7 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 			}
 			else if (lv.boolValue(ctxt))
 			{
-				Value rv = right.undefinedEval(ctxt);
+				Value rv = right.eval(ctxt);
 
 				if (rv.isUndefined())
 				{
