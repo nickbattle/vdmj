@@ -380,7 +380,12 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, imp.result.type), env);
 				}
 				
-				push(new POSaveStateContext(getStateDefinition()));
+				if (imp.postdef != null && imp.postdef.location.module.equals(from.module))
+				{
+					// Only save old state if we need it
+					push(new POSaveStateContext(getStateDefinition()));
+				}
+
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 
@@ -411,7 +416,12 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exop.type.result), env);
 				}
 					
-				push(new POSaveStateContext(getStateDefinition()));
+				if (exop.postdef != null && exop.postdef.location.module.equals(from.module))
+				{
+					// Only save old state if we need it
+					push(new POSaveStateContext(getStateDefinition()));
+				}
+
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
 				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
 
