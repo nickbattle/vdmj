@@ -53,6 +53,8 @@ import workspace.plugins.POPlugin;
 
 public class QuickCheckLSPPlugin extends AnalysisPlugin
 {
+	private static final long DEFAULT_TIMEOUT = 5000L;
+
 	public static AnalysisPlugin factory(Dialect dialect)
 	{
 		return new QuickCheckLSPPlugin();
@@ -117,7 +119,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 
 		Vector<Integer> poList = new Vector<Integer>();
 		Vector<String> poNames = new Vector<String>();
-		long timeout = getParamArgs(request, poList, poNames);
+		JSONObject config = getConfig(request, poList, poNames);
 
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
@@ -135,7 +137,8 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		}
 		else if (qc.initStrategies())
 		{
-			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen, timeout);
+			qc.setUndefinedEvals(config.get("undefined_evals", false));
+			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen, config.get("timeout"));
 			executor.start();
 			return null;
 		}
@@ -146,21 +149,21 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		}
 	}
 
-	private long getParamArgs(RPCRequest request,
+	private JSONObject getConfig(RPCRequest request,
 			Vector<Integer> poList, Vector<String> poNames)
 	{
-		long timeout = 3000L;	// faster default for GUI?
+		JSONObject result = new JSONObject("timeout", DEFAULT_TIMEOUT);
 		
 		if (request.get("params") != null)
 		{
 			JSONObject params = request.get("params");
 			
-			if (params.get("config") != null)
+			if (params.containsKey("config"))
 			{
 				JSONObject config = params.get("config");
+				result.putAll(config);
+
 				JSONArray obligations = config.get("obligations");
-				
-				timeout = config.get("timeout", 1000L);
 				
 				if (obligations != null && !obligations.isEmpty())
 				{
@@ -177,7 +180,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			}
 		}
 		
-		return timeout;
+		return result;
 	}
 
 	private List<String> getStrategyArgs(RPCRequest request)

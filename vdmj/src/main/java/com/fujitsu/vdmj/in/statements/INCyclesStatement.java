@@ -59,7 +59,7 @@ public class INCyclesStatement extends INStatement
 		
 		assertNotInit(ctxt);
 
-		SchedulableThread me = (SchedulableThread)Thread.currentThread();
+		SchedulableThread me = SchedulableThread.getSchedulableThread(location, ctxt);
 
 		if (me.inOuterTimestep())
 		{

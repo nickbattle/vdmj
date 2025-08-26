@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 
 public class POLetDefContext extends POContext
@@ -69,8 +70,17 @@ public class POLetDefContext extends POContext
 				{
 					POAssignmentDefinition ass = (POAssignmentDefinition)def;
 					sb.append(ass.name);
-					sb.append(" : ");
-					sb.append(ass.type.toExplicitString(ass.location));
+
+					// This is because (say) "let x : nat = undefined" will fail, whereas
+					// "let x = undefined" will be okay, as long as x is defined before it
+					// is used. This occurs with "dcl x : nat;" without an initializer.
+
+					if (!(ass.expression instanceof POUndefinedExpression))
+					{
+						sb.append(" : ");
+						sb.append(ass.type.toExplicitString(ass.location));
+					}
+
 					sb.append(" = ");
 					sb.append(ass.expression);
 				}

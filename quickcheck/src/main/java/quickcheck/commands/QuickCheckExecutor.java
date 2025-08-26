@@ -135,7 +135,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 				}
 			}
 
-			if (chosen.size() != all.size())
+			if (poList.isEmpty() && poNames.isEmpty() && chosen.size() != all.size())
 			{
 				infoln("(Use 'qc .*' to check all POs)");
 			}

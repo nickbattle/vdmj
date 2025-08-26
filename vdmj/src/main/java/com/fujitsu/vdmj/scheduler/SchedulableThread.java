@@ -556,4 +556,17 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 	{
 		return getName().compareTo(other.getName());
 	}
+
+	/**
+	 * Get the current SchedulableThread or throw an exception.
+	 */
+	public static SchedulableThread getSchedulableThread(LexLocation location, Context ctxt)
+	{
+		if (Thread.currentThread() instanceof SchedulableThread)
+		{
+			return (SchedulableThread)Thread.currentThread();
+		}
+
+		throw new ContextException(4177, "Not in a SchedulableThread", location, ctxt);
+	}
 }

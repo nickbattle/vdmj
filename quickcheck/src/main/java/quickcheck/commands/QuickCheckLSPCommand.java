@@ -112,6 +112,14 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 					case "-n":
 						nominal = true;
 						break;
+
+					case "-e":	// Not in usage
+						qc.setUndefinedEvals(false);
+						break;
+						
+					case "-u":	// Not in usage
+						qc.setUndefinedEvals(true);
+						break;
 						
 					case "-t":
 						i++;

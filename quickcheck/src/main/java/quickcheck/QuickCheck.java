@@ -38,9 +38,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.PatternSyntaxException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
@@ -88,6 +90,8 @@ public class QuickCheck
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosenPOs = null;
+
+	private boolean undefinedEvals = true;			// Use undefinedEval for some bools, by default
 	
 	public QuickCheck()
 	{
@@ -258,12 +262,20 @@ public class QuickCheck
 			
 			for (String name: poNames)
 			{
-				for (ProofObligation po: all)
+				try
 				{
-					if (po.location.module.matches(name) || po.name.matches(name))
+					for (ProofObligation po: all)
 					{
-						chosenPOs.add(po);
+						if (po.location.module.matches(name) || po.name.matches(name))
+						{
+							chosenPOs.add(po);
+						}
 					}
+				}
+				catch (PatternSyntaxException e)
+				{
+					errorln("Pattern syntax error: " + name);
+					errorCount++;
 				}
 			}
 			
@@ -468,6 +480,9 @@ public class QuickCheck
 			// Suspend annotation execution by the interpreter, because the
 			// expressions and statements in the PO can invoke them.
 			INAnnotation.suspend(true);
+
+			// Allow some error cases in booleans to return undefined?
+			Properties.in_undefined_evals = undefinedEvals;
 			
 			do
 			{
@@ -501,7 +516,7 @@ public class QuickCheck
 		catch (Exception e)
 		{
 			execResult = new BooleanValue(false);
-			execException = new ContextException(1, e.getMessage(), po.location, null);
+			execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
 		}
 		finally
 		{
@@ -518,6 +533,7 @@ public class QuickCheck
 			INBindingGlobals.getInstance().clear();
 			verbose("PO #%d, stopped evaluation.\n", po.number);
 			INAnnotation.suspend(false);
+			Properties.in_undefined_evals = false;		// Always disable on restore
 		}
 	}
 
@@ -880,6 +896,7 @@ public class QuickCheck
 		println("");
 		println("  -?|-help           - show command help");
 		println("  -q|-v|-n           - run with minimal, verbose, basic output");
+	//	println("  -e|-u              - show eval errors, or use undefined");
 		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");
@@ -905,5 +922,10 @@ public class QuickCheck
 				println("  " + strategy.help());
 			}
 		}
+	}
+
+	public void setUndefinedEvals(boolean undefinedEvals)
+	{
+		this.undefinedEvals = undefinedEvals;
 	}
 }

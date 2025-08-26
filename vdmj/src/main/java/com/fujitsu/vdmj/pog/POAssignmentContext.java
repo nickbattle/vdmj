@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
-import com.fujitsu.vdmj.po.types.visitors.DefaultExpressionCreator;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
@@ -64,33 +63,7 @@ public class POAssignmentContext extends POContext
 		this.type = null;
 		this.expression = null;
 
-		/**
-		 * Filter out things like "dcl x:nat;", which become "let x : nat = (undefined) in".
-		 * These type check, but they are a problem for QuickCheck and some more complex cases
-		 * get confused by missing variables. So we add a default expression value here.
-		 */
-		DefaultExpressionCreator dvc = new DefaultExpressionCreator();
-		
-		for (PODefinition def: assignmentDefs)
-		{
-			POAssignmentDefinition adef = (POAssignmentDefinition) def;
-
-			if (adef.expression instanceof POUndefinedExpression)
-			{
-				try
-				{
-					POExpression exp = adef.type.apply(dvc, null);
-					adef = new POAssignmentDefinition(adef.name, adef.type, exp, adef.expType);
-					setComment("Note, default value set");
-				}
-				catch (Exception e)
-				{
-					// Something we can't default... so just leave as undefined.
-				}
-			}
-			
-			this.assignmentDefs.add(adef);
-		}
+		this.assignmentDefs.addAll(assignmentDefs);
 	}
 
 	public POAssignmentContext(POStateDesignator target, TCType type, POExpression expression)
@@ -190,8 +163,17 @@ public class POAssignmentContext extends POContext
 		{
 			sb.append("let ");
 			sb.append(pattern);
-			sb.append(" : ");
-			sb.append(type.toExplicitString(expression.location));
+
+			// This is because (say) "let x : nat = undefined" will fail, whereas
+			// "let x = undefined" will be okay, as long as x is defined before it
+			// is used. This occurs with "dcl x : nat;" without an initializer.
+
+			if (!(expression instanceof POUndefinedExpression))
+			{
+				sb.append(" : ");
+				sb.append(type.toExplicitString(expression.location));
+			}
+			
 			sb.append(" = ");
 			sb.append(expression);
 			sb.append(" in");
@@ -205,8 +187,17 @@ public class POAssignmentContext extends POContext
 				sb.append(sep);
 				POAssignmentDefinition adef = (POAssignmentDefinition)def;
 				sb.append(adef.name);
-				sb.append(" : ");
-				sb.append(adef.type.toExplicitString(adef.location));
+
+				// This is because (say) "let x : nat = undefined" will fail, whereas
+				// "let x = undefined" will be okay, as long as x is defined before it
+				// is used. This occurs with "dcl x : nat;" without an initializer.
+			
+				if (!(adef.expression instanceof POUndefinedExpression))
+				{
+					sb.append(" : ");
+					sb.append(adef.type.toExplicitString(adef.location));
+				}
+			
 				sb.append(" = ");
 				sb.append(adef.expression);
 				sep = ", ";

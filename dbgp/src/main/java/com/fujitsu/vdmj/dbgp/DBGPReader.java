@@ -860,7 +860,7 @@ public class DBGPReader extends DebugLink implements VDMJMain
 
 		if (Thread.currentThread() instanceof SchedulableThread)
 		{
-			SchedulableThread th = (SchedulableThread)Thread.currentThread();
+			SchedulableThread th = SchedulableThread.getSchedulableThread(LexLocation.ANY, null);
 
 			body.append("threadId=\"");
 			body.append(th.getId());
