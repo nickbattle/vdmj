@@ -28,13 +28,14 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * A visitor set to explore the TC tree and return the state names updated.
  */
-public class TCDefinitionStateUpdates extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, Object>
+public class TCDefinitionStateUpdates extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, Environment>
 {
-	public TCDefinitionStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public TCDefinitionStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
 		this.visitorSet = visitors;
 	}
@@ -46,7 +47,7 @@ public class TCDefinitionStateUpdates extends TCLeafDefinitionVisitor<TCNameToke
 	}
 
 	@Override
-	public TCNameSet caseDefinition(TCDefinition node, Object arg)
+	public TCNameSet caseDefinition(TCDefinition node, Environment arg)
 	{
 		return newCollection();
 	}

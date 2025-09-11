@@ -24,8 +24,13 @@
 
 package com.fujitsu.vdmj.tc.statements.visitors;
 
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionStateUpdates;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionStateUpdates;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -33,22 +38,27 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindStateUpdates;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindStateUpdates;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
+import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
+import com.fujitsu.vdmj.tc.statements.TCCallStatement;
+import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * A visitor set to explore the TC tree and return the state names updated.
  */
-public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Object>
+public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Environment>
 {
 	public TCStatementStateUpdates()
 	{
 		super();
 		
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Object>()
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Environment>()
 		{
 			@Override
 			protected void setVisitors()
@@ -69,15 +79,27 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 	}
 
 	@Override
-	public TCNameSet caseAnnotatedStatement(TCAnnotatedStatement node, Object arg)
+	public TCNameSet caseAnnotatedStatement(TCAnnotatedStatement node, Environment env)
 	{
 		return node.statement.apply(this, null);	// Don't process args
 	}
 	
 	@Override
-	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Object arg)
+	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Environment env)
 	{
 		return designatorUpdates(node.target);
+	}
+
+	@Override
+	public TCNameSet caseCallStatement(TCCallStatement node, Environment env)
+	{
+		return operationCall(node.getDefinition(), env);
+	}
+
+	@Override
+	public TCNameSet caseCallObjectStatement(TCCallObjectStatement node, Environment env)
+	{
+		return operationCall(node.getDefinition(), env);
 	}
 	
 	@Override
@@ -87,9 +109,25 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 	}
 
 	@Override
-	public TCNameSet caseStatement(TCStatement node, Object arg)
+	public TCNameSet caseStatement(TCStatement node, Environment env)
 	{
 		return newCollection();
+	}
+
+	private TCNameSet getStateVariables(Environment env)
+	{
+		TCStateDefinition state = env.findStateDefinition();
+		TCNameSet all = newCollection();
+
+		if (state != null)
+		{
+			for (TCField field: state.fields)
+			{
+				all.add(field.tagname);
+			}
+		}
+
+		return all;
 	}
 
 	/**
@@ -115,6 +153,48 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 			all.addAll(designatorUpdates(msd.mapseq));
 		}
 		
+		return all;
+	}
+
+	/**
+	 * Use the operation's pure and ext clauses to try to determine the variable updates.
+	 */
+	private TCNameSet operationCall(TCDefinition def, Environment env)
+	{
+		TCNameSet all = new TCNameSet();
+		
+		if (def == null)
+		{
+			all.addAll(getStateVariables(env));	// Don't know!
+		}
+		else if (def.accessSpecifier.isPure)
+		{
+			// No updates by definition of pure
+		}
+		else if (def instanceof TCImplicitOperationDefinition)
+		{
+			TCImplicitOperationDefinition imp = (TCImplicitOperationDefinition)def;
+			
+			if (imp.externals != null)
+			{
+				for (TCExternalClause ext: imp.externals)
+				{
+					if (ext.mode.is(Token.WRITE))
+					{
+						all.addAll(ext.identifiers);
+					}
+				}
+			}
+			else
+			{
+				all.addAll(getStateVariables(env));
+			}
+		}
+		else if (def instanceof TCExplicitOperationDefinition)
+		{
+			all.addAll(getStateVariables(env));
+		}
+
 		return all;
 	}
 }

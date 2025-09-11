@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -35,8 +34,6 @@ import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVariableFinder;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCQualifiedDefinitionFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.statements.visitors.TCStatementStateUpdates;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -266,13 +263,6 @@ public abstract class TCExpression extends TCNode
 		TCNameSet set = new TCNameSet();
 		set.addAll(this.apply(visitor, null));
 		return set;
-	}
-
-	public TCNameSet updatesState()
-	{
-		TCStatementStateUpdates finder = new TCStatementStateUpdates();
-		TCVisitorSet<TCNameToken, TCNameSet, Object> vset = finder.getVistorSet();
-		return vset.applyExpressionVisitor(this, true);
 	}
 
 	/**

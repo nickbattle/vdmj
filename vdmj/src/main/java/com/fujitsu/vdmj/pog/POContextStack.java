@@ -380,14 +380,15 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, imp.result.type), env);
 				}
 				
-				if (imp.postdef != null && imp.postdef.location.module.equals(from.module))
+				if (called.location.module.equals(from.module) &&
+					(imp.predef != null || imp.postdef != null))
 				{
 					// Only save old state if we need it
 					push(new POSaveStateContext(getStateDefinition()));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
+				if (!names.isEmpty()) setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -416,14 +417,15 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exop.type.result), env);
 				}
 					
-				if (exop.postdef != null && exop.postdef.location.module.equals(from.module))
+				if (called.location.module.equals(from.module) &&
+					(exop.predef != null || exop.postdef != null))
 				{
 					// Only save old state if we need it
 					push(new POSaveStateContext(getStateDefinition()));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
+				if (!names.isEmpty()) setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -444,7 +446,7 @@ public class POContextStack extends Stack<POContext>
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
 		StringBuilder preArgs  = new StringBuilder(Utils.listToString(args));
 		
-		PODefinition sdef = getStateDefinition();				// No state => null
+		PODefinition sdef = getStateDefinition();		// No state => null
 
 		if (resultVar != null)
 		{

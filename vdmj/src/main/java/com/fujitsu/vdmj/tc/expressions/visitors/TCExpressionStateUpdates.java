@@ -29,19 +29,20 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * A visitor set to explore the TC tree and return the state names updated.
  */
-public class TCExpressionStateUpdates extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
+public class TCExpressionStateUpdates extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Environment>
 {
-	public TCExpressionStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public TCExpressionStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(TCVariableExpression node, Object arg)
+	public TCNameSet caseVariableExpression(TCVariableExpression node, Environment arg)
 	{
 		TCNameSet all = newCollection();
 
@@ -60,7 +61,7 @@ public class TCExpressionStateUpdates extends TCLeafExpressionVisitor<TCNameToke
 	}
 
 	@Override
-	public TCNameSet caseExpression(TCExpression node, Object arg)
+	public TCNameSet caseExpression(TCExpression node, Environment arg)
 	{
 		return newCollection();
 	}

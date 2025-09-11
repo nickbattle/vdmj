@@ -207,11 +207,12 @@ public abstract class TCStatement extends TCNode
 
 	/**
 	 * State variables updated by this statement.
+	 * @param env 
 	 */
-	public TCNameSet updatesState(boolean nested)
+	public TCNameSet updatesState(Environment env)
 	{
 		TCStatementStateUpdates visitor = new TCStatementStateUpdates();
-		return this.apply(visitor, nested);
+		return this.apply(visitor, env);
 	}
 
 	/**

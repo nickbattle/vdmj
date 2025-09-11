@@ -847,13 +847,14 @@ public class QuickCheck
 					}
 				}
 				
-				infof("----\n%s\n", po.source);
+				infof("----\n%s\n", po.toString());
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
 			{
 				String witness = stringOfContext(po.witness);
 				infoln("Witness: " + witness);
+				infof("----\n%s\n", po.toString());
 			}
 		}
 	}
