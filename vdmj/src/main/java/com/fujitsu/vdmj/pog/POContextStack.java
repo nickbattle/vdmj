@@ -380,7 +380,8 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, imp.result.type), env);
 				}
 				
-				if (imp.postdef != null && imp.postdef.location.module.equals(from.module))
+				if (called.location.module.equals(from.module) &&
+					(imp.predef != null || imp.postdef != null))
 				{
 					// Only save old state if we need it
 					push(new POSaveStateContext(getStateDefinition()));
@@ -416,7 +417,8 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exop.type.result), env);
 				}
 					
-				if (exop.postdef != null && exop.postdef.location.module.equals(from.module))
+				if (called.location.module.equals(from.module) &&
+					(exop.predef != null || exop.postdef != null))
 				{
 					// Only save old state if we need it
 					push(new POSaveStateContext(getStateDefinition()));

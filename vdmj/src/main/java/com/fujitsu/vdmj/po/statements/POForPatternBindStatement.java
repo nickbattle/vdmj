@@ -115,7 +115,7 @@ public class POForPatternBindStatement extends POStatement
 
 		boolean varAmbiguous = pogState.isAmbiguous();
 		POLoopInvariantList annotations = invariants.getList();
-		TCNameSet updates = statement.updatesState();
+		TCNameSet updates = statement.updatesState(ctxt);
 		POExpression invariant = null;
 		
 		if (!annotations.isEmpty())

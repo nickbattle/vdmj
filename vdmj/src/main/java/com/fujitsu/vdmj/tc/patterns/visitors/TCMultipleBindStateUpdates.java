@@ -25,15 +25,16 @@ package com.fujitsu.vdmj.tc.patterns.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A visitor set to explore the TC tree and return the state names updated.
  */
-public class TCMultipleBindStateUpdates extends TCLeafMultipleBindVisitor<TCNameToken, TCNameSet, Object>
+public class TCMultipleBindStateUpdates extends TCLeafMultipleBindVisitor<TCNameToken, TCNameSet, Environment>
 {
-	public TCMultipleBindStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public TCMultipleBindStateUpdates(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
 		this.visitorSet = visitors;
 	}
@@ -45,7 +46,7 @@ public class TCMultipleBindStateUpdates extends TCLeafMultipleBindVisitor<TCName
 	}
 
 	@Override
-	public TCNameSet caseMultipleBind(TCMultipleBind node, Object arg)
+	public TCNameSet caseMultipleBind(TCMultipleBind node, Environment arg)
 	{
 		return newCollection();
 	}

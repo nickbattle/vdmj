@@ -109,9 +109,9 @@ public abstract class POStatement extends PONode
 	/**
 	 * State variables updated or read by this statement.
 	 */
-	public TCNameSet updatesState()
+	public TCNameSet updatesState(POContextStack ctxt)
 	{
-		POStatementStateUpdates visitor = new POStatementStateUpdates();
+		POStatementStateUpdates visitor = new POStatementStateUpdates(ctxt);
 		return this.apply(visitor, null);
 	}
 

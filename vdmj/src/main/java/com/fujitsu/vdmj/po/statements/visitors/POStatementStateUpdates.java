@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.po.statements.visitors;
 
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.annotations.POAnnotatedStatement;
@@ -44,6 +43,7 @@ import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
 import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -52,11 +52,13 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
  */
 public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
 {
-	private static TCNameToken EVERYTHING = new TCNameToken(LexLocation.ANY, "*", "*");
+	private final POContextStack ctxt;
 	
-	public POStatementStateUpdates()
+	public POStatementStateUpdates(POContextStack ctxt)
 	{
 		super(false);
+
+		this.ctxt = ctxt;
 		
 		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Object>()
 		{
@@ -93,13 +95,13 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	@Override
 	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
 	{
-		return operationCall(node.opdef);
+		return operationCall(node.opdef, ctxt);
 	}
 	
 	@Override
 	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Object arg)
 	{
-		return operationCall(node.fdef);
+		return operationCall(node.fdef, ctxt);
 	}
 	
 	@Override
@@ -144,13 +146,13 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	 * Use the operation's pure and ext clauses to try to determine the variable
 	 * access.
 	 */
-	public static TCNameSet operationCall(PODefinition def)
+	public static TCNameSet operationCall(PODefinition def, POContextStack ctxt)
 	{
 		TCNameSet all = new TCNameSet();
 		
 		if (def == null)
 		{
-			all.add(EVERYTHING);	// Don't know!
+			all.addAll(ctxt.getStateVariables());	// Don't know!
 		}
 		else if (def.accessSpecifier.isPure)
 		{
@@ -172,12 +174,12 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 			}
 			else
 			{
-				all.add(EVERYTHING);
+				all.addAll(ctxt.getStateVariables());
 			}
 		}
 		else if (def instanceof POExplicitOperationDefinition)
 		{
-			all.add(EVERYTHING);
+			all.addAll(ctxt.getStateVariables());
 		}
 
 		return all;

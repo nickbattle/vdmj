@@ -92,7 +92,7 @@ public class TCLoopAnnotations implements Mappable
 
 		if (!invariants.isEmpty())
 		{
-			TCNameSet updates = stmt.updatesState(false);
+			TCNameSet updates = stmt.updatesState(env);
 			TCNameSet reasonsAbout = new TCNameSet();
 			
 			for (TCLoopInvariantAnnotation inv: invariants)

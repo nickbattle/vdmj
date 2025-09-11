@@ -74,7 +74,7 @@ public class POWhileStatement extends POStatement
 
 		POLoopInvariantList annotations = invariants.getList();
 		POLoopMeasureAnnotation measure = invariants.getMeasure();
-		TCNameSet updates = statement.updatesState();
+		TCNameSet updates = statement.updatesState(ctxt);
 		POExpression invariant = null;
 		
 		if (!annotations.isEmpty())
