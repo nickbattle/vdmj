@@ -387,7 +387,7 @@ public class POContextStack extends Stack<POContext>
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
+				if (!names.isEmpty()) setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -423,7 +423,7 @@ public class POContextStack extends Stack<POContext>
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname + ", could affect " + names);
+				if (!names.isEmpty()) setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -444,7 +444,7 @@ public class POContextStack extends Stack<POContext>
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
 		StringBuilder preArgs  = new StringBuilder(Utils.listToString(args));
 		
-		PODefinition sdef = getStateDefinition();				// No state => null
+		PODefinition sdef = getStateDefinition();		// No state => null
 
 		if (resultVar != null)
 		{
