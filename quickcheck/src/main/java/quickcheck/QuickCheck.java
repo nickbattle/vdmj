@@ -325,6 +325,16 @@ public class QuickCheck
 		ctxt = addSelf(po, ctxt);
 		IterableContext ictxt = addTypeParams(po, ctxt);
 		boolean hasAllValues = false;
+
+		try
+		{
+			// This is used by some strategies to find the module state
+			Interpreter.getInstance().setDefaultName(po.location.module);
+		}
+		catch (Exception e)
+		{
+			// Can't happen?
+		}
 		
 		while (ictxt.hasNext())
 		{
