@@ -388,7 +388,7 @@ public class POContextStack extends Stack<POContext>
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname);
+				setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -425,7 +425,7 @@ public class POContextStack extends Stack<POContext>
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname);
+				setComment("Call to " + opname);
 
 				if (canReturn)
 				{
