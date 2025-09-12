@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.RecordValue;
@@ -81,35 +80,30 @@ public class UndefinedQCStrategy extends QCStrategy
 	{
 		StrategyResults results = new StrategyResults();
 		Environment env = Interpreter.getInstance().getGlobalEnvironment();
+		TCStateDefinition state = env.findStateDefinition();
 
-		if (env instanceof ModuleEnvironment)
+		if (state != null && state.initdef == null)		// has state, but no init clause
 		{
-			ModuleEnvironment menv = (ModuleEnvironment)env;
-			TCStateDefinition state = menv.findStateDefinition();
+			TCRecordType rectype = (TCRecordType)state.getType();
 
-			if (state != null && state.initdef == null)		// has state, but no init clause
+			for (INBindingOverride bind: binds)
 			{
-				TCRecordType rectype = (TCRecordType)state.getType();
-
-				for (INBindingOverride bind: binds)
+				if (bind.getType().equals(rectype))
 				{
-					if (bind.getType().equals(rectype))
+					// Add a mk_Sigma value with undefined state fields...
+					NameValuePairList fvals = new NameValuePairList();
+					
+					for (TCField field: rectype.fields)
 					{
-						// Add a mk_Sigma value with undefined state fields...
-						NameValuePairList fvals = new NameValuePairList();
-						
-						for (TCField field: rectype.fields)
-						{
-							fvals.add(new NameValuePair(field.tagname, new UndefinedValue()));
-						}
-						
-						RecordValue rval = new RecordValue(rectype, fvals);		// No inv check!
-
-						Map<String, ValueList> values = new HashMap<String, ValueList>();
-						values.put(bind.toString(), new ValueList(rval));
-						results = new StrategyResults(values, false);
-						break;	// One is enough
+						fvals.add(new NameValuePair(field.tagname, new UndefinedValue()));
 					}
+					
+					RecordValue rval = new RecordValue(rectype, fvals);		// No inv check!
+
+					Map<String, ValueList> values = new HashMap<String, ValueList>();
+					values.put(bind.toString(), new ValueList(rval));
+					results = new StrategyResults(values, false);
+					break;	// One is enough
 				}
 			}
 		}
@@ -121,11 +115,5 @@ public class UndefinedQCStrategy extends QCStrategy
 	public boolean useByDefault()
 	{
 		return false;	// So you choose to try the undefined values
-	}
-
-	@Override
-	public String help()
-	{
-		return getName() + " (no options)";
 	}
 }
