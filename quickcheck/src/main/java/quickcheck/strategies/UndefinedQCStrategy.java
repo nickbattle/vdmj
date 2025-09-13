@@ -28,10 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.plugins.PluginConsole;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -44,8 +41,6 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.RecordValue;
 import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.ValueList;
-
-import quickcheck.QuickCheck;
 
 /**
  * A strategy to attempt to include a VDM-SL state vector that has not been initialized.
@@ -64,25 +59,13 @@ public class UndefinedQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public boolean init(QuickCheck qc)
-	{
-		if (Settings.dialect != Dialect.VDM_SL)
-		{
-			PluginConsole.errorln(getName() + " strategy only applies to VDM-SL");
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
 	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		StrategyResults results = new StrategyResults();
 		Environment env = Interpreter.getInstance().getGlobalEnvironment();
 		TCStateDefinition state = env.findStateDefinition();
 
-		if (state != null && state.initdef == null)		// has state, but no init clause
+		if (state != null && state.initdef == null)		// has SL state, but no init clause
 		{
 			TCRecordType rectype = (TCRecordType)state.getType();
 
@@ -109,11 +92,5 @@ public class UndefinedQCStrategy extends QCStrategy
 		}
 
 		return results;
-	}
-
-	@Override
-	public boolean useByDefault()
-	{
-		return false;	// So you choose to try the undefined values
 	}
 }
