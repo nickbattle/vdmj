@@ -234,7 +234,7 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public void makeOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
-		if (called == null)		// An op called in an expression?
+		if (called == null)		// An op called via a field expression, in PP or RT
 		{
 			push(new POAmbiguousContext("operation call", getStateVariables(), from));
 		}
