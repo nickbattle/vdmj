@@ -318,17 +318,19 @@ public class POContextStack extends Stack<POContext>
 	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
 	 * qualification, if possible.
 	 */
-	public void makeOperationCall(LexLocation from, PODefinition called,
+	public boolean makeOperationCall(LexLocation from, PODefinition called,
 		POExpressionList args, TCNameToken resultVar, boolean canReturn, POGState pogState, Environment env)
 	{
 		if (called == null)		// Called from an apply expression?
 		{
 			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			return false;
 		}
 		else if (called.getDefiniteExceptions() != null)
 		{
 			String opname = called.name.toExplicitString(from);
 			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+			return false;
 		}
 		else
 		{
@@ -433,6 +435,8 @@ public class POContextStack extends Stack<POContext>
 					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), result));
 				}
 			}
+
+			return true;
 		}
 	}
 

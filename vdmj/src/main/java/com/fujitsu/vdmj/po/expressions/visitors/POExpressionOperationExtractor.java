@@ -998,6 +998,28 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 
 			return setType(node, new POVariableExpression(name, null));
 		}
+		else if (node.root instanceof POFieldExpression)	// Object apply?
+		{
+			POFieldExpression root = (POFieldExpression)node.root;
+
+			// Note: the name is module-local to the node, not the called operation
+			name = new TCNameToken(node.location, node.location.module,
+				"$" + prefix + root.field.getName());
+
+			int count = 1;		// eg. $op becomes $op$1, $op$2 etc...
+
+			while (substitutions.containsKey(name))
+			{
+				name = new TCNameToken(node.location, node.location.module,
+					"$" + prefix + root.field.getName() + "$" + count);
+
+				count++;
+			}
+
+			substitutions.put(name, node);		// eg. "$op1" -> obj.op1(a,b,c)
+
+			return setType(node, new POVariableExpression(name, null));
+		}
 		else
 		{
 			throw new POOperationExtractionException(node, "no operation name?");

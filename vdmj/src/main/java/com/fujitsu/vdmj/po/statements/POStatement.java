@@ -164,7 +164,10 @@ public abstract class POStatement extends PONode
 
 				// Then add the "forall" version of the ambiguity for the apply call, which cannot
 				// return at this point (within an expression).
-				ctxt.makeOperationCall(exp.location, apply.opdef, apply.args, var, false, pogState, env);
+				if (!ctxt.makeOperationCall(exp.location, apply.opdef, apply.args, var, false, pogState, env))
+				{
+					return exp;		// failed for some reason, eg. exceptions?
+				}
 			}
 
 			return subs;
@@ -200,7 +203,10 @@ public abstract class POStatement extends PONode
 
 				// Then add the "forall" version of the ambiguity for the apply call, which cannot
 				// return at this point (within an expression).
-				ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env);
+				if (!ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env))
+				{
+					return designator;
+				}
 			}
 
 			return subs;
@@ -244,7 +250,10 @@ public abstract class POStatement extends PONode
 
 				// Then add the "forall" version of the ambiguity for the apply call, which cannot
 				// return at this point (within an expression).
-				ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env);
+				if (!ctxt.makeOperationCall(location, apply.opdef, apply.args, var, false, pogState, env))
+				{
+					return definitions;
+				}
 			}
 
 			return subs;
