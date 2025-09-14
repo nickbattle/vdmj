@@ -128,8 +128,8 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
     			{
     				if (rhs.isOrdered(location) && TypeComparator.compatible(lhs, rhs))
     				{
-    					poTypes.add(lhs);
-    				}
+						poTypes.add(TypeComparator.isSubType(lhs, rhs) ? rhs : lhs);	// Widest
+					}
     				else
     				{
     					poNeeded = true;
