@@ -71,6 +71,7 @@ import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.ParameterValue;
+import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -517,6 +518,12 @@ public class QuickCheck
 				// MAYBE, in effect - execCompleted will be false
 				execResult = new BooleanValue(!po.isExistential());
 			}
+			else if (internalException(e))
+			{
+				execResult = new UndefinedValue();	// Gives MAYBE
+				po.clearAnalysis();
+				po.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+			}
 			else
 			{
 				execResult = new BooleanValue(false);
@@ -544,6 +551,41 @@ public class QuickCheck
 			verbose("PO #%d, stopped evaluation.\n", po.number);
 			INAnnotation.suspend(false);
 			Properties.in_undefined_evals = false;		// Always disable on restore
+		}
+	}
+
+	/**
+	 * Until we can solve some tricky problems with VDM++/RT state handling, POs from these
+	 * dialects can raise problems due to missing func/op fields in objects and some other
+	 * specific error types. These are checked here and result in the PO being marked as
+	 * MAYBE, if the dialect is not SL.
+	 */
+	private boolean internalException(ContextException e)
+	{
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			return false;	// Special cases are only PP and RT
+		}
+
+		if (e.number >= 4089 && e.number <= 4105)	// Can't get <type>> value of undefined
+		{
+			return e.rawMessage.endsWith("undefined");
+		}
+
+		if (e.number == 4172 && e.rawMessage.endsWith(", undefined"))
+		{
+			return true;	// Error 4172: Values cannot be compared: <type>, undefined
+		}
+
+		switch (e.number)
+		{
+			case 4006:	// Type <class> has no field <opname>
+			case 4034:	// Name 'opname(args)' not in scope
+			case 4132:	// Using undefined value
+				return true;
+
+			default:
+				return false;
 		}
 	}
 
