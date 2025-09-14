@@ -52,7 +52,6 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.util.KCombinator;
@@ -195,7 +194,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	}
 	
 	/**
-	 * try to make an object that matches the class definition passed, without using
+	 * Try to make an object that matches the class definition passed, without using
 	 * any construction etc. This is just a means to create something that matches
 	 * the object pattern in the top level forall, to try to enable simple VDM++
 	 * specifications to be tested with QC. Note that and class invariants are
@@ -217,7 +216,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			return null;	// A superclass failed
 		}
 		
-		// Seed with the number passed in, and passed this generator, so that
+		// Seed with the number passed in, and pass this RangeCreator, so that
 		// we can copy the "done" types.
 		RandomRangeCreator generator = new RandomRangeCreator(ctxt, seed, this);
 		
@@ -226,17 +225,33 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			if (def instanceof TCInstanceVariableDefinition)
 			{
 				TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
-				TCType itype = idef.getType();
-				
-				ValueSet value = itype.apply(generator, 1);
-				
-				if (!value.isEmpty())
+				boolean generateValue = false;
+
+				if (idef.expression != null)	// Use initializer, if there is one
 				{
-					members.put(new NameValuePair(idef.name, value.get(0)));
+					try
+					{
+						INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(idef.expression);
+						members.put(new NameValuePair(idef.name, inexp.eval(ctxt)));
+					}
+					catch (Exception e)
+					{
+						generateValue = true;
+					}
 				}
-				else
+				
+				if (generateValue)		// else generate one random value
 				{
-					members.put(new NameValuePair(idef.name, new UndefinedValue()));
+					ValueSet value = idef.getType().apply(generator, 1);
+					
+					if (!value.isEmpty())
+					{
+						members.put(new NameValuePair(idef.name, value.get(0)));
+					}
+					else
+					{
+						members.put(new NameValuePair(idef.name, new UndefinedValue()));
+					}
 				}
 			}
 			else if (def instanceof TCValueDefinition)
@@ -245,15 +260,17 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
+					TCIdentifierPattern name = (TCIdentifierPattern)vdef.pattern;
+
 					try
 					{
-						TCIdentifierPattern name = (TCIdentifierPattern)vdef.pattern;
 						INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(vdef.exp);
 						members.put(new NameValuePair(name.name, inexp.eval(ctxt)));
 					}
 					catch (Exception e)
 					{
 						// Give up
+						members.put(new NameValuePair(name.name, new UndefinedValue()));
 					}
 				}
 			}

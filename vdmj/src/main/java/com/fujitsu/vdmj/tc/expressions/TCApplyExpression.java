@@ -157,6 +157,11 @@ public class TCApplyExpression extends TCExpression
 					results.add(new TCUnknownType(location));
 				}
 			}
+			else if (root instanceof TCFieldExpression)
+			{
+				TCFieldExpression exp = (TCFieldExpression)root;
+				opdef = env.findName(exp.memberName, scope);
+			}
 			
 			TCOperationType ot = type.getOperation();
 			ot.typeResolve(env);

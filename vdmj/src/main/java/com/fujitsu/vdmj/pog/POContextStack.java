@@ -234,7 +234,7 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public void makeOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
 	{
-		if (called == null)		// An op called in an expression?
+		if (called == null)		// An op called via a field expression, in PP or RT
 		{
 			push(new POAmbiguousContext("operation call", getStateVariables(), from));
 		}
@@ -318,17 +318,19 @@ public class POContextStack extends Stack<POContext>
 	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
 	 * qualification, if possible.
 	 */
-	public void makeOperationCall(LexLocation from, PODefinition called,
+	public boolean makeOperationCall(LexLocation from, PODefinition called,
 		POExpressionList args, TCNameToken resultVar, boolean canReturn, POGState pogState, Environment env)
 	{
 		if (called == null)		// Called from an apply expression?
 		{
 			push(new POAmbiguousContext("operation call", getStateVariables(), from));
+			return false;
 		}
 		else if (called.getDefiniteExceptions() != null)
 		{
 			String opname = called.name.toExplicitString(from);
 			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
+			return false;
 		}
 		else
 		{
@@ -388,7 +390,7 @@ public class POContextStack extends Stack<POContext>
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname);
+				setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -425,7 +427,7 @@ public class POContextStack extends Stack<POContext>
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
-				if (!names.isEmpty()) setComment("Call to " + opname);
+				setComment("Call to " + opname);
 
 				if (canReturn)
 				{
@@ -433,6 +435,8 @@ public class POContextStack extends Stack<POContext>
 					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), result));
 				}
 			}
+
+			return true;
 		}
 	}
 
