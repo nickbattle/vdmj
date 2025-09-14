@@ -262,11 +262,12 @@ public class RuntraceCommand extends AnalysisCommand
 		{
 			pattern = argv[1];
 		}
-		else
+		else if (argv.length > 2)
 		{
-			println("Usage: runalltraces <pattern>");
+			println("Usage: runalltraces [<pattern>]");
+			return;
 		}
-		
+
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
 			ModuleInterpreter minterpreter = (ModuleInterpreter)interpreter;
@@ -303,7 +304,7 @@ public class RuntraceCommand extends AnalysisCommand
 	    					String cmd = "runtrace " + d.name.getExplicit(true);
 	    					println("-------------------------------------");
 	    					println(cmd);
-	    					doRuntrace(false);
+	    					doRuntrace(cmd, false);
 	    				}
 	    			}
 				}
@@ -420,7 +421,7 @@ public class RuntraceCommand extends AnalysisCommand
 			"debugtrace <name> [start test [end test]] - debug CT trace",
 			"savetrace [<file> | off] - save CT trace output",
 			"seedtrace <number> - seed CT trace random generator",
-			"runalltraces [<name>] - run all CT traces in class/module name",
+			"runalltraces [<pattern>] - run all CT traces in class/module name(s)",
 			"filter %age | <reduction type> - reduce CT trace(s)"
 		);
 	}
