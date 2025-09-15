@@ -49,25 +49,25 @@ public class TCOverrideAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(6700, "@Override only applies to expressions and statements");
+		name.report(6700, "@Override only applies to functions or operations");
 	}
 
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6701, "@Override only applies to expressions and statements");
+		name.report(6701, "@Override only applies to functions or operations");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6702, "@Override only applies to expressions and statements");
+		name.report(6702, "@Override only applies to functions or operations");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6703, "@Override only applies to expressions and statements");
+		name.report(6703, "@Override only applies to functions or operations");
 	}
 
 	@Override
