@@ -439,7 +439,7 @@ public class QuickCheck
 			}
 			else
 			{
-				verbose("Trying possible values from strategies");
+				verbose("Trying possible values from strategies\n");
 				tryPossibleValues(po, sresults);
 			}
 		}
