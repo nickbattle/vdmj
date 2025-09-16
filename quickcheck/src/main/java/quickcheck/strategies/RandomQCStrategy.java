@@ -137,13 +137,13 @@ public class RandomQCStrategy extends QCStrategy
 				if (po.hasCorrelatedBinds())	// Must used fixed values by type
 				{
 					FixedRangeCreator visitor = new FixedRangeCreator(ctxt);
-					ValueSet extras = bind.getType().apply(visitor, expansionLimit);
+					ValueSet extras = bind.getType(ctxt).apply(visitor, expansionLimit);
 					list.addAll(extras);
 				}
 				else
 				{
 					RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);
-					ValueSet values = bind.getType().apply(visitor, expansionLimit);
+					ValueSet values = bind.getType(ctxt).apply(visitor, expansionLimit);
 					list.addAll(values);
 				}
 				

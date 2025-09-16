@@ -410,7 +410,7 @@ public class QuickCheck
 				// Generate some values for missing bindings, using the fixed method
 				verbose("Generating fixed values for %s\n", bind);
 				values = new ValueList();
-				values.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
+				values.addAll(bind.getType(ictxt).apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
 				union.put(bind.toString(), values);
 			}
 		}

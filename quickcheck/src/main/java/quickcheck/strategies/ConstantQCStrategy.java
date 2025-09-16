@@ -104,7 +104,7 @@ public class ConstantQCStrategy extends QCStrategy
 		
 		for (INBindingOverride bind: binds)
 		{
-			TCType bindType = bind.getType();
+			TCType bindType = bind.getType(ctxt);
 			String key = bind.toString();
 			
 			for (int i = 0; i < constants.size(); i++)

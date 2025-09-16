@@ -118,7 +118,7 @@ public class FiniteQCStrategy extends QCStrategy
 			{
 				try
 				{
-					long size = bind.getType().apply(new INTypeSizeVisitor(), ctxt);
+					long size = bind.getType(ctxt).apply(new INTypeSizeVisitor(), ctxt);
 					product = product * size;	// cumulative for each bind
 					verbose("Size of %s type is %s\n", bind, product);
 					
@@ -145,7 +145,7 @@ public class FiniteQCStrategy extends QCStrategy
 			{
 				try
 				{
-					result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
+					result.put(bind.toString(), bind.getType(ctxt).apply(new INGetAllValuesVisitor(), ctxt));
 				}
 				catch (InternalException e)
 				{

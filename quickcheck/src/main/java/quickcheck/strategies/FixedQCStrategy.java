@@ -392,7 +392,7 @@ public class FixedQCStrategy extends QCStrategy
 					if (!done.contains(mbind.toString()))
 					{
 						String range = null;
-						TCType type = mbind.getType();
+						TCType type = mbind.getType(null);
 						
 						if (type instanceof TCFunctionType)
 						{
@@ -535,7 +535,7 @@ public class FixedQCStrategy extends QCStrategy
 				else
 				{
 					verbose("Generating fixed values for %s\n", bind);
-					ValueSet set = bind.getType().apply(new FixedRangeCreator(ctxt), expansionLimit);
+					ValueSet set = bind.getType(ctxt).apply(new FixedRangeCreator(ctxt), expansionLimit);
 					ValueList list = new ValueList();
 					list.addAll(set);
 					values.put(key, list);

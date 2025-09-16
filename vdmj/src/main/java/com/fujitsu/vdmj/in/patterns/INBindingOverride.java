@@ -24,7 +24,10 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.ValueList;
 
 public class INBindingOverride
@@ -68,8 +71,17 @@ public class INBindingOverride
 		return this.bindValues;
 	}
 	
-	public TCType getType()
+	public TCType getType(Context ctxt)
 	{
-		return type;
+		if (ctxt != null && type instanceof TCParameterType)
+		{
+			TCParameterType ptype = (TCParameterType)type;
+			ParameterValue pv = (ParameterValue) ctxt.get(ptype.name);
+			return pv.type;
+		}
+		else
+		{
+			return type;
+		}
 	}
 }

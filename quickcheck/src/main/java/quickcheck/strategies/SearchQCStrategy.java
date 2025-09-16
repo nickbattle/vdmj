@@ -83,14 +83,14 @@ public class SearchQCStrategy extends QCStrategy
 					String key = bind.toString();
 					
 					// HACK! Only works for single name binds
-					if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
+					if (key.equals(pair.name.getName() + ":" + bind.getType(ctxt)))	// eg. "a:T" = "a" +":" + "T"
 					{
 						// The naivety of the search may result in value assignments that
 						// do not match the type (eg. inside is_(exp, T) => ...). So check.
 						
 						try
 						{
-							Value fixed = pair.value.convertTo(bind.getType(), ctxt);
+							Value fixed = pair.value.convertTo(bind.getType(ctxt), ctxt);
 							
 							if (result.containsKey(key))
 							{

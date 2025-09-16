@@ -71,7 +71,7 @@ public class UndefinedQCStrategy extends QCStrategy
 
 			for (INBindingOverride bind: binds)
 			{
-				if (bind.getType().equals(rectype))
+				if (bind.getType(ctxt).equals(rectype))
 				{
 					// Add a mk_Sigma value with undefined state fields...
 					NameValuePairList fvals = new NameValuePairList();
