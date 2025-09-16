@@ -24,8 +24,6 @@
 
 package annotations.tc;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -37,73 +35,50 @@ import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCOverrideAnnotation extends TCAnnotation
+public class TCMaximalTypesAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public TCOverrideAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCMaximalTypesAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
 
 	@Override
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		noArgs();
+	}
+	
+	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(6700, "@Override only applies to functions or operations");
+		noArgs();
 	}
-
+	
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6701, "@Override only applies to functions or operations");
+		noArgs();
 	}
 
 	@Override
-	public void tcBefore(TCModule module)
+	public void tcBefore(TCModule m)
 	{
-		name.report(6702, "@Override only applies to functions or operations");
+		noArgs();
 	}
 
 	@Override
-	public void tcBefore(TCClassDefinition clazz)
+	public void tcBefore(TCClassDefinition m)
 	{
-		name.report(6703, "@Override only applies to functions or operations");
+		noArgs();
 	}
 
-	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	private void noArgs()
 	{
-		if (Settings.dialect == Dialect.VDM_SL)
-		{
-			name.report(6704, "@Override not available in VDM-SL");
-		}
-		
 		if (!args.isEmpty())
 		{
-			name.report(6705, "@Override has no arguments");
-		}
-		
-		if (!def.isFunctionOrOperation())
-		{
-			name.report(6706, "@Override only applies to functions or operations");
-		}
-		else if (def.classDefinition != null)
-		{
-			boolean found = false;
-			
-			for (TCDefinition indef: def.classDefinition.localInheritedDefinitions)
-			{
-				if (indef.name.equals(def.name))
-				{
-					found = true;
-					break;
-				}
-			}
-			
-			if (!found)
-			{
-				name.report(6707, "Definition does not @Override superclass");
-			}
+			name.report(7400, "@MaximalTypes has no arguments");
 		}
 	}
 }

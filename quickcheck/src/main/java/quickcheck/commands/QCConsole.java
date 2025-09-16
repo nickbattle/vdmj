@@ -54,7 +54,7 @@ public class QCConsole extends PluginConsole
 		QCConsole.verbose = verbose;
 	}
 	
-	public boolean getVerbose()
+	public static boolean getVerbose()
 	{
 		return verbose;
 	}

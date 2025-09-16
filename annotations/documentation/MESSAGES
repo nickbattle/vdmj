@@ -26,6 +26,7 @@ The remaining blocks of message numbers are for annotations and annotations2:
 7100-7199	@SepRequire
 7200-7299	@TypeBind
 7300-7399	@TypeParam
+7400-7499	@MaximalTypes
 
 8000-8099	@Assert
 8100-8199	@Changes
