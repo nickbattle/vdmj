@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
@@ -62,7 +63,8 @@ public class POStateDefinition extends PODefinition
 
 	public final TCRecordType recordType;
 
-	public POStateDefinition(TCNameToken name, TCFieldList fields,
+	public POStateDefinition(POAnnotationList annotations,
+		TCNameToken name, TCFieldList fields,
 		POPattern invPattern, POExpression invExpression,
 		POPattern initPattern, POExpression initExpression,
 		POExplicitFunctionDefinition invdef, POExplicitFunctionDefinition initdef,
@@ -78,6 +80,7 @@ public class POStateDefinition extends PODefinition
 		this.invdef = invdef;
 		this.initdef = initdef;
 		this.recordType = recordType;
+		this.annotations = annotations;
 	}
 
 	@Override

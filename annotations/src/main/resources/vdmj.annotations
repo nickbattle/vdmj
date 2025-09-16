@@ -10,3 +10,4 @@ annotations.ast.ASTTraceAnnotation
 annotations.ast.ASTWarningAnnotation
 annotations.ast.ASTDocLinkAnnotation
 annotations.ast.ASTTypeParamAnnotation
+annotations.ast.ASTSetPropertyAnnotation

@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStateInitExpression;
@@ -68,7 +69,8 @@ public class TCStateDefinition extends TCDefinition
 	public boolean canBeExecuted = true;
 	public TCTypeList unresolved = new TCTypeList();
 
-	public TCStateDefinition(TCNameToken name, TCFieldList fields, TCPattern invPattern,
+	public TCStateDefinition(TCAnnotationList annotations,
+		TCNameToken name, TCFieldList fields, TCPattern invPattern,
 		TCExpression invExpression, TCPattern initPattern, TCExpression initExpression)
 	{
 		super(Pass.TYPES, name.getLocation(), name, NameScope.STATE);
@@ -78,6 +80,7 @@ public class TCStateDefinition extends TCDefinition
 		this.invExpression = invExpression;
 		this.initPattern = initPattern;
 		this.initExpression = initExpression;
+		this.annotations = annotations;
 
 		statedefs = new TCDefinitionList();
 
