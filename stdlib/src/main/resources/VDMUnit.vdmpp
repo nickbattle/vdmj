@@ -383,7 +383,7 @@ operations
   public addFailure: Test * AssertionFailedError ==> ()
   addFailure (-, -) == is subclass responsibility; 
 
-  public addError: Test * Throwable ==> ()
+  public addError: Test * Error ==> ()
   addError (-, -) == is subclass responsibility;
   
   public startTest: Test ==> ()
@@ -446,7 +446,7 @@ operations
       for all listener in set fListeners do
         listener.addFailure(ptst, pafe) );
   
-  public addError: Test * Throwable ==> ()
+  public addError: Test * Error ==> ()
   addError (ptst, perr) ==
     ( -- add the error to the list of exceptions caught so far
       fErrors := fErrors ^ [mk_InternalError(ptst.getName(), perr)];
