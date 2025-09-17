@@ -864,7 +864,7 @@ public class QuickCheck
 	{
 		infof("PO #%d, %s", po.number, po.status.toString().toUpperCase());
 		
-		if (po.qualifier != null)
+		if (po.qualifier != null && !nominal)
 		{
 			infof(" %s", po.qualifier);
 		}
