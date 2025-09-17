@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -60,7 +61,8 @@ public class INStateDefinition extends INDefinition
 	private TCRecordType recordType;
 	private State moduleState = null;
 
-	public INStateDefinition(TCNameToken name, TCFieldList fields,
+	public INStateDefinition(INAnnotationList annotations,
+		TCNameToken name, TCFieldList fields,
 		INPattern invPattern, INExpression invExpression,
 		INPattern initPattern, INExpression initExpression,
 		INExplicitFunctionDefinition invdef, INExplicitFunctionDefinition initdef,
@@ -76,6 +78,7 @@ public class INStateDefinition extends INDefinition
 		this.invdef = invdef;
 		this.initdef = initdef;
 		this.canBeExecuted = canBeExecuted;
+		this.annotations = annotations;
 
 		statedefs = new INDefinitionList();
 

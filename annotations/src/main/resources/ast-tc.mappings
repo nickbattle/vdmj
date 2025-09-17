@@ -17,3 +17,4 @@ map ASTDocLinkAnnotation{name, args} to TCDocLinkAnnotation(name, args);
 map ASTTypeParamAnnotation{name, qcParam, qcType} to TCTypeParamAnnotation(name, qcParam, qcType);
 map ASTTypeBindAnnotation{name, typebind, expression} to TCTypeBindAnnotation(name, typebind, expression);
 map ASTMaximalTypesAnnotation{name, args} to TCMaximalTypesAnnotation(name, args);
+map ASTSetPropertyAnnotation{name, args} to TCSetPropertyAnnotation(name, args);

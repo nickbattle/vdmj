@@ -1104,6 +1104,7 @@ public class DefinitionReader extends SyntaxReader
 	{
 		LexCommentList comments = getComments();
 		ASTAnnotationList annotations = readAnnotations(comments);
+		annotations.astBefore(this);
 
 		LexIdentifierToken name = readIdToken("Expecting identifier after 'state' definition");
 		checkFor(Token.OF, 2097, "Expecting 'of' after state name");
@@ -1147,6 +1148,8 @@ public class DefinitionReader extends SyntaxReader
 		checkFor(Token.END, 2100, "Expecting 'end' after state definition");
 		ASTStateDefinition def = new ASTStateDefinition(idToName(name), fieldList,
 			invPattern, invExpression, initPattern, initExpression);
+
+		annotations.astAfter(this, def);
 		def.setAnnotations(annotations);
 		def.setComments(comments);
 		return def;

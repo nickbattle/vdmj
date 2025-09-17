@@ -31,7 +31,7 @@ map TCMutexSyncDefinition{annotations, location, operations} to INMutexSyncDefin
 map TCNamedTraceDefinition{annotations, location, name, terms, classDefinition} to INNamedTraceDefinition(annotations, location, name, terms, classDefinition);
 map TCPerSyncDefinition{annotations, location, opname, guard} to INPerSyncDefinition(annotations, location, opname, guard);
 map TCRenamedDefinition{name, def} to INRenamedDefinition(name, def);
-map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted} to INStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted);
+map TCStateDefinition{annotations, name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted} to INStateDefinition(annotations, name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted);
 map TCSystemDefinition{annotations, name, classtype, definitions} to INSystemDefinition(annotations, name, classtype, definitions);
 map TCThreadDefinition{statement, operationDef} to INThreadDefinition(statement, operationDef);
 map TCTypeDefinition{annotations, accessSpecifier, name, type, invPattern, invExpression, invdef, eqdef, orddef, mindef, maxdef} to INTypeDefinition(annotations, accessSpecifier, name, type, invPattern, invExpression, invdef, eqdef, orddef, mindef, maxdef);

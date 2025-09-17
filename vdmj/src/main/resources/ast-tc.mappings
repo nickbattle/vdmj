@@ -30,7 +30,7 @@ map ASTMutexSyncDefinition{annotations, location, operations, comments} to TCMut
 map ASTNamedTraceDefinition{annotations, location, name, terms, comments} to TCNamedTraceDefinition(annotations, location, name, terms) set comments;
 map ASTPerSyncDefinition{annotations, location, opname, guard, comments} to TCPerSyncDefinition(annotations, location, opname, guard) set comments;
 map ASTRenamedDefinition{name, def, comments} to TCRenamedDefinition(name, def) set comments;
-map ASTStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, comments} to TCStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression) set comments;
+map ASTStateDefinition{annotations, name, fields, invPattern, invExpression, initPattern, initExpression, comments} to TCStateDefinition(annotations, name, fields, invPattern, invExpression, initPattern, initExpression) set comments;
 map ASTSystemDefinition{annotations, name, definitions, comments} to TCSystemDefinition(annotations, name, definitions) set comments;
 map ASTThreadDefinition{statement, comments} to TCThreadDefinition(statement) set comments;
 map ASTTypeDefinition{annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression, comments} to TCTypeDefinition(annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression) set comments;
