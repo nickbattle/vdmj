@@ -73,7 +73,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	 * instance for every use (or only re-use with care!). This is tested and modified in the
 	 * NamedType and RecordType entries.
 	 */
-	protected TCTypeSet done = new TCTypeSet();
+	protected TCTypeSet active = new TCTypeSet();
 
 	@Override
 	public Long caseType(TCType type, Context ctxt)
@@ -126,13 +126,15 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseNamedType(TCNamedType type, Context ctxt)
 	{
-		if (done.has(type))
+		if (active.contains(type))
 		{
-			return 1L;	// Not zero
+			infiniteType(type, ctxt);
 		}
 
-		done.add(type);
-		return type.type.apply(this, ctxt);
+		active.add(type);
+		Long size = type.type.apply(this, ctxt);
+		active.remove(type);
+		return size;
 	}
 
 	@Override
@@ -175,12 +177,12 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseRecordType(TCRecordType type, Context ctxt)
 	{
-		if (done.has(type))
+		if (active.contains(type))
 		{
-			return 1L;	// Not zero
+			infiniteType(type, ctxt);
 		}
 
-		done.add(type);
+		active.add(type);
 		TCTypeList fieldtypes = new TCTypeList();
 
 		for (TCField f: type.fields)
@@ -188,7 +190,9 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 			fieldtypes.add(f.type);
 		}
 
-		return ofTypeList(fieldtypes, ctxt);
+		long size = ofTypeList(fieldtypes, ctxt);
+		active.remove(type);
+		return size;
 	}
 
 	@Override

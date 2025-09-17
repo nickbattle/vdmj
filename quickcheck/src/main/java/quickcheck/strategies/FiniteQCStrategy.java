@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
@@ -118,6 +119,14 @@ public class FiniteQCStrategy extends QCStrategy
 			{
 				try
 				{
+					TCType btype = bind.getType(ctxt);
+					
+					if (btype.isInfinite())
+					{
+			   			verbose("Type is recursively infinite\n");
+			   			return new StrategyResults();	// Too big
+					}
+
 					long size = bind.getType(ctxt).apply(new INTypeSizeVisitor(), ctxt);
 					product = product * size;	// cumulative for each bind
 					verbose("Size of %s type is %s\n", bind, product);
