@@ -96,30 +96,36 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 			{
 				Field field = pclass.getField(fname);
 
-				if (field.getType().equals(int.class) &&
-					fvalue instanceof ASTIntegerLiteralExpression)
+				if (field.getType().equals(int.class))
 				{
-					ASTIntegerLiteralExpression exp = (ASTIntegerLiteralExpression)fvalue;
-					field.set(null, exp.value.value);
+					if (fvalue instanceof ASTIntegerLiteralExpression)
+					{
+						ASTIntegerLiteralExpression exp = (ASTIntegerLiteralExpression)fvalue;
+						field.set(null, exp.value.value);
+					}
 				}
-				else if (field.getType().equals(boolean.class) &&
-					fvalue instanceof ASTBooleanLiteralExpression)
+				else if (field.getType().equals(boolean.class))
 				{
-					ASTBooleanLiteralExpression exp = (ASTBooleanLiteralExpression)fvalue;
-					field.set(null, exp.value.value);
+					if (fvalue instanceof ASTBooleanLiteralExpression)
+					{
+						ASTBooleanLiteralExpression exp = (ASTBooleanLiteralExpression)fvalue;
+						field.set(null, exp.value.value);
+					}
 				}
-				else if (field.getType().equals(String.class) &&
-					fvalue instanceof ASTStringLiteralExpression)
+				else if (field.getType().equals(String.class))
 				{
-					ASTStringLiteralExpression exp = (ASTStringLiteralExpression)fvalue;
-					field.set(null, exp.value.value);
+					if (fvalue instanceof ASTStringLiteralExpression)
+					{
+						ASTStringLiteralExpression exp = (ASTStringLiteralExpression)fvalue;
+						field.set(null, exp.value.value);
+					}
 				}
 
-				// else ignore
+				// else ignore - TC will report unknown type
 			}
 			catch (Exception e)
 			{
-				// Ignore this - TC may report more
+				// Ignore this - TC will report no such field
 			}
 		}
 	}

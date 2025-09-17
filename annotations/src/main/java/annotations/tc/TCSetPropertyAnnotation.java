@@ -85,15 +85,15 @@ public class TCSetPropertyAnnotation extends TCAnnotation
 		if (args.size() != 2 ||
 			!(args.get(0) instanceof TCStringLiteralExpression))
 		{
-			name.report(7500, "Expecting @setProperty(\"vdmj.<area>.<name>\", <value>)");
+			name.report(7500, "Expecting @SetProperty(\"vdmj.<area>.<name>\", <value>)");
 		}
 		else
 		{
 			Class<Properties> pclass = Properties.class;
 			
 			// Names are all "vdmj.<area>.some_name" for field <area>_some_name.
-			TCStringLiteralExpression name = (TCStringLiteralExpression)args.get(0);
-			String fname = name.value.value.replace("vdmj.", "");
+			TCStringLiteralExpression sname = (TCStringLiteralExpression)args.get(0);
+			String fname = sname.value.value.replace("vdmj.", "");
 			fname = fname.replace(".", "_");
 
 			TCExpression fvalue = args.get(1);
@@ -102,29 +102,35 @@ public class TCSetPropertyAnnotation extends TCAnnotation
 			{
 				Field field = pclass.getField(fname);
 
-				if (field.getType().equals(int.class) &&
-					!(fvalue instanceof TCIntegerLiteralExpression))
+				if (field.getType().equals(int.class))
 				{
-					name.report(7501, "@setProperty(" + name + ", value) expects an integer value");
+					if (!(fvalue instanceof TCIntegerLiteralExpression))
+					{
+						fvalue.report(7501, "@SetProperty(" + sname + ", value) expects an integer constant");
+					}
 				}
-				else if (field.getType().equals(boolean.class) &&
-					!(fvalue instanceof TCBooleanLiteralExpression))
+				else if (field.getType().equals(boolean.class))
 				{
-					name.report(7502, "@setProperty(" + name + ", value) expects a boolean value");
+					if (!(fvalue instanceof TCBooleanLiteralExpression))
+					{
+						fvalue.report(7502, "@SetProperty(" + sname + ", value) expects a boolean constant");
+					}
 				}
-				else if (field.getType().equals(String.class) &&
-					!(fvalue instanceof TCStringLiteralExpression))
+				else if (field.getType().equals(String.class))
 				{
-					name.report(7503, "@setProperty(" + name + ", value) expects a string value");
+					if (!(fvalue instanceof TCStringLiteralExpression))
+					{
+						fvalue.report(7503, "@SetProperty(" + sname + ", value) expects a string constant");
+					}
 				}
 				else
 				{
-					name.report(7504, "@setProperty unexpected field type: " + field.getType());
+					name.report(7504, "@SetProperty unexpected field type: " + field.getType());
 				}
 			}
 			catch (Exception e)
 			{
-				name.report(7505, "@setProperty throws " + e);
+				sname.report(7505, "@SetProperty throws " + e);
 			}
 		}
 	}
