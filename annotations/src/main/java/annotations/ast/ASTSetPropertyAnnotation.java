@@ -104,7 +104,7 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					if (fvalue instanceof ASTIntegerLiteralExpression)
 					{
 						ASTIntegerLiteralExpression exp = (ASTIntegerLiteralExpression)fvalue;
-						field.set(null, exp.value.value);
+						field.set(null, (int)exp.value.value);
 						System.setProperty(sname.value.value, exp.toString());
 					}
 					else
@@ -122,7 +122,7 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					}
 					else
 					{
-						reader.report(7500, "Expecting boolean", fvalue.location);
+						reader.report(7501, "Expecting boolean", fvalue.location);
 					}
 				}
 				else if (field.getType().equals(String.class))
@@ -135,26 +135,26 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					}
 					else
 					{
-						reader.report(7500, "Expecting String", fvalue.location);
+						reader.report(7502, "Expecting String", fvalue.location);
 					}
 				}
 				else
 				{
-					reader.report(7500, "Unknown field type " + field.getType(), name.location);
+					reader.report(7503, "Unknown field type " + field.getType(), name.location);
 				}
 			}
 			catch (NoSuchFieldException e)
 			{
-				reader.report(7500, "Unknown property " + sname, sname.location);
+				reader.report(7504, "Unknown VDMJ property " + sname, sname.location);
 			}
 			catch (Exception e)
 			{
-				reader.report(7500, "@SetProperty throws " + e, name.location);
+				reader.report(7505, "@SetProperty throws " + e, name.location);
 			}
 		}
 		else
 		{
-			reader.report(7500, "Expecting @SetProperty(\"vdmj.<area>.<name>\", <value>)", name.location);
+			reader.report(7506, "Expecting @SetProperty(\"vdmj.<area>.<name>\", <value>)", name.location);
 		}
 	}
 }
