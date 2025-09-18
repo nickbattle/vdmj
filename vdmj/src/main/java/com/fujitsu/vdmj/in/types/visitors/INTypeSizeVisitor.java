@@ -141,7 +141,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 		}
 
 		active.add(type);
-		Long size = type.type.apply(this, ctxt);
+		BigInteger size = type.type.apply(this, ctxt);
 		active.remove(type);
 		return size;
 	}
@@ -199,7 +199,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 			fieldtypes.add(f.type);
 		}
 
-		long size = ofTypeList(fieldtypes, ctxt);
+		BigInteger size = ofTypeList(fieldtypes, ctxt);
 		active.remove(type);
 		return size;
 	}

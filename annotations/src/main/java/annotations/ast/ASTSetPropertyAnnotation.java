@@ -104,7 +104,7 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					if (fvalue instanceof ASTIntegerLiteralExpression)
 					{
 						ASTIntegerLiteralExpression exp = (ASTIntegerLiteralExpression)fvalue;
-						field.set(null, (int)exp.value.value);
+						field.set(null, (int)exp.value.value.intValue());
 						System.setProperty(sname.value.value, exp.toString());
 					}
 					else
