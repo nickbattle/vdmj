@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.util.Utils;
@@ -35,9 +36,10 @@ public class OperationPreConditionObligation extends ProofObligation
 {
 	public static final String UNKNOWN = "???";		// Use pre_(root, args) form
 
-	private OperationPreConditionObligation(POExpression root, POExpressionList args, String prename, POContextStack ctxt)
+	private OperationPreConditionObligation(LexLocation location,
+		POExpression root, POExpressionList args, String prename, POContextStack ctxt)
 	{
-		super(root.location, POType.OP_PRE_CONDITION, ctxt);
+		super(location, POType.OP_PRE_CONDITION, ctxt);
 		StringBuilder sb = new StringBuilder();
 
 		if (prename == UNKNOWN)
@@ -68,13 +70,14 @@ public class OperationPreConditionObligation extends ProofObligation
 	 * Create an obligation for each of the alternative stacks contained in the ctxt.
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
-	public static List<ProofObligation> getAllPOs(POExpression root, POExpressionList args, String prename, POContextStack ctxt)
+	public static List<ProofObligation> getAllPOs(LexLocation location,
+		POExpression root, POExpressionList args, String prename, POContextStack ctxt)
 	{
 		Vector<ProofObligation> results = new Vector<ProofObligation>();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new OperationPreConditionObligation(root, args, prename, choice));
+			results.add(new OperationPreConditionObligation(location, root, args, prename, choice));
 		}
 		
 		return results;

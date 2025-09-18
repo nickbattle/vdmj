@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.StatementReader;
+import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public class ASTSetPropertyAnnotation extends ASTAnnotation
 {
@@ -51,34 +52,34 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 	@Override
 	public void astBefore(DefinitionReader reader)
 	{
-		before();
+		before(reader);
 	}
 
 	@Override
 	public void astBefore(StatementReader reader)
 	{
-		before();
+		before(reader);
 	}
 
 	@Override
 	public void astBefore(ExpressionReader reader)
 	{
-		before();
+		before(reader);
 	}
 
 	@Override
 	public void astBefore(ModuleReader reader)
 	{
-		before();
+		before(reader);
 	}
 
 	@Override
 	public void astBefore(ClassReader reader)
 	{
-		before();
+		before(reader);
 	}
 
-	private void before()	// @SetProperty("name", value)
+	private void before(SyntaxReader reader)	// @SetProperty("name", value)
 	{
 		if (args.size() == 2 &&
 			args.get(0) instanceof ASTStringLiteralExpression)
@@ -86,14 +87,16 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 			Class<Properties> pclass = Properties.class;
 			
 			// Names are all "vdmj.<area>.some_name" being <area>_some_name.
-			ASTStringLiteralExpression name = (ASTStringLiteralExpression)args.get(0);
-			String fname = name.value.value.replace("vdmj.", "");
+			ASTStringLiteralExpression sname = (ASTStringLiteralExpression)args.get(0);
+			String fname = sname.value.value.replace("vdmj.", "");
 			fname = fname.replace(".", "_");
 
 			ASTExpression fvalue = args.get(1);
 
 			try
 			{
+				// Set both the Properties field and the System properties, to simulate
+				// calling Properties.init for one field.
 				Field field = pclass.getField(fname);
 
 				if (field.getType().equals(int.class))
@@ -101,7 +104,12 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					if (fvalue instanceof ASTIntegerLiteralExpression)
 					{
 						ASTIntegerLiteralExpression exp = (ASTIntegerLiteralExpression)fvalue;
-						field.set(null, exp.value.value);
+						field.set(null, (int)exp.value.value);
+						System.setProperty(sname.value.value, exp.toString());
+					}
+					else
+					{
+						reader.report(7500, "Expecting integer", fvalue.location);
 					}
 				}
 				else if (field.getType().equals(boolean.class))
@@ -110,6 +118,11 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					{
 						ASTBooleanLiteralExpression exp = (ASTBooleanLiteralExpression)fvalue;
 						field.set(null, exp.value.value);
+						System.setProperty(sname.value.value, exp.toString());
+					}
+					else
+					{
+						reader.report(7501, "Expecting boolean", fvalue.location);
 					}
 				}
 				else if (field.getType().equals(String.class))
@@ -118,15 +131,30 @@ public class ASTSetPropertyAnnotation extends ASTAnnotation
 					{
 						ASTStringLiteralExpression exp = (ASTStringLiteralExpression)fvalue;
 						field.set(null, exp.value.value);
+						System.setProperty(sname.value.value, exp.value.value);
+					}
+					else
+					{
+						reader.report(7502, "Expecting String", fvalue.location);
 					}
 				}
-
-				// else ignore - TC will report unknown type
+				else
+				{
+					reader.report(7503, "Unknown field type " + field.getType(), name.location);
+				}
+			}
+			catch (NoSuchFieldException e)
+			{
+				reader.report(7504, "Unknown VDMJ property " + sname, sname.location);
 			}
 			catch (Exception e)
 			{
-				// Ignore this - TC will report no such field
+				reader.report(7505, "@SetProperty throws " + e, name.location);
 			}
+		}
+		else
+		{
+			reader.report(7506, "Expecting @SetProperty(\"vdmj.<area>.<name>\", <value>)", name.location);
 		}
 	}
 }

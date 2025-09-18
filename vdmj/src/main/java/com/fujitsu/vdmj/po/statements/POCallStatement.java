@@ -160,7 +160,7 @@ public class POCallStatement extends POStatement
 						preargs.add(state.getMkExpression());
 					}
 
-					obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+					obligations.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
 				}
 				else	// target is another module
 				{
@@ -174,7 +174,7 @@ public class POCallStatement extends POStatement
 					}
 					
 					ProofObligationList checks = new ProofObligationList();
-					checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+					checks.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
 
 					if (state != null)	// So pre_op is malformed, for external state
 					{

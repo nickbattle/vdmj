@@ -106,7 +106,7 @@ public class POCallObjectStatement extends POStatement
 		// Precondition calling is not defined for PP dialects...
 		ProofObligationList checks = new ProofObligationList();
 		POFieldExpression field = new POFieldExpression(designator.getExpression(), fieldname, classname);
-		checks.addAll(OperationPreConditionObligation.getAllPOs(field, args, FunctionApplyObligation.UNKNOWN, ctxt));
+		checks.addAll(OperationPreConditionObligation.getAllPOs(location, field, args, FunctionApplyObligation.UNKNOWN, ctxt));
 		checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 		obligations.addAll(checks);
 
