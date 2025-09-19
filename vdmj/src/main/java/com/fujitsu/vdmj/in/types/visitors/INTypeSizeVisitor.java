@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.types.visitors;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
@@ -98,14 +100,14 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	{
 		long f = type.from.apply(this, ctxt);
 		long t = type.to.apply(this, ctxt);
-		long r = 1;	// +1 for the empty map
+		BigInteger r = BigInteger.ONE;	// +1 for the empty map
 		
 		for (int z=1; z<=f; z++)
 		{
-			r = r + combs(f, z) * pow(t, z);
+			r = r.add(combs(f, z).multiply(pow(t, z)));
 		}
 		
-		return r;
+		return r.longValueExact();
 	}
 
 	@Override
@@ -113,14 +115,14 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	{
 		long f = type.from.apply(this, ctxt);
 		long t = type.to.apply(this, ctxt);
-		long r = 1;	// +1 for the empty map
+		BigInteger r = BigInteger.ONE;	// +1 for the empty map
 		
 		for (int z=1; z<=f && z<=t; z++)
 		{
-			r = r + combs(f, z) * perms(t, z);
+			r = r.add(combs(f, z).multiply(perms(t, z)));
 		}
 		
-		return r;
+		return r.longValueExact();
 	}
 	
 	@Override
@@ -205,7 +207,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 			n = n - 1;
 		}
 
-		return pow(2, n);
+		return pow(2, n).longValueExact();
 	}
 
 	@Override
@@ -328,35 +330,40 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	}
 
 	/**
-	 * Factorial, binary-coefficient, permutations and power methods for caseMapType
+	 * Factorial, binary-coefficient, permutations and power methods for caseMapType. These
+	 * are evaluated using BigIntegers and then converted to longValueExact by the caller.
 	 */
-	private long fac(long n, long k)	// = fac(n) / fac(k), for efficiency
+	private BigInteger fac(long n)
 	{
-		return (n == k) ? 1 : Math.multiplyExact(n, fac(n-1, k));
+		if (n == 0)
+		{
+			return BigInteger.ONE;
+		}
+		else
+		{
+			BigInteger N = new BigInteger(Long.toString(n));
+			return N.multiply(fac(n-1));
+		}
 	}
 
-	private long fac(long n)
+	private BigInteger combs(long n, long k)	// k <= n
 	{
-		return fac(n, 0);
+		return fac(n).divide(fac(k).multiply(fac(n - k)));
 	}
 
-	private long combs(long n, long k)	// k <= n
+	private BigInteger perms(long n, long k)	// k <= n
 	{
-		return fac(n, k) / fac(n - k);	// = fac(n) / (fac(k) * fac(n - k));
+		return fac(n).divide(fac(n - k));
 	}
 
-	private long perms(long n, long k)	// k <= n
+	private BigInteger pow(long n, long k)
 	{
-		return fac(n, n - k);			// = fac(n) / fac(n - k);
-	}
-
-	private long pow(long n, long k)
-	{
-		long r = 1;
+		BigInteger r = BigInteger.ONE;
+		BigInteger N = new BigInteger(Long.toString(n));
 		
 		for (int i=0; i<k; i++)
 		{
-			r = Math.multiplyExact(r, n);	// catch overflow
+			r = r.multiply(N);
 		}
 		
 		return r;
