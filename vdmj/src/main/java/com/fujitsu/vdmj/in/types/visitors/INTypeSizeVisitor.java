@@ -337,7 +337,8 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	}
 
 	/**
-	 * Factorial, binary-coefficient, permutations and power methods for caseMapType
+	 * Factorial, binary-coefficient, permutations and power methods for caseMapType. These
+	 * are evaluated using BigIntegers.
 	 */
 	private BigInteger fac(BigInteger n)
 	{
@@ -394,50 +395,4 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 
 		return n;
 	}
-	
-	// For testing
-	public static void main(String[] args) throws IOException
-	{
-		INTypeSizeVisitor visitor = new INTypeSizeVisitor();
-		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("> ");
-		String line = br.readLine();
-		
-		while (line != null)
-		{
-			args = line.trim().split("\\s+");
-			
-			switch (args[0])
-			{
-				case "fac":
-					System.out.println(visitor.fac(new BigInteger(args[1])));
-					break;
-					
-				case "pow":
-					System.out.println(visitor.pow(new BigInteger(args[1]), new BigInteger(args[2])));
-					break;
-					
-				case "combs":
-					System.out.println(visitor.combs(new BigInteger(args[1]), new BigInteger(args[2])));
-					break;
-					
-				case "perms":
-					System.out.println(visitor.perms(new BigInteger(args[1]), new BigInteger(args[2])));
-					break;
-					
-				case "quit":
-				case "q":
-					System.exit(0);
-					
-				default:
-					System.out.println("<fac|pow|combs|perms> <int args>...");
-					System.out.println("or quit");
-			}
-			
-			System.out.print("> ");
-			line = br.readLine();
-		}
-	}
-	
 }
