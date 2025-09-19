@@ -330,19 +330,24 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	/**
 	 * Factorial, binary-coefficient, permutations and power methods for caseMapType
 	 */
+	private long fac(long n, long k)	// = fac(n) / fac(k), for efficiency
+	{
+		return (n == k) ? 1 : Math.multiplyExact(n, fac(n-1, k));
+	}
+
 	private long fac(long n)
 	{
-		return (n == 0) ? 1 : Math.multiplyExact(n, fac(n-1));
+		return fac(n, 0);
 	}
 
 	private long combs(long n, long k)	// k <= n
 	{
-		return fac(n) / (fac(k) * fac(n - k));
+		return fac(n, k) / fac(n - k);	// = fac(n) / (fac(k) * fac(n - k));
 	}
 
 	private long perms(long n, long k)	// k <= n
 	{
-		return fac(n) / fac(n - k);
+		return fac(n, n - k);			// = fac(n) / fac(n - k);
 	}
 
 	private long pow(long n, long k)
@@ -376,5 +381,14 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 		}
 
 		return n;
+	}
+
+	public static void main(String[] args)
+	{
+		long a = 6;
+		long b = 3;
+		INTypeSizeVisitor obj = new INTypeSizeVisitor();
+
+		System.out.println("f(a, b) = " + obj.perms(a, b));
 	}
 }
