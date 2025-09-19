@@ -28,13 +28,17 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleExecTimer;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 
 import dap.AsyncExecutor;
 import dap.DAPRequest;
@@ -43,7 +47,9 @@ import json.JSONObject;
 import lsp.LSPServer;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.StrategyResults;
+import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.MessageHub;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
@@ -98,6 +104,10 @@ public class QuickCheckExecutor extends AsyncExecutor
 		
 		if (qc.initStrategies())
 		{
+			MessageHub.getInstance().clearPluginMessages(pog);
+			pog.clearLenses();
+			List<VDMMessage> messages = new Vector<VDMMessage>();
+
 			for (ProofObligation po: chosen)
 			{
 				long before = System.currentTimeMillis();
@@ -118,6 +128,8 @@ public class QuickCheckExecutor extends AsyncExecutor
 						{
 							double duration = (double)(System.currentTimeMillis() - before)/1000;
 							qc.printQuickCheckResult(po, duration, nominal);
+							addWarnings(po, messages);
+							addCodeLenses(pog, po);
 						}
 					}
 					finally
@@ -139,9 +151,83 @@ public class QuickCheckExecutor extends AsyncExecutor
 			{
 				infoln("(Use 'qc .*' to check all POs)");
 			}
+
+			if (!cancelled)
+			{
+				RPCMessageList responses = new RPCMessageList();
+				MessageHub.getInstance().addPluginMessages(pog, messages);
+				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
+				responses.add(RPCRequest.create("workspace/codeLens/refresh", null));
+				LSPServer lspserver = LSPServer.getInstance();
+				
+				for (JSONObject message: responses)
+				{
+					lspserver.writeMessage(message);
+				}
+			}
 		}
 		
 		answer = qc.hasErrors() ? "Failed" : cancelled ? "Cancelled" : "OK";
+	}
+
+	private void addCodeLenses(POPlugin pog, ProofObligation po)
+	{
+		JSONObject launch = pog.getCexLaunch(po);
+
+		if (po instanceof RecursiveObligation)
+		{
+			RecursiveObligation rec = (RecursiveObligation)po;
+
+			if (rec.mutuallyRecursive)
+			{
+				// Recursive function obligations check the measure_f value for each
+				// (mutually) recursive call. So a launch would have to make two comparisons
+				// of measure values. Until we can figure out how to do this, we don't
+				// send a launch string, but set a message to display instead.
+
+				launch = null;
+			}
+		}
+
+		if (launch != null)
+		{
+			pog.addCodeLens(po);
+		}
+	}
+
+	private void addWarnings(ProofObligation po, List<VDMMessage> messages)
+	{
+		if (po.counterexample != null)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("PO #");
+			sb.append(po.number);
+			sb.append(" Counterexample: ");
+			sb.append(po.counterexample.toStringLine());
+			messages.add(new VDMWarning(9000, sb.toString(), po.location));
+		}
+
+		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
+		{
+			if (po.message != null)		// Add failed messages/qualifiers as a warning too
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" ");
+				sb.append(po.message);
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+			}
+			else if (po.qualifier != null)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" ");
+				sb.append(po.qualifier);
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+			}
+		}
 	}
 
 	@Override
