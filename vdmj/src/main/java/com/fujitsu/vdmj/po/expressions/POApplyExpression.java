@@ -149,7 +149,7 @@ public class POApplyExpression extends POExpression
 				}
 			}
 			
-			if (type.isOperation(location))		// PP or RT. SL's op calls are eliminated to vars
+			if (type.isOperation(location))		// op calls should have been eliminated to op$ vars
 			{
 				// Preconditions were handled above in getFuncOpObligations.
 
