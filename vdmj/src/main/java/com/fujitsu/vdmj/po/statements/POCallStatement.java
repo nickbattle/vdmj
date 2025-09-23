@@ -100,7 +100,7 @@ public class POCallStatement extends POStatement
 			// Precondition calling is not defined for PP dialects...
 			ProofObligationList checks = new ProofObligationList();
 			POExpression root = new POVariableExpression(opdef.name, opdef);
-			checks.addAll(OperationPreConditionObligation.getAllPOs(root, args, FunctionApplyObligation.UNKNOWN, ctxt));
+			checks.addAll(OperationPreConditionObligation.getAllPOs(location, root, args, FunctionApplyObligation.UNKNOWN, ctxt));
 			checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 			obligations.addAll(checks);
 		}
@@ -166,7 +166,7 @@ public class POCallStatement extends POStatement
 						preargs.add(state.getMkExpression());
 					}
 
-					obligations.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+					obligations.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
 				}
 				else	// target is another module
 				{
@@ -180,7 +180,7 @@ public class POCallStatement extends POStatement
 					}
 					
 					ProofObligationList checks = new ProofObligationList();
-					checks.addAll(OperationPreConditionObligation.getAllPOs(root, preargs, prename, ctxt));
+					checks.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
 
 					if (state != null)	// So pre_op is malformed, for external state
 					{
