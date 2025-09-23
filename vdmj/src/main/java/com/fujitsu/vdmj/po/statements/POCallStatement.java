@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
@@ -94,16 +95,21 @@ public class POCallStatement extends POStatement
 			i++;
 		}
 
-		obligations.addAll(checkPrecondition(location, opdef, args, ctxt));
-
-		if (Settings.dialect == Dialect.VDM_SL)
+		if (Settings.dialect != Dialect.VDM_SL)
 		{
-			ctxt.makeOperationCall(location, opdef, args, null, getStmttype().isReturn(), pogState, env);
+			// Precondition calling is not defined for PP dialects...
+			ProofObligationList checks = new ProofObligationList();
+			POExpression root = new POVariableExpression(opdef.name, opdef);
+			checks.addAll(OperationPreConditionObligation.getAllPOs(location, root, args, FunctionApplyObligation.UNKNOWN, ctxt));
+			checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+			obligations.addAll(checks);
 		}
 		else
 		{
-			ctxt.makeOperationCall(location, pogState, opdef, getStmttype().isReturn());
+			obligations.addAll(checkPrecondition(location, opdef, args, ctxt));
 		}
+
+		ctxt.makeOperationCall(location, opdef, args, null, getStmttype().isReturn(), pogState, env);
 		
 		TCType rtype = pogState.getResultType();
 		

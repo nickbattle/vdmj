@@ -90,7 +90,8 @@ public class POCallObjectStatement extends POStatement
 
 		for (POExpression exp: args)
 		{
-			obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+			POExpression extracted = extractOpCalls(exp, obligations, pogState, ctxt, env);
+			obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
 
 			TCType pt = paramTypes.get(i);
 			TCType at = exp.getExptype();
@@ -110,7 +111,7 @@ public class POCallObjectStatement extends POStatement
 		checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 		obligations.addAll(checks);
 
-		ctxt.makeOperationCall(location, pogState, fdef, getStmttype().isReturn());
+		ctxt.makeOperationCall(location, fdef, args, null, getStmttype().isReturn(), pogState, env);
 		
 		TCType rtype = pogState.getResultType();
 		

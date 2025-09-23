@@ -153,16 +153,14 @@ public class POApplyExpression extends POExpression
 				}
 			}
 			
-			if (type.isOperation(location))		// PP or RT. SL's op calls are eliminated to vars
+			/**
+			 * Expression op() calls should have been eliminated to op$ vars, but in a few cases we
+			 * can't do that, such as within {op(x) | x in ...} "loops". So we mark the state as
+			 * ambiguous, which may result in an unchecked PO. Note that preconditions were handled
+			 * above in getFuncOpObligations.
+			 */
+			if (type.isOperation(location))
 			{
-				// Preconditions were handled above in getFuncOpObligations.
-
-				// Create an ambiguous context for the operation call. Note that this is not
-				// included in the getFuncOpObligations method below, which is called separately.
-				ctxt.makeOperationCall(location, pogState, opdef, false);
-				
-				// Additionally, op returns are generally ambiguous, so that if this expression
-				// is being used to define something in a "let", we can mark that as ambiguous too.
 				pogState.setAmbiguous(true);
 			}
 		}

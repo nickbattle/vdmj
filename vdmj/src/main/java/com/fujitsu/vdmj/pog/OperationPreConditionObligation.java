@@ -36,10 +36,9 @@ public class OperationPreConditionObligation extends ProofObligation
 {
 	public static final String UNKNOWN = "???";		// Use pre_(root, args) form
 
-	private OperationPreConditionObligation(LexLocation location,
-		POExpression root, POExpressionList args, String prename, POContextStack ctxt)
+	private OperationPreConditionObligation(LexLocation from, POExpression root, POExpressionList args, String prename, POContextStack ctxt)
 	{
-		super(location, POType.OP_PRE_CONDITION, ctxt);
+		super(from, POType.OP_PRE_CONDITION, ctxt);
 		StringBuilder sb = new StringBuilder();
 
 		if (prename == UNKNOWN)
@@ -70,14 +69,13 @@ public class OperationPreConditionObligation extends ProofObligation
 	 * Create an obligation for each of the alternative stacks contained in the ctxt.
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
-	public static List<ProofObligation> getAllPOs(LexLocation location,
-		POExpression root, POExpressionList args, String prename, POContextStack ctxt)
+	public static List<ProofObligation> getAllPOs(LexLocation from, POExpression root, POExpressionList args, String prename, POContextStack ctxt)
 	{
 		Vector<ProofObligation> results = new Vector<ProofObligation>();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new OperationPreConditionObligation(location, root, args, prename, choice));
+			results.add(new OperationPreConditionObligation(from, root, args, prename, choice));
 		}
 		
 		return results;

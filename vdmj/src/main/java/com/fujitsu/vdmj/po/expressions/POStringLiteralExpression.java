@@ -41,7 +41,35 @@ public class POStringLiteralExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return value.toString();	// Includes quotes
+		return "\"" + quote(value.value) + "\"";
+	}
+		
+	private String quote(String value)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i=0; i<value.length(); i++)
+		{
+			char c = value.charAt(i);
+			
+			switch (c)
+			{
+    		    case '\r':	sb.append("\\r"); break;
+    		    case '\n':	sb.append("\\n"); break;
+    		    case '\t':	sb.append("\\t"); break;
+    		    case '\f':	sb.append("\\f"); break;
+    		    case '\b':	sb.append("\\b"); break;
+    		    case '\u000B':	sb.append("\\v"); break;
+
+    		    case '\"':	sb.append("\\\""); break;
+    		    case '\\':	sb.append("\\\\"); break;
+
+    		    default:
+    		    	sb.append(c);
+			}
+		}
+
+		return sb.toString();
 	}
 
 	@Override
