@@ -41,8 +41,6 @@ public class LexCharacterToken extends LexToken
 	@Override
 	public String toString()
 	{
-		return super.toString() + " value " +
-			(Character.isISOControl(unicode) ?
-				Integer.toString(unicode) + " decimal" : "[" + unicode + "]");
+		return Character.toString(unicode);
 	}
 }

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
@@ -49,7 +50,7 @@ public class INCharacterPattern extends INPattern
 	@Override
 	public String toString()
 	{
-		return value.toString();
+		return Utils.quoteChar(value.unicode);
 	}
 
 	@Override

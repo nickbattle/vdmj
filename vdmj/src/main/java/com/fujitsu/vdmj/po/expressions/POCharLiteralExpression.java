@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
-import com.fujitsu.vdmj.values.CharacterValue;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POCharLiteralExpression extends POExpression
 {
@@ -42,7 +42,7 @@ public class POCharLiteralExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return new CharacterValue(value.unicode).toString();	// eg. \0123 or 'a'
+		return Utils.quoteChar(value.unicode);	// With quotes
 	}
 
 	@Override

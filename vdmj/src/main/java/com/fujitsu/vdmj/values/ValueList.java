@@ -73,74 +73,7 @@ public class ValueList extends Vector<Value>
 	@Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder();
-
-		if (isEmpty())
-		{
-			sb.append("[]");
-		}
-		else
-		{
-			sb.append("\"");
-
-    		for (Value v: this)
-    		{
-    			v = v.deref();
-
-    			if (!(v instanceof CharacterValue))
-    			{
-    				return Utils.listToString("[", this, ", ", "]");
-    			}
-
-    			CharacterValue ch = (CharacterValue)v;
-
-    			switch (ch.unicode)
-    			{
-//    				case '\n':
-//    					sb.append("\\n");
-//    					break;
-
-//    				case '\t':
-//    					sb.append("\\t");
-//    					break;
-
-//    				case '\'':
-//    					sb.append("\\\'");
-//    					break;
-
-        		    case '\r':
-    					sb.append("\\r");
-    					break;
-
-        		    case '\f':
-    					sb.append("\\f");
-    					break;
-
-        		    case '\033':
-    					sb.append("\\e");
-    					break;
-
-        		    case '\007':
-    					sb.append("\\a");
-    					break;
-
-    				case '\"':
-    					sb.append("\\\"");
-    					break;
-
-    				case '\\':
-    					sb.append("\\\\");
-    					break;
-
-     				default:
-    					sb.append(ch.unicode);
-    			}
-    		}
-
-    		sb.append("\"");
-		}
-
-		return sb.toString();
+		return Utils.listToString("[", this, ", ", "]");
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.util.Utils;
 
 public class TCStringLiteralExpression extends TCExpression
 {
@@ -48,7 +49,7 @@ public class TCStringLiteralExpression extends TCExpression
 	@Override
 	public String toString()
 	{
-		return value.toString();	// Includes quotes
+		return Utils.quoteString(value.toString());	// Includes quotes
 	}
 
 	@Override

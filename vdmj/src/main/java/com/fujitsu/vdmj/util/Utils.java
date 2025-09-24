@@ -91,6 +91,51 @@ public class Utils
 		sb.append(")");
 		return sb.toString();
 	}
+
+	/**
+	 * Give the VDM syntax that represents a given raw string.
+	 * @param value
+	 * @return VDM string syntax
+	 */			
+	public static String quoteString(String value)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("\"");
+		
+		for (int i=0; i<value.length(); i++)
+		{
+			sb.append(quote(value.charAt(i)));
+		}
+
+		sb.append("\"");
+		return sb.toString();
+	}
+
+	public static String quoteChar(char unicode)
+	{
+		return "\'" + quote(unicode) + "\'";
+	}
+
+	public static String quote(char c)
+	{
+		switch (c)
+		{
+			case '\r':	return "\\r"; 
+			case '\n':	return "\\n"; 
+			case '\t':	return "\\t"; 
+			case '\f':	return "\\f"; 
+
+   		    case '\033': return "\\e";
+   		    case '\007': return "\\a";
+
+			case '\"':	return "\\\""; 
+			case '\'':	return "\\\'"; 
+			case '\\':	return "\\\\"; 
+
+			default:	return String.valueOf(c);
+		}
+	}
+
 	
 	/**
 	 * Clean an expression has outer brackets. We have to check

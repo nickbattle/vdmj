@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -44,7 +45,7 @@ public class INStringLiteralExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return value.toString();	// Includes quotes
+		return Utils.quoteString(value.toString());	// Includes quotes
 	}
 
 	@Override

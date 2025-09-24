@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class SeqValue extends Value
@@ -76,7 +77,7 @@ public class SeqValue extends Value
 	@Override
 	public String stringValue(Context ctxt)
 	{
-		String s = values.toString();
+		String s = toString();
 
 		if (s.charAt(0) == '"')
 		{
@@ -157,10 +158,41 @@ public class SeqValue extends Value
 		return false;
 	}
 
+	/**
+	 * If the sequence is empty, it is shown as "[]", else we start to generate a sequence
+	 * as if it is a "String", quoting each character. If anything non-character appears in
+	 * the list, a "[]...]" list is produced.
+	 */
 	@Override
 	public String toString()
 	{
-		return values.toString();
+		StringBuilder sb = new StringBuilder();
+
+		if (values.isEmpty())
+		{
+			sb.append("[]");
+		}
+		else
+		{
+			sb.append("\"");
+
+    		for (Value v: values)
+    		{
+    			v = v.deref();
+
+    			if (!(v instanceof CharacterValue))
+    			{
+    				return Utils.listToString("[", values, ", ", "]");
+    			}
+
+    			CharacterValue ch = (CharacterValue)v;
+				sb.append(Utils.quote(ch.unicode));
+    		}
+
+    		sb.append("\"");
+		}
+
+		return sb.toString();
 	}
 
 	@Override
