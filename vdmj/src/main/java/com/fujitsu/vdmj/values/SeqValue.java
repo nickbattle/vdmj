@@ -74,19 +74,38 @@ public class SeqValue extends Value
 		return values;
 	}
 
+	/**
+	 * This produces a raw (Java) String of the contents, assuming it is a seq of char.
+	 * Note that it therefore contains no quoted characters, like "\n" or "\"", and the
+	 * result can be the empty string. If it's not a seq of char, the result is the
+	 * standard string for the ValueList, which is [...].
+	 */
 	@Override
 	public String stringValue(Context ctxt)
 	{
-		String s = toString();
+		StringBuilder sb = new StringBuilder();
 
-		if (s.charAt(0) == '"')
+		for (Value v: values)
 		{
-			return s.substring(1, s.length()-1);
+			v = v.deref();
+
+			if (!(v instanceof CharacterValue))
+			{
+				return values.toString();	// [...] format
+			}
+
+			CharacterValue ch = (CharacterValue)v;
+			sb.append(ch.unicode);			// Note: unquoted
 		}
 
-		return s;
+		return sb.toString();
 	}
 
+	/**
+	 * This formatter uses the ALTERNATE flag to give a more "raw" output. So
+	 * an empty sequence is a blank string, a "value" in quotes has the quotes
+	 * removed, and a [seq, of, values] has the outer brackets removed.
+	 */
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width, int precision)
 	{
@@ -161,7 +180,7 @@ public class SeqValue extends Value
 	/**
 	 * If the sequence is empty, it is shown as "[]", else we start to generate a sequence
 	 * as if it is a "String", quoting each character. If anything non-character appears in
-	 * the list, a "[]...]" list is produced.
+	 * the list, a "[...]" format string is produced.
 	 */
 	@Override
 	public String toString()

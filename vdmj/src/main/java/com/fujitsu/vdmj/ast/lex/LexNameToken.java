@@ -86,7 +86,7 @@ public class LexNameToken extends LexToken implements Comparable<LexNameToken>
 	@Override
 	public int hashCode()
 	{
-		return name.hashCode() + module.hashCode();
+		return name.hashCode() + module.hashCode() + (old ? 1 : 0);
 	}
 
 	public String getName()
