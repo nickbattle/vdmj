@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
 import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
+import com.fujitsu.vdmj.util.Utils;
 
 public class ASTCharacterPattern extends ASTPattern
 {
@@ -41,7 +42,7 @@ public class ASTCharacterPattern extends ASTPattern
 	@Override
 	public String toString()
 	{
-		return value.toString();
+		return Utils.quoteChar(value.unicode);
 	}
 
 	@Override

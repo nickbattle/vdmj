@@ -41,6 +41,6 @@ public class LexStringToken extends LexToken
 	@Override
 	public String toString()
 	{
-		return "\"" + value + "\"";
+		return value;
 	}
 }

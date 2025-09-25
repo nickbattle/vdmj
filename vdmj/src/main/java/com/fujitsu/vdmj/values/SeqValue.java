@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class SeqValue extends Value
@@ -73,19 +74,38 @@ public class SeqValue extends Value
 		return values;
 	}
 
+	/**
+	 * This produces a raw (Java) String of the contents, assuming it is a seq of char.
+	 * Note that it therefore contains no quoted characters, like "\n" or "\"", and the
+	 * result can be the empty string. If it's not a seq of char, the result is the
+	 * standard string for the ValueList, which is [...].
+	 */
 	@Override
 	public String stringValue(Context ctxt)
 	{
-		String s = values.toString();
+		StringBuilder sb = new StringBuilder();
 
-		if (s.charAt(0) == '"')
+		for (Value v: values)
 		{
-			return s.substring(1, s.length()-1);
+			v = v.deref();
+
+			if (!(v instanceof CharacterValue))
+			{
+				return values.toString();	// [...] format
+			}
+
+			CharacterValue ch = (CharacterValue)v;
+			sb.append(ch.unicode);			// Note: unquoted
 		}
 
-		return s;
+		return sb.toString();
 	}
 
+	/**
+	 * This formatter uses the ALTERNATE flag to give a more "raw" output. So
+	 * an empty sequence is a blank string, a "value" in quotes has the quotes
+	 * removed, and a [seq, of, values] has the outer brackets removed.
+	 */
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width, int precision)
 	{
@@ -157,10 +177,41 @@ public class SeqValue extends Value
 		return false;
 	}
 
+	/**
+	 * If the sequence is empty, it is shown as "[]", else we start to generate a sequence
+	 * as if it is a "String", quoting each character. If anything non-character appears in
+	 * the list, a "[...]" format string is produced.
+	 */
 	@Override
 	public String toString()
 	{
-		return values.toString();
+		StringBuilder sb = new StringBuilder();
+
+		if (values.isEmpty())
+		{
+			sb.append("[]");
+		}
+		else
+		{
+			sb.append("\"");
+
+    		for (Value v: values)
+    		{
+    			v = v.deref();
+
+    			if (!(v instanceof CharacterValue))
+    			{
+    				return Utils.listToString("[", values, ", ", "]");
+    			}
+
+    			CharacterValue ch = (CharacterValue)v;
+				sb.append(Utils.quote(ch.unicode));
+    		}
+
+    		sb.append("\"");
+		}
+
+		return sb.toString();
 	}
 
 	@Override

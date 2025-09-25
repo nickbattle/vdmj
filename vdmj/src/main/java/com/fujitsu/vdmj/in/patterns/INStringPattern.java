@@ -31,7 +31,7 @@ import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
-import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
@@ -49,7 +49,7 @@ public class INStringPattern extends INPattern
 	@Override
 	public String toString()
 	{
-		return value.toString();
+		return Utils.quoteString(value.toString());
 	}
 
 	@Override
@@ -62,24 +62,16 @@ public class INStringPattern extends INPattern
 	public List<NameValuePairList> getAllNamedValues(Value expval, Context ctxt) throws PatternMatchException
 	{
 		List<NameValuePairList> result = new Vector<NameValuePairList>();
-
-		try
+		String sval = expval.toString();		// "[]" if empty, quoted
+		
+		if (sval.equals("[]"))
 		{
-			String sval = expval.stringValue(ctxt);		// "[]" if empty
-			
-			if (sval.equals("[]"))
-			{
-				sval = "";
-			}
-			
-			if (!sval.equals(value.value))
-			{
-				patternFail(4122, "String pattern match failed");
-			}
+			sval = "";
 		}
-		catch (ValueException e)
+		
+		if (!sval.equals(Utils.quoteString(value.value)))
 		{
-			patternFail(e);
+			patternFail(4122, "String pattern match failed");
 		}
 
 		result.add(new NameValuePairList());

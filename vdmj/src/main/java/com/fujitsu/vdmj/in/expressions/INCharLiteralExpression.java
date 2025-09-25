@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -44,7 +45,7 @@ public class INCharLiteralExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return new CharacterValue(value.unicode).toString();	// eg. \0123 or 'a'
+		return Utils.quoteChar(value.unicode);	// With quotes
 	}
 
 	@Override

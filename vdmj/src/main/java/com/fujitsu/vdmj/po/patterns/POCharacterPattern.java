@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POCharacterPattern extends POPattern
 {
@@ -41,7 +42,7 @@ public class POCharacterPattern extends POPattern
 	@Override
 	public String toString()
 	{
-		return "'" + value.unicode + "'";
+		return Utils.quoteChar(value.unicode);
 	}
 
 	@Override

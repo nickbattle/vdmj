@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
+import com.fujitsu.vdmj.util.Utils;
 
 public class TCStringPattern extends TCPattern
 {
@@ -41,7 +42,7 @@ public class TCStringPattern extends TCPattern
 	@Override
 	public String toString()
 	{
-		return value.toString();
+		return Utils.quoteString(value.toString());
 	}
 
 	@Override

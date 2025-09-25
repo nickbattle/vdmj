@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.util.Utils;
 
 public class TCCharLiteralExpression extends TCExpression
 {
@@ -46,7 +47,7 @@ public class TCCharLiteralExpression extends TCExpression
 	@Override
 	public String toString()
 	{
-		return String.format("'%c'", value.unicode);
+		return Utils.quoteChar(value.unicode);	// With quotes
 	}
 
 	@Override

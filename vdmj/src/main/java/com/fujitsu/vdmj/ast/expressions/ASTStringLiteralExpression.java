@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.expressions;
 
 import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
+import com.fujitsu.vdmj.util.Utils;
 
 public class ASTStringLiteralExpression extends ASTExpression
 {
@@ -41,7 +42,7 @@ public class ASTStringLiteralExpression extends ASTExpression
 	@Override
 	public String toString()
 	{
-		return value.toString();	// Includes quotes
+		return Utils.quoteString(value.toString());
 	}
 
 	@Override

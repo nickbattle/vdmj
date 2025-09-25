@@ -67,6 +67,17 @@ public class CharacterValue extends Value
 		return false;
 	}
 
+	/**
+	 * This produces a raw (Java) String of the character. Note that this does
+	 * not include quoting, like "\n" or "\"". The result will always be a Java
+	 * String with one character.
+	 */
+	@Override
+	public String stringValue(Context ctxt) throws ValueException
+	{
+		return String.valueOf(unicode);
+	}
+
 	@Override
 	public String toString()
 	{

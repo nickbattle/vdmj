@@ -117,21 +117,6 @@ public class TCNameToken extends TCToken implements Comparable<TCNameToken>
 		{
 			return (parameters == null && lother.parameters == null);
 		}
-		
-//		if (parameters != null && lother.parameters != null)
-//		{
-//			if (!TypeComparator.compatible(parameters, lother.parameters))
-//			{
-//				return false;
-//			}
-//		}
-//		else if ((parameters != null && lother.parameters == null) ||
-//				 (parameters == null && lother.parameters != null))
-//		{
-//			return false;
-//		}
-//
-//		return matches(lother);
 	}
 	
 	@Override

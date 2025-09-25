@@ -75,6 +75,9 @@ abstract public class LexToken extends ASTNode
 		return this.type != ttype;
 	}
 
+	/**
+	 * The raw value of the token, so without quotes or backslashes etc.
+	 */
 	@Override
 	public String toString()
 	{
