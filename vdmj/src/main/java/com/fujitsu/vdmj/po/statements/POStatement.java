@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.PODesignatorOperationExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -260,6 +261,11 @@ public abstract class POStatement extends PONode
 		}
 		catch (POOperationExtractionException e)
 		{
+			if (e.ambiguous)
+			{
+				ctxt.push(new POAmbiguousContext(e.getMessage(), ctxt.getStateVariables(), e.node.location));
+			}
+
 			return definitions;		// Caller decides if this is ambiguous
 		}
 	}

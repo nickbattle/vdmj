@@ -25,14 +25,22 @@
 package com.fujitsu.vdmj.po.expressions.visitors;
 
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.expressions.PONewExpression;
 
 public class POOperationExtractionException extends UnsupportedOperationException
 {
 	public final PONode node;
+	public final boolean ambiguous;
 
 	public POOperationExtractionException(PONode node, String reason)
 	{
+		this(null, reason, false);
+	}
+
+	public POOperationExtractionException(PONewExpression node, String reason, boolean ambiguous)
+	{
 		super(reason);
 		this.node = node;
+		this.ambiguous = ambiguous;
 	}
 }
