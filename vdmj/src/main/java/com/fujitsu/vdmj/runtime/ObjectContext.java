@@ -146,6 +146,12 @@ public class ObjectContext extends RootContext
 			if (variables)
 			{
     			out.print(this.format("\t", this));
+
+				if (freeVariables != null && !freeVariables.isEmpty())
+				{
+					out.println("Free Variables:");
+					out.print(this.format("\t", freeVariables));
+				}
 			}
 
 			out.println("In object context of " + title + " " + location);

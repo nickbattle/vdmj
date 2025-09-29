@@ -135,6 +135,12 @@ public class ClassContext extends RootContext
 			if (variables)
 			{
     			out.print(this.format("\t", this));
+
+				if (freeVariables != null && !freeVariables.isEmpty())
+				{
+					out.println("Free Variables:");
+					out.print(this.format("\t", freeVariables));
+				}
 			}
 
 			out.println("In class context of " + title + " " + location);
