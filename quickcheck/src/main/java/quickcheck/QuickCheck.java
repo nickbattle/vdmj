@@ -80,8 +80,8 @@ import quickcheck.annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
-import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.ExpressionTypeBindOverrider;
+import quickcheck.visitors.FixedRangeCreator;
 
 public class QuickCheck
 {
@@ -582,6 +582,7 @@ public class QuickCheck
 			case 4006:	// Type <class> has no field <opname>
 			case 4034:	// Name 'opname(args)' not in scope
 			case 4132:	// Using undefined value
+			case 4177:	// Not in a SchedulableThread
 				return true;
 
 			default:
