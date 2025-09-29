@@ -109,7 +109,7 @@ public class SeqValue extends Value
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width, int precision)
 	{
-		String s = values.toString();
+		String s = toString();	// Either [1,2,3] or "Hello"
 
 		if ((flags & FormattableFlags.ALTERNATE) > 0)
 		{
