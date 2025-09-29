@@ -175,6 +175,11 @@ public abstract class POStatement extends PONode
 		}
 		catch (POOperationExtractionException e)
 		{
+			if (e.ambiguous)
+			{
+				ctxt.push(new POAmbiguousContext(e.getMessage(), ctxt.getStateVariables(), e.node.location));
+			}
+
 			return exp;		// Caller decides if this is ambiguous
 		}
 	}
@@ -214,6 +219,11 @@ public abstract class POStatement extends PONode
 		}
 		catch (POOperationExtractionException e)
 		{
+			if (e.ambiguous)
+			{
+				ctxt.push(new POAmbiguousContext(e.getMessage(), ctxt.getStateVariables(), e.node.location));
+			}
+
 			return designator;		// Caller decides if this is ambiguous
 		}
 	}
