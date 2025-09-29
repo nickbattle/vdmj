@@ -807,6 +807,20 @@ public class DAPDebugExecutor implements DebugExecutor
 			arguments.put(nvp.getKey(), nvp.getValue());
 		}
 		
+		if (!arguments.isEmpty())
+		{
+			int vref = nextVariablesReference.incrementAndGet();
+			variablesReferences.put(vref, arguments);
+			frame.scopes.add(new Scope(scope, vref));
+		}
+
+		if (c.freeVariables != null && !c.freeVariables.isEmpty())
+		{
+			int vref = nextVariablesReference.incrementAndGet();
+			variablesReferences.put(vref, c.freeVariables);
+			frame.scopes.add(new Scope("Free Variables", vref));
+		}
+
 		if (c instanceof StateContext)
 		{
 			StateContext s = (StateContext)c;
@@ -840,13 +854,6 @@ public class DAPDebugExecutor implements DebugExecutor
 				variablesReferences.put(vref, statics);
 				frame.scopes.add(new Scope("Statics", vref));
 			}
-		}
-
-		if (!arguments.isEmpty())
-		{
-			int vref = nextVariablesReference.incrementAndGet();
-			variablesReferences.put(vref, arguments);
-			frame.scopes.add(new Scope(scope, vref));
 		}
 
 		frame.title = c.title;	// Title comes from RootContext

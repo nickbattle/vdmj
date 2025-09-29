@@ -176,6 +176,12 @@ public class StateContext extends RootContext
 			{
     			out.print(this.format("\t", this));
 
+				if (freeVariables != null && !freeVariables.isEmpty())
+				{
+					out.println("Free Variables:");
+					out.print(this.format("\t", freeVariables));
+				}
+
     			if (stateCtxt != null)
     			{
     				out.println("\tState visible");

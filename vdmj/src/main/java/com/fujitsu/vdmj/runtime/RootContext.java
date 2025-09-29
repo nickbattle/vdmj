@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.values.ObjectValue;
  */
 public abstract class RootContext extends Context
 {
-	protected final Context freeVariables;
+	public final Context freeVariables;
 
 	public RootContext(
 		LexLocation location, String title, Context freeVariables, Context outer)
@@ -54,7 +54,7 @@ public abstract class RootContext extends Context
 			visible.putAll(freeVariables);
 		}
 
-		return visible;
+		return visible;		// Does not include global variables
 	}
 
 	@Override
