@@ -102,10 +102,10 @@ public class INExplicitOperationDefinition extends INDefinition
 		NameValuePairList nvl = new NameValuePairList();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null, null);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null, null);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
 
 		OperationValue op = new OperationValue(this, prefunc, postfunc, statedef);
 		nvl.add(new NameValuePair(name, op));

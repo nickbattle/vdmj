@@ -155,7 +155,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 			nvl.addAll(names);
 		}
 
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc, null);
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc);
 		nvl.add(new NameValuePair(name, func));
 
 		return nvl;
@@ -202,7 +202,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		}
 
 		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
-		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv, null);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv);
 
 		polyfuncs.put(actualTypes, rv);
 		return rv;
