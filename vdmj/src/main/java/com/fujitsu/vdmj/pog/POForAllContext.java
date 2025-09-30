@@ -135,7 +135,7 @@ public class POForAllContext extends POContext
 	{
 		this.bindings = new Vector<POMultipleBind>();
 		POPatternList plist = new POPatternList();
-		plist.add(state.getPattern(from));
+		plist.add(new POIdentifierPattern(state.getPatternName(from)));
 		bindings.add(new POMultipleTypeBind(plist, state.getType()));
 	}
 

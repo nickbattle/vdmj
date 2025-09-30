@@ -31,10 +31,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
-import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.po.patterns.POPatternList;
-import com.fujitsu.vdmj.po.patterns.PORecordPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
@@ -117,17 +114,16 @@ public class POStateDefinition extends PODefinition
 		return sb.toString();
 	}
 
-	public POPattern getPattern(LexLocation from)
+	/**
+	 * Create a name, based on the state definition name, but with a given "from" module. This is
+	 * used to create POs with variables that quantify over the state, but as local variables in
+	 * the PO.
+	 */
+	public TCNameToken getPatternName(LexLocation from)
 	{
-		POPatternList list = new POPatternList();
-
-		for (TCField field: fields)
-		{
-			TCNameToken loc = new TCNameToken(from, field.tagname.getModule(), field.tagname.getName());
-			list.add(new POIdentifierPattern(loc));
-		}
-
-		return new PORecordPattern(name, list, getType());
+		return new TCNameToken(from, from.module,
+			"$" + name.getModule().toLowerCase() + "_" + name.getName().toLowerCase(),
+			false, false);
 	}
 
 	public POMkTypeExpression getMkExpression(LexLocation from)
@@ -187,5 +183,4 @@ public class POStateDefinition extends PODefinition
 	{
 		return visitor.caseStateDefinition(this, arg);
 	}
-
 }

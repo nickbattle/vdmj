@@ -177,7 +177,7 @@ public class POCallStatement extends POStatement
 					
 					if (state != null)
 					{
-						preargs.add(state.getMkExpression(location));
+						preargs.add(new POVariableExpression(state.getPatternName(location), null));
 						ctxt.push(new POForAllContext(state, location));
 					}
 					
@@ -187,7 +187,7 @@ public class POCallStatement extends POStatement
 
 					if (state != null)
 					{
-						checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
+						// checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
 					}
 				}
 			}
