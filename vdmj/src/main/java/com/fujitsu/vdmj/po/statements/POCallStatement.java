@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -163,7 +164,7 @@ public class POCallStatement extends POStatement
 
 					if (state != null)
 					{
-						preargs.add(state.getMkExpression());
+						preargs.add(state.getMkExpression(location));
 					}
 
 					obligations.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
@@ -176,18 +177,18 @@ public class POCallStatement extends POStatement
 					
 					if (state != null)
 					{
-						preargs.add(state.getMkExpression());
+						preargs.add(state.getMkExpression(location));
+						ctxt.push(new POForAllContext(state, location));
 					}
 					
 					ProofObligationList checks = new ProofObligationList();
 					checks.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
+					obligations.addAll(checks);
 
-					if (state != null)	// So pre_op is malformed, for external state
+					if (state != null)
 					{
 						checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
 					}
-
-					obligations.addAll(checks);
 				}
 			}
 		}

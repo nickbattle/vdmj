@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExists1Expression;
 import com.fujitsu.vdmj.po.expressions.POExistsExpression;
 import com.fujitsu.vdmj.po.expressions.POForAllExpression;
@@ -127,6 +129,14 @@ public class POForAllContext extends POContext
 				bindings.add(new POMultipleTypeBind(plist, def.getType()));
 			}
 		}
+	}
+
+	public POForAllContext(POStateDefinition state, LexLocation from)
+	{
+		this.bindings = new Vector<POMultipleBind>();
+		POPatternList plist = new POPatternList();
+		plist.add(state.getPattern(from));
+		bindings.add(new POMultipleTypeBind(plist, state.getType()));
 	}
 
 	public POForAllContext(Collection<? extends TCNameToken> updates, String qualifier, Environment env)

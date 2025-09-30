@@ -24,13 +24,17 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.PORecordPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
@@ -113,7 +117,20 @@ public class POStateDefinition extends PODefinition
 		return sb.toString();
 	}
 
-	public POMkTypeExpression getMkExpression()
+	public POPattern getPattern(LexLocation from)
+	{
+		POPatternList list = new POPatternList();
+
+		for (TCField field: fields)
+		{
+			TCNameToken loc = new TCNameToken(from, field.tagname.getModule(), field.tagname.getName());
+			list.add(new POIdentifierPattern(loc));
+		}
+
+		return new PORecordPattern(name, list, getType());
+	}
+
+	public POMkTypeExpression getMkExpression(LexLocation from)
 	{
 		POExpressionList args = new POExpressionList();
 		TCTypeList argTypes = new TCTypeList();
@@ -124,7 +141,14 @@ public class POStateDefinition extends PODefinition
 			argTypes.add(f.type);
 		}
 
-		return new POMkTypeExpression(name, args, recordType, argTypes);
+		if (location.module.equals(from.module))
+		{
+			return new POMkTypeExpression(name, args, recordType, argTypes);
+		}
+		else
+		{
+			return new POMkTypeExpression(name.getExplicit(true), args, recordType, argTypes);
+		}
 	}
 
 	@Override
