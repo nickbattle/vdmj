@@ -122,7 +122,7 @@ public class POStateDefinition extends PODefinition
 	 */
 	public TCNameToken getPatternName(LexLocation from)
 	{
-		return new TCNameToken(from, from.module, POSaveStateContext.OLDNAME, false, false);
+		return new TCNameToken(from, from.module, POSaveStateContext.getOldName(), false, false);
 	}
 
 	public POMkTypeExpression getMkExpression(LexLocation from)

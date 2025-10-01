@@ -40,8 +40,8 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -130,7 +130,8 @@ public class POCallStatement extends POStatement
 		if (opdef != null && Settings.dialect == Dialect.VDM_SL)
 		{
 			String prename = null;
-			PODefinition targetState = null;
+			PODefinition predef = null;
+			POStateDefinition targetState = null;
 
 			if (opdef instanceof POExplicitOperationDefinition)
 			{
@@ -138,7 +139,8 @@ public class POCallStatement extends POStatement
 
 				if (exop.predef != null)
 				{
-					prename = exop.predef.name.toExplicitString(location);
+					predef = exop.predef;
+					prename = predef.name.toExplicitString(location);
 					targetState = exop.stateDefinition;
 				}
 			}
@@ -148,7 +150,8 @@ public class POCallStatement extends POStatement
 
 				if (imop.predef != null)
 				{
-					prename = imop.predef.name.toExplicitString(location);
+					predef = imop.predef;
+					prename = predef.name.toExplicitString(location);
 					targetState = imop.stateDefinition;
 				}
 			}
@@ -159,34 +162,33 @@ public class POCallStatement extends POStatement
 
 				if (opdef.location.sameModule(location))		// Local?
 				{
-					POStateDefinition state = (POStateDefinition)ctxt.getStateDefinition();
 					POExpressionList preargs = new POExpressionList();
 					preargs.addAll(args);
 
-					if (state != null)
+					if (targetState != null)
 					{
-						preargs.add(state.getMkExpression(location));
+						preargs.add(targetState.getMkExpression(location));
 					}
 
 					obligations.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
 				}
 				else	// target is another module
 				{
-					POStateDefinition state = (POStateDefinition)targetState;
 					POExpressionList preargs = new POExpressionList();
 					preargs.addAll(args);
 					
-					if (state != null)
+					if (targetState != null)
 					{
-						preargs.add(new POVariableExpression(state.getPatternName(location), null));
-						ctxt.push(new POForAllContext(state, location));
+						POSaveStateContext.advance();
+						ctxt.push(new POSaveStateContext(predef, location, false));
+						preargs.add(new POVariableExpression(targetState.getPatternName(location), null));
 					}
 					
 					ProofObligationList checks = new ProofObligationList();
 					checks.addAll(OperationPreConditionObligation.getAllPOs(location, root, preargs, prename, ctxt));
 					obligations.addAll(checks);
 
-					if (state != null)
+					if (targetState != null)
 					{
 						ctxt.pop();	// Remove forall, ready for op call context
 					}

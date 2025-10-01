@@ -33,26 +33,32 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 
 public class POSaveStateContext extends POContext
 {
-	public static final String OLDNAME = "$oldState";
-	public static final String NEWNAME = "$newState";
+	private static int count = 0;
+
+	private static final String OLDNAME = "$oldState";
+	private static final String NEWNAME = "$newState";
 
 	private final LexLocation from;
 	private final POStateDefinition state;
 	private final POClassDefinition clazz;
+	private final int number;
+	private final boolean oldAndNew;
 
-	public POSaveStateContext(PODefinition opdef, LexLocation from)
+	public POSaveStateContext(PODefinition fdef, LexLocation from, boolean oldAndNew)
 	{
+		this.number = count;
 		this.from = from;
+		this.oldAndNew = oldAndNew;
 
-		if (opdef instanceof POExplicitFunctionDefinition)
+		if (fdef instanceof POExplicitFunctionDefinition)
 		{
-			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)opdef;
+			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)fdef;
 			this.state = exfn.stateDefinition;
 			this.clazz = exfn.classDefinition;
 		}
-		else if (opdef instanceof POImplicitFunctionDefinition)
+		else if (fdef instanceof POImplicitFunctionDefinition)
 		{
-			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)opdef;
+			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)fdef;
 			this.state = imfn.stateDefinition;
 			this.clazz = imfn.classDefinition;
 		}
@@ -61,6 +67,21 @@ public class POSaveStateContext extends POContext
 			this.state = null;	// Produces nothing in getSource
 			this.clazz = null;
 		}
+	}
+
+	public static void advance()
+	{
+		count = count + 1;
+	}
+
+	public static String getOldName()
+	{
+		return OLDNAME + count;
+	}
+
+	public static String getNewName()
+	{
+		return NEWNAME + count;
 	}
 
 	@Override
@@ -73,7 +94,7 @@ public class POSaveStateContext extends POContext
 			if (state.location.sameModule(from))
 			{
 				sb.append("let ");
-				sb.append(OLDNAME);
+				sb.append(OLDNAME + number);
 				sb.append(" = ");
 				sb.append(state.toPattern(false, from));
 				sb.append(" in");
@@ -81,13 +102,18 @@ public class POSaveStateContext extends POContext
 			else
 			{
 				sb.append("forall ");
-				sb.append(OLDNAME);
+				sb.append(OLDNAME + number);
 				sb.append(":");
 				sb.append(state.name.toExplicitString(from));
-				sb.append(", ");
-				sb.append(NEWNAME);
-				sb.append(":");
-				sb.append(state.name.toExplicitString(from));
+
+				if (oldAndNew)
+				{
+					sb.append(", ");
+					sb.append(NEWNAME + number);
+					sb.append(":");
+					sb.append(state.name.toExplicitString(from));
+				}
+
 				sb.append(" &");
 			}
 		}

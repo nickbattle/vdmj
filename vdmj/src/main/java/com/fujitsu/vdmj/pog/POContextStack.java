@@ -385,11 +385,11 @@ public class POContextStack extends Stack<POContext>
 				// Only save old state if we need it
 				if (imp.predef != null)
 				{
-					push(new POSaveStateContext(imp.predef, from));
+					push(new POSaveStateContext(imp.predef, from, imp.postdef != null));
 				}
 				else if (imp.postdef != null)
 				{
-					push(new POSaveStateContext(imp.postdef, from));
+					push(new POSaveStateContext(imp.postdef, from, imp.postdef != null));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
@@ -425,11 +425,11 @@ public class POContextStack extends Stack<POContext>
 				// Only save old state if we need it
 				if (exop.predef != null)
 				{
-					push(new POSaveStateContext(exop.predef, from));
+					push(new POSaveStateContext(exop.predef, from, exop.postdef != null));
 				}
 				else if (exop.postdef != null)
 				{
-					push(new POSaveStateContext(exop.postdef, from));
+					push(new POSaveStateContext(exop.postdef, from, exop.postdef != null));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
@@ -473,10 +473,10 @@ public class POContextStack extends Stack<POContext>
 		if (stateDefinition != null)
 		{
 			if (preArgs.length() > 0) preArgs.append(", ");
-			preArgs.append(POSaveStateContext.OLDNAME);
+			preArgs.append(POSaveStateContext.getOldName());
 
 			if (postArgs.length() > 0) postArgs.append(", ");
-			postArgs.append(POSaveStateContext.OLDNAME);
+			postArgs.append(POSaveStateContext.getOldName());
 			postArgs.append(", ");
 
 			if (stateDefinition.location.sameModule(from))
@@ -485,7 +485,7 @@ public class POContextStack extends Stack<POContext>
 			}
 			else
 			{
-				postArgs.append(POSaveStateContext.NEWNAME);
+				postArgs.append(POSaveStateContext.getNewName());
 			}
 		}
 		else if (classDefinition != null)
