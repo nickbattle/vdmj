@@ -153,7 +153,7 @@ public class POOperationDefinitionContext extends POContext
 		{
 			if (expandState)
 			{
-				sb.append(stateDefinition.toPattern(false));
+				sb.append(stateDefinition.toPattern(false, name.getLocation()));
 				sb.append(":");
 				sb.append(stateDefinition.name.getName());
 			}
@@ -167,7 +167,7 @@ public class POOperationDefinitionContext extends POContext
 		{
 			if (expandState)
 			{
-				sb.append(classDefinition.toPattern(false));
+				sb.append(classDefinition.toPattern(false, name.getLocation()));
 				sb.append(":");
 				sb.append(classDefinition.name.getName());
 			}

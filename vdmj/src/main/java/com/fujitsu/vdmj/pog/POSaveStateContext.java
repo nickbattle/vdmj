@@ -24,28 +24,37 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 
 public class POSaveStateContext extends POContext
 {
 	public static final String OLDNAME = "$oldState";
+	public static final String NEWNAME = "$newState";
 
-	POStateDefinition state;
-	POClassDefinition clazz;
+	private final LexLocation from;
+	private final POStateDefinition state;
+	private final POClassDefinition clazz;
 
-	public POSaveStateContext(PODefinition state)
+	public POSaveStateContext(PODefinition opdef, LexLocation from)
 	{
-		if (state instanceof POStateDefinition)
+		this.from = from;
+
+		if (opdef instanceof POExplicitFunctionDefinition)
 		{
-			this.state = (POStateDefinition)state;
-			this.clazz = null;
+			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)opdef;
+			this.state = exfn.stateDefinition;
+			this.clazz = exfn.classDefinition;
 		}
-		else if (state instanceof POClassDefinition)
+		else if (opdef instanceof POImplicitFunctionDefinition)
 		{
-			this.clazz = (POClassDefinition)state;
-			this.state = null;
+			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)opdef;
+			this.state = imfn.stateDefinition;
+			this.clazz = imfn.classDefinition;
 		}
 		else
 		{
@@ -61,11 +70,26 @@ public class POSaveStateContext extends POContext
 
 		if (state != null)
 		{
-			sb.append("let ");
-			sb.append(OLDNAME);
-			sb.append(" = ");
-			sb.append(state.toPattern(false));
-			sb.append(" in");
+			if (state.location.sameModule(from))
+			{
+				sb.append("let ");
+				sb.append(OLDNAME);
+				sb.append(" = ");
+				sb.append(state.toPattern(false, from));
+				sb.append(" in");
+			}
+			else
+			{
+				sb.append("forall ");
+				sb.append(OLDNAME);
+				sb.append(":");
+				sb.append(state.name.toExplicitString(from));
+				sb.append(", ");
+				sb.append(NEWNAME);
+				sb.append(":");
+				sb.append(state.name.toExplicitString(from));
+				sb.append(" &");
+			}
 		}
 		else if (clazz != null)
 		{

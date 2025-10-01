@@ -601,6 +601,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		def.setAccessSpecifier(accessSpecifier.getStatic(false));
 		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
 		return def;
 	}
 
@@ -648,6 +649,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		def.setAccessSpecifier(accessSpecifier.getStatic(false));
 		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
 		return def;
 	}
 

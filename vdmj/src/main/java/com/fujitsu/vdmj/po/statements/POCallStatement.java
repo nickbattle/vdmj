@@ -188,7 +188,7 @@ public class POCallStatement extends POStatement
 
 					if (state != null)
 					{
-						// checks.markUnchecked(ProofObligation.EXTERNAL_MODULE);
+						ctxt.pop();	// Remove forall, ready for op call context
 					}
 				}
 			}

@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInitObligation;
@@ -94,11 +95,11 @@ public class POStateDefinition extends PODefinition
 	}
 	
 	@Override
-	public String toPattern(boolean maximal)
+	public String toPattern(boolean maximal, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("mk_");
-		sb.append(name);
+		sb.append(name.toExplicitString(from));
 		if (maximal) sb.append("!");
 		sb.append("(");
 		String sep = "";
@@ -121,9 +122,7 @@ public class POStateDefinition extends PODefinition
 	 */
 	public TCNameToken getPatternName(LexLocation from)
 	{
-		return new TCNameToken(from, from.module,
-			"$" + name.getModule().toLowerCase() + "_" + name.getName().toLowerCase(),
-			false, false);
+		return new TCNameToken(from, from.module, POSaveStateContext.OLDNAME, false, false);
 	}
 
 	public POMkTypeExpression getMkExpression(LexLocation from)
@@ -137,7 +136,7 @@ public class POStateDefinition extends PODefinition
 			argTypes.add(f.type);
 		}
 
-		if (location.module.equals(from.module))
+		if (location.sameModule(from))
 		{
 			return new POMkTypeExpression(name, args, recordType, argTypes);
 		}

@@ -155,7 +155,7 @@ abstract public class POContext
 		if (state instanceof POStateDefinition)
 		{
 			call.append(sep);
-			call.append(state.toPattern(false));
+			call.append(state.toPattern(false, name.getLocation()));
 		}
 		else if (state instanceof POClassDefinition)
 		{
