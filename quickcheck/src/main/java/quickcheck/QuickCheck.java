@@ -530,10 +530,19 @@ public class QuickCheck
 				execException = e;
 			}
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
-			execResult = new BooleanValue(false);
-			execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
+			if (internalException(e))
+			{
+				execResult = new UndefinedValue();	// Gives MAYBE
+				po.clearAnalysis();
+				po.markUnchecked(ProofObligation.TOO_COMPLEX);
+			}
+			else
+			{
+				execResult = new BooleanValue(false);
+				execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
+			}
 		}
 		finally
 		{
@@ -588,6 +597,16 @@ public class QuickCheck
 			default:
 				return false;
 		}
+	}
+
+	/**
+	 * These problems indicate the PO analysis is too complicated.
+	 */
+	private boolean internalException(Throwable e)
+	{
+		return
+			e instanceof OutOfMemoryError ||
+			e instanceof StackOverflowError;
 	}
 
 	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,
