@@ -73,6 +73,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition postdef;
 	public TCDefinitionList paramDefinitions;
 
+	public TCStateDefinition stateDefinition;
 	public boolean recursive = false;
 	public boolean isUndefined = false;
 	public TCType actualResult;
@@ -137,6 +138,8 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	@Override
 	public void implicitDefinitions(Environment base)
 	{
+		stateDefinition = base.findStateDefinition();
+		
 		if (body instanceof TCSubclassResponsibilityExpression ||
 			body instanceof TCNotYetSpecifiedExpression)
 		{

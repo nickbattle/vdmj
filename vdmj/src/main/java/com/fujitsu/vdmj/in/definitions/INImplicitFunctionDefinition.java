@@ -66,6 +66,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
 	public final TCFunctionType type;
+	public final INStateDefinition stateDefinition;
 
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
 
@@ -78,7 +79,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		INExpression precondition,
 		INExpression postcondition, INExpression measureExp, TCNameToken measureName, INExplicitFunctionDefinition measureDef,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef,
-		INClassDefinition classdef)
+		INClassDefinition classDefinition, INStateDefinition stateDefinition)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -94,7 +95,8 @@ public class INImplicitFunctionDefinition extends INDefinition
 		this.measureDef = measureDef;
 		this.predef = predef;
 		this.postdef = postdef;
-		this.classDefinition = classdef;
+		this.classDefinition = classDefinition;
+		this.stateDefinition = stateDefinition;
 
 		TCTypeList ptypes = new TCTypeList();
 

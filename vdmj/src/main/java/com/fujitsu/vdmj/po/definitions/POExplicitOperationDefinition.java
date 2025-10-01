@@ -84,7 +84,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		POExplicitFunctionDefinition predef,
 		POExplicitFunctionDefinition postdef,
 		PODefinitionList paramDefinitions,
-		POStateDefinition state,
+		POStateDefinition stateDefinition,
 		POClassDefinition classDefinition,
 		TCType actualResult, boolean isConstructor,
 		TCTypeSet possibleExceptions)
@@ -100,7 +100,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.predef = predef;
 		this.postdef = postdef;
 		this.paramDefinitions = paramDefinitions;
-		this.stateDefinition = state;
+		this.stateDefinition = stateDefinition;
 		this.classDefinition = classDefinition;
 		this.actualResult = actualResult;
 		this.isConstructor = isConstructor;
