@@ -606,7 +606,15 @@ public class POContextStack extends Stack<POContext>
 			if (ctxt instanceof POOperationDefinitionContext)
 			{
 				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
-				return opdef.stateDefinition;
+				
+				if (opdef.stateDefinition != null)
+				{
+					return opdef.stateDefinition;
+				}
+				else
+				{
+					return opdef.classDefinition;
+				}
 			}
 		}
 
@@ -623,20 +631,16 @@ public class POContextStack extends Stack<POContext>
 			{
 				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
 				
-				if (opdef.stateDefinition instanceof POStateDefinition)
+				if (opdef.stateDefinition != null)
 				{
-					POStateDefinition state = (POStateDefinition)opdef.stateDefinition;
-					
-					for (TCField field: state.fields)
+					for (TCField field: opdef.stateDefinition.fields)
 					{
 						names.add(field.tagname);
 					}
 				}
-				else if (opdef.stateDefinition instanceof POClassDefinition)
+				else if (opdef.classDefinition != null)
 				{
-					POClassDefinition clazz = (POClassDefinition)opdef.stateDefinition;
-					
-					for (PODefinition def: clazz.definitions)
+					for (PODefinition def: opdef.classDefinition.definitions)
 					{
 						if (def instanceof POInstanceVariableDefinition)
 						{

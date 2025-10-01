@@ -122,7 +122,8 @@ public class POCallStatement extends POStatement
 		return obligations;
 	}
 
-	public static ProofObligationList checkPrecondition(LexLocation location, PODefinition opdef, POExpressionList args, POContextStack ctxt)
+	public static ProofObligationList checkPrecondition(LexLocation location,
+		PODefinition opdef, POExpressionList args, POContextStack ctxt)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		
@@ -156,7 +157,7 @@ public class POCallStatement extends POStatement
 			{
 				POExpression root = new POVariableExpression(opdef.name, opdef);
 
-				if (opdef.location.module.equals(location.module))		// Local?
+				if (opdef.location.sameModule(location))		// Local?
 				{
 					POStateDefinition state = (POStateDefinition)ctxt.getStateDefinition();
 					POExpressionList preargs = new POExpressionList();

@@ -176,7 +176,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		
 		if (stateDefinition != null)
 		{
-			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 			addOldContext(ctxt);
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
@@ -189,7 +189,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		}
 		else if (classDefinition != null)
 		{
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
+			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), true));
 			ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
 			ctxt.pop();
 			
@@ -206,7 +206,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		}
 		else	// Flat spec with no state defined
 		{
-			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), null, true));
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)

@@ -554,6 +554,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			typeParams, type.getPreType(), getParamPatternList(), precondition, null, null, false, null);
 
 		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
 		return def;
 	}
 
@@ -566,6 +567,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			typeParams, type.getPostType(),	parameters, postcondition,	null, null, false, null);
 
 		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
 		return def;
 	}
 

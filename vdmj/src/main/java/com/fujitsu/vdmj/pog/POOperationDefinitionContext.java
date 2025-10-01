@@ -47,33 +47,36 @@ public class POOperationDefinitionContext extends POContext
 	public final boolean addPrecond;
 	public final String precondition;
 	public final PODefinition definition;
-	public final PODefinition stateDefinition;	// Can be POClassDefinition
+	public final POStateDefinition stateDefinition;
+	public final POClassDefinition classDefinition;
 	public final boolean expandState;
 	public final POExpression preExp;
 	
 	public POOperationDefinitionContext(POExplicitOperationDefinition definition,
-		boolean precond, PODefinition stateDefinition, boolean expandState)
+		boolean precond, boolean expandState)
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.parameterPatterns;
+		this.stateDefinition = definition.stateDefinition;
+		this.classDefinition = definition.classDefinition;
 		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
-		this.stateDefinition = stateDefinition;
 		this.definition = definition;
 		this.expandState = expandState;
 		this.preExp = definition.precondition;
 	}
 
 	public POOperationDefinitionContext(POImplicitOperationDefinition definition,
-		boolean precond, PODefinition stateDefinition, boolean expandState)
+		boolean precond, boolean expandState)
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
+		this.stateDefinition = definition.stateDefinition;
+		this.classDefinition = definition.classDefinition;
 		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
-		this.stateDefinition = stateDefinition;
 		this.definition = definition;
 		this.expandState = expandState;
 		this.preExp = definition.precondition;
@@ -110,7 +113,7 @@ public class POOperationDefinitionContext extends POContext
 	{
 		StringBuilder sb = new StringBuilder();
 
-		if (!deftype.parameters.isEmpty() || stateDefinition != null)
+		if (!deftype.parameters.isEmpty() || stateDefinition != null || classDefinition != null)
 		{
     		sb.append("forall ");
     		String sep = "";
@@ -125,7 +128,7 @@ public class POOperationDefinitionContext extends POContext
 				sep = ", ";
 			}
 
-			if (stateDefinition != null)
+			if (stateDefinition != null || classDefinition != null)
 			{
 				sb.append(sep);
 				appendStatePatterns(sb);
@@ -146,41 +149,37 @@ public class POOperationDefinitionContext extends POContext
 
 	private void appendStatePatterns(StringBuilder sb)
 	{
-		if (stateDefinition == null)
+		if (stateDefinition != null)
 		{
-			return;
-		}
-		else if (stateDefinition instanceof POStateDefinition)
-		{
-			POStateDefinition def = (POStateDefinition)stateDefinition;
-			
 			if (expandState)
 			{
-				sb.append(def.toPattern(false));
+				sb.append(stateDefinition.toPattern(false));
 				sb.append(":");
-				sb.append(def.name.getName());
+				sb.append(stateDefinition.name.getName());
 			}
 			else
 			{
 				sb.append("oldstate:");
-				sb.append(def.name.getName());
+				sb.append(stateDefinition.name.getName());
 			}
 		}
-		else
+		else if (classDefinition != null)
 		{
-			POClassDefinition def = (POClassDefinition)stateDefinition;
-
 			if (expandState)
 			{
-				sb.append(def.toPattern(false));
+				sb.append(classDefinition.toPattern(false));
 				sb.append(":");
-				sb.append(def.name.getName());
+				sb.append(classDefinition.name.getName());
 			}
 			else
 			{
 				sb.append("oldself:");
-				sb.append(def.name.getName());
+				sb.append(classDefinition.name.getName());
 			}
+		}
+		else
+		{
+			return;
 		}
 	}
 }
