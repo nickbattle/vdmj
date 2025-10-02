@@ -62,6 +62,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 	public final boolean isCurried;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
+	public final INStateDefinition stateDefinition;
 	
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
 
@@ -72,7 +73,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		INExpression body, INExpression precondition, INExpression postcondition,
 		boolean typeInvariant, TCNameToken measureName, INExplicitFunctionDefinition measureDef,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef,
-		INClassDefinition classdef)
+		INClassDefinition classDefinition, INStateDefinition stateDefinition)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -89,7 +90,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 		this.isCurried = parameters.size() > 1;
 		this.predef = predef;
 		this.postdef = postdef;
-		this.classDefinition = classdef;
+		this.classDefinition = classDefinition;
+		this.stateDefinition = stateDefinition;
 
 		type.instantiated = (typeParams == null) ? null : false;
 	}
@@ -147,7 +149,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 			nvl.addAll(names);
 		}
 
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc, null);
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc);
 		nvl.add(new NameValuePair(name, func));
 
 		return nvl;
@@ -194,7 +196,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		}
 		
 		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
-		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv, null);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv);
 
 		polyfuncs.put(argTypes, rv);
 		return rv;

@@ -82,7 +82,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final POExplicitFunctionDefinition predef;
 	public final POExplicitFunctionDefinition postdef;
 	public final TCType actualResult;
-	public final PODefinition stateDefinition;
+	public final POStateDefinition stateDefinition;
 	public final boolean isConstructor;
 	public final TCTypeSet possibleExceptions;
 
@@ -208,7 +208,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		{
 			if (stateDefinition != null)
 			{
-				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 				addOldContext(ctxt);
 				obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
@@ -221,7 +221,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			}
 			else if (classDefinition != null)
 			{
-				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
+				ctxt.push(new POOperationDefinitionContext(this, (precondition != null), true));
 				ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
 				ctxt.pop();
 				
@@ -238,7 +238,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			}
 			else	// Flat spec with no state defined
 			{
-				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), null, true));
+				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 				obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 				if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
@@ -268,7 +268,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL &&
 				Settings.release == Release.VDM_10)		// Uses obj_C pattern
 			{
-				ctxt.push(new POOperationDefinitionContext(this, false, stateDefinition, false));
+				ctxt.push(new POOperationDefinitionContext(this, false, false));
 				obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt));
 				ctxt.pop();
 			}

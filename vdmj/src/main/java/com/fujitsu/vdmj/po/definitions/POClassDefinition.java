@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
@@ -93,11 +94,11 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
-	public String toPattern(boolean maximal)
+	public String toPattern(boolean maximal, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("obj_");
-		sb.append(name);
+		sb.append(name.toExplicitString(from));
 		sb.append("(");
 		String sep = "";
 

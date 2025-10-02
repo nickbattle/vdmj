@@ -57,7 +57,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public static final String REQUIRES_VDM10		= "Obligation requires VDM10";
 	public static final String HAS_AMBIGUOUS_STATE	= "Earlier statements create ambiguous state";
 	public static final String PO_HAS_ERRORS		= "PO has errors";
-	public static final String EXTERNAL_MODULE		= "Cannot determine target module state";
+	public static final String TOO_COMPLEX			= "Obligation is too complex to analyse";
 	
 	public final LexLocation location;
 	public final POType kind;

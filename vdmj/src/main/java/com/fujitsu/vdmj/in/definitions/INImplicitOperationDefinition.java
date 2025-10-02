@@ -61,7 +61,7 @@ public class INImplicitOperationDefinition extends INDefinition
 	public final boolean isConstructor;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
-	public final INStateDefinition statedef;
+	public final INStateDefinition stateDefinition;
 	public final TCOperationType type;		// Created from params/result
 
 	public INImplicitOperationDefinition(INAnnotationList annotations,
@@ -69,8 +69,8 @@ public class INImplicitOperationDefinition extends INDefinition
 		INPatternListTypePairList parameterPatterns,
 		INPatternTypePair result, INStatement body,
 		INExpression precondition, INExpression postcondition, INErrorCaseList errors, boolean isConstructor,
-		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef, INStateDefinition statedef,
-		INClassDefinition classdef)
+		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef, INStateDefinition stateDefinition,
+		INClassDefinition classDefinition)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -84,8 +84,8 @@ public class INImplicitOperationDefinition extends INDefinition
 		this.isConstructor = isConstructor;
 		this.predef = predef;
 		this.postdef = postdef;
-		this.statedef = statedef;
-		this.classDefinition = classdef;
+		this.stateDefinition = stateDefinition;
+		this.classDefinition = classDefinition;
 
 		TCTypeList ptypes = new TCTypeList();
 
@@ -123,16 +123,16 @@ public class INImplicitOperationDefinition extends INDefinition
 		NameValuePairList nvl = new NameValuePairList();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null, null);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null, null);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
 
 		// Note, body may be null if it is really implicit. This is caught
 		// when the function is invoked. The value is needed to implement
 		// the pre_() expression for implicit functions.
 
-		OperationValue op =	new OperationValue(this, prefunc, postfunc, statedef);
+		OperationValue op =	new OperationValue(this, prefunc, postfunc, stateDefinition);
 		nvl.add(new NameValuePair(name, op));
 
 		if (predef != null)

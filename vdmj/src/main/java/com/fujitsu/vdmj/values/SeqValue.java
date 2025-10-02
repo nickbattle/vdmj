@@ -105,11 +105,18 @@ public class SeqValue extends Value
 	 * This formatter uses the ALTERNATE flag to give a more "raw" output. So
 	 * an empty sequence is a blank string, a "value" in quotes has the quotes
 	 * removed, and a [seq, of, values] has the outer brackets removed.
+	 * 
+	 * Use with %#10s, for an alternate format within a 10 char width field.
 	 */
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width, int precision)
 	{
-		String s = toString();	// Either [1,2,3] or "Hello"
+		String s = stringValue(null);	// Either [1,2,3], or Hello, with "\n" etc converted
+
+		if (!s.startsWith("["))
+		{
+			s = "\"" + s + "\"";			// Add "quotes" back for a string
+		}
 
 		if ((flags & FormattableFlags.ALTERNATE) > 0)
 		{

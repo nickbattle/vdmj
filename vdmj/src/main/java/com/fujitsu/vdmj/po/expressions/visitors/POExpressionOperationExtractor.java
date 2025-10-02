@@ -86,6 +86,7 @@ import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.POModExpression;
 import com.fujitsu.vdmj.po.expressions.POMuExpression;
 import com.fujitsu.vdmj.po.expressions.PONarrowExpression;
+import com.fujitsu.vdmj.po.expressions.PONewExpression;
 import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.expressions.PONotInSetExpression;
@@ -194,6 +195,17 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 		{
 			return extracted;
 		}
+	}
+
+	/**
+	 * A new object constructor is similar to an operation call to the constructor,
+	 * returning an object value. But we cannot actually call a constructor as an operation,
+	 * so we mark the context ambiguous, using an exception.
+	 */
+	@Override
+	public POExpression caseNewExpression(PONewExpression node, Object arg)
+	{
+		throw new POOperationExtractionException(node, "call to " + node.toString(), true);
 	}
 
 	/**

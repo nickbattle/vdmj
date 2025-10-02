@@ -80,8 +80,8 @@ import quickcheck.annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
-import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.ExpressionTypeBindOverrider;
+import quickcheck.visitors.FixedRangeCreator;
 
 public class QuickCheck
 {
@@ -530,10 +530,19 @@ public class QuickCheck
 				execException = e;
 			}
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
-			execResult = new BooleanValue(false);
-			execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
+			if (internalException(e))
+			{
+				execResult = new UndefinedValue();	// Gives MAYBE
+				po.clearAnalysis();
+				po.markUnchecked(ProofObligation.TOO_COMPLEX);
+			}
+			else
+			{
+				execResult = new BooleanValue(false);
+				execException = new ContextException(78, "Exception: " + e.getMessage(), po.location, null);
+			}
 		}
 		finally
 		{
@@ -582,11 +591,22 @@ public class QuickCheck
 			case 4006:	// Type <class> has no field <opname>
 			case 4034:	// Name 'opname(args)' not in scope
 			case 4132:	// Using undefined value
+			case 4177:	// Not in a SchedulableThread
 				return true;
 
 			default:
 				return false;
 		}
+	}
+
+	/**
+	 * These problems indicate the PO analysis is too complicated.
+	 */
+	private boolean internalException(Throwable e)
+	{
+		return
+			e instanceof OutOfMemoryError ||
+			e instanceof StackOverflowError;
 	}
 
 	private void analyseResult(ProofObligation po, StrategyResults sresults, INBindingGlobals globals,

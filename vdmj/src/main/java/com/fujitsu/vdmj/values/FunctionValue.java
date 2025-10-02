@@ -123,7 +123,8 @@ public class FunctionValue extends Value
 	}
 
 	/*
-	 * This is used by lambda expressions - so no classdef, pre/post/measure
+	 * This is used by lambda expressions - so no classdef, pre/post/measure, But note that
+	 * this does use freeVariables.
 	 */
 	public FunctionValue(LexLocation location, String name, TCFunctionType type,
 		INPatternList paramPatterns, INExpression body, Context freeVariables)
@@ -151,8 +152,7 @@ public class FunctionValue extends Value
 	 * Explicit functions.
 	 */
 	public FunctionValue(INExplicitFunctionDefinition def,
-		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure,
-		Context freeVariables)
+		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure)
 	{
 		this.location = def.location;
 		this.name = def.name.getName();
@@ -163,7 +163,7 @@ public class FunctionValue extends Value
 		this.precondition = precondition;
 		this.postcondition = postcondition;
 		this.measure = measure;
-		this.freeVariables = freeVariables;
+		this.freeVariables = null;
 		this.classdef = def.classDefinition;
 		this.uninstantiated = (def.typeParams != null);
 		this.isStatic = def.accessSpecifier.isStatic;
@@ -186,8 +186,7 @@ public class FunctionValue extends Value
 	 * Implicit functions.
 	 */
 	public FunctionValue(INImplicitFunctionDefinition def,
-		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure,
-		Context freeVariables)
+		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure)
 	{
 		this.location = def.location;
 		this.name = def.name.getName();
@@ -208,7 +207,7 @@ public class FunctionValue extends Value
 		this.precondition = precondition;
 		this.postcondition = postcondition;
 		this.measure = measure;
-		this.freeVariables = freeVariables;
+		this.freeVariables = null;
 		this.classdef = def.classDefinition;
 		this.uninstantiated = (def.typeParams != null);
 		this.isStatic = def.accessSpecifier.isStatic;
@@ -232,9 +231,9 @@ public class FunctionValue extends Value
 	 */
 	public FunctionValue(INExplicitFunctionDefinition fdef,
 		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
-		FunctionValue postcondition, FunctionValue measure, Context freeVariables)
+		FunctionValue postcondition, FunctionValue measure)
 	{
-		this(fdef, precondition, postcondition, measure, freeVariables);
+		this(fdef, precondition, postcondition, measure);
 		this.typeValues = argTypes;
 		this.type = ftype;
 		this.uninstantiated = false;
@@ -245,9 +244,9 @@ public class FunctionValue extends Value
 	 */
 	public FunctionValue(INImplicitFunctionDefinition fdef,
 		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
-		FunctionValue postcondition, FunctionValue measure, Context freeVariables)
+		FunctionValue postcondition, FunctionValue measure)
 	{
-		this(fdef, precondition, postcondition, measure, freeVariables);
+		this(fdef, precondition, postcondition, measure);
 		this.typeValues = argTypes;
 		this.type = ftype;
 		this.uninstantiated = false;
@@ -344,7 +343,7 @@ public class FunctionValue extends Value
 		{
 			clearData();
 			ContextException.throwStackOverflow(location, ctxt);
-			return null;	// No reached
+			return null;	// Not reached
 		}
 	}
 

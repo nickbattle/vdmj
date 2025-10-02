@@ -75,7 +75,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition postdef;
 	public TCDefinitionList paramDefinitions;
 	
-	public TCStateDefinition state;
+	public TCStateDefinition stateDefinition;
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
 	public TCTypeSet possibleExceptions = null;
@@ -126,7 +126,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void implicitDefinitions(Environment base)
 	{
-		state = base.findStateDefinition();
+		stateDefinition = base.findStateDefinition();
 
 		if (precondition != null)
 		{
@@ -437,9 +437,9 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		TCPatternList plist = new TCPatternList();
 		plist.addAll(parameterPatterns);
 
-		if (state != null)
+		if (stateDefinition != null)
 		{
-			plist.add(new TCIdentifierPattern(state.name.getOldName()));
+			plist.add(new TCIdentifierPattern(stateDefinition.name.getOldName()));
 		}
 		else if (base.isVDMPP() && !accessSpecifier.isStatic)
 		{
@@ -447,10 +447,10 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		}
 
 		parameters.add(plist);
-		TCPreOpExpression preop = new TCPreOpExpression(name, precondition, null, state);
+		TCPreOpExpression preop = new TCPreOpExpression(name, precondition, null, stateDefinition);
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPreName(precondition.location),
-			null, type.getPreType(state, classDefinition, accessSpecifier.isStatic),
+			null, type.getPreType(stateDefinition, classDefinition, accessSpecifier.isStatic),
 			parameters, preop, null, null, false, null);
 
 		// Operation precondition functions are effectively not static as
@@ -459,6 +459,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 		def.setAccessSpecifier(accessSpecifier.getStatic(false));
 		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
 		return def;
 	}
 
@@ -473,10 +474,10 @@ public class TCExplicitOperationDefinition extends TCDefinition
     		plist.add(new TCIdentifierPattern(name.getResultName(location)));
 		}
 
-		if (state != null)	// Two args, called Sigma~ and Sigma
+		if (stateDefinition != null)	// Two args, called Sigma~ and Sigma
 		{
-			plist.add(new TCIdentifierPattern(state.name.getOldName()));
-			plist.add(new TCIdentifierPattern(state.name));
+			plist.add(new TCIdentifierPattern(stateDefinition.name.getOldName()));
+			plist.add(new TCIdentifierPattern(stateDefinition.name));
 		}
 		else if (base.isVDMPP())
 		{
@@ -490,10 +491,10 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		}
 
 		parameters.add(plist);
-		TCPostOpExpression postop = new TCPostOpExpression(name, precondition, postcondition, null, state);
+		TCPostOpExpression postop = new TCPostOpExpression(name, precondition, postcondition, null, stateDefinition);
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPostName(postcondition.location),
-			null, type.getPostType(state, classDefinition, accessSpecifier.isStatic),
+			null, type.getPostType(stateDefinition, classDefinition, accessSpecifier.isStatic),
 			parameters, postop, null, null, false, null);
 
 		// Operation postcondition functions are effectively not static as
@@ -502,6 +503,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 		def.setAccessSpecifier(accessSpecifier.getStatic(false));
 		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
 		return def;
 	}
 

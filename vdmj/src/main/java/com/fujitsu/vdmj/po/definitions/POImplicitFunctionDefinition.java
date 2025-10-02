@@ -69,6 +69,8 @@ public class POImplicitFunctionDefinition extends PODefinition
 	public final TCFunctionType type;
 	public final POExplicitFunctionDefinition predef;
 	public final POExplicitFunctionDefinition postdef;
+
+	public final POStateDefinition stateDefinition;
 	public final boolean recursive;
 	public final boolean isUndefined;
 	public final TCType actualResult;
@@ -90,7 +92,8 @@ public class POImplicitFunctionDefinition extends PODefinition
 		boolean isUndefined,
 		TCType actualResult,
 		POExplicitFunctionDefinition measureDef,
-		TCNameToken measureName)
+		TCNameToken measureName,
+		POStateDefinition stateDefinition, POClassDefinition classDefinition)
 	{
 		super(name.getLocation(), name);
 
@@ -109,6 +112,8 @@ public class POImplicitFunctionDefinition extends PODefinition
 		this.measureDef = measureDef;
 		this.actualResult = actualResult;
 		this.measureName = measureName;
+		this.stateDefinition = stateDefinition;
+		this.classDefinition = classDefinition;
 	}
 
 	@Override

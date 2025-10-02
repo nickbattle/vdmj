@@ -54,7 +54,7 @@ public class INExplicitOperationDefinition extends INDefinition
 	public final boolean isConstructor;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
-	public final INStateDefinition statedef;
+	public final INStateDefinition stateDefinition;
 
 	public INExplicitOperationDefinition(INAnnotationList annotations,
 		INAccessSpecifier accessSpecifier,
@@ -62,7 +62,7 @@ public class INExplicitOperationDefinition extends INDefinition
 		INPatternList parameters, INExpression precondition,
 		INExpression postcondition, INStatement body, boolean isConstructor,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef,
-		INStateDefinition statedef, INClassDefinition classdef)
+		INStateDefinition stateDefinition, INClassDefinition classDefinition)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -75,9 +75,8 @@ public class INExplicitOperationDefinition extends INDefinition
 		this.isConstructor = isConstructor;
 		this.predef = predef;
 		this.postdef = postdef;
-		this.statedef = statedef;
-		
-		this.classDefinition = classdef;
+		this.stateDefinition = stateDefinition;
+		this.classDefinition = classDefinition;
 	}
 
 	@Override
@@ -102,12 +101,12 @@ public class INExplicitOperationDefinition extends INDefinition
 		NameValuePairList nvl = new NameValuePairList();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null, null);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null, null);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
 
-		OperationValue op = new OperationValue(this, prefunc, postfunc, statedef);
+		OperationValue op = new OperationValue(this, prefunc, postfunc, stateDefinition);
 		nvl.add(new NameValuePair(name, op));
 
 		if (predef != null)

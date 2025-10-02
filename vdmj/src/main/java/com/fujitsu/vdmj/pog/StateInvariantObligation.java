@@ -76,7 +76,7 @@ public class StateInvariantObligation extends ProofObligation
 			sb.append("let ");
 			sb.append(sdef.invPattern);
 			sb.append(" = ");
-			sb.append(sdef.toPattern(true));	// maximal
+			sb.append(sdef.toPattern(true, sdef.location));	// maximal
 			sb.append(" in\n");
 			sb.append(sdef.invExpression);
 			

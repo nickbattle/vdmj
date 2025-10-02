@@ -220,16 +220,33 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 		return file.equals(other.file) && other.startLine > startLine;
 	}
 
+	/**
+	 * Check whether a different location is in the same class/module as this one.
+	 */
+	public boolean sameModule(LexLocation other)
+	{
+		return other.module.equals(module);
+	}
+
+	/**
+	 * Mark as executable (so hit() will have effect)
+	 */
 	public void executable(boolean exe)
 	{
 		executable = exe;
 	}
 
+	/**
+	 * Increment hit count, if executable.
+	 */
 	public void hit()
 	{
 		if (executable) hits++;
 	}
 
+	/**
+	 * Manage global static location counters.
+	 */
 	public static void clearLocations()
 	{
 		for (LexLocation loc: allLocations)

@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -34,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInitObligation;
@@ -93,11 +95,11 @@ public class POStateDefinition extends PODefinition
 	}
 	
 	@Override
-	public String toPattern(boolean maximal)
+	public String toPattern(boolean maximal, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("mk_");
-		sb.append(name);
+		sb.append(name.toExplicitString(from));
 		if (maximal) sb.append("!");
 		sb.append("(");
 		String sep = "";
@@ -113,7 +115,17 @@ public class POStateDefinition extends PODefinition
 		return sb.toString();
 	}
 
-	public POMkTypeExpression getMkExpression()
+	/**
+	 * Create a name, based on the state definition name, but with a given "from" module. This is
+	 * used to create POs with variables that quantify over the state, but as local variables in
+	 * the PO.
+	 */
+	public TCNameToken getPatternName(LexLocation from)
+	{
+		return new TCNameToken(from, from.module, POSaveStateContext.getOldName(), false, false);
+	}
+
+	public POMkTypeExpression getMkExpression(LexLocation from)
 	{
 		POExpressionList args = new POExpressionList();
 		TCTypeList argTypes = new TCTypeList();
@@ -124,7 +136,14 @@ public class POStateDefinition extends PODefinition
 			argTypes.add(f.type);
 		}
 
-		return new POMkTypeExpression(name, args, recordType, argTypes);
+		if (location.sameModule(from))
+		{
+			return new POMkTypeExpression(name, args, recordType, argTypes);
+		}
+		else
+		{
+			return new POMkTypeExpression(name.getExplicit(true), args, recordType, argTypes);
+		}
 	}
 
 	@Override
@@ -163,5 +182,4 @@ public class POStateDefinition extends PODefinition
 	{
 		return visitor.caseStateDefinition(this, arg);
 	}
-
 }

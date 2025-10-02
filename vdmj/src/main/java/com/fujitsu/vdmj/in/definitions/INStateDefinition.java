@@ -118,13 +118,13 @@ public class INStateDefinition extends INDefinition
 	{
 		if (invdef != null)
 		{
-			invfunc = new FunctionValue(invdef, null, null, null, initialContext);
+			invfunc = new FunctionValue(invdef, null, null, null);
 			initialContext.put(name.getInvName(location), invfunc);
 		}
 
 		if (initdef != null)
 		{
-			initfunc = new FunctionValue(initdef, null, null, null, initialContext);
+			initfunc = new FunctionValue(initdef, null, null, null);
 			initialContext.put(name.getInitName(location), initfunc);
 		}
 

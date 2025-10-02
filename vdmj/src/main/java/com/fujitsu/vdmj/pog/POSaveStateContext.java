@@ -24,34 +24,64 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 
 public class POSaveStateContext extends POContext
 {
-	public static final String OLDNAME = "$oldState";
+	private static int count = 0;
 
-	POStateDefinition state;
-	POClassDefinition clazz;
+	private static final String OLDNAME = "$oldState";
+	private static final String NEWNAME = "$newState";
 
-	public POSaveStateContext(PODefinition state)
+	private final LexLocation from;
+	private final POStateDefinition state;
+	private final POClassDefinition clazz;
+	private final int number;
+	private final boolean oldAndNew;
+
+	public POSaveStateContext(PODefinition fdef, LexLocation from, boolean oldAndNew)
 	{
-		if (state instanceof POStateDefinition)
+		this.number = count;
+		this.from = from;
+		this.oldAndNew = oldAndNew;
+
+		if (fdef instanceof POExplicitFunctionDefinition)
 		{
-			this.state = (POStateDefinition)state;
-			this.clazz = null;
+			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)fdef;
+			this.state = exfn.stateDefinition;
+			this.clazz = exfn.classDefinition;
 		}
-		else if (state instanceof POClassDefinition)
+		else if (fdef instanceof POImplicitFunctionDefinition)
 		{
-			this.clazz = (POClassDefinition)state;
-			this.state = null;
+			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)fdef;
+			this.state = imfn.stateDefinition;
+			this.clazz = imfn.classDefinition;
 		}
 		else
 		{
 			this.state = null;	// Produces nothing in getSource
 			this.clazz = null;
 		}
+	}
+
+	public static void advance()
+	{
+		count = count + 1;
+	}
+
+	public static String getOldName()
+	{
+		return OLDNAME + count;
+	}
+
+	public static String getNewName()
+	{
+		return NEWNAME + count;
 	}
 
 	@Override
@@ -61,11 +91,31 @@ public class POSaveStateContext extends POContext
 
 		if (state != null)
 		{
-			sb.append("let ");
-			sb.append(OLDNAME);
-			sb.append(" = ");
-			sb.append(state.toPattern(false));
-			sb.append(" in");
+			if (state.location.sameModule(from))
+			{
+				sb.append("let ");
+				sb.append(OLDNAME + number);
+				sb.append(" = ");
+				sb.append(state.toPattern(false, from));
+				sb.append(" in");
+			}
+			else
+			{
+				sb.append("forall ");
+				sb.append(OLDNAME + number);
+				sb.append(":");
+				sb.append(state.name.toExplicitString(from));
+
+				if (oldAndNew)
+				{
+					sb.append(", ");
+					sb.append(NEWNAME + number);
+					sb.append(":");
+					sb.append(state.name.toExplicitString(from));
+				}
+
+				sb.append(" &");
+			}
 		}
 		else if (clazz != null)
 		{

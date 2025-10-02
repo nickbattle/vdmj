@@ -68,6 +68,12 @@ public class TCElementsExpression extends TCUnaryExpression
 		}
 
 		TCSeqType seq = arg.getSeq();
+
+		if (TCType.isFunctionType(seq.seqof, location))
+		{
+			exp.warning(5037, "Function equality cannot be reliably computed");
+		}
+
 		return setType(seq.empty ? new TCSetType(location) : new TCSetType(location, seq.seqof));
 	}
 

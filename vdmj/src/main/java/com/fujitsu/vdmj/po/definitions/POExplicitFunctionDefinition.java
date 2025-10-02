@@ -70,6 +70,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final POExplicitFunctionDefinition postdef;
 	public final PODefinitionListList paramDefinitionList;
 
+	public final POStateDefinition stateDefinition;
 	public final TCType expectedResult;
 	public final TCType actualResult;
 	public final boolean isUndefined;
@@ -90,7 +91,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 		PODefinitionListList paramDefinitionList,
 		boolean recursive,
 		POExplicitFunctionDefinition measureDef,
-		TCNameToken measureName)
+		TCNameToken measureName,
+		POStateDefinition stateDefinition, POClassDefinition classDefinition)
 	{
 		super(name.getLocation(), name);
 
@@ -111,6 +113,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 		this.paramDefinitionList = paramDefinitionList;
 		this.recursive = recursive;
 		this.measureName = measureName;
+		this.stateDefinition = stateDefinition;
+		this.classDefinition = classDefinition;
 	}
 
 	@Override

@@ -382,11 +382,14 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, imp.result.type), env);
 				}
 				
-				if (called.location.module.equals(from.module) &&
-					(imp.predef != null || imp.postdef != null))
+				// Only save old state if we need it
+				if (imp.predef != null)
 				{
-					// Only save old state if we need it
-					push(new POSaveStateContext(getStateDefinition()));
+					push(new POSaveStateContext(imp.predef, from, imp.postdef != null));
+				}
+				else if (imp.postdef != null)
+				{
+					push(new POSaveStateContext(imp.postdef, from, imp.postdef != null));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
@@ -419,11 +422,14 @@ public class POContextStack extends Stack<POContext>
 					env = new FlatEnvironment(new TCLocalDefinition(from, resultVar, exop.type.result), env);
 				}
 					
-				if (called.location.module.equals(from.module) &&
-					(exop.predef != null || exop.postdef != null))
+				// Only save old state if we need it
+				if (exop.predef != null)
 				{
-					// Only save old state if we need it
-					push(new POSaveStateContext(getStateDefinition()));
+					push(new POSaveStateContext(exop.predef, from, exop.postdef != null));
+				}
+				else if (exop.postdef != null)
+				{
+					push(new POSaveStateContext(exop.postdef, from, exop.postdef != null));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
@@ -450,29 +456,41 @@ public class POContextStack extends Stack<POContext>
 		StringBuilder postArgs = new StringBuilder(Utils.listToString(args));
 		StringBuilder preArgs  = new StringBuilder(Utils.listToString(args));
 		
-		PODefinition sdef = getStateDefinition();		// No state => null
-
 		if (resultVar != null)
 		{
 			if (postArgs.length() > 0) postArgs.append(", ");
 			postArgs.append(resultVar.getName());
 		}
 
-		if (sdef instanceof POStateDefinition)
+		POStateDefinition stateDefinition =
+			predef != null ? predef.stateDefinition :
+			postdef != null ? postdef.stateDefinition : null;
+
+		POClassDefinition classDefinition =
+			predef != null ? predef.classDefinition :
+			postdef != null ? postdef.classDefinition : null;
+
+		if (stateDefinition != null)
 		{
-			POStateDefinition state = (POStateDefinition)sdef;
+			if (preArgs.length() > 0) preArgs.append(", ");
+			preArgs.append(POSaveStateContext.getOldName());
 
 			if (postArgs.length() > 0) postArgs.append(", ");
-			postArgs.append(POSaveStateContext.OLDNAME);
+			postArgs.append(POSaveStateContext.getOldName());
 			postArgs.append(", ");
-			postArgs.append(state.toPattern(false));
 
-			if (preArgs.length() > 0) preArgs.append(", ");
-			preArgs.append(POSaveStateContext.OLDNAME);
+			if (stateDefinition.location.sameModule(from))
+			{
+				postArgs.append(stateDefinition.toPattern(false, from));
+			}
+			else
+			{
+				postArgs.append(POSaveStateContext.getNewName());
+			}
 		}
-		else if (sdef instanceof POClassDefinition)
+		else if (classDefinition != null)
 		{
-			return null;	// Can't handle VDM++/RT
+			return null;	// Can't handle VDM++/RT pre/post function state
 		}
 
 		/*
@@ -484,19 +502,19 @@ public class POContextStack extends Stack<POContext>
 
 		StringBuilder result = new StringBuilder();
 
-		if (predef != null && predef.location.module.equals(from.module))
+		if (predef != null)
 		{
 			// Comment this in/out to include preconditions
-			result.append(predef.name);
+			result.append(predef.name.toExplicitString(from));
 			result.append("(");
 			result.append(preArgs);
 			result.append(")");
 		}
 
-		if (postdef != null && postdef.location.module.equals(from.module))
+		if (postdef != null)
 		{
 			if (result.length() > 0) result.append(" and ");
-			result.append(postdef.name);
+			result.append(postdef.name.toExplicitString(from));
 			result.append("(");
 			result.append(postArgs);
 			result.append(")");
@@ -606,7 +624,15 @@ public class POContextStack extends Stack<POContext>
 			if (ctxt instanceof POOperationDefinitionContext)
 			{
 				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
-				return opdef.stateDefinition;
+				
+				if (opdef.stateDefinition != null)
+				{
+					return opdef.stateDefinition;
+				}
+				else
+				{
+					return opdef.classDefinition;
+				}
 			}
 		}
 
@@ -623,20 +649,16 @@ public class POContextStack extends Stack<POContext>
 			{
 				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
 				
-				if (opdef.stateDefinition instanceof POStateDefinition)
+				if (opdef.stateDefinition != null)
 				{
-					POStateDefinition state = (POStateDefinition)opdef.stateDefinition;
-					
-					for (TCField field: state.fields)
+					for (TCField field: opdef.stateDefinition.fields)
 					{
 						names.add(field.tagname);
 					}
 				}
-				else if (opdef.stateDefinition instanceof POClassDefinition)
+				else if (opdef.classDefinition != null)
 				{
-					POClassDefinition clazz = (POClassDefinition)opdef.stateDefinition;
-					
-					for (PODefinition def: clazz.definitions)
+					for (PODefinition def: opdef.classDefinition.definitions)
 					{
 						if (def instanceof POInstanceVariableDefinition)
 						{
