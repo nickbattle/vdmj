@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.scheduler.InitThread;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.values.Value;
 
 /**
@@ -76,6 +77,11 @@ public abstract class INStatement extends INNode
 		if (Properties.in_init_checks && Thread.currentThread() instanceof InitThread)
 		{
 			throw new ContextException(4177, "Not permitted during initialization", location, ctxt);
+		}
+
+		if (!(Thread.currentThread() instanceof SchedulableThread))		// eg. QuickCheck
+		{
+			throw new ContextException(4177, "Not permitted on this thread", location, ctxt);
 		}
 	}
 
