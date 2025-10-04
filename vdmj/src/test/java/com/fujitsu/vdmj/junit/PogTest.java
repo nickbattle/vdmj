@@ -199,7 +199,7 @@ public class PogTest extends TestCase
 
 	private String[] expectedLoops =
 	{
-		/* 1 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (let loop_measure_14 : nat = ax in\n          (let ax : nat = (ax - 1) in\n            (let cx : nat = (cx + 1) in\n              ax < loop_measure_14)))))))\n",
+		/* 1 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (let LOOP_15$ : nat = ax in\n          (let ax : nat = (ax - 1) in\n            (let cx : nat = (cx + 1) in\n              ax < LOOP_15$)))))))\n",
 		/* 2 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax + cx) = size)))\n",
 		/* 3 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax > 0) =>\n      ((ax + cx) = size))))\n",
 		/* 4 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (ax - 1) >= 0))))\n",
@@ -212,10 +212,10 @@ public class PogTest extends TestCase
 		/* 11 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {} in\n      (ax = sums(ABC)))))\n",
 		/* 12 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, ABC:set of nat1, z:nat1 &\n      ((z in set ({1, 2, 3} \\ ABC)) and (ax = sums(ABC)) =>\n        (let ABC : set of nat1 = (ABC union {z}) in\n          (let ax : nat = (ax + z) in\n            (ax = sums(ABC))))))))\n",
 		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {1, 2, 3} in\n      (forall ax:nat &\n        ((ax = sums(ABC)) =>\n          ax <> 0)))))\n",
-		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of nat = [] in\n      (ax = sumq(GHOST$)))))\n",
+		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [] in\n      (ax = sumq(DONE_60$)))))\n",
 		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
-		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, GHOST$:seq of nat, z:nat &\n      ((GHOST$ = ([0, 1, 2, 3](1, ... ,(len GHOST$)))) and (ax = sumq(GHOST$)) =>\n        (let GHOST$ : seq of nat = (GHOST$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(GHOST$))))))))\n",
-		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let GHOST$ : seq of nat = [0, 1, 2, 3] in\n      (forall ax:nat &\n        ((ax = sumq(GHOST$)) =>\n          ax <> 0)))))\n",
+		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, z:nat, DONE_60$:seq of nat &\n      ((z in set ((elems ([0, 1, 2, 3])) \\ (elems (DONE_60$)))) and (ax = sumq(DONE_60$)) =>\n        (let DONE_60$ : seq of nat = (DONE_60$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(DONE_60$))))))))\n",
+		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [0, 1, 2, 3] in\n      (forall ax:nat &\n        ((ax = sumq(DONE_60$)) =>\n          ax <> 0)))))\n",
 		/* 18 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
 		/* 19 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
 		/* 20 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    measure_sumq(s) > measure_sumq(tl s)))\n",

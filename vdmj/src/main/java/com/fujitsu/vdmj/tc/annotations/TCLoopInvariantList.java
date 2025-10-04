@@ -50,7 +50,6 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> implements Mappable
 {
 	private final TCStatement stmt;
-	private final List<TCLoopGhostAnnotation> ghosts;
 	private TCAssignmentDefinition ghostDef = null;
 
 	public TCLoopInvariantList(TCStatement stmt)
@@ -59,26 +58,21 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 			stmt.getAnnotations().getInstances(TCLoopInvariantAnnotation.class);
 
 		super.addAll(invariants);
-		this.ghosts = stmt.getAnnotations().getInstances(TCLoopGhostAnnotation.class);
 		this.stmt = stmt;
-	}
-
-	public List<TCLoopGhostAnnotation> getGhostNames()
-	{
-		return ghosts;
 	}
 
 	private TCNameToken getGhostName()
 	{
-		if (!ghosts.isEmpty())
+		for (TCLoopInvariantAnnotation invariant: this)
 		{
-			String name = ghosts.get(0).ghostName;
-			return new TCNameToken(stmt.location, stmt.location.module, name);
+			if (invariant.ghostName != null)
+			{
+				return invariant.ghostName;
+			}
 		}
-		else
-		{
-			return new TCNameToken(stmt.location, stmt.location.module, "GHOST$");
-		}
+
+		// Default ghost name
+		return new TCNameToken(stmt.location, stmt.location.module, "DONE_" + stmt.location.startLine + "$");
 	}
 
 	public TCAssignmentDefinition getGhostDefinition(TCStatement stmt, Environment env)

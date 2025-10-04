@@ -114,7 +114,7 @@ public class POWhileStatement extends POStatement
 		
 		ctxt.push(new POImpliesContext(this.exp));					// while C => ...
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before each while body");
+		obligations.lastElement().setMessage("check invariant before first while body");
 		ctxt.pop();
 
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>

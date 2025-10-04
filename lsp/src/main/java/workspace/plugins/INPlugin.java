@@ -139,6 +139,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "help":
 			case "?":			return new HelpCommand(line);
 			case "version":		return new VersionCommand(line);
+			case "reload":
 			case "restart":		return new RestartCommand(line);
 			case "quit":
 			case "q":			return new QuitCommand(line);
@@ -162,7 +163,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			QuitCommand.HELP,
 			HelpCommand.HELP,
 			VersionCommand.HELP
-			// Restart hidden
+			// Restart and reload hidden, because it's just advice
 		);
 	}
 

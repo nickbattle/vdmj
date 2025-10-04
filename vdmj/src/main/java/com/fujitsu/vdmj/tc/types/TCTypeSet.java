@@ -83,6 +83,26 @@ public class TCTypeSet extends TreeSet<TCType> implements Mappable
 	@Override
 	public boolean add(TCType t)
 	{
+		if (!(t instanceof TCOptionalType))
+		{
+			// If [T] already there, ignore this one
+			TCOptionalType optional = new TCOptionalType(t.location, t);
+
+			if (contains(optional))
+			{
+				return false;		// Because [T] | T = [T]
+			}
+		}
+		else
+		{
+			TCOptionalType opt = (TCOptionalType)t;
+			
+			if (!opt.type.isUnknown(opt.type.location) && contains(opt.type))
+			{
+				remove(opt.type);	// Because T | [T] = [T]
+			}
+		}
+
 		if (t instanceof TCSeq1Type)
 		{
 			// If we add a TCSeq1Type, and there is already a TCSeqType in the set
@@ -151,15 +171,6 @@ public class TCTypeSet extends TreeSet<TCType> implements Mappable
 						return false;	// Was already there
 					}
 				}
-			}
-		}
-		else if (t instanceof TCOptionalType)
-		{
-			TCOptionalType opt = (TCOptionalType)t;
-			
-			if (!opt.type.isUnknown(opt.type.location) && contains(opt.type))
-			{
-				remove(opt.type);	// Because T | [T] = [T]
 			}
 		}
 		else if (t instanceof TCTokenType)

@@ -74,19 +74,6 @@ public class TCLoopAnnotations implements Mappable
 
 	public void typeCheck(Environment env, TCStatement stmt, TCNameList loopVars)
 	{
-		if (!invariants.getGhostNames().isEmpty())
-		{
-			if (invariants.isEmpty())
-			{
-				stmt.report(6007, "@LoopGhost must also have @LoopInvariant(s)");
-			}
-
-			if (invariants.getGhostNames().size() > 1)
-			{
-				stmt.report(6007, "Only one @LoopGhost allowed");
-			}
-		}
-
 		// Called, even if invariants empty, to set ghost definitions.
 		Environment local = invariants.getGhostEnvironment(stmt, env);
 

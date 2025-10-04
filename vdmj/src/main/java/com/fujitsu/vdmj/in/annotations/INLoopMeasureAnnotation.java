@@ -45,12 +45,12 @@ public class INLoopMeasureAnnotation extends INAnnotation
 	private final INStatement stmt;
 	private final TCNameToken measureName;
 
-	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args, INStatement stmt)
+	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args,
+		INStatement stmt, TCNameToken measureName)
 	{
 		super(name, args);
 		this.stmt = stmt;
-		this.measureName = new TCNameToken(location,
-			location.module, "loop_measure_" + location.startLine);
+		this.measureName = measureName;
 
 		setBreaks(false);	// Break on checks instead
 	}
@@ -63,21 +63,35 @@ public class INLoopMeasureAnnotation extends INAnnotation
 
 	public void check(Context ctxt) throws ValueException
 	{
-		Value currentValue = args.firstElement().eval(ctxt).deref();	// UpdatableValue
-		BigInteger current = currentValue.natValue(ctxt);
+		String message = null;
+		LexLocation at = null;
 
-		Value previousValue = ctxt.check(measureName);
-		BigInteger previous = previousValue.natValue(ctxt);
+		try
+		{
+			Value currentValue = args.firstElement().eval(ctxt).deref();	// UpdatableValue
+			BigInteger current = currentValue.natValue(ctxt);
 
-		if (previous.compareTo(current) > 0)
-		{
-			ctxt.put(measureName, currentValue);	// Fine
+			Value previousValue = ctxt.check(measureName);
+			BigInteger previous = previousValue.natValue(ctxt);
+
+			if (previous.compareTo(current) > 0)
+			{
+				ctxt.put(measureName, currentValue);	// Fine
+				return;
+			}
+			else
+			{
+				message = "Loop measure failed: prev " + previous + ", curr " + current;
+				at = lastLocation();
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			throw new ContextException(4179,
-				"Loop measure failed: prev " + previous + ", curr " + current, lastLocation(), ctxt);
+			message = "Loop measure failed: " + e.getMessage();
+			at = location;
 		}
+
+		throw new ContextException(4179,	message, at, ctxt);
 	}
 
 	private LexLocation lastLocation()

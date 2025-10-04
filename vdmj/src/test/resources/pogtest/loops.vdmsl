@@ -42,8 +42,7 @@ operations
 	(
 		dcl ax : nat := 0;
 
-		-- @LoopGhost(ABC)
-		-- @LoopInvariant(ax = sums(ABC))
+		-- @LoopInvariant(ax = sums(ABC), ABC)
 		for all z in set {1,2,3} do
 		(
 			ax := ax + z
@@ -57,7 +56,7 @@ operations
 	(
 		dcl ax : nat := 0;
 
-		-- @LoopInvariant(ax = sumq(GHOST$))
+		-- @LoopInvariant(ax = sumq(DONE_60$))
 		for z in seq [0,1] in [0,1,2,3] do
 		(
 			ax := ax + z
