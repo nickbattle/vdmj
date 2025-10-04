@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -34,14 +33,13 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
-import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
+import com.fujitsu.vdmj.po.expressions.POElementsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
-import com.fujitsu.vdmj.po.expressions.POLenExpression;
+import com.fujitsu.vdmj.po.expressions.POInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqEnumExpression;
-import com.fujitsu.vdmj.po.expressions.POSubseqExpression;
+import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternBind;
@@ -213,7 +211,7 @@ public class POForPatternBindStatement extends POStatement
 		}
 
 		ctxt.push(new POForAllContext(updates, local));
-		ctxt.push(new POImpliesContext(ghostIsPrefix(ghostDef, eseq), invariant));
+		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eseq), invariant));
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
 
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
@@ -309,8 +307,28 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	/**
-	 * Produce "GHOST$ = sequence(1, ..., len GHOST$)"
+	 * Produce "x in set (elems list \ elems GHOST$)"
 	 */
+	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eset)
+	{
+		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
+		TCType setof = ghostDef.type.getSeq().seqof;
+		
+		return new POInSetExpression(
+			getPattern().getMatchingExpression(),				// eg mk_(x, y)
+			new LexKeywordToken(Token.INSET, location),
+			new POSetDifferenceExpression(
+				new POElementsExpression(location, eset),
+				new LexKeywordToken(Token.SETDIFF, location),
+				new POElementsExpression(location,
+					new POVariableExpression(ghostDef.name, vardef)),
+				ghostDef.type, ghostDef.type),
+			setof, ghostDef.type);
+	}
+
+	/**
+	 * Produce "GHOST$ = sequence(1, ..., len GHOST$)"
+	 *
 	private POExpression ghostIsPrefix(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
@@ -325,6 +343,7 @@ public class POForPatternBindStatement extends POStatement
 					new POVariableExpression(ghostDef.name, vardef)), ghostDef.type, ghostDef.type),
 			ghostDef.type, ghostDef.type);
 	}
+	***/
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

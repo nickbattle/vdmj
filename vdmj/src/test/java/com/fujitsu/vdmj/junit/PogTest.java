@@ -214,7 +214,7 @@ public class PogTest extends TestCase
 		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {1, 2, 3} in\n      (forall ax:nat &\n        ((ax = sums(ABC)) =>\n          ax <> 0)))))\n",
 		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [] in\n      (ax = sumq(DONE_60$)))))\n",
 		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
-		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, z:nat, DONE_60$:seq of nat &\n      ((DONE_60$ = ([0, 1, 2, 3](1, ... ,(len DONE_60$)))) and (ax = sumq(DONE_60$)) =>\n        (let DONE_60$ : seq of nat = (DONE_60$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(DONE_60$))))))))\n",
+		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, z:nat, DONE_60$:seq of nat &\n      ((z in set ((elems ([0, 1, 2, 3])) \\ (elems (DONE_60$)))) and (ax = sumq(DONE_60$)) =>\n        (let DONE_60$ : seq of nat = (DONE_60$ ^ [z]) in\n          (let ax : nat = (ax + z) in\n            (ax = sumq(DONE_60$))))))))\n",
 		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [0, 1, 2, 3] in\n      (forall ax:nat &\n        ((ax = sumq(DONE_60$)) =>\n          ax <> 0)))))\n",
 		/* 18 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
 		/* 19 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
