@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.annotations;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
@@ -38,13 +39,13 @@ public class POLoopMeasureAnnotation extends POAnnotation
 	public final TCNameToken measureName;
 	public final POExpression expression;
 
-	public POLoopMeasureAnnotation(TCIdentifierToken name, POExpressionList args)
+	public POLoopMeasureAnnotation(TCIdentifierToken name, POExpressionList args,
+		POStatement stmt, TCNameToken measureName)
 	{
 		super(name, args);
 
 		this.expression = args.firstElement();
-		this.measureName = new TCNameToken(location,
-			location.module, "LOOP_" + location.startLine + "$");
+		this.measureName = measureName;
 	}
 
 	public POAssignmentDefinition getDefinition()

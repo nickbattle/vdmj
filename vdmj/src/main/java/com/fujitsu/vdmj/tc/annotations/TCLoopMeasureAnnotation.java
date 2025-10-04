@@ -28,7 +28,9 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
@@ -42,6 +44,7 @@ public class TCLoopMeasureAnnotation extends TCAnnotation
 	private static final long serialVersionUID = 1L;
 
 	public TCStatement stmt;	// The annotated while loop
+	public TCNameToken measureName = null;
 
 	public TCLoopMeasureAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -81,9 +84,9 @@ public class TCLoopMeasureAnnotation extends TCAnnotation
 		{
 			name.report(6006, "@LoopMeasure only applies to while statements");
 		}
-		else if (args.size() != 1)
+		else if (args.size() != 1 && args.size() != 2)
 		{
-			name.report(6007, "@LoopMeasure expects one argument");
+			name.report(6007, "@LoopMeasure args: <numeric expression> [, <ghost>]");
 		}
 		else
 		{
@@ -93,13 +96,42 @@ public class TCLoopMeasureAnnotation extends TCAnnotation
 			{
 				TCNumericType ntype = type.getNumeric();
 
-				if (ntype.getWeight() < 3)		// nat1, nat or int
+				if (ntype.getWeight() > 2)		// NOT nat1, nat or int => rat or real
 				{
-					return;
+					name.report(6007, "@LoopMeasure argument must be type nat");
+					name.detail("Actual", ntype.toString());
 				}
 			}
+			else
+			{
+				name.report(6007, "@LoopMeasure argument must be numeric");
+				name.detail("Actual", type.toString());
+			}
 
-			name.report(6007, "@LoopMeasure argument must be type nat");
+			if (args.size() == 2)	// Ghost name given
+			{
+				if (args.get(1) instanceof TCVariableExpression)
+				{
+					TCVariableExpression variable = (TCVariableExpression)args.get(1);
+
+					if (env.findName(variable.name, scope) != null)
+					{
+						args.get(1).report(6007, "@LoopMeasure ghost already in scope");
+					}
+					
+					measureName = variable.name;
+				}
+				else
+				{
+					args.get(1).report(6007, "@LoopMeasure ghost must be a name");
+					args.get(1).detail("Actual", args.get(1));
+				}
+			}
+			else
+			{
+				measureName = new TCNameToken(stmt.location,
+					stmt.location.module, "LOOP_" + stmt.location.startLine + "$");
+			}
 		}
 	}
 

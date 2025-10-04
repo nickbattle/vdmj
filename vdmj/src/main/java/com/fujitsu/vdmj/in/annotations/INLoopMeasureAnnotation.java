@@ -43,12 +43,12 @@ public class INLoopMeasureAnnotation extends INAnnotation
 	private final INStatement stmt;
 	private final TCNameToken measureName;
 
-	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args, INStatement stmt)
+	public INLoopMeasureAnnotation(TCIdentifierToken name, INExpressionList args,
+		INStatement stmt, TCNameToken measureName)
 	{
 		super(name, args);
 		this.stmt = stmt;
-		this.measureName = new TCNameToken(location,
-			location.module, "loop_measure_" + location.startLine);
+		this.measureName = measureName;
 
 		setBreaks(false);	// Break on checks instead
 	}

@@ -199,7 +199,7 @@ public class PogTest extends TestCase
 
 	private String[] expectedLoops =
 	{
-		/* 1 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (let LOOP_14$ : nat = ax in\n          (let ax : nat = (ax - 1) in\n            (let cx : nat = (cx + 1) in\n              ax < LOOP_14$)))))))\n",
+		/* 1 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (let LOOP_15$ : nat = ax in\n          (let ax : nat = (ax - 1) in\n            (let cx : nat = (cx + 1) in\n              ax < LOOP_15$)))))))\n",
 		/* 2 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax + cx) = size)))\n",
 		/* 3 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax > 0) =>\n      ((ax + cx) = size))))\n",
 		/* 4 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) and (ax > 0) =>\n        (ax - 1) >= 0))))\n",
