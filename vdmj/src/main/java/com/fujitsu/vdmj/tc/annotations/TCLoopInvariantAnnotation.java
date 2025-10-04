@@ -88,7 +88,11 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		}
 		else if (args.size() == 2)
 		{
-			if (args.get(1) instanceof TCVariableExpression)
+			if (stmt instanceof TCWhileStatement || stmt instanceof TCForIndexStatement)
+			{
+				args.get(1).warning(6007, "@LoopInvariant ghost not used");
+			}
+			else if (args.get(1) instanceof TCVariableExpression)
 			{
 				TCVariableExpression variable = (TCVariableExpression)args.get(1);
 
