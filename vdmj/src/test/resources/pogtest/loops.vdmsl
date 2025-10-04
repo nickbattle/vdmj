@@ -58,6 +58,7 @@ operations
 		dcl ax : nat := 0;
 
 		-- @LoopInvariant(ax = sumq(GHOST$))
+		-- @LoopGhost(GHOST$)
 		for z in seq [0,1] in [0,1,2,3] do
 		(
 			ax := ax + z

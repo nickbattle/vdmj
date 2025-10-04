@@ -77,7 +77,7 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 		}
 		else
 		{
-			return new TCNameToken(stmt.location, stmt.location.module, "GHOST$");
+			return new TCNameToken(stmt.location, stmt.location.module, "DONE_" + stmt.location.startLine + "$");
 		}
 	}
 

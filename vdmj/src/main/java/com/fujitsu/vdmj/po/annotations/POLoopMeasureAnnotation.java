@@ -44,7 +44,7 @@ public class POLoopMeasureAnnotation extends POAnnotation
 
 		this.expression = args.firstElement();
 		this.measureName = new TCNameToken(location,
-			location.module, "loop_measure_" + location.startLine);
+			location.module, "LOOP_" + location.startLine + "$");
 	}
 
 	public POAssignmentDefinition getDefinition()
