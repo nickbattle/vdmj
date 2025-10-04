@@ -354,7 +354,6 @@ package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
 map TCLoopAnnotations{invariants, measure} to POLoopAnnotations(invariants, measure);
 map TCLoopInvariantList{ghostDef} to POLoopInvariantList(this, ghostDef);
 map TCLoopInvariantAnnotation{name, args, hasLoopVars} to POLoopInvariantAnnotation(name, args, hasLoopVars);
-map TCLoopGhostAnnotation{name, args} to POLoopGhostAnnotation(name, args);
 map TCLoopMeasureAnnotation{name, args} to POLoopMeasureAnnotation(name, args);
 
 # Java - usually unmappeds

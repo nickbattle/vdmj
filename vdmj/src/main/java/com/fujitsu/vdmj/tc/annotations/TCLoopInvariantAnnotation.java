@@ -28,14 +28,15 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
 import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCForPatternBindStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -43,6 +44,7 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private boolean hasLoopVars = false;
+	public TCNameToken ghostName = null;
 
 	public TCLoopInvariantAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -74,15 +76,33 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
 		if (!isLoop(stmt))
 		{
 			name.report(6006, "@LoopInvariant only applies to loop statements");
 		}
-		else if (args.size() != 1)
+		else if (args.size() != 1 && args.size() != 2)
 		{
-			name.report(6007, "@LoopInvariant is one boolean condition");
+			name.report(6007, "@LoopInvariant args: <boolean expression> [, <ghost>]");
+		}
+		else if (args.size() == 2)
+		{
+			if (args.get(1) instanceof TCVariableExpression)
+			{
+				TCVariableExpression variable = (TCVariableExpression)args.get(1);
+
+				if (env.findName(variable.name, scope) != null)
+				{
+					args.get(1).report(6007, "@LoopInvariant ghost already in scope");
+				}
+				
+				ghostName = variable.name;
+			}
+			else
+			{
+				args.get(1).report(6007, "@LoopInvariant ghost must be a name");
+			}
 		}
 
 		// Further checks are performed across the collection of all LoopInvariants on
