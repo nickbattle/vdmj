@@ -132,6 +132,15 @@ public abstract class PODefinition extends PONode implements Comparable<PODefini
 	}
 
 	/**
+	 * True if this definition is a PP/RT constructor.
+	 * @return
+	 */
+	public boolean isConstructor()
+	{
+		return false;
+	}
+
+	/**
 	 * Return a list of variable names that would be defined by the definition.
 	 */
 	public final TCNameList getVariableNames()
