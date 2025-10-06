@@ -96,6 +96,7 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
+import quickcheck.QuickCheckException;
 import quickcheck.visitors.FixedRangeCreator;
 
 public class FixedQCStrategy extends QCStrategy
@@ -541,6 +542,10 @@ public class FixedQCStrategy extends QCStrategy
 					values.put(key, list);
 				}
 			}
+		}
+		catch (QuickCheckException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{

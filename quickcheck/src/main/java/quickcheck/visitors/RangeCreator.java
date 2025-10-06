@@ -60,8 +60,9 @@ import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairMap;
 import com.fujitsu.vdmj.values.ObjectValue;
-import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.ValueSet;
+
+import quickcheck.QuickCheckException;
 
 public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
@@ -198,13 +199,20 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	 * any construction etc. This is just a means to create something that matches
 	 * the object pattern in the top level forall, to try to enable simple VDM++
 	 * specifications to be tested with QC. Note that and class invariants are
-	 * checked separately by checkObject below.
+	 * checked separately by checkObject below -- though it looks like this will
+	 * never work in practice, so we may be better off aborting these cases.
 	 */
-	protected ObjectValue createObject(TCClassDefinition cdef, int seed)
+	protected ObjectValue createObject(TCClassDefinition cdef, int seed) throws QuickCheckException
 	{
 		TCClassType ctype = (TCClassType)cdef.getType();
 		List<ObjectValue> superobjects = new Vector<ObjectValue>();
 		NameValuePairMap members = new NameValuePairMap();
+
+		// We can't deal with classes that have class invariants (too hard)
+		if (cdef.invariant != null)
+		{
+			throw new QuickCheckException("Cannot generate object value with invariant: " + cdef.name);
+		}
 		
 		for (TCClassDefinition sdef: cdef.superdefs)
 		{
@@ -250,7 +258,8 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 					}
 					else
 					{
-						members.put(new NameValuePair(idef.name, new UndefinedValue()));
+						// members.put(new NameValuePair(idef.name, new UndefinedValue()));
+						throw new QuickCheckException("Cannot generate " + idef.name + " values");
 					}
 				}
 			}
@@ -269,8 +278,8 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 					}
 					catch (Exception e)
 					{
-						// Give up
-						members.put(new NameValuePair(name.name, new UndefinedValue()));
+						// members.put(new NameValuePair(name.name, new UndefinedValue()));
+						throw new QuickCheckException("Cannot generate " + name + " values");
 					}
 				}
 			}
