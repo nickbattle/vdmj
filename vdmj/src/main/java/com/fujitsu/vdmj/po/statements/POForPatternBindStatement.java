@@ -42,9 +42,9 @@ import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
+import com.fujitsu.vdmj.po.expressions.POPlusExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqEnumExpression;
-import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POSubseqExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -71,6 +71,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -314,32 +315,40 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	/**
-	 * Produce "(GHOST$ = list(1, ..., len GHOST$)) and x in set (elems list \ elems GHOST$)"
+	 * Produce "(GHOST$ = list(1, ..., len GHOST$)) and (x in set elems list(len GHOST$ + 1, ..., len list))"
 	 */
-	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eset)
+	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
 		TCType seqof = ghostDef.type.getSeq().seqof;
 		
-		TCBooleanType boolt = new TCBooleanType(location);
+		TCBooleanType booltype = new TCBooleanType(location);
+		TCNaturalType nattype = new TCNaturalType(location);
 
 		return new POAndExpression(
-			ghostIsPrefix(ghostDef, eset),
+			ghostIsPrefix(ghostDef, eseq),
 
 			new LexKeywordToken(Token.AND, location),
 		
 			new POInSetExpression(
 				getPattern().getMatchingExpression(),				// eg mk_(x, y)
 				new LexKeywordToken(Token.INSET, location),
-				new POSetDifferenceExpression(
-					new POElementsExpression(location, eset),
-					new LexKeywordToken(Token.SETDIFF, location),
-					new POElementsExpression(location,
-						new POVariableExpression(ghostDef.name, vardef)),
-					ghostDef.type, ghostDef.type),
+				new POElementsExpression(location,
+					new POSubseqExpression(
+						eseq,
+						new POPlusExpression(
+							new POLenExpression(location, new POVariableExpression(ghostDef.name, vardef)),
+							new LexKeywordToken(Token.PLUS, location),
+							new POIntegerLiteralExpression(LexIntegerToken.ONE),
+							nattype, nattype
+						),
+						new POLenExpression(location, eseq),
+						nattype, nattype
+					)
+				),
 				seqof, ghostDef.type),
 
-			boolt, boolt);
+			booltype, booltype);
 	}
 
 	/**
@@ -348,6 +357,7 @@ public class POForPatternBindStatement extends POStatement
 	private POExpression ghostIsPrefix(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
+		TCNaturalType nattype = new TCNaturalType(location);
 		
 		return new POEqualsExpression(
 			new POVariableExpression(ghostDef.name, vardef),
@@ -356,7 +366,8 @@ public class POForPatternBindStatement extends POStatement
 				eseq,
 				new POIntegerLiteralExpression(LexIntegerToken.ONE),
 				new POLenExpression(location,
-					new POVariableExpression(ghostDef.name, vardef)), ghostDef.type, ghostDef.type),
+					new POVariableExpression(ghostDef.name, vardef)),
+				nattype, nattype),
 			ghostDef.type, ghostDef.type);
 	}
 
