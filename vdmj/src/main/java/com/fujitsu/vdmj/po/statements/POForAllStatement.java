@@ -33,9 +33,11 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
+import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POInSetExpression;
+import com.fujitsu.vdmj.po.expressions.POProperSubsetExpression;
 import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POSetUnionExpression;
@@ -56,6 +58,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -223,21 +226,33 @@ public class POForAllStatement extends POStatement
 	}
 
 	/**
-	 * Produce "x in set (ax \ gx)"
+	 * Produce "(ghost subset values) and x in set (values \ ghost)"
 	 */
 	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eset)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
 		TCType setof = ghostDef.type.getSet().setof;
-		
-		return new POInSetExpression(
-			pattern.getMatchingExpression(),				// eg mk_(x, y)
-			new LexKeywordToken(Token.INSET, location),
-			new POSetDifferenceExpression(
+		TCBooleanType boolt = new TCBooleanType(location);
+
+		return new POAndExpression(
+			new POProperSubsetExpression(
+				new POVariableExpression(ghostDef.name, vardef),
+				new LexKeywordToken(Token.PSUBSET, location),
 				eset,
-				new LexKeywordToken(Token.SETDIFF, location),
-				new POVariableExpression(ghostDef.name, vardef), ghostDef.type, ghostDef.type),
-			setof, ghostDef.type);
+				setof, setof),
+
+			new LexKeywordToken(Token.AND, location),
+		
+			new POInSetExpression(
+				pattern.getMatchingExpression(),				// eg mk_(x, y)
+				new LexKeywordToken(Token.INSET, location),
+				new POSetDifferenceExpression(
+					eset,
+					new LexKeywordToken(Token.SETDIFF, location),
+					new POVariableExpression(ghostDef.name, vardef), ghostDef.type, ghostDef.type),
+				setof, ghostDef.type),
+
+			boolt, boolt);
 	}
 
 	@Override
