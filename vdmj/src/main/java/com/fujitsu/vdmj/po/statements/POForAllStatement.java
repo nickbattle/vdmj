@@ -106,7 +106,7 @@ public class POForAllStatement extends POStatement
 		
 		if (!annotations.isEmpty())
 		{
-			invariant = annotations.combine(false);
+			invariant = annotations.combine(true);
 		}
 	
 		POAssignmentDefinition ghostDef = annotations.getGhostDef();
@@ -155,6 +155,11 @@ public class POForAllStatement extends POStatement
 		Environment local = new FlatCheckedEnvironment(tcdefs, env, NameScope.NAMES);
 		updates.addAll(pattern.getVariableNames());
 		updates.add(ghostName);
+
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(false);	// Don't exclude loop vars now
+		}
 
 		ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
 		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eset), invariant));	// x in set S \ GHOST$ && invariant => ...

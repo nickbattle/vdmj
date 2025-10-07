@@ -120,7 +120,7 @@ public class POForIndexStatement extends POStatement
 
 		if (!annotations.isEmpty())
 		{
-			invariant = annotations.combine(false);
+			invariant = annotations.combine(true);
 		}
 
 		POAltContext altCtxt = new POAltContext();
@@ -155,6 +155,11 @@ public class POForIndexStatement extends POStatement
 		TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
 		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
 		updates.add(var);
+
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(false);	// Don't exclude loop vars now
+		}
 
 		ctxt.push(new POForAllContext(updates, local));				// forall <changed values> and vars
 		ctxt.push(new POImpliesContext(varIsValid(efrom, eto, eby), invariant));	// valid index && invariant => ...
