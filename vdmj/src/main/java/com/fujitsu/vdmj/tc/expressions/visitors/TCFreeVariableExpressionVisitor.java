@@ -48,6 +48,10 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCFreeVariableBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCFreeVariableMultipleBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCFreeVariablePatternVisitor;
+import com.fujitsu.vdmj.tc.types.visitors.TCFreeVariableTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -58,6 +62,32 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 	{
 		assert visitors != null : "Visitor set cannot be null";
 		visitorSet = visitors;
+	}
+
+	/**
+	 * Special constructor that creates a visitorSet independent of the Definition visitor. This is
+	 * used in TCExpression.getFreeVariables().
+	 */
+	public TCFreeVariableExpressionVisitor()
+	{
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Environment>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				expressionVisitor = new TCFreeVariableExpressionVisitor(this);
+				patternVisitor = new TCFreeVariablePatternVisitor(this);
+				typeVisitor = new TCFreeVariableTypeVisitor();
+				bindVisitor = new TCFreeVariableBindVisitor(this);
+				multiBindVisitor = new TCFreeVariableMultipleBindVisitor(this); 
+			}
+
+			@Override
+			protected TCNameSet newCollection()
+			{
+				return TCFreeVariableExpressionVisitor.this.newCollection();
+			}
+		};
 	}
 
 	@Override
@@ -311,7 +341,7 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 			}
 		}
 		
-		if (arg.findName(node.name, NameScope.NAMESANDANYSTATE) == null)
+		if (d == null)
 		{
 			return new TCNameSet(node.name.getExplicit(true));
 		}
