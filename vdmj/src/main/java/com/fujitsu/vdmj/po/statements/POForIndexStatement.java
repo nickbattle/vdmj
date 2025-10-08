@@ -141,17 +141,11 @@ public class POForIndexStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * The initial case verifies that the invariant is true for the loop "from" value.
+		 * The initial case verifies that the invariant is true before the loop.
 		 */
-		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
-		ctxt.push(new POLetDefContext(def));		// eg. let x = 1 in
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant at first for-loop");
-		ctxt.pop();
+		obligations.lastElement().setMessage("check invariant before for-loop");
 
-		/**
-		 * The preservation case verifies that if the invariant is true at X, then it is true at X+by
-		 */
 		TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
 		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
 		updates.add(var);
@@ -161,7 +155,20 @@ public class POForIndexStatement extends POStatement
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
 
-		ctxt.push(new POForAllContext(updates, local));				// forall <changed values> and vars
+		/**
+		 * The start of the loop verifies that the first "from" value can start the loop and
+		 * will meet the invariant.
+		 */
+		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
+		ctxt.push(new POLetDefContext(def));						// eg. let x = 1 in
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant for first for-loop");
+		ctxt.pop();
+
+		/**
+		 * The preservation case verifies that if the invariant is true at X, then it is true at X+by
+		 */
+		ctxt.push(new POForAllContext(updates, local));								// forall <changed values> and vars
 		ctxt.push(new POImpliesContext(varIsValid(efrom, eto, eby), invariant));	// valid index && invariant => ...
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 

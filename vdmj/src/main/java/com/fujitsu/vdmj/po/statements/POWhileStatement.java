@@ -109,19 +109,29 @@ public class POWhileStatement extends POStatement
 
 		int popto = ctxt.size();	// Includes missing invariant above
 
+		/**
+		 * The initial case verifies that the invariant is true before the loop starts.
+		 */
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before while condition");
 		
+		/**
+		 * Then we verify that if we can start the loop, we will meet the invariant.
+		 */
 		ctxt.push(new POImpliesContext(this.exp));					// while C => ...
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before first while body");
 		ctxt.pop();
 
+		/**
+		 * The preservation case verifies that if the invariant is true initially, then it is true
+		 * the end of the loop.
+		 */
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant, this.exp));		// invariant && while C => ...
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant after each while body");
+		obligations.lastElement().setMessage("check invariant preserved by while body");
 
 		/**
 		 * The context stack now contains everything from the statement block, but we want to

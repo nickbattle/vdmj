@@ -34,11 +34,13 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
+import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POElementsExpression;
 import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POHeadExpression;
 import com.fujitsu.vdmj.po.expressions.POInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
@@ -148,7 +150,7 @@ public class POForPatternBindStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * The initial case verifies that the invariant is true for the empty ghost state.
+		 * The initial case verifies that the invariant is true before the loop.
 		 */
 		ctxt.push(new POLetDefContext(ghostDef));			// let ghost = [] in
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
@@ -193,9 +195,6 @@ public class POForPatternBindStatement extends POStatement
 			ctxt.pop();
 		}
 
-		/**
-		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ {x}
-		 */
 		TCSeqType stype = eseq.getExptype().getSeq();
 		PODefinitionList podefs = getPattern().getDefinitions(stype.seqof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
@@ -218,6 +217,20 @@ public class POForPatternBindStatement extends POStatement
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
 
+		/**
+		 * The start of the loop verifies that the first value in the list can start the loop and
+		 * will meet the invariant. The ghost is therefore set to that one value.
+		 */
+		ctxt.push(new POLetDefContext(firstItemDef()));				// x := hd sequence
+		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));		// ghost := [x]]
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant for first for-loop");
+		ctxt.pop();
+		ctxt.pop();
+
+		/**
+		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ {x}
+		 */
 		ctxt.push(new POForAllContext(updates, local));
 		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eseq), invariant));
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
@@ -304,6 +317,28 @@ public class POForPatternBindStatement extends POStatement
 			new POSeqEnumExpression(location, elist, tlist), ghostDef.type, ghostDef.type);
 
 		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, cat, ghostDef.type);
+	}
+
+	/**
+	 * Produce "<pattern> = <hd sequence>"
+	 */
+	private POValueDefinition firstItemDef()
+	{
+		TCSeqType seqtype = expType.getSeq();
+		POHeadExpression head = new POHeadExpression(location, sequence, seqtype);
+		return new POValueDefinition(null, getPattern(), seqtype.seqof, head, seqtype.seqof, null);
+	}
+
+	/**
+	 * Produce "ghost := [<pattern>]"
+	 */
+	private POAssignmentDefinition ghostFirst(POAssignmentDefinition ghostDef)
+	{
+		POExpressionList members = new POExpressionList();
+		members.add(getPattern().getMatchingExpression());
+		TCTypeList types = new TCTypeList(ghostDef.type);
+		POSeqEnumExpression first = new POSeqEnumExpression(location, members, types);
+		return ghostFinal(ghostDef, first);
 	}
 
 	/**

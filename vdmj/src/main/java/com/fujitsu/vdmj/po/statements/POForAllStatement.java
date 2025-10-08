@@ -129,16 +129,14 @@ public class POForAllStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * The initial case verifies that the invariant is true for the empty ax/gx state.
+		 * The initial case verifies that the invariant is true before the loop starts. The GHOST
+		 * is empty therefore, but there are no loop variables bound.
 		 */
 		ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before for-loop");
 		ctxt.pop();
 
-		/**
-		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
-		 */
 		TCSetType stype = eset.getExptype().getSet();
 		PODefinitionList podefs = pattern.getDefinitions(stype.setof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
@@ -161,6 +159,19 @@ public class POForAllStatement extends POStatement
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
 
+		/**
+		 * The start of the loop verifies that every value in the set can start the loop and
+		 * will meet the invariant. The ghost is therefore set to that one value.
+		 */
+		ctxt.push(new POForAllContext(pattern, eset));							// forall possible first values
+		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));					// ghost := {x}
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant for first for-loop");
+		ctxt.pop();
+
+		/**
+		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
+		 */
 		ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
 		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eset), invariant));	// x in set S \ GHOST$ && invariant => ...
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
@@ -220,6 +231,18 @@ public class POForAllStatement extends POStatement
 			new POSetEnumExpression(location, elist, tlist), ghostDef.type, ghostDef.type);
 
 		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, union, ghostDef.type);
+	}
+
+	/**
+	 * Produce "ghost := {<pattern>}"
+	 */
+	private POAssignmentDefinition ghostFirst(POAssignmentDefinition ghostDef)
+	{
+		POExpressionList members = new POExpressionList();
+		members.add(pattern.getMatchingExpression());
+		TCTypeList types = new TCTypeList(ghostDef.type);
+		POSetEnumExpression first = new POSetEnumExpression(location, members, types);
+		return ghostFinal(ghostDef, first);
 	}
 
 	/**
