@@ -51,7 +51,7 @@ public class TCSubseqExpression extends TCExpression
 	@Override
 	public String toString()
 	{
-		return "(" + seq + "(" + from + ", ... ," + to + "))";
+		return "(" + seq + "(" + from + ", ..., " + to + "))";
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class POSubseqExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return "(" + seq + "(" + from + ", ... ," + to + "))";
+		return "(" + seq + "(" + from + ", ..., " + to + "))";
 	}
 
 	@Override

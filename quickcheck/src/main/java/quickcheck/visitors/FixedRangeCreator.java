@@ -87,6 +87,8 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
+import quickcheck.QuickCheckException;
+
 public class FixedRangeCreator extends RangeCreator
 {
 	public FixedRangeCreator(Context ctxt)
@@ -131,9 +133,13 @@ public class FixedRangeCreator extends RangeCreator
 				}
 				while (--retries > 0);
 			}
+			catch (QuickCheckException e)
+			{
+				throw e;
+			}
 			catch (Throwable t)
 			{
-				break;	// Give up and return what we've got
+				throw new QuickCheckException("Cannot generate " + node.toString() + " values");
 			}
 		}
 		

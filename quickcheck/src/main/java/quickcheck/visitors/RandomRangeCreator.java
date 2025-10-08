@@ -88,6 +88,8 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
+import quickcheck.QuickCheckException;
+
 public class RandomRangeCreator extends RangeCreator
 {
 	private final Random prng;
@@ -169,7 +171,7 @@ public class RandomRangeCreator extends RangeCreator
 			}
 			catch (Throwable t)
 			{
-				break;	// Give up and return what we've got
+				throw new QuickCheckException("Cannot generate " + node.toString() + " values");
 			}
 		}
 		

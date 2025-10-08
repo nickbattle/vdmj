@@ -116,7 +116,12 @@ public class POCallStatement extends POStatement
 		
 		if (rtype != null && getStmttype().isReturn() && !TypeComparator.isSubType(getStmttype(), rtype))
 		{
-			obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
+			PODefinition calledFrom = ctxt.getDefinition();
+
+			if (!calledFrom.isConstructor())	// Strange subtype rules don't apply to ctors
+			{
+				obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
+			}
 		}
 
 		return obligations;

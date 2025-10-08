@@ -50,7 +50,7 @@ public class INSubseqExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return "(" + seq + "(" + from + ", ... ," + to + "))";
+		return "(" + seq + "(" + from + ", ..., " + to + "))";
 	}
 
 	@Override

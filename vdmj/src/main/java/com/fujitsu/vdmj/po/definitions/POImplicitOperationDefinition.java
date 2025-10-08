@@ -142,6 +142,12 @@ public class POImplicitOperationDefinition extends PODefinition
 	}
 
 	@Override
+	public boolean isConstructor()
+	{
+		return isConstructor;
+	}
+
+	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		ProofObligationList obligations =

@@ -354,6 +354,11 @@ public class QuickCheck
 
 					sresults = strategy.getValues(po, binds, ictxt);
 				}
+				catch (QuickCheckException e)
+				{
+					po.markUnchecked(e.getMessage());	// Controlled abort, unsets isCheckable
+					break;
+				}
 				catch (Throwable t)
 				{
 					errorln("Strategy " + strategy.getName() + " failed to generate values: " + t);
@@ -401,17 +406,20 @@ public class QuickCheck
 			verboseln("------------------------- Strategies complete.");
 		}
 		
-		for (INBindingOverride bind: binds)
+		if (po.isCheckable)		// Can be unset by a QuickCheckException
 		{
-			ValueList values = union.get(bind.toString());
-			
-			if (values == null)
+			for (INBindingOverride bind: binds)
 			{
-				// Generate some values for missing bindings, using the fixed method
-				verbose("Generating fixed values for %s\n", bind);
-				values = new ValueList();
-				values.addAll(bind.getType(ictxt).apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
-				union.put(bind.toString(), values);
+				ValueList values = union.get(bind.toString());
+				
+				if (values == null)
+				{
+					// Generate some values for missing bindings, using the fixed method
+					verbose("Generating fixed values for %s\n", bind);
+					values = new ValueList();
+					values.addAll(bind.getType(ictxt).apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
+					union.put(bind.toString(), values);
+				}
 			}
 		}
 		
@@ -425,14 +433,17 @@ public class QuickCheck
 		try
 		{
 			verbose("------------------------ Checking PO #%d\n", po.number);
+
+			if (!po.isCheckable)	// Probably set via QuickCheckExceptions earlier
+			{
+				verbose("PO is UNCHECKED");
+				return;
+			}
+
 			resetErrors();			// Only flag fatal errors
 			po.clearAnalysis();		// Clears fields to be set by QC
 
-			if (!po.isCheckable)
-			{
-				verbose("PO is UNCHECKED");
-			}
-			else if (sresults.updater != null)
+			if (sresults.updater != null)
 			{
 				verbose("Calling updater");
 				sresults.updater.updateProofObligation(po);	
@@ -529,6 +540,12 @@ public class QuickCheck
 				execResult = new BooleanValue(false);
 				execException = e;
 			}
+		}
+		catch (QuickCheckException e)
+		{
+			execResult = new UndefinedValue();		// Gives MAYBE
+			po.clearAnalysis();
+			po.markUnchecked(e.getMessage());
 		}
 		catch (Throwable e)
 		{

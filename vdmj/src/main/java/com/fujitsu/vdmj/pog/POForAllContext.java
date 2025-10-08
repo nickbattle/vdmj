@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExists1Expression;
 import com.fujitsu.vdmj.po.expressions.POExistsExpression;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POForAllExpression;
 import com.fujitsu.vdmj.po.expressions.POIotaExpression;
 import com.fujitsu.vdmj.po.expressions.POLambdaExpression;
@@ -41,7 +42,10 @@ import com.fujitsu.vdmj.po.expressions.POSeqCompExpression;
 import com.fujitsu.vdmj.po.expressions.POSetCompExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
+import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
+import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
@@ -143,6 +147,22 @@ public class POForAllContext extends POContext
 	{
 		this(updates, env);
 		this.qualifier = qualifier;
+	}
+
+	public POForAllContext(POPattern pattern, POExpression setseq)
+	{
+		this.bindings = new Vector<POMultipleBind>();
+		POPatternList plist = new POPatternList();
+		plist.add(pattern);
+
+		if (setseq.getExptype().isSet(pattern.location))
+		{
+			bindings.add(new POMultipleSetBind(plist, setseq));
+		}
+		else
+		{
+			bindings.add(new POMultipleSeqBind(plist, setseq));
+		}
 	}
 
 	@Override

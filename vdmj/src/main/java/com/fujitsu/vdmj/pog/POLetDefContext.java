@@ -69,7 +69,7 @@ public class POLetDefContext extends POContext
 				if (def instanceof POAssignmentDefinition)
 				{
 					POAssignmentDefinition ass = (POAssignmentDefinition)def;
-					sb.append(ass.name);
+					sb.append(ass.name.getName());
 
 					// This is because (say) "let x : nat = undefined" will fail, whereas
 					// "let x = undefined" will be okay, as long as x is defined before it
