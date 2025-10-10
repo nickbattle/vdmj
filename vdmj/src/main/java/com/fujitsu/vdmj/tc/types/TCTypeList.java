@@ -46,9 +46,12 @@ public class TCTypeList extends TCMappedList<ASTType, TCType>
 		super();
 	}
 
-	public TCTypeList(TCType act)
+	public TCTypeList(TCType... types)
 	{
-		add(act);
+		for (TCType type: types)
+		{
+			add(type);
+		}
 	}
 
 	@Override
