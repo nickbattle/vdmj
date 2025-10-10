@@ -142,13 +142,6 @@ public class POForIndexStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * Push an implication that the loop range is not empty. This applies to everything
-		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
-		 * the isEmpty() case in another altpath.
-		 */
-		ctxt.push(new POImpliesContext(isNotEmpty()));
-
-		/**
 		 * The initial case verifies that the invariant is true before the loop.
 		 */
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
@@ -162,6 +155,13 @@ public class POForIndexStatement extends POStatement
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
+
+		/**
+		 * Push an implication that the loop range is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty()));
 
 		/**
 		 * The start of the loop verifies that the first "from" value can start the loop and
@@ -218,6 +218,7 @@ public class POForIndexStatement extends POStatement
 		 */
 		ctxt.push(new POImpliesContext(isEmpty()));
 		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The three alternatives in one added.

@@ -139,13 +139,6 @@ public class POForAllStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * Push an implication that the input set is not empty. This applies to everything
-		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
-		 * the isEmpty() case in another altpath.
-		 */
-		ctxt.push(new POImpliesContext(isNotEmpty(eset)));
-
-		/**
 		 * The initial case verifies that the invariant is true before the loop starts. The GHOST
 		 * is empty therefore, but there are no loop variables bound.
 		 */
@@ -174,6 +167,13 @@ public class POForAllStatement extends POStatement
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
+
+		/**
+		 * Push an implication that the input set is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty(eset)));
 
 		/**
 		 * The start of the loop verifies that every value in the set can start the loop and
@@ -232,6 +232,8 @@ public class POForAllStatement extends POStatement
 		 */
 		ctxt.push(new POImpliesContext(isEmpty(eset)));
 		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POLetDefContext(ghostDef));					// let ghost = {} in
+		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The three alternatives in one added.

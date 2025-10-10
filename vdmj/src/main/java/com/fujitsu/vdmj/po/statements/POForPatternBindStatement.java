@@ -152,13 +152,6 @@ public class POForPatternBindStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant, and notEmpty check above
 
 		/**
-		 * Push an implication that the input sequence is not empty. This applies to everything
-		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
-		 * the isEmpty() case in another altpath.
-		 */
-		ctxt.push(new POImpliesContext(isNotEmpty()));
-
-		/**
 		 * The initial case verifies that the invariant is true before the loop.
 		 */
 		ctxt.push(new POLetDefContext(ghostDef));			// let ghost = [] in
@@ -225,6 +218,13 @@ public class POForPatternBindStatement extends POStatement
 		}
 
 		/**
+		 * Push an implication that the input sequence is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty()));
+
+		/**
 		 * The start of the loop verifies that the first value in the list can start the loop and
 		 * will meet the invariant. The ghost is therefore set to that one value.
 		 */
@@ -279,6 +279,8 @@ public class POForPatternBindStatement extends POStatement
 		 */
 		ctxt.push(new POImpliesContext(isEmpty()));
 		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POLetDefContext(ghostDef));						// let ghost = [] in
+		ctxt.push(new POImpliesContext(invariant));						// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The three alternatives in one added.
