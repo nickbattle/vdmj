@@ -60,7 +60,8 @@ public class TCNotEqualExpression extends TCBinaryExpression
 
 		if (!TypeComparator.compatible(ltype, rtype))
 		{
-			report(3136, "Left and right of '<>' different types");
+			// These will always be unequal, but that is not necessarily an error
+			warning(3136, "Left and right of '<>' different types");
 			detail2("Left", ltype, "Right", rtype);
 		}
 

@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POHeadExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
+import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqEnumExpression;
@@ -148,7 +149,14 @@ public class POForPatternBindStatement extends POStatement
 			invariant = new POVariableExpression(loopinv.name, loopinv);
 		}
 
-		int popto = ctxt.size();	// Includes missing invariant above
+		int popto = ctxt.size();	// Includes missing invariant, and notEmpty check above
+
+		/**
+		 * Push an implication that the input sequence is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty()));
 
 		/**
 		 * The initial case verifies that the invariant is true before the loop.
@@ -259,12 +267,21 @@ public class POForPatternBindStatement extends POStatement
 			invariant = annotations.combine(true);
 		}
 
+		ctxt.push(new POImpliesContext(isNotEmpty()));					// <sequence> <> [] =>
 		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eseq)));		// let GHOST$ = set in
 		ctxt.push(new POForAllContext(updates, env));					// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));						// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
-		// The two alternatives in one added.
+		/**
+		 * Finally, the loop may not have been entered if the sequence is empty, so we create
+		 * another alternative path with this condition and nothing else.
+		 */
+		ctxt.push(new POImpliesContext(isEmpty()));
+		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The three alternatives in one added.
 		ctxt.push(altCtxt);
 
 		return obligations;
@@ -335,7 +352,31 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	/**
-	 * Produce "(GHOST$ ^ [x]) = list(1, ..., len GHOST$ + 1)"
+	 * Produce "<sequence> = []"
+	 */
+	private POExpression isEmpty()
+	{
+		return new POEqualsExpression(
+			sequence,
+			new LexKeywordToken(Token.EQUALS, location),
+			new POSeqEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			sequenceType, sequenceType);
+	}
+
+	/**
+	 * Produce "<sequence> <> []"
+	 */
+	private POExpression isNotEmpty()
+	{
+		return new PONotEqualExpression(
+			sequence,
+			new LexKeywordToken(Token.NE, location),
+			new POSeqEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			sequenceType, sequenceType);
+	}
+
+	/**
+	 * Produce "(list <> []) and (GHOST$ ^ [hd list]) = list(1, ..., len GHOST$ + 1)"
 	 */
 	private POExpression varsMatch(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
@@ -343,32 +384,32 @@ public class POForPatternBindStatement extends POStatement
 		TCNaturalType nattype = new TCNaturalType(location);
 
 		return new POEqualsExpression(
-			new POSeqConcatExpression(
-				new POVariableExpression(ghostDef.name, vardef),
-				new LexKeywordToken(Token.CONCATENATE, location),
-				new POSeqEnumExpression(location,
-					new POExpressionList(
-						new POHeadExpression(
-							location, sequence, sequenceType)),
-						new TCTypeList(sequenceType)
-					),
-				sequenceType, sequenceType),
+				new POSeqConcatExpression(
+					new POVariableExpression(ghostDef.name, vardef),
+					new LexKeywordToken(Token.CONCATENATE, location),
+					new POSeqEnumExpression(location,
+						new POExpressionList(
+							new POHeadExpression(
+								location,
+								sequence, sequenceType)
+							),
+							new TCTypeList(sequenceType)
+						),
+					sequenceType, sequenceType),
 
-			new LexKeywordToken(Token.EQUALS, location),
+				new LexKeywordToken(Token.EQUALS, location),
 
-			new POSubseqExpression(
-				eseq,
-				new POIntegerLiteralExpression(LexIntegerToken.ONE),
-				new POPlusExpression(
-					new POLenExpression(location, new POVariableExpression(ghostDef.name, vardef)),
-					new LexKeywordToken(Token.PLUS, location),
+				new POSubseqExpression(
+					eseq,
 					new POIntegerLiteralExpression(LexIntegerToken.ONE),
-					nattype, nattype
-				),
-				nattype, nattype
-			),
-
-			sequenceType, sequenceType);
+					new POPlusExpression(
+						new POLenExpression(location, new POVariableExpression(ghostDef.name, vardef)),
+						new LexKeywordToken(Token.PLUS, location),
+						new POIntegerLiteralExpression(LexIntegerToken.ONE),
+						nattype, nattype
+					),
+					nattype, nattype),
+				sequenceType, sequenceType);
 	}
 
 	@Override

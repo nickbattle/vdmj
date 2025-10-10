@@ -41,11 +41,6 @@ public class TCTypeList extends TCMappedList<ASTType, TCType>
 		super(from);
 	}
 
-	public TCTypeList()
-	{
-		super();
-	}
-
 	public TCTypeList(TCType... types)
 	{
 		for (TCType type: types)
