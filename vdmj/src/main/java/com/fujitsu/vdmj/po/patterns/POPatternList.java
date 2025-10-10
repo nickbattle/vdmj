@@ -38,8 +38,12 @@ public class POPatternList extends POMappedList<TCPattern, POPattern>
 		super(from);
 	}
 	
-	public POPatternList()
+	public POPatternList(POPattern... patterns)
 	{
+		for (POPattern pattern: patterns)
+		{
+			add(pattern);
+		}
 	}
 
 	@Override
