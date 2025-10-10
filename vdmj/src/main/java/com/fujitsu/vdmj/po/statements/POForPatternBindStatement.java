@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.po.patterns.POPatternBind;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
@@ -87,6 +88,8 @@ public class POForPatternBindStatement extends POStatement
 	public final POStatement statement;
 	public final POLoopAnnotations invariants;
 
+	private final POPattern remPattern;
+
 	public POForPatternBindStatement(LexLocation location,
 		POPatternBind patternBind, boolean reverse, POExpression sequence, TCType sequenceType,
 		POStatement body, POLoopAnnotations invariants)
@@ -98,6 +101,9 @@ public class POForPatternBindStatement extends POStatement
 		this.sequenceType = sequenceType.getSeq();
 		this.statement = body;
 		this.invariants = invariants;
+
+		PORemoveIgnoresVisitor.init();
+		this.remPattern = getPattern().removeIgnorePatterns();
 	}
 
 	@Override
@@ -131,7 +137,7 @@ public class POForPatternBindStatement extends POStatement
 
 		if (varAmbiguous)
 		{
-			ctxt.push(new POAmbiguousContext("loop var", getPattern().getVariableNames(), location));
+			ctxt.push(new POAmbiguousContext("loop var", remPattern.getVariableNames(), location));
 		}
 
 		if (invariant == null)
@@ -189,7 +195,7 @@ public class POForPatternBindStatement extends POStatement
 			ctxt.pop();
 		}
 
-		PODefinitionList podefs = getPattern().getDefinitions(sequenceType.seqof);
+		PODefinitionList podefs = remPattern.getDefinitions(sequenceType.seqof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
 		for (PODefinition podef: podefs)
@@ -202,7 +208,7 @@ public class POForPatternBindStatement extends POStatement
 
 		tcdefs.add(new TCLocalDefinition(location, ghostDef.name, ghostDef.type));
 		Environment local = new FlatCheckedEnvironment(tcdefs, env, NameScope.NAMES);
-		updates.addAll(getPattern().getVariableNames());
+		updates.addAll(remPattern.getVariableNames());
 		updates.add(ghostDef.name);
 
 		if (!annotations.isEmpty())
@@ -246,7 +252,7 @@ public class POForPatternBindStatement extends POStatement
 		 * and GHOST$ set to the original sequence value.
 		 */
 		updates.remove(ghostDef.name);
-		updates.removeAll(getPattern().getVariableNames());
+		updates.removeAll(remPattern.getVariableNames());
 
 		if (!annotations.isEmpty())
 		{
@@ -297,7 +303,7 @@ public class POForPatternBindStatement extends POStatement
 	{
 		TCType etype = ghostDef.type.getSeq().seqof;
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
-		POExpressionList elist = new POExpressionList(getPattern().getMatchingExpression());
+		POExpressionList elist = new POExpressionList(remPattern.getMatchingExpression());
 		TCTypeList tlist = new TCTypeList(etype);
 
 		POSeqConcatExpression cat = new POSeqConcatExpression(
