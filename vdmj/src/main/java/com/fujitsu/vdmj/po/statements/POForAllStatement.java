@@ -168,6 +168,7 @@ public class POForAllStatement extends POStatement
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant for first for-loop");
 		ctxt.pop();
+		ctxt.pop();
 
 		/**
 		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}

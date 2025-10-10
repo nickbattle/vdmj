@@ -212,7 +212,7 @@ public class PogTest extends TestCase
 		/* 11 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (forall cx:nat, ax:nat &\n      (((ax + cx) = size) =>\n        size <> 0))))\n",
 		/* 12 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {} in\n      (ax = sums(ABC)))))\n",
 		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in set {1, 2, 3} &\n      (let ABC : set of nat1 = {z} in\n        (ax = sums(ABC))))))\n",
-		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in set {1, 2, 3} &\n      (forall ax:nat, ABC:set of nat1, z:nat1 &\n        (((ABC psubset {1, 2, 3}) and (z in set ({1, 2, 3} \\ ABC))) and (ax = sums(ABC)) =>\n          (let ABC : set of nat1 = (ABC union {z}) in\n            (let ax : nat = (ax + z) in\n              (ax = sums(ABC)))))))))\n",
+		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall ax:nat, ABC:set of nat1, z:nat1 &\n      (((ABC psubset {1, 2, 3}) and (z in set ({1, 2, 3} \\ ABC))) and (ax = sums(ABC)) =>\n        (let ABC : set of nat1 = (ABC union {z}) in\n          (let ax : nat = (ax + z) in\n            (ax = sums(ABC))))))))\n",
 		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {1, 2, 3} in\n      (forall ax:nat &\n        ((ax = sums(ABC)) =>\n          ax <> 0)))))\n",
 		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [] in\n      (ax = sumq(DONE_60$)))))\n",
 		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
