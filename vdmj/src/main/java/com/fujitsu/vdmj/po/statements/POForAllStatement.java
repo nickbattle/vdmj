@@ -34,9 +34,11 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
+import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POInSetExpression;
+import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POProperSubsetExpression;
 import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
@@ -75,6 +77,7 @@ public class POForAllStatement extends POStatement
 	public final POLoopAnnotations invariants;
 
 	private final POPattern remPattern;
+	private final TCSetType setType;
 
 	public POForAllStatement(LexLocation location,
 		POPattern pattern, POExpression set, POStatement stmt, POLoopAnnotations invariants)
@@ -87,6 +90,8 @@ public class POForAllStatement extends POStatement
 
 		PORemoveIgnoresVisitor.init();
 		this.remPattern = pattern.removeIgnorePatterns();
+
+		this.setType = set.getExptype().getSet();
 	}
 
 	@Override
@@ -134,6 +139,13 @@ public class POForAllStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
+		 * Push an implication that the input set is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty(eset)));
+
+		/**
 		 * The initial case verifies that the invariant is true before the loop starts. The GHOST
 		 * is empty therefore, but there are no loop variables bound.
 		 */
@@ -142,8 +154,7 @@ public class POForAllStatement extends POStatement
 		obligations.lastElement().setMessage("check invariant before for-loop");
 		ctxt.pop();
 
-		TCSetType stype = eset.getExptype().getSet();
-		PODefinitionList podefs = remPattern.getDefinitions(stype.setof);
+		PODefinitionList podefs = remPattern.getDefinitions(setType.setof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
 		for (PODefinition podef: podefs)
@@ -209,15 +220,48 @@ public class POForAllStatement extends POStatement
 			invariant = annotations.combine(true);
 		}
 
+		ctxt.push(new POImpliesContext(isNotEmpty(eset)));			// set <> {} =>
 		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eset)));	// let GHOST$ = set in
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
-		// The two alternatives in one added.
+		/**
+		 * Finally, the loop may not have been entered if the set is empty, so we create
+		 * another alternative path with this condition and nothing else.
+		 */
+		ctxt.push(new POImpliesContext(isEmpty(eset)));
+		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The three alternatives in one added.
 		ctxt.push(altCtxt);
 
 		return obligations;
+	}
+
+	/**
+	 * Produce "<set> = {}"
+	 */
+	private POExpression isEmpty(POExpression eset)
+	{
+		return new POEqualsExpression(
+			eset,
+			new LexKeywordToken(Token.EQUALS, location),
+			new POSetEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			setType, setType);
+	}
+
+	/**
+	 * Produce "<set> <> {}"
+	 */
+	private POExpression isNotEmpty(POExpression eset)
+	{
+		return new PONotEqualExpression(
+			eset,
+			new LexKeywordToken(Token.NE, location),
+			new POSetEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			setType, setType);
 	}
 
 	/**
