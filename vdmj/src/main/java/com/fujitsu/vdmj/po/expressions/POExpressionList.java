@@ -42,8 +42,12 @@ public class POExpressionList extends POMappedList<TCExpression, POExpression>
 		super(from);
 	}
 	
-	public POExpressionList()
+	public POExpressionList(POExpression... exps)
 	{
+		for (POExpression exp: exps)
+		{
+			add(exp);
+		}
 	}
 
 	@Override
