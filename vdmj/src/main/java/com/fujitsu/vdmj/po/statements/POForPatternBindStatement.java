@@ -378,7 +378,7 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	/**
-	 * Produce "(list <> []) and (GHOST$ ^ [hd list]) = list(1, ..., len GHOST$ + 1)"
+	 * Produce "(GHOST$ ^ [x]) = list(1, ..., len GHOST$ + 1)"
 	 */
 	private POExpression varsMatch(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
@@ -389,12 +389,8 @@ public class POForPatternBindStatement extends POStatement
 				new POSeqConcatExpression(
 					new POVariableExpression(ghostDef.name, vardef),
 					new LexKeywordToken(Token.CONCATENATE, location),
-					new POSeqEnumExpression(location,
-						new POExpressionList(
-							new POHeadExpression(
-								location,
-								sequence, sequenceType)
-							),
+					new POSeqEnumExpression(location, 
+							new POExpressionList(remPattern.getMatchingExpression()),
 							new TCTypeList(sequenceType)
 						),
 					sequenceType, sequenceType),
