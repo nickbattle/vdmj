@@ -163,6 +163,10 @@ public class POForAllStatement extends POStatement
 		updates.addAll(remPattern.getVariableNames());
 		updates.add(ghostName);
 
+		/**
+		 * From here on, we push contexts that include the loop variables (in updates or
+		 * remPattern), so the invariant can reason about them.
+		 */
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
@@ -179,7 +183,7 @@ public class POForAllStatement extends POStatement
 		 * The start of the loop verifies that every value in the set can start the loop and
 		 * will meet the invariant. The ghost is therefore set to that one value.
 		 */
-		ctxt.push(new POForAllContext(remPattern, eset));							// forall possible first values
+		ctxt.push(new POForAllContext(remPattern, eset));						// forall possible first values
 		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));					// ghost := {x}
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant for first for-loop");

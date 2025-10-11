@@ -212,11 +212,6 @@ public class POForPatternBindStatement extends POStatement
 		updates.addAll(remPattern.getVariableNames());
 		updates.add(ghostDef.name);
 
-		if (!annotations.isEmpty())
-		{
-			invariant = annotations.combine(false);	// Don't exclude loop vars now
-		}
-
 		/**
 		 * Push an implication that the input sequence is not empty. This applies to everything
 		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
@@ -232,6 +227,15 @@ public class POForPatternBindStatement extends POStatement
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant for first for-loop");
 		ctxt.pop();
+
+		/**
+		 * From here on, we push contexts that include the loop variables (in updates), so
+		 * the invariant can reason about them.
+		 */
+		if (!annotations.isEmpty())
+		{
+			invariant = annotations.combine(false);	// Don't exclude loop vars now
+		}
 
 		/**
 		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ {x}

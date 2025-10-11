@@ -151,6 +151,10 @@ public class POForIndexStatement extends POStatement
 		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
 		updates.add(var);
 
+		/**
+		 * From here on, we push contexts that include the loop variables (var in updates), so
+		 * the invariant can reason about them.
+		 */
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
