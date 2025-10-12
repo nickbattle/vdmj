@@ -121,7 +121,7 @@ public class POWhileStatement extends POStatement
 		ctxt.push(new POImpliesContext(this.exp));					// while C => ...
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant before first while body");
-		ctxt.pop();
+		// No ctxt.pop here, because we always check that the loop is entered.
 
 		/**
 		 * The preservation case verifies that if the invariant is true initially, then it is true
@@ -149,11 +149,21 @@ public class POWhileStatement extends POStatement
 		 * unless there are return paths from the above.
 		 */
 		POExpression negated = new PONotExpression(location, this.exp);
+		ctxt.push(new POImpliesContext(this.exp));				// while C => (loop entered)
 		ctxt.push(new POForAllContext(updates, env));			// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant, negated));	// invariant && not C => ...
 		ctxt.popInto(popto, altCtxt.add());
 
-		// The two alternatives in one added.
+		/**
+		 * Finally, the loop may not have been entered if the range is empty, so we create
+		 * another alternative path with this condition and nothing else.
+		 */
+		ctxt.push(new POImpliesContext(negated));			// if not C => (not entered)
+		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The three alternatives in one added.
 		ctxt.push(altCtxt);
 
 		return obligations;
