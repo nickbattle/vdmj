@@ -128,8 +128,7 @@ public class POForAllContext extends POContext
 			
 			if (def != null)
 			{
-				POPatternList plist = new POPatternList();
-				plist.add(new POIdentifierPattern(var));
+				POPatternList plist = new POPatternList(new POIdentifierPattern(var));
 				bindings.add(new POMultipleTypeBind(plist, def.getType()));
 			}
 		}
@@ -152,8 +151,7 @@ public class POForAllContext extends POContext
 	public POForAllContext(POPattern pattern, POExpression setseq)
 	{
 		this.bindings = new Vector<POMultipleBind>();
-		POPatternList plist = new POPatternList();
-		plist.add(pattern);
+		POPatternList plist = new POPatternList(pattern);
 
 		if (setseq.getExptype().isSet(pattern.location))
 		{

@@ -34,16 +34,13 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
-import com.fujitsu.vdmj.po.definitions.POValueDefinition;
-import com.fujitsu.vdmj.po.expressions.POAndExpression;
-import com.fujitsu.vdmj.po.expressions.POElementsExpression;
 import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POHeadExpression;
-import com.fujitsu.vdmj.po.expressions.POInSetExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
+import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqEnumExpression;
@@ -54,6 +51,7 @@ import com.fujitsu.vdmj.po.patterns.POPatternBind;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
@@ -72,7 +70,6 @@ import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -88,21 +85,26 @@ public class POForPatternBindStatement extends POStatement
 	public final POPatternBind patternBind;
 	public final boolean reverse;
 	public final POExpression sequence;
-	public final TCType expType;
+	public final TCSeqType sequenceType;
 	public final POStatement statement;
 	public final POLoopAnnotations invariants;
 
+	private final POPattern remPattern;
+
 	public POForPatternBindStatement(LexLocation location,
-		POPatternBind patternBind, boolean reverse, POExpression exp, TCType expType,
+		POPatternBind patternBind, boolean reverse, POExpression sequence, TCType sequenceType,
 		POStatement body, POLoopAnnotations invariants)
 	{
 		super(location);
 		this.patternBind = patternBind;
 		this.reverse = reverse;
-		this.sequence = exp;
-		this.expType = expType;
+		this.sequence = sequence;
+		this.sequenceType = sequenceType.getSeq();
 		this.statement = body;
 		this.invariants = invariants;
+
+		PORemoveIgnoresVisitor.init();
+		this.remPattern = getPattern().removeIgnorePatterns();
 	}
 
 	@Override
@@ -136,7 +138,7 @@ public class POForPatternBindStatement extends POStatement
 
 		if (varAmbiguous)
 		{
-			ctxt.push(new POAmbiguousContext("loop var", getPattern().getVariableNames(), location));
+			ctxt.push(new POAmbiguousContext("loop var", remPattern.getVariableNames(), location));
 		}
 
 		if (invariant == null)
@@ -147,7 +149,7 @@ public class POForPatternBindStatement extends POStatement
 			invariant = new POVariableExpression(loopinv.name, loopinv);
 		}
 
-		int popto = ctxt.size();	// Includes missing invariant above
+		int popto = ctxt.size();	// Includes missing invariant, and notEmpty check above
 
 		/**
 		 * The initial case verifies that the invariant is true before the loop.
@@ -164,13 +166,12 @@ public class POForPatternBindStatement extends POStatement
 		else if (patternBind.bind instanceof POTypeBind)	// for p : nat in [a,b,c] do
 		{
 			POTypeBind bind = (POTypeBind)patternBind.bind;
-			TCSeqType s = expType.isSeq(location) ? expType.getSeq() : null;
 			
-			if (s != null && !TypeComparator.isSubType(s.seqof, bind.type))
+			if (!TypeComparator.isSubType(sequenceType.seqof, bind.type))
 			{
 				ctxt.push(new POForAllSequenceContext(bind, eseq));
 				obligations.addAll(SubTypeObligation.getAllPOs(
-					bind.pattern.getMatchingExpression(), bind.type, s.seqof, ctxt));
+					bind.pattern.getMatchingExpression(), bind.type, sequenceType.seqof, ctxt));
 				ctxt.pop();
 			}
 		}
@@ -195,8 +196,7 @@ public class POForPatternBindStatement extends POStatement
 			ctxt.pop();
 		}
 
-		TCSeqType stype = eseq.getExptype().getSeq();
-		PODefinitionList podefs = getPattern().getDefinitions(stype.seqof);
+		PODefinitionList podefs = remPattern.getDefinitions(sequenceType.seqof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
 		for (PODefinition podef: podefs)
@@ -209,30 +209,39 @@ public class POForPatternBindStatement extends POStatement
 
 		tcdefs.add(new TCLocalDefinition(location, ghostDef.name, ghostDef.type));
 		Environment local = new FlatCheckedEnvironment(tcdefs, env, NameScope.NAMES);
-		updates.addAll(getPattern().getVariableNames());
+		updates.addAll(remPattern.getVariableNames());
 		updates.add(ghostDef.name);
 
+		/**
+		 * Push an implication that the input sequence is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty()));
+
+		/**
+		 * The start of the loop verifies that the first value in the list can start the loop and
+		 * will meet the invariant. The ghost is therefore set to that one value.
+		 */
+		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));		// ghost := [hd sequence]
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
+		obligations.lastElement().setMessage("check invariant for first for-loop");
+		ctxt.pop();
+
+		/**
+		 * From here on, we push contexts that include the loop variables (in updates), so
+		 * the invariant can reason about them.
+		 */
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
 
 		/**
-		 * The start of the loop verifies that the first value in the list can start the loop and
-		 * will meet the invariant. The ghost is therefore set to that one value.
-		 */
-		ctxt.push(new POLetDefContext(firstItemDef()));				// x := hd sequence
-		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));		// ghost := [x]]
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant for first for-loop");
-		ctxt.pop();
-		ctxt.pop();
-
-		/**
 		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ {x}
 		 */
 		ctxt.push(new POForAllContext(updates, local));
-		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eseq), invariant));
+		ctxt.push(new POImpliesContext(varsMatch(ghostDef, eseq), invariant));
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
 
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
@@ -255,19 +264,30 @@ public class POForPatternBindStatement extends POStatement
 		 * and GHOST$ set to the original sequence value.
 		 */
 		updates.remove(ghostDef.name);
-		updates.removeAll(getPattern().getVariableNames());
+		updates.removeAll(remPattern.getVariableNames());
 
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(true);
 		}
 
+		ctxt.push(new POImpliesContext(isNotEmpty()));					// <sequence> <> [] =>
 		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eseq)));		// let GHOST$ = set in
 		ctxt.push(new POForAllContext(updates, env));					// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));						// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
-		// The two alternatives in one added.
+		/**
+		 * Finally, the loop may not have been entered if the sequence is empty, so we create
+		 * another alternative path with this condition and nothing else.
+		 */
+		ctxt.push(new POImpliesContext(isEmpty()));
+		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POLetDefContext(ghostDef));						// let ghost = [] in
+		ctxt.push(new POImpliesContext(invariant));						// invariant => ...
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The three alternatives in one added.
 		ctxt.push(altCtxt);
 
 		return obligations;
@@ -306,10 +326,8 @@ public class POForPatternBindStatement extends POStatement
 	{
 		TCType etype = ghostDef.type.getSeq().seqof;
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
-		POExpressionList elist = new POExpressionList();
-		elist.add(getPattern().getMatchingExpression());
-		TCTypeList tlist = new TCTypeList();
-		tlist.add(etype);
+		POExpressionList elist = new POExpressionList(remPattern.getMatchingExpression());
+		TCTypeList tlist = new TCTypeList(etype);
 
 		POSeqConcatExpression cat = new POSeqConcatExpression(
 			new POVariableExpression(ghostDef.name, vardef),
@@ -320,25 +338,15 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	/**
-	 * Produce "<pattern> = <hd sequence>"
-	 */
-	private POValueDefinition firstItemDef()
-	{
-		TCSeqType seqtype = expType.getSeq();
-		POHeadExpression head = new POHeadExpression(location, sequence, seqtype);
-		return new POValueDefinition(null, getPattern(), seqtype.seqof, head, seqtype.seqof, null);
-	}
-
-	/**
-	 * Produce "ghost := [<pattern>]"
+	 * Produce "ghost := [hd sequence]"
 	 */
 	private POAssignmentDefinition ghostFirst(POAssignmentDefinition ghostDef)
 	{
-		POExpressionList members = new POExpressionList();
-		members.add(getPattern().getMatchingExpression());
+		POHeadExpression head = new POHeadExpression(location, sequence, sequenceType);
+		POExpressionList members = new POExpressionList(head);
 		TCTypeList types = new TCTypeList(ghostDef.type);
 		POSeqEnumExpression first = new POSeqEnumExpression(location, members, types);
-		return ghostFinal(ghostDef, first);
+		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, first, ghostDef.type);
 	}
 
 	/**
@@ -350,60 +358,60 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	/**
-	 * Produce "(GHOST$ = list(1, ..., len GHOST$)) and (x in set elems list(len GHOST$ + 1, ..., len list))"
+	 * Produce "<sequence> = []"
 	 */
-	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eseq)
+	private POExpression isEmpty()
 	{
-		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
-		TCType seqof = ghostDef.type.getSeq().seqof;
-		
-		TCBooleanType booltype = new TCBooleanType(location);
-		TCNaturalType nattype = new TCNaturalType(location);
-
-		return new POAndExpression(
-			ghostIsPrefix(ghostDef, eseq),
-
-			new LexKeywordToken(Token.AND, location),
-		
-			new POInSetExpression(
-				getPattern().getMatchingExpression(),				// eg mk_(x, y)
-				new LexKeywordToken(Token.INSET, location),
-				new POElementsExpression(location,
-					new POSubseqExpression(
-						eseq,
-						new POPlusExpression(
-							new POLenExpression(location, new POVariableExpression(ghostDef.name, vardef)),
-							new LexKeywordToken(Token.PLUS, location),
-							new POIntegerLiteralExpression(LexIntegerToken.ONE),
-							nattype, nattype
-						),
-						new POLenExpression(location, eseq),
-						nattype, nattype
-					)
-				),
-				seqof, ghostDef.type),
-
-			booltype, booltype);
+		return new POEqualsExpression(
+			sequence,
+			new LexKeywordToken(Token.EQUALS, location),
+			new POSeqEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			sequenceType, sequenceType);
 	}
 
 	/**
-	 * Produce "GHOST$ = list(1, ..., len GHOST$)"
+	 * Produce "<sequence> <> []"
 	 */
-	private POExpression ghostIsPrefix(POAssignmentDefinition ghostDef, POExpression eseq)
+	private POExpression isNotEmpty()
+	{
+		return new PONotEqualExpression(
+			sequence,
+			new LexKeywordToken(Token.NE, location),
+			new POSeqEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			sequenceType, sequenceType);
+	}
+
+	/**
+	 * Produce "(GHOST$ ^ [x]) = list(1, ..., len GHOST$ + 1)"
+	 */
+	private POExpression varsMatch(POAssignmentDefinition ghostDef, POExpression eseq)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
 		TCNaturalType nattype = new TCNaturalType(location);
-		
+
 		return new POEqualsExpression(
-			new POVariableExpression(ghostDef.name, vardef),
-			new LexKeywordToken(Token.EQUALS, location),
-			new POSubseqExpression(
-				eseq,
-				new POIntegerLiteralExpression(LexIntegerToken.ONE),
-				new POLenExpression(location,
-					new POVariableExpression(ghostDef.name, vardef)),
-				nattype, nattype),
-			ghostDef.type, ghostDef.type);
+				new POSeqConcatExpression(
+					new POVariableExpression(ghostDef.name, vardef),
+					new LexKeywordToken(Token.CONCATENATE, location),
+					new POSeqEnumExpression(location, 
+							new POExpressionList(remPattern.getMatchingExpression()),
+							new TCTypeList(sequenceType)
+						),
+					sequenceType, sequenceType),
+
+				new LexKeywordToken(Token.EQUALS, location),
+
+				new POSubseqExpression(
+					eseq,
+					new POIntegerLiteralExpression(LexIntegerToken.ONE),
+					new POPlusExpression(
+						new POLenExpression(location, new POVariableExpression(ghostDef.name, vardef)),
+						new LexKeywordToken(Token.PLUS, location),
+						new POIntegerLiteralExpression(LexIntegerToken.ONE),
+						nattype, nattype
+					),
+					nattype, nattype),
+				sequenceType, sequenceType);
 	}
 
 	@Override

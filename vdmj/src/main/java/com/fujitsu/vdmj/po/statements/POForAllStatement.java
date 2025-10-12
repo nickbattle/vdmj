@@ -34,15 +34,18 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
+import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POInSetExpression;
+import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POProperSubsetExpression;
 import com.fujitsu.vdmj.po.expressions.POSetDifferenceExpression;
 import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POSetUnionExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
@@ -60,7 +63,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
@@ -74,6 +76,9 @@ public class POForAllStatement extends POStatement
 	public final POStatement statement;
 	public final POLoopAnnotations invariants;
 
+	private final POPattern remPattern;
+	private final TCSetType setType;
+
 	public POForAllStatement(LexLocation location,
 		POPattern pattern, POExpression set, POStatement stmt, POLoopAnnotations invariants)
 	{
@@ -82,6 +87,11 @@ public class POForAllStatement extends POStatement
 		this.set = set;
 		this.statement = stmt;
 		this.invariants = invariants;
+
+		PORemoveIgnoresVisitor.init();
+		this.remPattern = pattern.removeIgnorePatterns();
+
+		this.setType = set.getExptype().getSet();
 	}
 
 	@Override
@@ -115,7 +125,7 @@ public class POForAllStatement extends POStatement
 
 		if (varAmbiguous)
 		{
-			ctxt.push(new POAmbiguousContext("loop var", pattern.getVariableNames(), location));
+			ctxt.push(new POAmbiguousContext("loop var", remPattern.getVariableNames(), location));
 		}
 
 		if (invariant == null)
@@ -137,8 +147,7 @@ public class POForAllStatement extends POStatement
 		obligations.lastElement().setMessage("check invariant before for-loop");
 		ctxt.pop();
 
-		TCSetType stype = eset.getExptype().getSet();
-		PODefinitionList podefs = pattern.getDefinitions(stype.setof);
+		PODefinitionList podefs = remPattern.getDefinitions(setType.setof);
 		TCDefinitionList tcdefs = new TCDefinitionList();
 
 		for (PODefinition podef: podefs)
@@ -151,22 +160,34 @@ public class POForAllStatement extends POStatement
 
 		tcdefs.add(new TCLocalDefinition(location, ghostName, ghostDef.type));
 		Environment local = new FlatCheckedEnvironment(tcdefs, env, NameScope.NAMES);
-		updates.addAll(pattern.getVariableNames());
+		updates.addAll(remPattern.getVariableNames());
 		updates.add(ghostName);
 
+		/**
+		 * From here on, we push contexts that include the loop variables (in updates or
+		 * remPattern), so the invariant can reason about them.
+		 */
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
 
 		/**
+		 * Push an implication that the input set is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty(eset)));
+
+		/**
 		 * The start of the loop verifies that every value in the set can start the loop and
 		 * will meet the invariant. The ghost is therefore set to that one value.
 		 */
-		ctxt.push(new POForAllContext(pattern, eset));							// forall possible first values
+		ctxt.push(new POForAllContext(remPattern, eset));						// forall possible first values
 		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));					// ghost := {x}
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
 		obligations.lastElement().setMessage("check invariant for first for-loop");
+		ctxt.pop();
 		ctxt.pop();
 
 		/**
@@ -196,22 +217,57 @@ public class POForAllStatement extends POStatement
 		 * and GHOST$ set to the original set value.
 		 */
 		updates.remove(ghostName);
-		updates.removeAll(pattern.getVariableNames());
+		updates.removeAll(remPattern.getVariableNames());
 
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(true);
 		}
 
+		ctxt.push(new POImpliesContext(isNotEmpty(eset)));			// set <> {} =>
 		ctxt.push(new POLetDefContext(ghostFinal(ghostDef, eset)));	// let GHOST$ = set in
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
-		// The two alternatives in one added.
+		/**
+		 * Finally, the loop may not have been entered if the set is empty, so we create
+		 * another alternative path with this condition and nothing else.
+		 */
+		ctxt.push(new POImpliesContext(isEmpty(eset)));
+		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POLetDefContext(ghostDef));					// let ghost = {} in
+		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The three alternatives in one added.
 		ctxt.push(altCtxt);
 
 		return obligations;
+	}
+
+	/**
+	 * Produce "<set> = {}"
+	 */
+	private POExpression isEmpty(POExpression eset)
+	{
+		return new POEqualsExpression(
+			eset,
+			new LexKeywordToken(Token.EQUALS, location),
+			new POSetEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			setType, setType);
+	}
+
+	/**
+	 * Produce "<set> <> {}"
+	 */
+	private POExpression isNotEmpty(POExpression eset)
+	{
+		return new PONotEqualExpression(
+			eset,
+			new LexKeywordToken(Token.NE, location),
+			new POSetEnumExpression(location, new POExpressionList(), new TCTypeList()),
+			setType, setType);
 	}
 
 	/**
@@ -220,15 +276,14 @@ public class POForAllStatement extends POStatement
 	private POAssignmentDefinition ghostUpdate(POAssignmentDefinition ghostDef)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
-		POExpressionList elist = new POExpressionList();
-		elist.add(pattern.getMatchingExpression());
-		TCTypeList tlist = new TCTypeList();
-		tlist.add(ghostDef.type);
+		POExpressionList elist = new POExpressionList(remPattern.getMatchingExpression());
+		TCTypeList tlist = new TCTypeList(ghostDef.type);
 
 		POSetUnionExpression union = new POSetUnionExpression(
 			new POVariableExpression(ghostDef.name, vardef),
 			new LexKeywordToken(Token.UNION, location),
-			new POSetEnumExpression(location, elist, tlist), ghostDef.type, ghostDef.type);
+			new POSetEnumExpression(location, elist, tlist),
+			ghostDef.type, ghostDef.type);
 
 		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, union, ghostDef.type);
 	}
@@ -238,11 +293,10 @@ public class POForAllStatement extends POStatement
 	 */
 	private POAssignmentDefinition ghostFirst(POAssignmentDefinition ghostDef)
 	{
-		POExpressionList members = new POExpressionList();
-		members.add(pattern.getMatchingExpression());
+		POExpressionList members = new POExpressionList(remPattern.getMatchingExpression());
 		TCTypeList types = new TCTypeList(ghostDef.type);
 		POSetEnumExpression first = new POSetEnumExpression(location, members, types);
-		return ghostFinal(ghostDef, first);
+		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, first, ghostDef.type);
 	}
 
 	/**
@@ -259,7 +313,7 @@ public class POForAllStatement extends POStatement
 	private POExpression varsInSet(POAssignmentDefinition ghostDef, POExpression eset)
 	{
 		POLocalDefinition vardef = new POLocalDefinition(location, ghostDef.name, ghostDef.type);
-		TCType setof = ghostDef.type.getSet().setof;
+		TCSetType settype = ghostDef.type.getSet();
 		TCBooleanType boolt = new TCBooleanType(location);
 
 		return new POAndExpression(
@@ -267,18 +321,19 @@ public class POForAllStatement extends POStatement
 				new POVariableExpression(ghostDef.name, vardef),
 				new LexKeywordToken(Token.PSUBSET, location),
 				eset,
-				setof, setof),
+				settype, settype),
 
 			new LexKeywordToken(Token.AND, location),
 		
 			new POInSetExpression(
-				pattern.getMatchingExpression(),				// eg mk_(x, y)
+				remPattern.getMatchingExpression(),				// eg mk_(x, y)
 				new LexKeywordToken(Token.INSET, location),
 				new POSetDifferenceExpression(
 					eset,
 					new LexKeywordToken(Token.SETDIFF, location),
-					new POVariableExpression(ghostDef.name, vardef), ghostDef.type, ghostDef.type),
-				setof, ghostDef.type),
+					new POVariableExpression(ghostDef.name, vardef),
+					ghostDef.type, ghostDef.type),
+				settype, settype),
 
 			boolt, boolt);
 	}

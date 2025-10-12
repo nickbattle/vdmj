@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POGreaterExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLessEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
@@ -150,10 +151,21 @@ public class POForIndexStatement extends POStatement
 		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
 		updates.add(var);
 
+		/**
+		 * From here on, we push contexts that include the loop variables (var in updates), so
+		 * the invariant can reason about them.
+		 */
 		if (!annotations.isEmpty())
 		{
 			invariant = annotations.combine(false);	// Don't exclude loop vars now
 		}
+
+		/**
+		 * Push an implication that the loop range is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty()));
 
 		/**
 		 * The start of the loop verifies that the first "from" value can start the loop and
@@ -199,14 +211,52 @@ public class POForIndexStatement extends POStatement
 			invariant = annotations.combine(true);
 		}
 
+		ctxt.push(new POImpliesContext(isNotEmpty()));		// from <= to =>
 		ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
-		// The two alternatives in one added.
+		/**
+		 * Finally, the loop may not have been entered if the range is empty, so we create
+		 * another alternative path with this condition and nothing else.
+		 */
+		ctxt.push(new POImpliesContext(isEmpty()));
+		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
+		ctxt.popInto(popto, altCtxt.add());
+
+		// The three alternatives in one added.
 		ctxt.push(altCtxt);
 		
 		return obligations;
+	}
+
+	/**
+	 * Produce "from > to"
+	 */
+	private POExpression isEmpty()
+	{
+		TCRealType real = new TCRealType(location);
+
+		return new POGreaterExpression(
+			from,
+			new LexKeywordToken(Token.GT, location),
+			to,
+			real, real);
+	}
+
+	/**
+	 * Produce "from <= to"
+	 */
+	private POExpression isNotEmpty()
+	{
+		TCRealType real = new TCRealType(location);
+
+		return new POLessEqualExpression(
+			from,
+			new LexKeywordToken(Token.LE, location),
+			to,
+			real, real);
 	}
 
 	private POExpression varIsValid(POExpression efrom, POExpression eto, POExpression eby)

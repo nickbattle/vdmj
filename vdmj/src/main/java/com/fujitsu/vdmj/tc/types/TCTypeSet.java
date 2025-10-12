@@ -53,15 +53,12 @@ public class TCTypeSet extends TreeSet<TCType> implements Mappable
 		super();
 	}
 
-	public TCTypeSet(TCType t)
+	public TCTypeSet(TCType... types)
 	{
-		add(t);
-	}
-
-	public TCTypeSet(TCType t1, TCType t2)
-	{
-		add(t1);
-		add(t2);
+		for (TCType type: types)
+		{
+			add(type);
+		}
 	}
 
 	public boolean has(Object other)

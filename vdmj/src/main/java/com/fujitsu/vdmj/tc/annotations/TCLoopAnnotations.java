@@ -85,14 +85,15 @@ public class TCLoopAnnotations implements Mappable
 			for (TCLoopInvariantAnnotation inv: invariants)
 			{
 				TCExpression exp = inv.args.firstElement();
-				reasonsAbout.addAll(exp.getVariableNames());
-
 				TCType itype = exp.typeCheck(local, null, NameScope.NAMESANDSTATE, null);
 				
 				if (!(itype instanceof TCBooleanType))
 				{
 					exp.report(6007, "@LoopInvariant must be a boolean expression");
 				}
+
+				// This has to be after typecheck!
+				reasonsAbout.addAll(exp.getFreeVariableNames());
 			}
 				
 			if (!reasonsAbout.containsAll(updates))
@@ -111,7 +112,7 @@ public class TCLoopAnnotations implements Mappable
 				for (TCLoopInvariantAnnotation loopInv: invariants)
 				{
 					boolean hasLoopVars = false;
-					TCNameSet invVars = loopInv.args.get(0).getVariableNames();
+					TCNameSet invVars = loopInv.args.get(0).getFreeVariableNames();
 
 					for (TCNameToken loopVar: loopVars)
 					{
