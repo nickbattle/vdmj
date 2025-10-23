@@ -122,7 +122,7 @@ public abstract class ASTStatementVisitor<R, S>
 
  	public R caseDefStatement(ASTDefStatement node, S arg)
 	{
-		return caseLetDefStatement(node, arg);
+		return caseStatement(node, arg);
 	}
 
  	public R caseDurationStatement(ASTDurationStatement node, S arg)

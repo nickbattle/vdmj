@@ -93,7 +93,7 @@ public abstract class INExpressionVisitor<R, S>
 
  	public R caseDefExpression(INDefExpression node, S arg)
 	{
-		return caseLetDefExpression(node, arg);
+		return caseExpression(node, arg);
 	}
 
  	public R caseDistConcatExpression(INDistConcatExpression node, S arg)

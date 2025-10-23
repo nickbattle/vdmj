@@ -29,14 +29,18 @@ import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.util.Utils;
 
-public class ASTDefExpression extends ASTLetDefExpression
+public class ASTDefExpression extends ASTExpression
 {
 	private static final long serialVersionUID = 1L;
+	public final ASTDefinitionList localDefs;
+	public final ASTExpression expression;
 
 	public ASTDefExpression(LexLocation location,
-		ASTDefinitionList equalsDefs, ASTExpression expression)
+				ASTDefinitionList localDefs, ASTExpression expression)
 	{
-		super(location, equalsDefs, expression);
+		super(location);
+		this.localDefs = localDefs;
+		this.expression = expression;
 	}
 
 	@Override

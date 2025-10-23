@@ -32,6 +32,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
 import com.fujitsu.vdmj.tc.expressions.TCDefExpression;
@@ -164,9 +165,9 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, TrivialQCKnow
 	{
 		for (TCDefinition def: node.localDefs)
 		{
-			if (def instanceof TCValueDefinition)
+			if (def instanceof TCEqualsDefinition)
 			{
-				TCValueDefinition vdef = (TCValueDefinition)def;
+				TCEqualsDefinition vdef = (TCEqualsDefinition)def;
 				
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
@@ -175,7 +176,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, TrivialQCKnow
 					TCEqualsExpression exp = new TCEqualsExpression(
 							new TCVariableExpression(id.location, id.name, id.toString()),
 							new LexKeywordToken(Token.EQUALS, id.location),
-							vdef.exp);
+							vdef.test);
 						
 					truths = new TrivialQCKnown(exp, truths, id.name);
 				}

@@ -29,13 +29,18 @@ import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.util.Utils;
 
-public class ASTDefStatement extends ASTLetDefStatement
+public class ASTDefStatement extends ASTStatement
 {
 	private static final long serialVersionUID = 1L;
+	public final ASTDefinitionList localDefs;
+	public final ASTStatement statement;
 
-	public ASTDefStatement(LexLocation location, ASTDefinitionList equalsDefs, ASTStatement statement)
+	public ASTDefStatement(LexLocation location,
+		ASTDefinitionList localDefs, ASTStatement statement)
 	{
-		super(location, equalsDefs, statement);
+		super(location);
+		this.localDefs = localDefs;
+		this.statement = statement;
 	}
 
 	@Override

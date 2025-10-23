@@ -34,14 +34,19 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
-public class PODefExpression extends POLetDefExpression
+public class PODefExpression extends POExpression
 {
 	private static final long serialVersionUID = 1L;
+	public final PODefinitionList localDefs;
+	public final POExpression expression;
 
-	public PODefExpression(LexLocation location, PODefinitionList equalsDefs, POExpression expression)
+	public PODefExpression(LexLocation location, PODefinitionList localDefs, POExpression expression)
 	{
-		super(location, equalsDefs, expression);
+		super(location);
+		this.localDefs = localDefs;
+		this.expression = expression;
 	}
+
 
 	@Override
 	public String toString()

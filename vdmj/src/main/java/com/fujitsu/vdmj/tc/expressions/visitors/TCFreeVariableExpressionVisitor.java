@@ -139,15 +139,8 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 
 		for (TCDefinition d: node.localDefs)
 		{
-			if (d instanceof TCExplicitFunctionDefinition)
-			{
-				// ignore
-			}
-			else
-			{
-				local = new FlatEnvironment(d, local);
-				names.addAll(visitorSet.applyDefinitionVisitor(d, local));
-			}
+			local = new FlatEnvironment(d, local);
+			names.addAll(visitorSet.applyDefinitionVisitor(d, local));
 		}
 
 		names.addAll(node.expression.apply(this, local));

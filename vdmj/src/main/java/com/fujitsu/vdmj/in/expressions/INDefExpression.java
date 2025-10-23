@@ -32,13 +32,17 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.Value;
 
-public class INDefExpression extends INLetDefExpression
+public class INDefExpression extends INExpression
 {
 	private static final long serialVersionUID = 1L;
+	public final INDefinitionList localDefs;
+	public final INExpression expression;
 
-	public INDefExpression(LexLocation location, INDefinitionList equalsDefs, INExpression expression)
+	public INDefExpression(LexLocation location, INDefinitionList localDefs, INExpression expression)
 	{
-		super(location, equalsDefs, expression);
+		super(location);
+		this.localDefs = localDefs;
+		this.expression = expression;
 	}
 
 	@Override

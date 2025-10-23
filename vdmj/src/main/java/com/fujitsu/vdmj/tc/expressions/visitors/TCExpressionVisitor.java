@@ -93,7 +93,7 @@ public abstract class TCExpressionVisitor<R, S>
 
  	public R caseDefExpression(TCDefExpression node, S arg)
 	{
-		return caseLetDefExpression(node, arg);
+		return caseExpression(node, arg);
 	}
 
  	public R caseDistConcatExpression(TCDistConcatExpression node, S arg)
