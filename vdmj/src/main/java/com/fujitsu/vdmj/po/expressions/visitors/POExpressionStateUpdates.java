@@ -25,8 +25,9 @@
 package com.fujitsu.vdmj.po.expressions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementStateUpdates;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -41,18 +42,23 @@ public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToke
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(POVariableExpression node, Object arg)
+	public TCNameSet caseApplyExpression(POApplyExpression node, Object arg)
 	{
-		TCNameSet all = newCollection();
+		TCNameSet all = super.caseApplyExpression(node, arg);
 
-//		if (node.vardef != null && node.vardef.nameScope.matches(NameScope.STATE))
-//		{
-//			all.add(node.name);
-//		}
+		if (node.opdef != null)		// Apply is an operation call
+		{
+			if (visitorSet.getStatementVisitor() instanceof POStatementStateUpdates)
+			{
+				// Call over to statement visitor's "operationCall" method
+				POStatementStateUpdates stmt = (POStatementStateUpdates)visitorSet.getStatementVisitor();
+				all.addAll(stmt.operationCall(node.location, node.opdef));
+			}
+		}
 
 		return all;
 	}
-	
+
 	@Override
 	protected TCNameSet newCollection()
 	{

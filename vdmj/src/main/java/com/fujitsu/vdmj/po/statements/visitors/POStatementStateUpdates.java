@@ -90,19 +90,21 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	@Override
 	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Object arg)
 	{
-		return designatorUpdates(node.target);
+		TCNameSet rhs = visitorSet.applyExpressionVisitor(node.exp, arg);
+		rhs.addAll(designatorUpdates(node.target));
+		return rhs;
 	}
 	
 	@Override
 	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
 	{
-		return operationCall(node.location, node.opdef, ctxt);
+		return operationCall(node.location, node.opdef);
 	}
 	
 	@Override
 	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Object arg)
 	{
-		return operationCall(node.location, node.fdef, ctxt);
+		return operationCall(node.location, node.fdef);
 	}
 	
 	@Override
@@ -145,9 +147,9 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 
 	/**
 	 * Use the operation's pure and ext clauses to try to determine the variable
-	 * access.
+	 * access. This is also called from the expression visitor.
 	 */
-	private static TCNameSet operationCall(LexLocation from, PODefinition def, POContextStack ctxt)
+	public TCNameSet operationCall(LexLocation from, PODefinition def)
 	{
 		TCNameSet all = new TCNameSet();
 		
