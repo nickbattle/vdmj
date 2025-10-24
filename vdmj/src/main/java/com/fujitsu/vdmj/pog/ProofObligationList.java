@@ -51,7 +51,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -171,7 +170,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 	}
 	
-	public void typeCheck(TCModule tcmodule, MultiModuleEnvironment menv)
+	public void typeCheck(MultiModuleEnvironment menv)
 	{
 		String tc = TypeComparator.getCurrentModule();
 		

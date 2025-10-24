@@ -338,6 +338,14 @@ public abstract class TCDefinition extends TCNode implements Comparable<TCDefini
 	}
 
 	/**
+	 * True if this definition directly assigns module or class state variables.
+	 */
+	public boolean assignsState()
+	{
+		return false;	// See operation definitions
+	}
+
+	/**
 	 * Test access specifier. An empty specifier defaults to PRIVATE.
 	 */
 	public boolean isAccess(Token kind)

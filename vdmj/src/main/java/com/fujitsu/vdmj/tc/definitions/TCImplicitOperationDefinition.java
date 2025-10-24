@@ -672,6 +672,14 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	}
 
 	@Override
+	public boolean assignsState()
+	{
+		return
+			(externals != null && externals.has(Token.WRITE)) ||
+			(body != null && body.assignsState());
+	}
+
+	@Override
 	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseImplicitOperationDefinition(this, arg);

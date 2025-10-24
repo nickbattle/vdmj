@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.ast.statements.ASTExternalClause;
 import com.fujitsu.vdmj.ast.statements.ASTExternalClauseList;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCMappedList;
 
 public class TCExternalClauseList extends TCMappedList<ASTExternalClause, TCExternalClause>
@@ -40,5 +41,18 @@ public class TCExternalClauseList extends TCMappedList<ASTExternalClause, TCExte
 	public TCExternalClauseList(ASTExternalClauseList from) throws Exception
 	{
 		super(from);
+	}
+
+	public boolean has(Token mode)
+	{
+		for (TCExternalClause clause: this)
+		{
+			if (clause.mode.is(mode))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

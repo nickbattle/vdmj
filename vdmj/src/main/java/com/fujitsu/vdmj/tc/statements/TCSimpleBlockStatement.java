@@ -141,6 +141,20 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 	}
 
 	@Override
+	public boolean assignsState()
+	{
+		for (TCStatement stmt: statements)
+		{
+			if (stmt.assignsState())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSimpleBlockStatement(this, arg);

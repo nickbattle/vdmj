@@ -261,21 +261,53 @@ public class POContextStack extends Stack<POContext>
 				POInheritedDefinition idef = (POInheritedDefinition)called;
 				called = idef.superdef;
 			}
+
+			PODefinition caller = getDefinition();
 			
 			if (called instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 				TCNameList names = getStateVariables();
-				
-				if (imp.externals != null && imp.location.module.equals(from.module))
+
+				if (imp.location.module.equals(from.module))	// local call
 				{
-					names.clear();
-					
-					for (POExternalClause ext: imp.externals)
+					if (imp.externals != null)
 					{
-						if (ext.mode.is(Token.WRITE))
+						for (POExternalClause ext: imp.externals)
 						{
-							names.addAll(ext.identifiers);
+							if (ext.mode.is(Token.WRITE))
+							{
+								names.addAll(ext.identifiers);
+							}
+						}
+					}
+					else if (!imp.accessSpecifier.isPure)
+					{
+						names.addAll(getStateVariables());
+					}
+				}
+				else // remote
+				{
+					if (caller.moduleDefinition != null)
+					{
+						if (caller.moduleDefinition.mappedFrom.stateExported)
+						{
+							if (!imp.accessSpecifier.isPure)
+							{
+								names.addAll(getStateVariables());
+							}
+						}
+						else
+						{
+							// Module hasn't exported anything that can change state
+							// so no names affected.
+						}
+					}
+					else if (caller.classDefinition != null)
+					{
+						if (!imp.accessSpecifier.isPure)
+						{
+							names.addAll(getStateVariables());
 						}
 					}
 				}
@@ -296,10 +328,45 @@ public class POContextStack extends Stack<POContext>
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)called;
+				TCNameList names = new TCNameList();
+
+				if (exop.location.module.equals(from.module))	// A local call
+				{
+					if (!exop.accessSpecifier.isPure)
+					{
+						names.addAll(getStateVariables());
+					}
+				}
+				else // remote module
+				{
+					if (caller.moduleDefinition != null)
+					{
+						if (caller.moduleDefinition.mappedFrom.stateExported)
+						{
+							if (!exop.accessSpecifier.isPure)
+							{
+								names.addAll(getStateVariables());
+							}
+						}
+						else
+						{
+							// Module hasn't exported anything that can change state
+							// so no names affected.
+						}
+					}
+					else if (caller.classDefinition != null)
+					{
+						if (!exop.accessSpecifier.isPure)
+						{
+							names.addAll(getStateVariables());
+						}
+					}
+				}
+
 				if (addReturn)
 				{
 					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-					TCNameList names = getStateVariables();
 					names.add(result);
 					
 					push(new POAmbiguousContext("operation call to " + opname, names, from));
@@ -346,31 +413,57 @@ public class POContextStack extends Stack<POContext>
 				POInheritedDefinition idef = (POInheritedDefinition)called;
 				called = idef.superdef;
 			}
+
+			PODefinition caller = getDefinition();
 			
 			if (called instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 				TCNameList names = new TCNameList();
-				
-				if (!imp.accessSpecifier.isPure)
-				{
-					names.addAll(getStateVariables());
-				}
 
-				if (imp.externals != null &&
-					imp.location.module.equals(from.module))	// Only local exts!
+				if (imp.location.module.equals(from.module))	// A local call
 				{
-					names.clear();
-					
-					for (POExternalClause ext: imp.externals)
+					if (imp.externals != null)
 					{
-						if (ext.mode.is(Token.WRITE))
+						for (POExternalClause ext: imp.externals)
 						{
-							names.addAll(ext.identifiers);
+							if (ext.mode.is(Token.WRITE))
+							{
+								names.addAll(ext.identifiers);
+							}
+						}
+					}
+					else if (!imp.accessSpecifier.isPure)
+					{
+						names.addAll(getStateVariables());
+					}
+				}
+				else // remote module
+				{
+					if (caller.moduleDefinition != null)
+					{
+						if (caller.moduleDefinition.mappedFrom.stateExported)
+						{
+							if (!imp.accessSpecifier.isPure)
+							{
+								names.addAll(getStateVariables());
+							}
+						}
+						else
+						{
+							// Module hasn't exported anything that can change state
+							// so no names affected.
+						}
+					}
+					else if (caller.classDefinition != null)
+					{
+						if (!imp.accessSpecifier.isPure)
+						{
+							names.addAll(getStateVariables());
 						}
 					}
 				}
-
+				
 				if (imp.type.result.isReturn())
 				{
 					if (resultVar == null)
@@ -406,9 +499,37 @@ public class POContextStack extends Stack<POContext>
 				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)called;
 				TCNameList names = new TCNameList();
 
-				if (!exop.accessSpecifier.isPure)
+				if (exop.location.module.equals(from.module))	// A local call
 				{
-					names.addAll(getStateVariables());
+					if (!exop.accessSpecifier.isPure)
+					{
+						names.addAll(getStateVariables());
+					}
+				}
+				else // remote module
+				{
+					if (caller.moduleDefinition != null)
+					{
+						if (caller.moduleDefinition.mappedFrom.stateExported)
+						{
+							if (!exop.accessSpecifier.isPure)
+							{
+								names.addAll(getStateVariables());
+							}
+						}
+						else
+						{
+							// Module hasn't exported anything that can change state
+							// so no names affected.
+						}
+					}
+					else if (caller.classDefinition != null)
+					{
+						if (!exop.accessSpecifier.isPure)
+						{
+							names.addAll(getStateVariables());
+						}
+					}
 				}
 
 				if (exop.type.result.isReturn())

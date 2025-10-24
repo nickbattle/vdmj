@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.definitions.visitors.POGetVariableNamesVisitor;
+import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -60,6 +61,9 @@ public abstract class PODefinition extends PONode implements Comparable<PODefini
 	
 	/** A pointer to the enclosing class definition, if any. */
 	public POClassDefinition classDefinition = null;	// Set in subclass constructors.
+
+	/** A pointer to the enclosing module definition, if any */
+	public POModule moduleDefinition = null;			// Set in POModule getProofObligations
 	
 	/** A list of annotations, if any */
 	public POAnnotationList annotations = null;

@@ -95,6 +95,12 @@ public class TCAssignmentStatement extends TCStatement
 	}
 
 	@Override
+	public boolean assignsState()
+	{
+		return true;
+	}
+
+	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseAssignmentStatement(this, arg);
