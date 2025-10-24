@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.statements.visitors;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
@@ -93,13 +94,13 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 	@Override
 	public TCNameSet caseCallStatement(TCCallStatement node, Environment env)
 	{
-		return operationCall(node.getDefinition(), env);
+		return operationCall(node.location, node.getDefinition(), env);
 	}
 
 	@Override
 	public TCNameSet caseCallObjectStatement(TCCallObjectStatement node, Environment env)
 	{
-		return operationCall(node.getDefinition(), env);
+		return operationCall(node.location, node.getDefinition(), env);
 	}
 	
 	@Override
@@ -159,7 +160,7 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 	/**
 	 * Use the operation's pure and ext clauses to try to determine the variable updates.
 	 */
-	private TCNameSet operationCall(TCDefinition def, Environment env)
+	private TCNameSet operationCall(LexLocation from, TCDefinition def, Environment env)
 	{
 		TCNameSet all = new TCNameSet();
 		
@@ -175,7 +176,7 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 		{
 			TCImplicitOperationDefinition imp = (TCImplicitOperationDefinition)def;
 			
-			if (imp.externals != null)
+			if (imp.location.sameModule(from) && imp.externals != null)
 			{
 				for (TCExternalClause ext: imp.externals)
 				{

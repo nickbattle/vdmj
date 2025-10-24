@@ -25,18 +25,66 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
-public class TCDefExpression extends TCLetDefExpression
+public class TCDefExpression extends TCExpression
 {
 	private static final long serialVersionUID = 1L;
+	public final TCDefinitionList localDefs;
+	public final TCExpression expression;
 
 	public TCDefExpression(LexLocation location,
-		TCDefinitionList equalsDefs, TCExpression expression)
+		TCDefinitionList localDefs, TCExpression expression)
 	{
-		super(location, equalsDefs, expression);
+		super(location);
+		this.localDefs = localDefs;
+		this.expression = expression;
+	}
+
+	@Override
+	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
+	{
+		// Each local definition is in scope for later local definitions...
+
+		Environment local = env;
+
+		for (TCDefinition d: localDefs)
+		{
+			d.implicitDefinitions(local);
+			d.typeResolve(local);
+			d.typeCheck(local, scope);
+
+			/***
+			if (Settings.dialect == Dialect.VDM_SL && d instanceof TCEqualsDefinition)
+			{
+				TCEqualsDefinition eqdef = (TCEqualsDefinition)d;
+
+				if (eqdef.test instanceof TCApplyExpression)
+				{
+					// Simple op call or a function call, so fine
+				}
+				else if (eqdef.test.callsOperations(env))
+				{
+					// Complex expression that calls an operation
+					eqdef.test.warning(9999, "RHS of 'def' should be an op call or a pure expression");
+				}
+			}
+			***/
+
+			local = new FlatCheckedEnvironment(d, local, scope);	// cumulative
+		}
+
+		TCType r = expression.typeCheck(local, null, scope, constraint);
+		local.unusedCheck(env);
+		return setType(r);
 	}
 
 	@Override

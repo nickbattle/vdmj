@@ -108,7 +108,7 @@ public abstract class POStatement extends PONode
 	}
 
 	/**
-	 * State variables updated or read by this statement.
+	 * State variables updated by this statement.
 	 */
 	public TCNameSet updatesState(POContextStack ctxt)
 	{
@@ -129,8 +129,8 @@ public abstract class POStatement extends PONode
 	 * Create the missing @LoopInvariant for substitution into the POs by name.
 	 * 
 	 *   (-- Missing @LoopInvariant, assuming true at 9:9
-	 *     (let  : bool = true in
-	 *       ( and (condition) =>
+	 *     (let $LoopInvariant : bool = true in
+	 *       ( $LoopInvariant and (condition) => ...
 	 */
 	protected PODefinition getLoopInvDef()
 	{

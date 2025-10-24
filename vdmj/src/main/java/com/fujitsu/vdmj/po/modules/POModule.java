@@ -48,18 +48,17 @@ public class POModule extends PONode
 	public final PODefinitionList defs;
 	/** A list of annotations, if any */
 	public final POAnnotationList annotations;
-	/** The TC module, for type checking */
-	public final TCModule tcmodule;
+	/** Reference to the TCModule that this was mapped from, see ClassMapper.MAPPED_FROM */
+	public TCModule mappedFrom = null;
 
 	/**
 	 * Create a module from the given name and definitions.
 	 */
-	public POModule(POAnnotationList annotations, TCIdentifierToken name, PODefinitionList defs, TCModule tcmodule)
+	public POModule(POAnnotationList annotations, TCIdentifierToken name, PODefinitionList defs)
 	{
 		this.annotations = annotations;
 		this.name = name;
 		this.defs = defs;
-		this.tcmodule = tcmodule;
 	}
 
 	@Override
@@ -90,12 +89,13 @@ public class POModule extends PONode
 		
 		for (PODefinition def: defs)
 		{
+			def.moduleDefinition = this;
 			POContextStack ctxt = new POContextStack();
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), menv));
 		}
 		
-		list.typeCheck(tcmodule, menv);
+		list.typeCheck(menv);
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;

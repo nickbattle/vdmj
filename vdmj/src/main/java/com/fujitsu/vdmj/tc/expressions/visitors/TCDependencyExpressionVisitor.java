@@ -347,6 +347,17 @@ public class TCDependencyExpressionVisitor extends TCLeafExpressionVisitor<TCNam
 	@Override
 	public TCNameSet caseDefExpression(TCDefExpression node, EnvTriple arg)
 	{
-		return caseLetDefExpression(node, arg);
+		Environment local = arg.env;
+		TCNameSet names = new TCNameSet();
+
+		for (TCDefinition d: node.localDefs)
+		{
+			local = new FlatEnvironment(d, local);
+			names.addAll(visitorSet.applyDefinitionVisitor(d,
+					new EnvTriple(arg.globals, local, new AtomicBoolean())));
+		}
+
+		names.addAll(node.expression.apply(this, new EnvTriple(arg.globals, local, null)));
+		return names;
 	}
 }

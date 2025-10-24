@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.statements.visitors;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.annotations.POAnnotatedStatement;
@@ -89,19 +90,21 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	@Override
 	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Object arg)
 	{
-		return designatorUpdates(node.target);
+		TCNameSet rhs = visitorSet.applyExpressionVisitor(node.exp, arg);
+		rhs.addAll(designatorUpdates(node.target));
+		return rhs;
 	}
 	
 	@Override
 	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
 	{
-		return operationCall(node.opdef, ctxt);
+		return operationCall(node.location, node.opdef);
 	}
 	
 	@Override
 	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Object arg)
 	{
-		return operationCall(node.fdef, ctxt);
+		return operationCall(node.location, node.fdef);
 	}
 	
 	@Override
@@ -144,9 +147,9 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 
 	/**
 	 * Use the operation's pure and ext clauses to try to determine the variable
-	 * access.
+	 * access. This is also called from the expression visitor.
 	 */
-	public static TCNameSet operationCall(PODefinition def, POContextStack ctxt)
+	public TCNameSet operationCall(LexLocation from, PODefinition def)
 	{
 		TCNameSet all = new TCNameSet();
 		
@@ -157,6 +160,10 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 		else if (def.accessSpecifier.isPure)
 		{
 			// No updates by definition of pure
+		}
+		else if (!def.location.sameModule(from))
+		{
+			all.addAll(ctxt.getStateVariables());	// Remote call may call back!
 		}
 		else if (def instanceof POImplicitOperationDefinition)
 		{

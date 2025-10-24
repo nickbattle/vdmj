@@ -59,6 +59,24 @@ public class TCDefStatement extends TCStatement
 			d.implicitDefinitions(local);
 			d.typeResolve(local);
 			d.typeCheck(local, scope);
+
+			/***
+			if (Settings.dialect == Dialect.VDM_SL && d instanceof TCEqualsDefinition)
+			{
+				TCEqualsDefinition eqdef = (TCEqualsDefinition)d;
+
+				if (eqdef.test instanceof TCApplyExpression)
+				{
+					// Simple op call or a function call, so fine
+				}
+				else if (eqdef.test.callsOperations(env))
+				{
+					// Complex expression that calls an operation
+					eqdef.test.warning(9999, "RHS of 'def' should be an op call or a pure expression");
+				}
+			}
+			***/
+
 			local = new FlatCheckedEnvironment(d, local, scope);	// cumulative
 		}
 

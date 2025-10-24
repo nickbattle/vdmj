@@ -53,7 +53,7 @@ public class MultiModuleEnvironment extends Environment
 		
 		for (POModule m: modules)
 		{
-			moduleEnvs.add(new ModuleEnvironment(m.tcmodule));
+			moduleEnvs.add(new ModuleEnvironment(m.mappedFrom));
 		}
 	}
 

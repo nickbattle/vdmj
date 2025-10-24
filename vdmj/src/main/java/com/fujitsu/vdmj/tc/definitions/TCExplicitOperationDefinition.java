@@ -526,6 +526,12 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	}
 
 	@Override
+	public boolean updatesState(Environment env)
+	{
+		return !body.updatesState(env).isEmpty();
+	}
+
+	@Override
 	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseExplicitOperationDefinition(this, arg);

@@ -93,7 +93,7 @@ public abstract class POExpressionVisitor<R, S>
 
  	public R caseDefExpression(PODefExpression node, S arg)
 	{
-		return caseLetDefExpression(node, arg);
+		return caseExpression(node, arg);
 	}
 
  	public R caseDistConcatExpression(PODistConcatExpression node, S arg)

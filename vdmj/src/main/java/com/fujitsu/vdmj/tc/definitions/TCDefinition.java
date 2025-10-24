@@ -338,6 +338,15 @@ public abstract class TCDefinition extends TCNode implements Comparable<TCDefini
 	}
 
 	/**
+	 * True if this definition updates module or class state variables.
+	 * @param env 
+	 */
+	public boolean updatesState(Environment env)
+	{
+		return false;	// See operation definitions
+	}
+
+	/**
 	 * Test access specifier. An empty specifier defaults to PRIVATE.
 	 */
 	public boolean isAccess(Token kind)

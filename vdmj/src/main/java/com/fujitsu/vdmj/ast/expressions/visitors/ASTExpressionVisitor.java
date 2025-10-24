@@ -93,7 +93,7 @@ public abstract class ASTExpressionVisitor<R, S>
 
  	public R caseDefExpression(ASTDefExpression node, S arg)
 	{
-		return caseLetDefExpression(node, arg);
+		return caseExpression(node, arg);
 	}
 
  	public R caseDistConcatExpression(ASTDistConcatExpression node, S arg)
