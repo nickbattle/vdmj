@@ -672,11 +672,11 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	}
 
 	@Override
-	public boolean assignsState()
+	public boolean updatesState(Environment env)
 	{
 		return
 			(externals != null && externals.has(Token.WRITE)) ||
-			(body != null && body.assignsState());
+			(body != null && !body.updatesState(env).isEmpty());
 	}
 
 	@Override

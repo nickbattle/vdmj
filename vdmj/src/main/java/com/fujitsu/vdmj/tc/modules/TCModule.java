@@ -155,10 +155,11 @@ public class TCModule extends TCNode
 		{
 			exportdefs.clear();
 			exportdefs.addAll(exports.getDefinitions(defs));
+			ModuleEnvironment env = new ModuleEnvironment(this);
 
 			for (TCDefinition export: exportdefs)
 			{
-				if (export.assignsState())
+				if (export.updatesState(env))
 				{
 					stateExported = true;
 					break;

@@ -338,9 +338,10 @@ public abstract class TCDefinition extends TCNode implements Comparable<TCDefini
 	}
 
 	/**
-	 * True if this definition directly assigns module or class state variables.
+	 * True if this definition updates module or class state variables.
+	 * @param env 
 	 */
-	public boolean assignsState()
+	public boolean updatesState(Environment env)
 	{
 		return false;	// See operation definitions
 	}

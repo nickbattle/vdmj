@@ -526,9 +526,9 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	}
 
 	@Override
-	public boolean assignsState()
+	public boolean updatesState(Environment env)
 	{
-		return body.assignsState();
+		return !body.updatesState(env).isEmpty();
 	}
 
 	@Override

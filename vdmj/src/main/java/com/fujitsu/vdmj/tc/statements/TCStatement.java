@@ -231,14 +231,6 @@ public abstract class TCStatement extends TCNode
 	{
 		return annotations;
 	}
-	
-	/**
-	 * True if the statement directly assigns module or class state.
-	 */
-	public boolean assignsState()
-	{
-		return false;	// Implemented by TCAssignmentStatement
-	}
 
 	/**
 	 * Implemented by all statements to allow visitor processing.
