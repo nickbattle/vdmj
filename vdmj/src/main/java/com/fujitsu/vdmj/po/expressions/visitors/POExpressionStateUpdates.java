@@ -34,17 +34,17 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 /**
  * A visitor set to explore the PO tree and return the state names updated.
  */
-public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToken, TCNameSet, Object>
+public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToken, TCNameSet, TCNameSet>
 {
-	public POExpressionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public POExpressionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, TCNameSet> visitors)
 	{
 		this.visitorSet = visitors;
 	}
 	
 	@Override
-	public TCNameSet caseApplyExpression(POApplyExpression node, Object arg)
+	public TCNameSet caseApplyExpression(POApplyExpression node, TCNameSet locals)
 	{
-		TCNameSet all = super.caseApplyExpression(node, arg);
+		TCNameSet all = super.caseApplyExpression(node, locals);
 
 		if (node.opdef != null)		// Apply is an operation call
 		{
@@ -66,7 +66,7 @@ public class POExpressionStateUpdates extends POLeafExpressionVisitor<TCNameToke
 	}
 
 	@Override
-	public TCNameSet caseExpression(POExpression node, Object arg)
+	public TCNameSet caseExpression(POExpression node, TCNameSet locals)
 	{
 		return newCollection();
 	}

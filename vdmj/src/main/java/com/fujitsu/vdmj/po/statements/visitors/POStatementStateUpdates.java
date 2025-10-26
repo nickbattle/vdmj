@@ -49,9 +49,10 @@ import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names updated.
+ * A visitor set to explore the PO tree and return the state names updated. This excludes any
+ * names that are added within the scope.
  */
-public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, Object>
+public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken, TCNameSet, TCNameSet>
 {
 	private final POContextStack ctxt;
 	
@@ -61,7 +62,7 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 
 		this.ctxt = ctxt;
 		
-		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, Object>()
+		visitorSet = new POVisitorSet<TCNameToken, TCNameSet, TCNameSet>()
 		{
 			@Override
 			protected void setVisitors()
@@ -82,27 +83,33 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	}
 
 	@Override
-	public TCNameSet caseAnnotatedStatement(POAnnotatedStatement node, Object arg)
+	public TCNameSet caseAnnotatedStatement(POAnnotatedStatement node, TCNameSet locals)
 	{
-		return node.statement.apply(this, null);	// Don't process args
+		return node.statement.apply(this, locals);	// Don't process annotation's args
 	}
 	
 	@Override
-	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, Object arg)
+	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, TCNameSet locals)
 	{
-		TCNameSet rhs = visitorSet.applyExpressionVisitor(node.exp, arg);
-		rhs.addAll(designatorUpdates(node.target));
+		TCNameSet rhs = visitorSet.applyExpressionVisitor(node.exp, locals);
+		TCNameToken target = designatorUpdates(node.target);
+
+		if (!locals.contains(target))	// If it's not defined within the scope
+		{
+			rhs.add(target);
+		}
+
 		return rhs;
 	}
 	
 	@Override
-	public TCNameSet caseCallStatement(POCallStatement node, Object arg)
+	public TCNameSet caseCallStatement(POCallStatement node, TCNameSet locals)
 	{
 		return operationCall(node.location, node.opdef);
 	}
 	
 	@Override
-	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, Object arg)
+	public TCNameSet caseCallObjectStatement(POCallObjectStatement node, TCNameSet locals)
 	{
 		return operationCall(node.location, node.fdef);
 	}
@@ -114,35 +121,35 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	}
 
 	@Override
-	public TCNameSet caseStatement(POStatement node, Object arg)
+	public TCNameSet caseStatement(POStatement node, TCNameSet locals)
 	{
 		return newCollection();
 	}
 
 	/**
-	 * Identify the state names that are updated by a given state designator.
+	 * Identify the state name that is updated by a state designator.
 	 */
-	private TCNameSet designatorUpdates(POStateDesignator sd)
+	private TCNameToken designatorUpdates(POStateDesignator sd)
 	{
-		TCNameSet all = newCollection();
-		
 		if (sd instanceof POIdentifierDesignator)
 		{
 			POIdentifierDesignator id = (POIdentifierDesignator)sd;
-			all.add(id.name);
+			return id.name;
 		}
 		else if (sd instanceof POFieldDesignator)
 		{
 			POFieldDesignator fd = (POFieldDesignator)sd;
-			all.addAll(designatorUpdates(fd.object));
+			return designatorUpdates(fd.object);
 		}
 		else if (sd instanceof POMapSeqDesignator)
 		{
 			POMapSeqDesignator msd = (POMapSeqDesignator)sd;
-			all.addAll(designatorUpdates(msd.mapseq));
+			return designatorUpdates(msd.mapseq);
 		}
-		
-		return all;
+		else
+		{
+			throw new IllegalArgumentException("designatorUpdates");
+		}
 	}
 
 	/**
