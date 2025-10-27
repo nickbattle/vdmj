@@ -74,22 +74,25 @@ public class TCLoopAnnotations implements Mappable
 
 	public void typeCheck(Environment env, TCStatement stmt, TCNameList loopVars)
 	{
-		// Called, even if invariants empty, to set ghost definitions.
-		Environment local = invariants.getGhostEnvironment(stmt, env);
-
 		if (!invariants.isEmpty())
 		{
 			TCNameSet updates = stmt.updatesState(env);
 			TCNameSet reasonsAbout = new TCNameSet();
+			TCNameSet ghosts = new TCNameSet();
 			
 			for (TCLoopInvariantAnnotation inv: invariants)
 			{
 				TCExpression exp = inv.args.firstElement();
-				TCType itype = exp.typeCheck(local, null, NameScope.NAMESANDSTATE, null);
+				TCType itype = exp.typeCheck(env, null, NameScope.GHOSTSNAMESANDSTATE, null);
 				
 				if (!(itype instanceof TCBooleanType))
 				{
 					exp.report(6007, "@LoopInvariant must be a boolean expression");
+				}
+
+				if (inv.ghostName != null)
+				{
+					ghosts.add(inv.ghostName);
 				}
 
 				// This has to be after typecheck!
@@ -103,6 +106,11 @@ public class TCLoopAnnotations implements Mappable
 				missing.addAll(updates);
 				missing.removeAll(reasonsAbout);
 				stmt.warning(6007, "@LoopInvariants do not reason about " + missing);
+			}
+
+			if (ghosts.size() > 1)
+			{
+				stmt.report(6007, "@LoopInvariants have different ghosts: " + ghosts);
 			}
 
 			if (!loopVars.isEmpty())	// So we must have at least one inv without these
@@ -139,5 +147,10 @@ public class TCLoopAnnotations implements Mappable
 				}
 			}
 		}
+	}
+
+	public Environment getGhosEnvironment(TCStatement stmt, Environment env)
+	{
+		return invariants.getGhostEnvironment(stmt, env);
 	}
 }

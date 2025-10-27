@@ -77,15 +77,16 @@ public class TCForPatternBindStatement extends TCStatement
 	{
 		expType = seqexp.typeCheck(base, null, scope, null);
 
-		Environment local = base;
-
 		if (expType.isSeq(location))
 		{
+			invariants = TCLoopAnnotations.getLoopAnnotations(this);
 			TCSeqType st = expType.getSeq();
 			patternBind.typeCheck(base, scope, st.seqof);
 			TCDefinitionList defs = patternBind.getDefinitions();
 			defs.typeCheck(base, scope);
-			local = new FlatCheckedEnvironment(defs, base, scope);
+
+			Environment local = invariants.getGhosEnvironment(this, base);
+			local = new FlatCheckedEnvironment(defs, local, scope);
 			TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 			
 			if (!(st instanceof TCSeq1Type) && !(rt instanceof TCVoidType))
@@ -94,7 +95,6 @@ public class TCForPatternBindStatement extends TCStatement
 				rt = new TCUnionType(location, rt, new TCVoidType(location));
 			}
 			
-			invariants = TCLoopAnnotations.getLoopAnnotations(this);
 			invariants.typeCheck(local, this, getPattern().getVariableNames());
 			local.unusedCheck();
 			return setType(rt);
