@@ -38,11 +38,10 @@ public enum NameScope
 	OLDSTATE(8),		// SL state names with a "~" modifier
 	TYPENAME(16),		// The names of types
 	CLASSNAME(32),	// The names of classes
-	VARSTATE(64),		// Class instance variables also carry this bit	
-	GHOST(128),		// Ghost variables used in @LoopInvariants
+	GHOST(64),		// Ghost variables used in @LoopInvariants
 
 	/**
-	 * Lookups of names in the environment specify one of the following "scopes"
+	 * Lookups of names in the environment specify one of the following "scope sets"
 	 * which indicates which of the definitions (above) are applicable (usually
 	 * to typechecking). For example, function bodies are typechecked as NAMES,
 	 * since locals and globals in scope, but state isn't; operations are checked
@@ -51,9 +50,7 @@ public enum NameScope
 	NAMES(1+2),
 	NAMESANDSTATE(1+2+4),
 	NAMESANDANYSTATE(1+2+4+8),
-	VARSANDSTATE(4+64),
-	VARSANDNAMES(1+2+64),
-	GHOSTSNAMESANDSTATE(1+2+4+128),
+	GHOSTSNAMESANDSTATE(1+2+4+64),
 	
 	ANYTHING(255);
 

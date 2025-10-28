@@ -326,7 +326,7 @@ public class LSPDefinitionFinder
 			else if (fexp.root.isClass(env))
 			{
 	    		TCClassType cls = fexp.root.getClassType(env);
-	    		return cls.findName(fexp.memberName, NameScope.VARSANDNAMES);
+	    		return cls.findName(fexp.memberName, NameScope.NAMESANDSTATE);
 			}
 		}
 		else if (node instanceof TCIsExpression)

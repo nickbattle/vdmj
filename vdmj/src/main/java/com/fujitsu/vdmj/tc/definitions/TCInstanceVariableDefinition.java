@@ -49,7 +49,7 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCType type, TCExpression expression)
 	{
-		super(accessSpecifier, name, type, expression, NameScope.VARSANDSTATE);	// State and varstate
+		super(accessSpecifier, name, type, expression, NameScope.STATE);
 		this.annotations = annotations;
 		oldname = name.getOldName();
 		initialized = !(expression instanceof TCUndefinedExpression);
