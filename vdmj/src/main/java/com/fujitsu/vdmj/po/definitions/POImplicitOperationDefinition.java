@@ -126,7 +126,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	@Override
 	public String toString()
 	{
-		return	(type.isPure() ? "pure " : "") + name +
+		return	(type.isPure() ? "pure " : "") + name.getName() +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(externals == null ? "" : "\n\text " + externals) +

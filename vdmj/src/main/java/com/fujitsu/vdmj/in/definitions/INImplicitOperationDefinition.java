@@ -103,7 +103,7 @@ public class INImplicitOperationDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return	accessSpecifier.ifSet(" ") + name +
+		return	accessSpecifier.ifSet(" ") + name.getName() +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +

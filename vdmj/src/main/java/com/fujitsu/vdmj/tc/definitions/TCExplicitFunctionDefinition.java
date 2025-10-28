@@ -122,9 +122,9 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			params.append("(" + Utils.listToString(plist) + ")");
 		}
 
-		return accessSpecifier.ifSet(" ") + name +
+		return accessSpecifier.ifSet(" ") + name.getName() +
 				(typeParams == null ? ": " : "[" + typeParams + "]: ") + Utils.deBracketed(type) +
-				"\n\t" + name + params + " ==\n" + body +
+				"\n\t" + name.getName() + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition) +
 				(measureExp == null ? "" : "\n\tmeasure " + measureExp);
