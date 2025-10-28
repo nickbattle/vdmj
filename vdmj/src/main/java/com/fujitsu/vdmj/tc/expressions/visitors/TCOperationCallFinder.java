@@ -55,12 +55,12 @@ public class TCOperationCallFinder extends TCLeafExpressionVisitor<TCNameToken, 
 		if (node.root instanceof TCVariableExpression)
 		{
 			TCVariableExpression exp = (TCVariableExpression)node.root;
-			opdef = env.findName(exp.name, NameScope.NAMES);
+			opdef = env.findName(exp.name, NameScope.NAMESANDSTATE);
 		}
 		else if (node.root instanceof TCFieldExpression)
 		{
 			TCFieldExpression exp = (TCFieldExpression)node.root;
-			opdef = env.findName(exp.memberName, NameScope.NAMES);
+			opdef = env.findName(exp.memberName, NameScope.NAMESANDSTATE);
 		}
 
 		if (opdef != null && opdef.isOperation())

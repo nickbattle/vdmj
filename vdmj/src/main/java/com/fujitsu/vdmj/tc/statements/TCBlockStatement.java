@@ -24,9 +24,13 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -57,6 +61,22 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 			local = new FlatCheckedEnvironment(d, local, scope);	// cumulative
 			d.implicitDefinitions(local);
 			d.typeCheck(local, scope);
+
+			if (Settings.strict && Settings.dialect == Dialect.VDM_SL &&
+				d instanceof TCAssignmentDefinition)
+			{
+				TCAssignmentDefinition def = (TCAssignmentDefinition)d;
+
+				if (def.expression instanceof TCApplyExpression)
+				{
+					// Simple op call or a function call, so fine
+				}
+				else if (def.expression.callsOperations(env))
+				{
+					// Complex expression that calls an operation
+					def.expression.warning(5045, "Strict: RHS of ':=' not an op call or a pure expression");
+				}
+			}
 		}
 
 		// For type checking purposes, the definitions are treated as

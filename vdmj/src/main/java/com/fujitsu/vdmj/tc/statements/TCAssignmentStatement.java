@@ -24,11 +24,14 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -67,6 +70,19 @@ public class TCAssignmentStatement extends TCStatement
 	{
 		targetType = target.typeCheck(env);
 		expType = exp.typeCheck(env, null, scope, targetType);
+
+		if (Settings.strict && Settings.dialect == Dialect.VDM_SL)
+		{
+			if (exp instanceof TCApplyExpression)
+			{
+				// Simple op call or a function call, so fine
+			}
+			else if (exp.callsOperations(env))
+			{
+				// Complex expression that calls an operation
+				exp.warning(5045, "Strict: RHS of ':=' not an op call or a pure expression");
+			}
+		}
 
 		if (!TypeComparator.compatible(targetType, expType))
 		{
