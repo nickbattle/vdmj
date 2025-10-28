@@ -32,11 +32,11 @@ public enum NameScope
 	/**
 	 * Definitions are declared with one of the following scopes.
 	 */
-	LOCAL(1),			// Let definitions and parameters
+	LOCAL(1),		// Let definitions and parameters
 	GLOBAL(2),		// Module and class func/ops/values
-	STATE(4),			// SL state or object instance values
-	OLDSTATE(8),		// SL state names with a "~" modifier
-	TYPENAME(16),		// The names of types
+	STATE(4),		// SL state or object instance values
+	OLDSTATE(8),	// SL state names with a "~" modifier
+	TYPENAME(16),	// The names of types
 	CLASSNAME(32),	// The names of classes
 	GHOST(64),		// Ghost variables used in @LoopInvariants
 
@@ -47,22 +47,22 @@ public enum NameScope
 	 * since locals and globals in scope, but state isn't; operations are checked
 	 * as NAMESANDSTATE, and postconditions as NAMESANDANYSTATE.
 	 */
-	NAMES(1+2),
-	NAMESANDSTATE(1+2+4),
-	NAMESANDANYSTATE(1+2+4+8),
-	GHOSTSNAMESANDSTATE(1+2+4+64),
+	NAMES(LOCAL.mask + GLOBAL.mask),
+	NAMESANDSTATE(LOCAL.mask + GLOBAL.mask + STATE.mask),
+	NAMESANDANYSTATE(NAMESANDSTATE.mask + OLDSTATE.mask),
+	GHOSTSNAMESANDSTATE(NAMESANDSTATE.mask + GHOST.mask),
 	
 	ANYTHING(255);
 
 	private int mask;
 
-	NameScope(int level)
+	NameScope(int mask)
 	{
-		this.mask = level;
+		this.mask = mask;
 	}
 
 	public boolean matches(NameScope other)
 	{
-		return (mask & other.mask) != 0;
+		return (this.mask & other.mask) != 0;
 	}
 }
