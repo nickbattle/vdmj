@@ -358,7 +358,7 @@ public class LSPDefinitionFinder
 				}
 			}
 			
-			TCDefinition def = env.findName(name, NameScope.VARSANDNAMES);
+			TCDefinition def = env.findName(name, NameScope.NAMES);
 			
 			if (def != null)
 			{

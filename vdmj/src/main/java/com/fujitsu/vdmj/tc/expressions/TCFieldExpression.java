@@ -122,7 +122,7 @@ public class TCFieldExpression extends TCExpression
     		
     		if (env.isFunctional())
     		{
-    			scope = NameScope.VARSANDNAMES;		// Allow fields as well in functions
+    			scope = NameScope.VARSANDNAMES;		// Allow field state as well, in functions
     		}
     		
     		TCDefinition fdef = cls.findName(memberName, scope);

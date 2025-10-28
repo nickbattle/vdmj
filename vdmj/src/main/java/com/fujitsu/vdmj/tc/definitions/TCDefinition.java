@@ -259,7 +259,7 @@ public abstract class TCDefinition extends TCNode implements Comparable<TCDefini
 		{
 			if (!nameScope.matches(scope))
 			{
-				if (nameScope.matches(NameScope.VARSANDSTATE))
+				if (nameScope.matches(NameScope.STATE))
 				{
 					sought.report(3302,
 						"State variable '" + sought.toString() + "' cannot be accessed from this context");
