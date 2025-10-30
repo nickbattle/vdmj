@@ -24,8 +24,10 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
@@ -84,7 +86,9 @@ public class TCLoopInvariantAnnotation extends TCAnnotation
 		}
 		else if (args.size() != 1 && args.size() != 2)
 		{
-			name.report(6007, "@LoopInvariant args: <boolean expression> [, <ghost>]");
+			name.report(6007, "@LoopInvariant args: (<boolean expression> [, <ghost>])");
+			args.clear();
+			args.add(new TCBooleanLiteralExpression(LexBooleanToken.TRUE));		// Avoids later errs
 		}
 		else if (args.size() == 2)
 		{
