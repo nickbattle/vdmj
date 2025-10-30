@@ -206,11 +206,11 @@ public class PogTest extends TestCase
 		/* 5 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax > 0) =>\n      (forall cx:nat, ax:nat &\n        (((ax + cx) = size) and (ax > 0) =>\n          (let ax : nat = (ax - 1) in\n            (let cx : nat = (cx + 1) in\n              ((ax + cx) = size))))))))\n",
 		/* 6 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((ax > 0) =>\n      (forall cx:nat, ax:nat &\n        (((ax + cx) = size) and (not (ax > 0)) =>\n          size <> 0)))))\n",
 		/* 7 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((not (ax > 0)) =>\n      (-- Did not enter loop at 15:9\n        (((ax + cx) = size) =>\n          size <> 0)))))\n",
-		/* 8 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    (let z : nat1 = 1 in\n      ((ax + cx) = size))))\n",
+		/* 8 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((1 <= size) =>\n      (let z : nat1 = 1 in\n        ((ax + cx) = size)))))\n",
 		/* 9 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((1 <= size) =>\n      (forall cx:nat, ax:nat, z:nat1 &\n        (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n          (ax - 1) >= 0)))))\n",
 		/* 10 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((1 <= size) =>\n      (forall cx:nat, ax:nat, z:nat1 &\n        (((z >= 1) and (z <= size)) and ((ax + cx) = size) =>\n          (let ax : nat = (ax - 1) in\n            (let cx : nat = (cx + 1) in\n              (let z : nat1 = (z + 1) in\n                ((ax + cx) = size)))))))))\n",
 		/* 11 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((1 <= size) =>\n      (forall cx:nat, ax:nat &\n        (let z : nat1 = (size + 1) in\n          (((ax + cx) = size) =>\n            size <> 0))))))\n",
-		/* 12 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((1 > size) =>\n      (-- Did not enter loop at 31:9\n        (let z : nat1 = 1 in\n          (((ax + cx) = size) =>\n            size <> 0))))))\n",
+		/* 12 */ "(forall size:nat &\n  (let ax : nat = size, cx : nat = 0 in\n    ((1 > size) =>\n      (-- Did not enter loop at 31:9\n        size <> 0))))\n",
 		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {} in\n      (ax = sums(ABC)))))\n",
 		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (({1, 2, 3} <> {}) =>\n      (forall ax:nat, ABC:set of nat1, z:nat1 &\n        (((ABC psubset {1, 2, 3}) and (z in set ({1, 2, 3} \\ ABC))) and (ax = sums(ABC)) =>\n          (let ax : nat = (ax + z) in\n            (let ABC : set of nat1 = (ABC union {z}) in\n              (ax = sums(ABC)))))))))\n",
 		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (({1, 2, 3} <> {}) =>\n      (let ABC : set of nat1 = {1, 2, 3} in\n        (forall ax:nat &\n          ((ax = sums(ABC)) =>\n            ax <> 0))))))\n",
@@ -228,7 +228,6 @@ public class PogTest extends TestCase
 		/* 27 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    exists e in set s & true))\n",
 		/* 28 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    (forall e in set s &\n      measure_sums(s) > measure_sums(s \\ {e}))))\n"
 	};
-
 	public void testVDMSL() throws Exception
 	{
 		runPOG("expectedSL", Dialect.VDM_SL, "/pogtest/pog.vdmsl", expectedSL);

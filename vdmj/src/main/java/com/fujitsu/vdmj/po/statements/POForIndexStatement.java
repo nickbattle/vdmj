@@ -145,7 +145,14 @@ public class POForIndexStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * The initial case verifies that the invariant is true before the loop.
+		 * Push an implication that the loop range is not empty. This applies to everything
+		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
+		 * the isEmpty() case in another altpath.
+		 */
+		ctxt.push(new POImpliesContext(isNotEmpty()));
+
+		/**
+		 * The initial case verifies that the invariant is true for the first loop.
 		 */
 		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
 		ctxt.push(new POLetDefContext(def));						// eg. let x = 1 in
@@ -153,16 +160,12 @@ public class POForIndexStatement extends POStatement
 		obligations.lastElement().setMessage("check invariant before for-loop");
 		ctxt.pop();
 
+		/**
+		 * Create a local environment with the loop variable, which affects POForAllContexts.
+		 */
 		TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
 		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
 		updates.add(var);
-
-		/**
-		 * Push an implication that the loop range is not empty. This applies to everything
-		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
-		 * the isEmpty() case in another altpath.
-		 */
-		ctxt.push(new POImpliesContext(isNotEmpty()));
 
 		/**
 		 * The preservation case verifies that if the invariant is true at X, then it is true at X+by
@@ -203,14 +206,11 @@ public class POForIndexStatement extends POStatement
 
 		/**
 		 * Finally, the loop may not have been entered if the range is empty, so we create
-		 * another alternative path with this condition and nothing else. The variable is set
-		 * to the start value, so this looks like the case before the loop.
+		 * another alternative path with this condition and nothing else. There is no invariant
+		 * check in this case, just like the check before the loop.
 		 */
-		ctxt.push(new POImpliesContext(isEmpty()));
+		ctxt.push(new POImpliesContext(isEmpty()));			// from > to =>
 		ctxt.push(new POCommentContext("Did not enter loop", location));
-		def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
-		ctxt.push(new POLetDefContext(def));				// eg. let x = 1 in
-		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The three alternatives in one added.
