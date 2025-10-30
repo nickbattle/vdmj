@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
 import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.POHeadExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLenExpression;
 import com.fujitsu.vdmj.po.expressions.PONotEqualExpression;
@@ -220,15 +219,6 @@ public class POForPatternBindStatement extends POStatement
 		ctxt.push(new POImpliesContext(isNotEmpty()));
 
 		/**
-		 * The start of the loop verifies that the first value in the list can start the loop and
-		 * will meet the invariant. The ghost is therefore set to that one value.
-		 */
-		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));		// ghost := [hd sequence]
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant for first for-loop");
-		ctxt.pop();
-
-		/**
 		 * From here on, we push contexts that include the loop variables (in updates), so
 		 * the invariant can reason about them.
 		 */
@@ -238,13 +228,15 @@ public class POForPatternBindStatement extends POStatement
 		}
 
 		/**
-		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ {x}
+		 * The preservation case verifies that if invariant is true for gx, then it is true for gx ^ [x].
+		 * The base case is the state before the loop, covered above.
 		 */
 		ctxt.push(new POForAllContext(updates, local));
 		ctxt.push(new POImpliesContext(varsMatch(ghostDef, eseq), invariant));
-		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
-
+		
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+		
+		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
@@ -335,18 +327,6 @@ public class POForPatternBindStatement extends POStatement
 			new POSeqEnumExpression(location, elist, tlist), ghostDef.type, ghostDef.type);
 
 		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, cat, ghostDef.type);
-	}
-
-	/**
-	 * Produce "ghost := [hd sequence]"
-	 */
-	private POAssignmentDefinition ghostFirst(POAssignmentDefinition ghostDef)
-	{
-		POHeadExpression head = new POHeadExpression(location, sequence, sequenceType);
-		POExpressionList members = new POExpressionList(head);
-		TCTypeList types = new TCTypeList(ghostDef.type);
-		POSeqEnumExpression first = new POSeqEnumExpression(location, members, types);
-		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, first, ghostDef.type);
 	}
 
 	/**

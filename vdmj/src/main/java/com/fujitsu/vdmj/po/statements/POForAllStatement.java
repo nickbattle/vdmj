@@ -180,24 +180,15 @@ public class POForAllStatement extends POStatement
 		ctxt.push(new POImpliesContext(isNotEmpty(eset)));
 
 		/**
-		 * The start of the loop verifies that every value in the set can start the loop and
-		 * will meet the invariant. The ghost is therefore set to that one value.
-		 */
-		ctxt.push(new POForAllContext(remPattern, eset));						// forall possible first values
-		ctxt.push(new POLetDefContext(ghostFirst(ghostDef)));					// ghost := {x}
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant for first for-loop");
-		ctxt.pop();
-		ctxt.pop();
-
-		/**
-		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}
+		 * The preservation case verifies that if invariant is true for gx, then it is true for gx union {x}.
+		 * The base case is the "before the loop" case above.
 		 */
 		ctxt.push(new POForAllContext(updates, local));							// forall <changed values> and vars
 		ctxt.push(new POImpliesContext(varsInSet(ghostDef, eset), invariant));	// x in set S \ GHOST$ && invariant => ...
-		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
-
+		
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
+
+		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
 		obligations.lastElement().setMessage("invariant preservation for next for-loop");
 
@@ -286,17 +277,6 @@ public class POForAllStatement extends POStatement
 			ghostDef.type, ghostDef.type);
 
 		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, union, ghostDef.type);
-	}
-
-	/**
-	 * Produce "ghost := {<pattern>}"
-	 */
-	private POAssignmentDefinition ghostFirst(POAssignmentDefinition ghostDef)
-	{
-		POExpressionList members = new POExpressionList(remPattern.getMatchingExpression());
-		TCTypeList types = new TCTypeList(ghostDef.type);
-		POSetEnumExpression first = new POSetEnumExpression(location, members, types);
-		return new POAssignmentDefinition(ghostDef.name, ghostDef.type, first, ghostDef.type);
 	}
 
 	/**

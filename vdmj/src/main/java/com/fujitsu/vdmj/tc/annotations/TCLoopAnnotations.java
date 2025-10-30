@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -115,7 +116,7 @@ public class TCLoopAnnotations implements Mappable
 
 			if (!loopVars.isEmpty())	// So we must have at least one inv without these
 			{
-				boolean oneOkay = false;
+				boolean oneOkay = (stmt instanceof TCForIndexStatement);
 
 				for (TCLoopInvariantAnnotation loopInv: invariants)
 				{
