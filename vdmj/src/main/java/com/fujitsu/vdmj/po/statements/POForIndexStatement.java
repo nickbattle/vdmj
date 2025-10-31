@@ -206,11 +206,12 @@ public class POForIndexStatement extends POStatement
 
 		/**
 		 * Finally, the loop may not have been entered if the range is empty, so we create
-		 * another alternative path with this condition and nothing else. There is no invariant
-		 * check in this case, just like the check before the loop.
+		 * another alternative path with this condition and nothing else. The invariant
+		 * holds, because of the check before the loop.
 		 */
 		ctxt.push(new POImpliesContext(isEmpty()));			// from > to =>
 		ctxt.push(new POCommentContext("Did not enter loop", location));
+		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		// The three alternatives in one added.
