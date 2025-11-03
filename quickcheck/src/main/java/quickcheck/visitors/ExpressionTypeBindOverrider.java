@@ -77,7 +77,7 @@ public class ExpressionTypeBindOverrider extends INLeafExpressionVisitor<INBindi
 		}
 		else
 		{
-			return newCollection();
+			return visitorSet.applyExpressionVisitor(node.predicate, arg);
 		}
 	}
 	
@@ -92,7 +92,7 @@ public class ExpressionTypeBindOverrider extends INLeafExpressionVisitor<INBindi
 		}
 		else
 		{
-			return newCollection();
+			return visitorSet.applyExpressionVisitor(node.predicate, arg);
 		}
 	}
 
