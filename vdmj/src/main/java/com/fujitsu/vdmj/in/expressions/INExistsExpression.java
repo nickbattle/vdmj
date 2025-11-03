@@ -45,15 +45,18 @@ public class INExistsExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
+	public final boolean bindsUsed;
 	
 	/** Result information for QuickCheck */
 	public INBindingGlobals globals = null;
 
-	public INExistsExpression(LexLocation location, INMultipleBindList bindList, INExpression predicate)
+	public INExistsExpression(LexLocation location,
+		INMultipleBindList bindList, INExpression predicate, boolean bindsUsed)
 	{
 		super(location);
 		this.bindList = bindList;
 		this.predicate = predicate;
+		this.bindsUsed = bindsUsed;
 	}
 
 	@Override
@@ -74,7 +77,17 @@ public class INExistsExpression extends INExpression
 
 			for (INMultipleBind mb: bindList)
 			{
-				ValueList bvals = mb.getBindValues(ctxt, false);
+				ValueList bvals = null;
+
+				if (bindsUsed)
+				{
+					bvals = mb.getBindValues(ctxt, false);
+				}
+				else
+				{
+					// None of the bindings are used, so just set undefined
+					bvals = new ValueList(new UndefinedValue());
+				}
 
 				for (INPattern p: mb.plist)
 				{
@@ -116,14 +129,24 @@ public class INExistsExpression extends INExpression
 						Value result = predicate.eval(evalContext);
 						hasUndefined = hasUndefined || result.isUndefined();
 						
-						if (result.isDefined() && result.boolValue(ctxt))
+						if (result.isDefined())
 						{
-							if (globals != null)
+							if (result.boolValue(ctxt))
 							{
-								globals.setWitness(evalContext);
+								if (globals != null)
+								{
+									globals.setWitness(evalContext);
+								}
+								
+								return new BooleanValue(true);
 							}
-							
-							return new BooleanValue(true);
+							else	// result is false
+							{
+								if (!bindsUsed)
+								{
+									return new BooleanValue(false);
+								}
+							}
 						}
 					}
 				}
