@@ -41,8 +41,11 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.statements.visitors.TCStatementOpCallFinder;
 
 
 /**
@@ -181,6 +184,106 @@ abstract public class TypeChecker
 		return false;
 	}
 
+	/**
+	 * Populate the transitiveUpdates field of operation definitions, to include every
+	 * localUpdates set from itself and the operations is calls transitively.
+	 */
+	protected void populateTransitiveUpdates(TCDefinitionList alldefs)
+	{
+		Environment globals = new FlatEnvironment(alldefs, null);
+
+		for (TCDefinition def: alldefs)
+		{
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+				oneCallsUpdates(exop, globals);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+				oneCallsUpdates(imop, globals);
+			}
+		}
+	}
+
+	/**
+	 * Populate the transitive updates of one opcall.
+	 */
+	private void oneCallsUpdates(TCExplicitOperationDefinition opdef, Environment globals)
+	{
+		TCStatementOpCallFinder visitor =  new TCStatementOpCallFinder();
+		
+		if (opdef.transitiveUpdates == null)		// Not done yet
+		{
+			opdef.transitiveUpdates = new TCNameSet();
+			opdef.transitiveUpdates.addAll(opdef.localUpdates);
+
+			TCNameSet opcalls = opdef.body.apply(visitor, globals);
+			TCNameSet updates = new TCNameSet();
+
+			for (TCNameToken op: opcalls)
+			{
+				TCDefinition def = globals.findName(op, NameScope.GLOBAL);
+
+				if (def instanceof TCExplicitOperationDefinition)
+				{
+					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+					oneCallsUpdates(exop, globals);
+					updates.addAll(exop.transitiveUpdates);
+				}
+				else if (def instanceof TCImplicitOperationDefinition)
+				{
+					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+					oneCallsUpdates(imop, globals);
+					updates.addAll(imop.transitiveUpdates);
+				}
+			}
+
+			opdef.transitiveUpdates.addAll(updates);
+		}
+	}
+
+	private void oneCallsUpdates(TCImplicitOperationDefinition opdef, Environment globals)
+	{
+		TCStatementOpCallFinder visitor =  new TCStatementOpCallFinder();
+		
+		if (opdef.transitiveUpdates == null)		// Not done yet
+		{
+			opdef.transitiveUpdates = new TCNameSet();
+			opdef.transitiveUpdates.addAll(opdef.localUpdates);
+
+			if (opdef.body != null)
+			{
+				TCNameSet opcalls = opdef.body.apply(visitor, globals);
+				TCNameSet updates = new TCNameSet();
+
+				for (TCNameToken op: opcalls)
+				{
+					TCDefinition def = globals.findName(op, NameScope.GLOBAL);
+
+					if (def instanceof TCExplicitOperationDefinition)
+					{
+						TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+						oneCallsUpdates(exop, globals);
+						updates.addAll(exop.transitiveUpdates);
+					}
+					else if (def instanceof TCImplicitOperationDefinition)
+					{
+						TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+						oneCallsUpdates(imop, globals);
+						updates.addAll(imop.transitiveUpdates);
+					}
+				}
+
+				opdef.transitiveUpdates.addAll(updates);
+			}
+		}
+	}
+
+	/**
+	 * Report a TC error.
+	 */
 	public static void report(int number, String problem, LexLocation location)
 	{
 		if (suspended) return;	
@@ -206,6 +309,9 @@ abstract public class TypeChecker
 		}
 	}
 
+	/**
+	 * Report a TC warning.
+	 */
 	public static void warning(int number, String problem, LexLocation location)
 	{
 		if (suspended) return;

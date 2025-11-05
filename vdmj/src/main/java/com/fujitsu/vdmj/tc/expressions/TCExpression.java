@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVariableFinder;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCFreeVariableExpressionVisitor;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCOperationCallFinder;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionOpCallFinder;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCQualifiedDefinitionFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -285,7 +285,7 @@ public abstract class TCExpression extends TCNode
 	 */
 	public boolean callsOperations(Environment env)
 	{
-		TCOperationCallFinder finder = new TCOperationCallFinder();
+		TCExpressionOpCallFinder finder = new TCExpressionOpCallFinder();
 		return !this.apply(finder, env).isEmpty();
 	}
 
