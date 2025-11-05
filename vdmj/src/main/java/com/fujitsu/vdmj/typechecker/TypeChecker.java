@@ -190,6 +190,11 @@ abstract public class TypeChecker
 	 */
 	protected void populateTransitiveUpdates(TCDefinitionList alldefs)
 	{
+		if (getErrorCount() > 0)
+		{
+			return;		// Can't populate everything until it's clean
+		}
+
 		Environment globals = new FlatEnvironment(alldefs, null);
 
 		for (TCDefinition def: alldefs)
@@ -208,7 +213,7 @@ abstract public class TypeChecker
 	}
 
 	/**
-	 * Populate the transitive updates of one opcall.
+	 * Populate the transitive updates of one explicit opcall.
 	 */
 	private void oneCallsUpdates(TCExplicitOperationDefinition opdef, Environment globals)
 	{
@@ -244,6 +249,9 @@ abstract public class TypeChecker
 		}
 	}
 
+	/**
+	 * Populate the transitive updates of one implicit opcall.
+	 */
 	private void oneCallsUpdates(TCImplicitOperationDefinition opdef, Environment globals)
 	{
 		TCStatementOpCallFinder visitor =  new TCStatementOpCallFinder();
