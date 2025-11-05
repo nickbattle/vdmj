@@ -171,6 +171,16 @@ public class TCIdentifierDesignator extends TCStateDesignator
 		}
 	}
 	
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	@Override
+	public TCNameToken updatedVariableName()
+	{
+		return name;
+	}
+
 	public TCDefinition getDefinition()
 	{
 		return vardef;

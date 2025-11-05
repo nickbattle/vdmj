@@ -42,10 +42,6 @@ import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
-import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
-import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
-import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
-import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -88,7 +84,7 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 	@Override
 	public TCNameSet caseAssignmentStatement(TCAssignmentStatement node, Environment env)
 	{
-		return designatorUpdates(node.target);
+		return new TCNameSet(node.target.updatedVariableName());
 	}
 
 	@Override
@@ -128,32 +124,6 @@ public class TCStatementStateUpdates extends TCLeafStatementVisitor<TCNameToken,
 			}
 		}
 
-		return all;
-	}
-
-	/**
-	 * Identify the state names that are updated by a given state designator.
-	 */
-	private TCNameSet designatorUpdates(TCStateDesignator sd)
-	{
-		TCNameSet all = newCollection();
-		
-		if (sd instanceof TCIdentifierDesignator)
-		{
-			TCIdentifierDesignator id = (TCIdentifierDesignator)sd;
-			all.add(id.name);
-		}
-		else if (sd instanceof TCFieldDesignator)
-		{
-			TCFieldDesignator fd = (TCFieldDesignator)sd;
-			all.addAll(designatorUpdates(fd.object));
-		}
-		else if (sd instanceof TCMapSeqDesignator)
-		{
-			TCMapSeqDesignator msd = (TCMapSeqDesignator)sd;
-			all.addAll(designatorUpdates(msd.mapseq));
-		}
-		
 		return all;
 	}
 

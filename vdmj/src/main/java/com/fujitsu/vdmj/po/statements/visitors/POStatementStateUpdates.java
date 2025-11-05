@@ -39,10 +39,6 @@ import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
-import com.fujitsu.vdmj.po.statements.POFieldDesignator;
-import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
-import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
-import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -92,7 +88,7 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	public TCNameSet caseAssignmentStatement(POAssignmentStatement node, TCNameSet locals)
 	{
 		TCNameSet rhs = visitorSet.applyExpressionVisitor(node.exp, locals);
-		TCNameToken target = designatorUpdates(node.target);
+		TCNameToken target = node.target.updatedVariableName();
 
 		if (!locals.contains(target))	// If it's not defined within the scope
 		{
@@ -124,32 +120,6 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	public TCNameSet caseStatement(POStatement node, TCNameSet locals)
 	{
 		return newCollection();
-	}
-
-	/**
-	 * Identify the state name that is updated by a state designator.
-	 */
-	private TCNameToken designatorUpdates(POStateDesignator sd)
-	{
-		if (sd instanceof POIdentifierDesignator)
-		{
-			POIdentifierDesignator id = (POIdentifierDesignator)sd;
-			return id.name;
-		}
-		else if (sd instanceof POFieldDesignator)
-		{
-			POFieldDesignator fd = (POFieldDesignator)sd;
-			return designatorUpdates(fd.object);
-		}
-		else if (sd instanceof POMapSeqDesignator)
-		{
-			POMapSeqDesignator msd = (POMapSeqDesignator)sd;
-			return designatorUpdates(msd.mapseq);
-		}
-		else
-		{
-			throw new IllegalArgumentException("designatorUpdates");
-		}
 	}
 
 	/**
