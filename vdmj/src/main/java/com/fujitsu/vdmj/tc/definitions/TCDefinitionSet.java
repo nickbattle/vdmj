@@ -26,11 +26,13 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.TreeSet;
 
+import com.fujitsu.vdmj.mapper.Mappable;
+
 /**
  * A class to hold a set of Definitions with unique names.
  */
 
-public class TCDefinitionSet extends TreeSet<TCDefinition>
+public class TCDefinitionSet extends TreeSet<TCDefinition> implements Mappable
 {
 	public TCDefinitionSet()
 	{

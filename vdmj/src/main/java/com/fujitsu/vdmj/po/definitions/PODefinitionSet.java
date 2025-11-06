@@ -24,13 +24,20 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.TreeSet;
+import com.fujitsu.vdmj.po.POMappedSet;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
 
 /**
  * A class to hold a set of Definitions with unique names.
  */
-public class PODefinitionSet extends TreeSet<PODefinition>
+public class PODefinitionSet extends POMappedSet<TCDefinition, PODefinition>
 {
+	public PODefinitionSet(TCDefinitionSet from) throws Exception
+	{
+		super(from);
+	}
+
 	public PODefinitionSet()
 	{
 		super();

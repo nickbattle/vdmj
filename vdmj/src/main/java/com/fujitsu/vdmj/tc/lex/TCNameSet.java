@@ -43,6 +43,21 @@ public class TCNameSet extends HashSet<TCNameToken>
 		super();
 	}
 
+	public TCNameSet matching(String sought)
+	{
+		TCNameSet result = new TCNameSet();
+
+		for (TCNameToken name: this)
+		{
+			if (name.getModule().equals(sought))
+			{
+				result.add(name);
+			}
+		}
+
+		return result;
+	}
+
 	@Override
 	public String toString()
 	{

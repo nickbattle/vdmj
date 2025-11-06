@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementOpCallFinder;
 
 
@@ -220,65 +221,80 @@ abstract public class TypeChecker
 	}
 
 	/**
+	 * Populate transitive calls and updates. The method starts by populating transitiveCalls,
+	 * by recursing into the call graph. Then it loops through the transitiveCalls, adding
+	 * the localUpdates to the transitiveUpdates for this operation.
+	 */
+	private void populateTransitiveUpdates(Environment globals, TCStatement body,
+		TCDefinitionSet transitiveCalls, TCNameSet transitiveUpdates, TCNameSet localUpdates)
+	{
+		TCDefinitionSet exCalls = new TCDefinitionSet();
+		TCDefinitionSet imCalls = new TCDefinitionSet();
+
+		for (TCNameToken op: body.apply(new TCStatementOpCallFinder(), globals))
+		{
+			TCDefinition def = globals.findName(op, NameScope.GLOBAL);
+
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				exCalls.add(def);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				imCalls.add(def);
+			}
+		}
+
+		transitiveCalls.addAll(exCalls);	// add local calls
+		transitiveCalls.addAll(imCalls);
+
+		for (TCDefinition def: exCalls)
+		{
+			TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+			populateTransitiveUpdates(exop, globals);
+			transitiveCalls.addAll(exop.transitiveCalls);
+		}
+
+		for (TCDefinition def: imCalls)
+		{
+			TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+			populateTransitiveUpdates(imop, globals);
+			transitiveCalls.addAll(imop.transitiveCalls);
+		}
+
+		// transitiveCalls is now complete for opdef and all of the ops it calls. So now
+		// go through the transitiveCalls to add the localUpdates for each to
+		// transitiveUpdates.
+
+		transitiveUpdates.addAll(localUpdates);		// add local updates
+
+		for (TCDefinition def: transitiveCalls)
+		{
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+				transitiveUpdates.addAll(exop.localUpdates);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+				transitiveUpdates.addAll(imop.localUpdates);
+			}
+		}
+	}
+
+	/**
 	 * Populate the transitive updates of one explicit opcall.
 	 */
 	private void populateTransitiveUpdates(TCExplicitOperationDefinition opdef, Environment globals)
 	{
-		TCStatementOpCallFinder visitor =  new TCStatementOpCallFinder();
-		
 		if (opdef.transitiveCalls == null)		// Not done yet
 		{
 			opdef.transitiveCalls = new TCDefinitionSet();
 			opdef.transitiveUpdates = new TCNameSet();
-			TCDefinitionSet exCalls = new TCDefinitionSet();
-			TCDefinitionSet imCalls = new TCDefinitionSet();
 
-			for (TCNameToken op: opdef.body.apply(visitor, globals))
-			{
-				TCDefinition def = globals.findName(op, NameScope.GLOBAL);
-
-				if (def instanceof TCExplicitOperationDefinition)
-				{
-					exCalls.add(def);
-				}
-				else if (def instanceof TCImplicitOperationDefinition)
-				{
-					imCalls.add(def);
-				}
-			}
-
-			opdef.transitiveCalls.addAll(exCalls);
-			opdef.transitiveCalls.addAll(imCalls);
-
-			for (TCDefinition def: exCalls)
-			{
-				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-				populateTransitiveUpdates(exop, globals);
-				opdef.transitiveCalls.addAll(exop.transitiveCalls);
-			}
-
-			for (TCDefinition def: imCalls)
-			{
-				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-				populateTransitiveUpdates(imop, globals);
-				opdef.transitiveCalls.addAll(imop.transitiveCalls);
-			}
-
-			opdef.transitiveUpdates.addAll(opdef.localUpdates);
-
-			for (TCDefinition def: opdef.transitiveCalls)
-			{
-				if (def instanceof TCExplicitOperationDefinition)
-				{
-					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-					opdef.transitiveUpdates.addAll(exop.localUpdates);
-				}
-				else if (def instanceof TCImplicitOperationDefinition)
-				{
-					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-					opdef.transitiveUpdates.addAll(imop.localUpdates);
-				}
-			}
+			populateTransitiveUpdates(globals, opdef.body,
+				opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
 		}
 	}
 
@@ -287,8 +303,6 @@ abstract public class TypeChecker
 	 */
 	private void populateTransitiveUpdates(TCImplicitOperationDefinition opdef, Environment globals)
 	{
-		TCStatementOpCallFinder visitor =  new TCStatementOpCallFinder();
-		
 		if (opdef.transitiveCalls == null)		// Not done yet
 		{
 			opdef.transitiveCalls = new TCDefinitionSet();
@@ -296,55 +310,8 @@ abstract public class TypeChecker
 
 			if (opdef.body != null)
 			{
-				TCDefinitionSet exCalls = new TCDefinitionSet();
-				TCDefinitionSet imCalls = new TCDefinitionSet();
-
-				for (TCNameToken op: opdef.body.apply(visitor, globals))
-				{
-					TCDefinition def = globals.findName(op, NameScope.GLOBAL);
-
-					if (def instanceof TCExplicitOperationDefinition)
-					{
-						exCalls.add(def);
-					}
-					else if (def instanceof TCImplicitOperationDefinition)
-					{
-						imCalls.add(def);
-					}
-				}
-
-				opdef.transitiveCalls.addAll(exCalls);
-				opdef.transitiveCalls.addAll(imCalls);
-
-				for (TCDefinition def: exCalls)
-				{
-					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-					populateTransitiveUpdates(exop, globals);
-					opdef.transitiveCalls.addAll(exop.transitiveCalls);
-				}
-
-				for (TCDefinition def: imCalls)
-				{
-					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-					populateTransitiveUpdates(imop, globals);
-					opdef.transitiveCalls.addAll(imop.transitiveCalls);
-				}
-
-				opdef.transitiveUpdates.addAll(opdef.localUpdates);
-
-				for (TCDefinition def: opdef.transitiveCalls)
-				{
-					if (def instanceof TCExplicitOperationDefinition)
-					{
-						TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-						opdef.transitiveUpdates.addAll(exop.localUpdates);
-					}
-					else if (def instanceof TCImplicitOperationDefinition)
-					{
-						TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-						opdef.transitiveUpdates.addAll(imop.localUpdates);
-					}
-				}
+				populateTransitiveUpdates(globals, opdef.body,
+					opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
 			}
 		}
 	}

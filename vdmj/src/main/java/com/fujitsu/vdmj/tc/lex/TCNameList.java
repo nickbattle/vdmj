@@ -89,4 +89,19 @@ public class TCNameList extends Vector<TCNameToken> implements Mappable
 
 		return false;
 	}
+
+	public TCNameList matching(String sought)
+	{
+		TCNameList result = new TCNameList();
+
+		for (TCNameToken name: this)
+		{
+			if (name.getModule().equals(sought))
+			{
+				result.add(name);
+			}
+		}
+
+		return result;
+	}
 }

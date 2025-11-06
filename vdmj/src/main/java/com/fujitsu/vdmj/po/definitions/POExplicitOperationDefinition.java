@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -76,6 +77,9 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final TCType actualResult;
 	public final boolean isConstructor;
 	public final TCTypeSet possibleExceptions;
+	public final TCNameSet localUpdates;
+	public final PODefinitionSet transitiveCalls;
+	public final TCNameSet transitiveUpdates;
 
 	public POExplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name, TCOperationType type,
@@ -87,7 +91,10 @@ public class POExplicitOperationDefinition extends PODefinition
 		POStateDefinition stateDefinition,
 		POClassDefinition classDefinition,
 		TCType actualResult, boolean isConstructor,
-		TCTypeSet possibleExceptions)
+		TCTypeSet possibleExceptions,
+		TCNameSet localUpdates,
+		PODefinitionSet transitiveCalls,
+		TCNameSet transitiveUpdates)
 	{
 		super(name.getLocation(), name);
 
@@ -105,6 +112,9 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.actualResult = actualResult;
 		this.isConstructor = isConstructor;
 		this.possibleExceptions = possibleExceptions;
+		this.localUpdates = localUpdates;
+		this.transitiveCalls = transitiveCalls;
+		this.transitiveUpdates = transitiveUpdates;
 	}
 
 	@Override
