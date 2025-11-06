@@ -89,6 +89,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCTypeSet possibleExceptions = null;
 	public TCNameSet localUpdates = null;
 	public TCNameSet transitiveUpdates = null;
+	public TCDefinitionSet transitiveCalls = null;
 
 	public boolean isConstructor = false;
 

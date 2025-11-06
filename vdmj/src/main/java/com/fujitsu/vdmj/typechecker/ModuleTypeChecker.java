@@ -300,6 +300,6 @@ public class ModuleTypeChecker extends TypeChecker
     	cyclicDependencyCheck(alldefs);
 
 		// Calculate the transitive update sets for the operations
-		// populateTransitiveUpdates(alldefs);
+		populateTransitiveUpdates(alldefs);
 	}
 }

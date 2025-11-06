@@ -181,6 +181,10 @@ public class ClassTypeChecker extends TypeChecker
 		// Close any annotations
 		TCAnnotation.close();
 
-		cyclicDependencyCheck(allDefs);
+    	// Check for inter-definition cyclic dependencies before initialization
+    	cyclicDependencyCheck(allDefs);
+
+		// Calculate the transitive update sets for the operations
+		populateTransitiveUpdates(allDefs);
 	}
 }
