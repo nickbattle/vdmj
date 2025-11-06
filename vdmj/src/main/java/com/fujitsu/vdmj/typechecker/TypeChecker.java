@@ -188,7 +188,7 @@ abstract public class TypeChecker
 
 	/**
 	 * Populate the transitiveUpdates field of operation definitions, to include every
-	 * localUpdates set from itself and the operations is calls transitively.
+	 * localUpdates set by itself and the operations it calls transitively.
 	 */
 	protected void populateTransitiveUpdates(TCDefinitionList alldefs)
 	{
