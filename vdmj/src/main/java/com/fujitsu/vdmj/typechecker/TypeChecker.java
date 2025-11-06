@@ -198,20 +198,16 @@ abstract public class TypeChecker
 		}
 
 		Environment globals = new FlatEnvironment(alldefs, null);
-		TCDefinitionSet exCalls = new TCDefinitionSet();
-		TCDefinitionSet imCalls = new TCDefinitionSet();
 
 		for (TCDefinition def: alldefs)
 		{
 			if (def instanceof TCExplicitOperationDefinition)
 			{
-				exCalls.add(def);
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
 				populateTransitiveUpdates(exop, globals);
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
 			{
-				imCalls.add(def);
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
 				populateTransitiveUpdates(imop, globals);
 			}
