@@ -25,18 +25,28 @@
 package com.fujitsu.vdmj.po.definitions.visitors;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
- * A visitor set to explore the PO tree and return the state names updated.
+ * A visitor set to explore the PO tree and return the state names updated. This excludes any
+ * names that are added within the scope.
  */
-public class PODefinitionStateUpdates extends POLeafDefinitionVisitor<TCNameToken, TCNameSet, Object>
+public class PODefinitionStateUpdates extends POLeafDefinitionVisitor<TCNameToken, TCNameSet, TCNameSet>
 {
-	public PODefinitionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public PODefinitionStateUpdates(POVisitorSet<TCNameToken, TCNameSet, TCNameSet> visitors)
 	{
 		this.visitorSet = visitors;
+	}
+
+	@Override
+	public TCNameSet caseAssignmentDefinition(POAssignmentDefinition node, TCNameSet locals)
+	{
+		TCNameSet all = super.caseAssignmentDefinition(node, locals);
+		locals.add(node.name);
+		return all;
 	}
 	
 	@Override
@@ -46,7 +56,7 @@ public class PODefinitionStateUpdates extends POLeafDefinitionVisitor<TCNameToke
 	}
 
 	@Override
-	public TCNameSet caseDefinition(PODefinition node, Object arg)
+	public TCNameSet caseDefinition(PODefinition node, TCNameSet locals)
 	{
 		return newCollection();
 	}

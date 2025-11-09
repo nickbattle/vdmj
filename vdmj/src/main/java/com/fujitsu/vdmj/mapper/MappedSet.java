@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2024 Nick Battle.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,32 +21,29 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.po.patterns.visitors;
 
-import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.patterns.POMultipleBind;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+package com.fujitsu.vdmj.mapper;
 
-/**
- * A visitor set to explore the PO tree and return the state names updated.
- */
-public class POMultipleBindStateUpdates extends POLeafMultipleBindVisitor<TCNameToken, TCNameSet, TCNameSet>
+import java.util.Set;
+import java.util.TreeSet;
+
+abstract public class MappedSet<FROM extends Mappable, TO extends Mappable> extends TreeSet<TO> implements Mappable
 {
-	public POMultipleBindStateUpdates(POVisitorSet<TCNameToken, TCNameSet, TCNameSet> visitors)
+	private static final long serialVersionUID = 1L;
+
+	@SuppressWarnings("unchecked")
+	public MappedSet(String mappings, Set<FROM> from) throws Exception
 	{
-		this.visitorSet = visitors;
+		ClassMapper mapper = ClassMapper.getInstance(mappings);	// NB. no init!
+		
+		for (FROM type: from)
+		{
+			add((TO)mapper.convert(type));
+		}
 	}
 	
-	@Override
-	protected TCNameSet newCollection()
+	public MappedSet()
 	{
-		return new TCNameSet();
-	}
-
-	@Override
-	public TCNameSet caseMultipleBind(POMultipleBind node, TCNameSet locals)
-	{
-		return newCollection();
+		super();
 	}
 }

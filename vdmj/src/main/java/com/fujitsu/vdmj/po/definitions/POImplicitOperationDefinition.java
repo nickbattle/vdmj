@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -85,6 +86,10 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final POStateDefinition stateDefinition;
 	public final boolean isConstructor;
 	public final TCTypeSet possibleExceptions;
+	public final TCNameSet localUpdates;
+	public final PODefinitionSet transitiveCalls;
+	public final TCNameSet transitiveUpdates;
+
 
 	public POImplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name,
@@ -101,7 +106,10 @@ public class POImplicitOperationDefinition extends PODefinition
 		POStateDefinition stateDefinition,
 		POClassDefinition classDefinition,
 		boolean isConstructor,
-		TCTypeSet possibleExceptions)
+		TCTypeSet possibleExceptions,
+		TCNameSet localUpdates,
+		PODefinitionSet transitiveCalls,
+		TCNameSet transitiveUpdates)
 	{
 		super(name.getLocation(), name);
 		
@@ -121,12 +129,15 @@ public class POImplicitOperationDefinition extends PODefinition
 		this.classDefinition = classDefinition;
 		this.isConstructor = isConstructor;
 		this.possibleExceptions = possibleExceptions;
+		this.localUpdates = localUpdates;
+		this.transitiveCalls = transitiveCalls;
+		this.transitiveUpdates = transitiveUpdates;
 	}
 
 	@Override
 	public String toString()
 	{
-		return	(type.isPure() ? "pure " : "") + name +
+		return	(type.isPure() ? "pure " : "") + name.getName() +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(externals == null ? "" : "\n\text " + externals) +

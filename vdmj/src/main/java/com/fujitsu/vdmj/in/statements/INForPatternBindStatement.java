@@ -104,9 +104,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for pattern", ctxt);
 						evalContext.putList(patternBind.pattern.getNamedValues(val, ctxt));
 
-						invariants.checkUpdateGhost(evalContext, val);
-						Value rv = statement.eval(evalContext);
 						invariants.check(evalContext, true);
+						Value rv = statement.eval(evalContext);
+						invariants.checkUpdateGhost(evalContext, val);
 
 						if (!rv.isVoid())
 						{
@@ -136,9 +136,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for set bind", ctxt);
 						evalContext.putList(setbind.pattern.getNamedValues(val, ctxt));
 
-						invariants.checkUpdateGhost(evalContext, val);
-						Value rv = statement.eval(evalContext);
 						invariants.check(evalContext, true);
+						Value rv = statement.eval(evalContext);
+						invariants.checkUpdateGhost(evalContext, val);
 
 						if (!rv.isVoid())
 						{
@@ -168,9 +168,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for seq bind", ctxt);
 						evalContext.putList(seqbind.pattern.getNamedValues(val, ctxt));
 
-						invariants.checkUpdateGhost(evalContext, val);
-						Value rv = statement.eval(evalContext);
 						invariants.check(evalContext, true);
+						Value rv = statement.eval(evalContext);
+						invariants.checkUpdateGhost(evalContext, val);
 
 						if (!rv.isVoid())
 						{
@@ -196,9 +196,9 @@ public class INForPatternBindStatement extends INStatement
 						Context evalContext = new Context(location, "for type bind", ctxt);
 						evalContext.putList(typebind.pattern.getNamedValues(converted, ctxt));
 
-						invariants.checkUpdateGhost(evalContext, val);
-						Value rv = statement.eval(evalContext);
 						invariants.check(evalContext, true);
+						Value rv = statement.eval(evalContext);
+						invariants.checkUpdateGhost(evalContext, val);
 
 						if (!rv.isVoid())
 						{

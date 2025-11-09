@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -49,6 +50,12 @@ public abstract class TCStateDesignator extends TCNode
 	abstract public String toString();
 
 	abstract public TCType typeCheck(Environment env);
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	abstract public TCNameToken updatedVariableName();
 
 	public TCDefinition targetDefinition(Environment env)
 	{

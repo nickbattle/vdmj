@@ -85,9 +85,10 @@ public class INForIndexStatement extends INStatement
 			}
 
 			invariants.before(ctxt);
-			invariants.check(ctxt, false);
+			// No check before, as covered in 1st loop check
+			BigInteger value = BigInteger.ZERO;
 
-			for (BigInteger value = fval;
+			for (value = fval;
 				 (bval.compareTo(BigInteger.ZERO) > 0 && value.compareTo(tval) <= 0) ||
 				 (bval.compareTo(BigInteger.ZERO) < 0 && value.compareTo(tval) >= 0);
 				 value = value.add(bval))
@@ -97,13 +98,18 @@ public class INForIndexStatement extends INStatement
 
 				invariants.check(evalContext, true);
 				Value rv = statement.eval(evalContext);
-				invariants.check(evalContext, true);
+				// No after-check as this is covered in the (x+1) loop next
 
 				if (!rv.isVoid())
 				{
 					return rv;
 				}
 			}
+
+			// Check after loop, with the loop variable one beyond the end
+			Context evalContext = new Context(location, "for index", ctxt);
+			evalContext.put(var, new IntegerValue(value));
+			invariants.check(evalContext, true);
 		}
 		catch (ValueException e)
 		{

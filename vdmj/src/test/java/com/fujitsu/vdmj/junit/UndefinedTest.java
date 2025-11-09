@@ -158,7 +158,7 @@ public class UndefinedTest extends TestCase
 		INMultipleBindList bindList = new INMultipleBindList();
 		bindList.add(new INMultipleTypeBind(patternList, new TCBooleanType(LexLocation.ANY)));
 		INExpression predicate = new INImpliesExpression(new INVariableExpression(VAR), IMP, UNDEFINED);
-		INForAllExpression forall = new INForAllExpression(LexLocation.ANY, bindList, predicate);
+		INForAllExpression forall = new INForAllExpression(LexLocation.ANY, bindList, predicate, true);
 
 		// forall x:bool & x => undefined
 		assertTrue(forall.eval(ctxt).isUndefined());	// Because one case is undefined and none are false
@@ -177,7 +177,7 @@ public class UndefinedTest extends TestCase
 		INMultipleBindList bindList = new INMultipleBindList();
 		bindList.add(new INMultipleSetBind(patternList, set));
 		INExpression predicate = new INVariableExpression(VAR);
-		INForAllExpression forall = new INForAllExpression(LexLocation.ANY, bindList, predicate);
+		INForAllExpression forall = new INForAllExpression(LexLocation.ANY, bindList, predicate, true);
 
 		// forall x in set {undefined, true, false} & x
 		assertTrue(forall.eval(ctxt).equals(F));
@@ -196,7 +196,7 @@ public class UndefinedTest extends TestCase
 		INMultipleBindList bindList = new INMultipleBindList();
 		bindList.add(new INMultipleTypeBind(patternList, new TCBooleanType(LexLocation.ANY)));
 		INExpression predicate = new INImpliesExpression(new INVariableExpression(VAR), IMP, UNDEFINED);
-		INExistsExpression exists = new INExistsExpression(LexLocation.ANY, bindList, predicate);
+		INExistsExpression exists = new INExistsExpression(LexLocation.ANY, bindList, predicate, true);
 
 		// exists x:bool & x => undefined
 		assertTrue(exists.eval(ctxt).equals(T));		// Because one case is true, regardless of undefined
@@ -215,7 +215,7 @@ public class UndefinedTest extends TestCase
 		INMultipleBindList bindList = new INMultipleBindList();
 		bindList.add(new INMultipleSetBind(patternList, set));
 		INExpression predicate = new INVariableExpression(VAR);
-		INExistsExpression forall = new INExistsExpression(LexLocation.ANY, bindList, predicate);
+		INExistsExpression forall = new INExistsExpression(LexLocation.ANY, bindList, predicate, true);
 
 		// exists x in set {undefined, true, false} & x
 		assertTrue(forall.eval(ctxt).equals(T));

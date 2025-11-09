@@ -117,4 +117,14 @@ public class TCFieldDesignator extends TCStateDesignator
 
 		return result.getType(location);
 	}
+	
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	@Override
+	public TCNameToken updatedVariableName()
+	{
+		return object.updatedVariableName();
+	}
 }

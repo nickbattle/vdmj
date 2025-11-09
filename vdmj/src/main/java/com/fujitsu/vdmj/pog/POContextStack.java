@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.po.definitions.PORenamedDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.POUndefinedExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POExternalClause;
@@ -226,162 +225,9 @@ public class POContextStack extends Stack<POContext>
 
 		return false;	// Didn't patch this level
 	}
-	
-	/**
-	 * Operation calls may cause ambiguities in the state. This is affected by whether
-	 * they are pure or have ext clauses. This version is used for PP dialects. The
-	 * equivalent for SL is below.
-	 */
-	public void makeOperationCall(LexLocation from, POGState pogState, PODefinition called, boolean addReturn)
-	{
-		if (called == null)		// An op called via a field expression, in PP or RT
-		{
-			push(new POAmbiguousContext("operation call", getStateVariables(), from));
-		}
-		else if (called.getDefiniteExceptions() != null)
-		{
-			String opname = called.name.toExplicitString(from);
-			push(new POAmbiguousContext(opname + " throws exceptions", getStateVariables(), from));
-		}
-		else if (called.accessSpecifier.isPure)
-		{
-			return;			// No updates, by definition
-		}
-		else
-		{
-			String opname = called.name.toExplicitString(from);
-			
-			if (called instanceof PORenamedDefinition)
-			{
-				PORenamedDefinition rdef = (PORenamedDefinition)called;
-				called = rdef.def;
-			}
-			else if (called instanceof POInheritedDefinition)
-			{
-				POInheritedDefinition idef = (POInheritedDefinition)called;
-				called = idef.superdef;
-			}
-
-			PODefinition caller = getDefinition();
-			
-			if (called instanceof POImplicitOperationDefinition)
-			{
-				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
-				TCNameList names = getStateVariables();
-
-				if (imp.location.module.equals(from.module))	// local call
-				{
-					if (imp.externals != null)
-					{
-						for (POExternalClause ext: imp.externals)
-						{
-							if (ext.mode.is(Token.WRITE))
-							{
-								names.addAll(ext.identifiers);
-							}
-						}
-					}
-					else if (!imp.accessSpecifier.isPure)
-					{
-						names.addAll(getStateVariables());
-					}
-				}
-				else // remote
-				{
-					if (caller.moduleDefinition != null)
-					{
-						if (caller.moduleDefinition.mappedFrom.stateExported)
-						{
-							if (!imp.accessSpecifier.isPure)
-							{
-								names.addAll(getStateVariables());
-							}
-						}
-						else
-						{
-							// Module hasn't exported anything that can change state
-							// so no names affected.
-						}
-					}
-					else if (caller.classDefinition != null)
-					{
-						if (!imp.accessSpecifier.isPure)
-						{
-							names.addAll(getStateVariables());
-						}
-					}
-				}
-
-				if (addReturn)
-				{
-					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-					names.add(result);
-					
-					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
-				}
-				else
-				{
-					push(new POAmbiguousContext("operation call to " + opname, names, from));
-				}
-
-			}
-			else if (called instanceof POExplicitOperationDefinition)
-			{
-				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)called;
-				TCNameList names = new TCNameList();
-
-				if (exop.location.module.equals(from.module))	// A local call
-				{
-					if (!exop.accessSpecifier.isPure)
-					{
-						names.addAll(getStateVariables());
-					}
-				}
-				else // remote module
-				{
-					if (caller.moduleDefinition != null)
-					{
-						if (caller.moduleDefinition.mappedFrom.stateExported)
-						{
-							if (!exop.accessSpecifier.isPure)
-							{
-								names.addAll(getStateVariables());
-							}
-						}
-						else
-						{
-							// Module hasn't exported anything that can change state
-							// so no names affected.
-						}
-					}
-					else if (caller.classDefinition != null)
-					{
-						if (!exop.accessSpecifier.isPure)
-						{
-							names.addAll(getStateVariables());
-						}
-					}
-				}
-
-				if (addReturn)
-				{
-					TCNameToken result = new TCNameToken(from, from.module, pogState.getResultPattern().toString());
-					names.add(result);
-					
-					push(new POAmbiguousContext("operation call to " + opname, names, from));
-					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), new POUndefinedExpression(from)));
-				}
-				else
-				{
-					push(new POAmbiguousContext("operation call to " + opname, getStateVariables(), from));
-				}
-			}
-		}
-	}
 
 	/**
-	 * An operation CallStatement has been made. The ambiguous names are calculated, and these
+	 * An operation CallStatement has been made. The updatable state names are calculated, and these
 	 * added as a "forall" of possibilities. Then the postcondition is considered, and added as a "=>"
 	 * qualification, if possible.
 	 */
@@ -421,7 +267,7 @@ public class POContextStack extends Stack<POContext>
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
 				TCNameList names = new TCNameList();
 
-				if (imp.location.module.equals(from.module))	// A local call
+				if (imp.location.sameModule(from))	// A local call
 				{
 					if (imp.externals != null)
 					{
@@ -435,7 +281,7 @@ public class POContextStack extends Stack<POContext>
 					}
 					else if (!imp.accessSpecifier.isPure)
 					{
-						names.addAll(getStateVariables());
+						names.addAll(imp.transitiveUpdates.matching(from.module));
 					}
 				}
 				else // remote module
@@ -446,7 +292,7 @@ public class POContextStack extends Stack<POContext>
 						{
 							if (!imp.accessSpecifier.isPure)
 							{
-								names.addAll(getStateVariables());
+								names.addAll(imp.transitiveUpdates.matching(from.module));
 							}
 						}
 						else
@@ -459,7 +305,7 @@ public class POContextStack extends Stack<POContext>
 					{
 						if (!imp.accessSpecifier.isPure)
 						{
-							names.addAll(getStateVariables());
+							names.addAll(imp.transitiveUpdates.matching(from.module));
 						}
 					}
 				}
@@ -499,11 +345,11 @@ public class POContextStack extends Stack<POContext>
 				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)called;
 				TCNameList names = new TCNameList();
 
-				if (exop.location.module.equals(from.module))	// A local call
+				if (exop.location.sameModule(from))		// A local call
 				{
 					if (!exop.accessSpecifier.isPure)
 					{
-						names.addAll(getStateVariables());
+						names.addAll(exop.transitiveUpdates.matching(from.module));
 					}
 				}
 				else // remote module
@@ -514,7 +360,7 @@ public class POContextStack extends Stack<POContext>
 						{
 							if (!exop.accessSpecifier.isPure)
 							{
-								names.addAll(getStateVariables());
+								names.addAll(exop.transitiveUpdates.matching(from.module));
 							}
 						}
 						else
@@ -527,7 +373,7 @@ public class POContextStack extends Stack<POContext>
 					{
 						if (!exop.accessSpecifier.isPure)
 						{
-							names.addAll(getStateVariables());
+							names.addAll(exop.transitiveUpdates.matching(from.module));
 						}
 					}
 				}

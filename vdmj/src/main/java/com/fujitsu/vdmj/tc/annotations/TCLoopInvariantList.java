@@ -67,7 +67,7 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 		{
 			if (invariant.ghostName != null)
 			{
-				return invariant.ghostName;
+				return invariant.ghostName;		// Use first
 			}
 		}
 
@@ -91,7 +91,8 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 
 				ghostDef = new TCAssignmentDefinition(
 					TCAccessSpecifier.DEFAULT, getGhostName(), st,
-					new TCSetEnumExpression(stmt.location, new TCExpressionList()));
+					new TCSetEnumExpression(stmt.location, new TCExpressionList()),
+					NameScope.GHOST);
 
 				ghostDef.typeCheck(env, NameScope.LOCAL);
 			}
@@ -107,7 +108,8 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 
 				ghostDef = new TCAssignmentDefinition(
 					TCAccessSpecifier.DEFAULT, getGhostName(), st,
-					new TCSeqEnumExpression(stmt.location, new TCExpressionList()));
+					new TCSeqEnumExpression(stmt.location, new TCExpressionList()),
+					NameScope.GHOST);
 
 				ghostDef.typeCheck(env, NameScope.LOCAL);
 			}

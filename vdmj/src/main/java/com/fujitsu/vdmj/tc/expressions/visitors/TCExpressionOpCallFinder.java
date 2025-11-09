@@ -28,39 +28,39 @@ import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCOperationCallFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameList, Environment>
+public class TCExpressionOpCallFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, Environment>
 {
-	public TCOperationCallFinder()
+	public TCExpressionOpCallFinder()
 	{
 		// default visitorSet
 	}
 
 	@Override
-	public TCNameList caseExpression(TCExpression node, Environment env)
+	public TCNameSet caseExpression(TCExpression node, Environment env)
 	{
 		return newCollection();
 	}
 	
 	@Override
-	public TCNameList caseApplyExpression(TCApplyExpression node, Environment env)
+	public TCNameSet caseApplyExpression(TCApplyExpression node, Environment env)
 	{
-		TCNameList result = newCollection();
+		TCNameSet result = newCollection();
 		TCDefinition opdef = null;
 
 		if (node.root instanceof TCVariableExpression)
 		{
 			TCVariableExpression exp = (TCVariableExpression)node.root;
-			opdef = env.findName(exp.name, NameScope.NAMES);
+			opdef = env.findName(exp.name, NameScope.NAMESANDSTATE);
 		}
 		else if (node.root instanceof TCFieldExpression)
 		{
 			TCFieldExpression exp = (TCFieldExpression)node.root;
-			opdef = env.findName(exp.memberName, NameScope.NAMES);
+			opdef = env.findName(exp.memberName, NameScope.NAMESANDSTATE);
 		}
 
 		if (opdef != null && opdef.isOperation())
@@ -73,8 +73,8 @@ public class TCOperationCallFinder extends TCLeafExpressionVisitor<TCNameToken, 
 	}
 
 	@Override
-	protected TCNameList newCollection()
+	protected TCNameSet newCollection()
 	{
-		return new TCNameList();
+		return new TCNameSet();
 	}
 }

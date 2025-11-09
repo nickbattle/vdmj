@@ -73,10 +73,12 @@ public class TCForAllStatement extends TCStatement
 
 		if (setType.isSet(location))
 		{
+			invariants = TCLoopAnnotations.getLoopAnnotations(this);
 			TCSetType st = setType.getSet();
 			TCDefinitionList defs = pattern.getDefinitions(st.setof, NameScope.LOCAL);
 
-			Environment local = new FlatCheckedEnvironment(defs, base, scope);
+			Environment local = invariants.getGhosEnvironment(this, base);
+			local = new FlatCheckedEnvironment(defs, local, scope);
 			TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 			
 			if (!(st instanceof TCSet1Type) &&!(rt instanceof TCVoidType))
@@ -85,7 +87,6 @@ public class TCForAllStatement extends TCStatement
 				rt = new TCUnionType(location, rt, new TCVoidType(location));
 			}
 			
-			invariants = TCLoopAnnotations.getLoopAnnotations(this);
 			invariants.typeCheck(local, this, pattern.getVariableNames());
 			local.unusedCheck();
 			return setType(rt);

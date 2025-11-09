@@ -326,7 +326,7 @@ public class LSPDefinitionFinder
 			else if (fexp.root.isClass(env))
 			{
 	    		TCClassType cls = fexp.root.getClassType(env);
-	    		return cls.findName(fexp.memberName, NameScope.VARSANDNAMES);
+	    		return cls.findName(fexp.memberName, NameScope.NAMESANDSTATE);
 			}
 		}
 		else if (node instanceof TCIsExpression)
@@ -358,7 +358,7 @@ public class LSPDefinitionFinder
 				}
 			}
 			
-			TCDefinition def = env.findName(name, NameScope.VARSANDNAMES);
+			TCDefinition def = env.findName(name, NameScope.NAMES);
 			
 			if (def != null)
 			{

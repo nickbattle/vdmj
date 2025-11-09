@@ -70,14 +70,30 @@ public class ExpressionTypeBindOverrider extends INLeafExpressionVisitor<INBindi
 	public List<INBindingOverride> caseForAllExpression(INForAllExpression node, Object arg)
 	{
 		node.globals = INBindingGlobals.getInstance();
-		return super.caseForAllExpression(node, arg);
+
+		if (node.bindsUsed)
+		{
+			return super.caseForAllExpression(node, arg);
+		}
+		else
+		{
+			return visitorSet.applyExpressionVisitor(node.predicate, arg);
+		}
 	}
 	
 	@Override
 	public List<INBindingOverride> caseExistsExpression(INExistsExpression node, Object arg)
 	{
 		node.globals = INBindingGlobals.getInstance();
-		return super.caseExistsExpression(node, arg);
+
+		if (node.bindsUsed)
+		{
+			return super.caseExistsExpression(node, arg);
+		}
+		else
+		{
+			return visitorSet.applyExpressionVisitor(node.predicate, arg);
+		}
 	}
 
 	@Override

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -136,6 +137,7 @@ public class TCThreadDefinition extends TCDefinition
 
 		def.setAccessSpecifier(accessSpecifier);
 		def.classDefinition = classDefinition;
+		def.localUpdates = new TCNameSet();
 		return def;
 	}
 

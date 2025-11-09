@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -116,5 +117,15 @@ public class TCMapSeqDesignator extends TCStateDesignator
 		}
 
 		return result.getType(location);
+	}
+
+	/**
+	 * The simple updated variable name, x := 1, x(i) := 1 and x(i)(2).fld := 1
+	 * all return the updated variable "x".
+	 */
+	@Override
+	public TCNameToken updatedVariableName()
+	{
+		return mapseq.updatedVariableName();
 	}
 }

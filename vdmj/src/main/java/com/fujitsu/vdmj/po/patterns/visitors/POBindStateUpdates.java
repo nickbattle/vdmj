@@ -31,9 +31,9 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 /**
  * A visitor set to explore the PO tree and return the state names updated.
  */
-public class POBindStateUpdates extends POLeafBindVisitor<TCNameToken, TCNameSet, Object>
+public class POBindStateUpdates extends POLeafBindVisitor<TCNameToken, TCNameSet, TCNameSet>
 {
-	public POBindStateUpdates(POVisitorSet<TCNameToken, TCNameSet, Object> visitors)
+	public POBindStateUpdates(POVisitorSet<TCNameToken, TCNameSet, TCNameSet> visitors)
 	{
 		this.visitorSet = visitors;
 	}
@@ -45,7 +45,7 @@ public class POBindStateUpdates extends POLeafBindVisitor<TCNameToken, TCNameSet
 	}
 
 	@Override
-	public TCNameSet caseBind(POBind node, Object arg)
+	public TCNameSet caseBind(POBind node, TCNameSet locals)
 	{
 		return newCollection();
 	}

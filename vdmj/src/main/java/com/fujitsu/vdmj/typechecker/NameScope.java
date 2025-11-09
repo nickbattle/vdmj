@@ -25,42 +25,44 @@
 package com.fujitsu.vdmj.typechecker;
 
 /**
- * An enum to represent name scoping. When names are being looked up with
- * findName, the scope is used
- * to indicate what sorts of names are being sought. When a specification is
- * being type checked, the typeCheck method uses NameScope to indicate what names are permitted when
- * checking the content. For example, an operation would be type checked under
- * the NAMESANDSTATE scope, but when its post condition is checked, it would
- * be checked under NAMESANDANYSTATE to include the "old" names.
+ * An enum to represent name scoping.
  */
-
 public enum NameScope
 {
+	/**
+	 * Definitions are declared with one of the following scopes.
+	 */
 	LOCAL(1),		// Let definitions and parameters
-	GLOBAL(2),		// Eg. module and class func/ops/values
-	STATE(4),		// TCModule state or object instance values
-	OLDSTATE(8),	// State names with a "~" modifier
+	GLOBAL(2),		// Module and class func/ops/values
+	STATE(4),		// SL state or object instance values
+	OLDSTATE(8),	// SL state names with a "~" modifier
 	TYPENAME(16),	// The names of types
 	CLASSNAME(32),	// The names of classes
-	VARSTATE(64),	// Class instance variables also carry this bit	
+	GHOST(64),		// Ghost variables used in @LoopInvariants
 
-	NAMES(3),
-	NAMESANDSTATE(7),
-	NAMESANDANYSTATE(15),
-	VARSANDSTATE(68),
-	VARSANDNAMES(67),
+	/**
+	 * Lookups of names in the environment specify one of the following "scope sets"
+	 * which indicates which of the definitions (above) are applicable (usually
+	 * to typechecking). For example, function bodies are typechecked as NAMES,
+	 * since locals and globals in scope, but state isn't; operations are checked
+	 * as NAMESANDSTATE, and postconditions as NAMESANDANYSTATE.
+	 */
+	NAMES(LOCAL.mask + GLOBAL.mask),
+	NAMESANDSTATE(NAMES.mask + STATE.mask),
+	NAMESANDANYSTATE(NAMESANDSTATE.mask + OLDSTATE.mask),
+	GHOSTSNAMESANDSTATE(NAMESANDSTATE.mask + GHOST.mask),
 	
 	ANYTHING(255);
 
 	private int mask;
 
-	NameScope(int level)
+	NameScope(int mask)
 	{
-		this.mask = level;
+		this.mask = mask;
 	}
 
 	public boolean matches(NameScope other)
 	{
-		return (mask & other.mask) != 0;
+		return (this.mask & other.mask) != 0;
 	}
 }

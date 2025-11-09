@@ -33,14 +33,17 @@ import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
+import com.fujitsu.vdmj.po.expressions.PODivideExpression;
 import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POFloorExpression;
 import com.fujitsu.vdmj.po.expressions.POGreaterExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLessEqualExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
 import com.fujitsu.vdmj.po.expressions.PORemExpression;
 import com.fujitsu.vdmj.po.expressions.POSubtractExpression;
+import com.fujitsu.vdmj.po.expressions.POTimesExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
@@ -121,7 +124,7 @@ public class POForIndexStatement extends POStatement
 
 		if (!annotations.isEmpty())
 		{
-			invariant = annotations.combine(true);
+			invariant = annotations.combine(false);
 		}
 
 		POAltContext altCtxt = new POAltContext();
@@ -142,25 +145,6 @@ public class POForIndexStatement extends POStatement
 		int popto = ctxt.size();	// Includes missing invariant above
 
 		/**
-		 * The initial case verifies that the invariant is true before the loop.
-		 */
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before for-loop");
-
-		TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
-		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
-		updates.add(var);
-
-		/**
-		 * From here on, we push contexts that include the loop variables (var in updates), so
-		 * the invariant can reason about them.
-		 */
-		if (!annotations.isEmpty())
-		{
-			invariant = annotations.combine(false);	// Don't exclude loop vars now
-		}
-
-		/**
 		 * Push an implication that the loop range is not empty. This applies to everything
 		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
 		 * the isEmpty() case in another altpath.
@@ -168,20 +152,27 @@ public class POForIndexStatement extends POStatement
 		ctxt.push(new POImpliesContext(isNotEmpty()));
 
 		/**
-		 * The start of the loop verifies that the first "from" value can start the loop and
-		 * will meet the invariant.
+		 * The initial case verifies that the invariant is true for the first loop.
 		 */
 		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
 		ctxt.push(new POLetDefContext(def));						// eg. let x = 1 in
 		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant for first for-loop");
+		obligations.lastElement().setMessage("check invariant before for-loop");
 		ctxt.pop();
+
+		/**
+		 * Create a local environment with the loop variable, which affects POForAllContexts.
+		 */
+		TCLocalDefinition tcdef = new TCLocalDefinition(location, var, vardef.getType());
+		Environment local = new FlatCheckedEnvironment(tcdef, env, NameScope.NAMES);
+		updates.add(var);
 
 		/**
 		 * The preservation case verifies that if the invariant is true at X, then it is true at X+by
 		 */
 		ctxt.push(new POForAllContext(updates, local));								// forall <changed values> and vars
 		ctxt.push(new POImpliesContext(varIsValid(efrom, eto, eby), invariant));	// valid index && invariant => ...
+
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
 		def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(eby), vardef.getType());
@@ -202,25 +193,23 @@ public class POForIndexStatement extends POStatement
 
 		/**
 		 * The context stack beyond the loop just contains the loop invariant unless there are
-		 * return paths from the above. Invariant clauses that mention the loop variable are omitted.
+		 * return paths from the above. The loop var is "to + by", which terminated the loop.
 		 */
 		updates.remove(var);
 
-		if (!annotations.isEmpty())
-		{
-			invariant = annotations.combine(true);
-		}
-
 		ctxt.push(new POImpliesContext(isNotEmpty()));		// from <= to =>
 		ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
+		def = new POAssignmentDefinition(var, vardef.getType(), varAfter(efrom, eto, eby), vardef.getType());
+		ctxt.push(new POLetDefContext(def));				// eg. let x = <to + by> in
 		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 
 		/**
 		 * Finally, the loop may not have been entered if the range is empty, so we create
-		 * another alternative path with this condition and nothing else.
+		 * another alternative path with this condition and nothing else. The invariant
+		 * holds, because of the check before the loop.
 		 */
-		ctxt.push(new POImpliesContext(isEmpty()));
+		ctxt.push(new POImpliesContext(isEmpty()));			// from > to =>
 		ctxt.push(new POCommentContext("Did not enter loop", location));
 		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
@@ -259,6 +248,51 @@ public class POForIndexStatement extends POStatement
 			real, real);
 	}
 
+	/**
+	 * Produce "to + by", allowing for modular arithmetic, to give the var value after the loop.
+	 * 
+	 * If by defaults to 1, this is just "to + 1"
+	 * Otherwise the value is <from> + (floor((<to> - <from>)/<by>) + 1) x <by>
+	 */
+	private POExpression varAfter(POExpression efrom, POExpression eto, POExpression eby)
+	{
+		TCRealType real = new TCRealType(location);
+
+		if (eby == null)	// defaults to 1
+		{
+			return new POPlusExpression(
+				eto,
+				new LexKeywordToken(Token.PLUS, location),
+				new POIntegerLiteralExpression(LexIntegerToken.ONE),
+				real, real);
+		}
+		else
+		{
+			return new POPlusExpression(
+				efrom,
+				new LexKeywordToken(Token.PLUS, location),
+				new POTimesExpression(
+					new POFloorExpression(
+						location,
+						new PODivideExpression(
+							new POSubtractExpression(
+								eto,
+								new LexKeywordToken(Token.MINUS, location),
+								efrom,
+								real, real),
+							new LexKeywordToken(Token.DIVIDE, location),
+							eby,
+							real, real)),
+					new LexKeywordToken(Token.TIMES, location),
+					eby,
+					real, real),
+				real, real);
+		}
+	}
+
+	/**
+	 * Produce test of a valid index, between from and to using "by".
+	 */
 	private POExpression varIsValid(POExpression efrom, POExpression eto, POExpression eby)
 	{
 		TCRealType real = new TCRealType(location);
@@ -283,6 +317,9 @@ public class POForIndexStatement extends POStatement
 		}
 	}
 
+	/**
+	 * Produce "<var> + <by>"
+	 */
 	private POExpression varPlusBy(POExpression eby)
 	{
 		POExpression vexp = new POVariableExpression(var, vardef);

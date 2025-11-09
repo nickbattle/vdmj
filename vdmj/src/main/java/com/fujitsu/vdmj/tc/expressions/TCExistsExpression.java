@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
@@ -44,6 +45,7 @@ public class TCExistsExpression extends TCExpression
 	public final TCExpression predicate;
 	
 	public TCDefinition def = null;
+	public boolean bindsUsed = true;		// True if some binding(s) used in predicate
 
 	public TCExistsExpression(LexLocation location, TCMultipleBindList bindList, TCExpression predicate)
 	{
@@ -71,8 +73,25 @@ public class TCExistsExpression extends TCExpression
 			predicate.report(3089, "Predicate is not boolean");
 		}
 
-		local.unusedCheck();
+		bindsUsedCheck(local);
 		return checkConstraint(constraint, new TCBooleanType(location));
+	}
+
+	private void bindsUsedCheck(Environment local)
+	{
+		TCDefinitionList list = def.getDefinitions();
+		this.bindsUsed = list.isEmpty();
+
+		for (TCDefinition d: list)
+		{
+			if (d.used)
+			{
+				this.bindsUsed = true;	// At least one!
+				break;
+			}
+		}
+		
+		local.unusedCheck();	// Raise warnings last, marks as used
 	}
 
 	@Override

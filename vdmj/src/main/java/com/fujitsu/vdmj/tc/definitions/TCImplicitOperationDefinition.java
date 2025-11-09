@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -86,6 +87,9 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCStateDefinition stateDefinition;
 	public TCType actualResult;
 	public TCTypeSet possibleExceptions = null;
+	public TCNameSet localUpdates = null;
+	public TCNameSet transitiveUpdates = null;
+	public TCDefinitionSet transitiveCalls = null;
 
 	public boolean isConstructor = false;
 
@@ -124,9 +128,10 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return	accessSpecifier.ifSet(" ") + name +
+		return	accessSpecifier.ifSet(" ") + name.getName() +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
+				(body == null ? "" : " ==\n\t" + body) +
 				(externals == null ? "" : "\n\text " + externals) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition) +
@@ -487,6 +492,26 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		{
 			possibleExceptions = IN_PROGRESS;
 			possibleExceptions = body.exitCheck(base);
+		}
+
+		if (localUpdates == null)
+		{
+			localUpdates = new TCNameSet();
+
+			if (body !=null)
+			{
+				localUpdates.addAll(body.localUpdates());
+			}
+			else if (externals != null)
+			{
+				for (TCExternalClause ext: externals)
+				{
+					if (ext.mode.is(Token.WRITE))
+					{
+						localUpdates.addAll(ext.identifiers);
+					}
+				}
+			}
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

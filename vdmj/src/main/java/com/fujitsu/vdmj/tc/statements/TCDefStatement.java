@@ -24,9 +24,13 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -60,8 +64,8 @@ public class TCDefStatement extends TCStatement
 			d.typeResolve(local);
 			d.typeCheck(local, scope);
 
-			/***
-			if (Settings.dialect == Dialect.VDM_SL && d instanceof TCEqualsDefinition)
+			if (Settings.strict && Settings.dialect == Dialect.VDM_SL &&
+				d instanceof TCEqualsDefinition)
 			{
 				TCEqualsDefinition eqdef = (TCEqualsDefinition)d;
 
@@ -72,10 +76,9 @@ public class TCDefStatement extends TCStatement
 				else if (eqdef.test.callsOperations(env))
 				{
 					// Complex expression that calls an operation
-					eqdef.test.warning(9999, "RHS of 'def' should be an op call or a pure expression");
+					eqdef.test.warning(5045, "Strict: RHS of 'def' not an op call or a pure expression");
 				}
 			}
-			***/
 
 			local = new FlatCheckedEnvironment(d, local, scope);	// cumulative
 		}

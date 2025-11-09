@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.VDMError;
@@ -41,8 +42,14 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.statements.TCExternalClause;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.statements.visitors.TCStatementOpCallFinder;
 
 
 /**
@@ -181,6 +188,208 @@ abstract public class TypeChecker
 		return false;
 	}
 
+	/**
+	 * Populate the transitiveUpdates field of operation definitions, to include every
+	 * localUpdates set by itself and the operations it calls transitively.
+	 */
+	protected void populateTransitiveUpdates(TCDefinitionList alldefs)
+	{
+		if (getErrorCount() > 0)
+		{
+			return;		// Can't populate everything until it's clean
+		}
+
+		Environment globals = new FlatEnvironment(alldefs, null);
+
+		for (TCDefinition def: alldefs)
+		{
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+				populateTransitiveUpdates(exop, globals);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+				populateTransitiveUpdates(imop, globals);
+			}
+		}
+
+		// If strict mode enabled, check for various things using the transitive sets.
+
+		if (Settings.strict)
+		{
+			checkTransitiveExtClauses(alldefs);
+			checkTransitivePures(alldefs);
+		}
+		
+		return;
+	}
+
+	/**
+	 * Check that "pure" operations have empty transitive update sets.
+	 */
+	private void checkTransitivePures(TCDefinitionList alldefs)
+	{
+		for (TCDefinition def: alldefs)
+		{
+			if (def.accessSpecifier.isPure)
+			{
+				TCNameSet transitiveUpdates = null;
+
+				if (def instanceof TCImplicitOperationDefinition)
+				{
+					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+					transitiveUpdates = imop.transitiveUpdates;
+				}
+				else if (def instanceof TCExplicitOperationDefinition)
+				{
+					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+					transitiveUpdates = exop.transitiveUpdates;
+				}
+
+				if (transitiveUpdates != null && !transitiveUpdates.isEmpty())
+				{
+					warning(5047, "Strict: pure operation updates state", def.location);
+					detail("Updates", transitiveUpdates.toString());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check for operations that have "ext" clauses which are narrower than their
+	 * transitive update sets.
+	 */
+	private void checkTransitiveExtClauses(TCDefinitionList alldefs)
+	{
+		for (TCDefinition def: alldefs)
+		{
+			if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+
+				if (imop.externals != null && imop.transitiveUpdates != null)
+				{
+					for (TCExternalClause ext: imop.externals)
+					{
+						if (ext.mode.is(Token.WRITE))
+						{
+							TCNameSet updates = new TCNameSet();
+							updates.addAll(imop.transitiveUpdates);
+							updates.removeAll(ext.identifiers);
+
+							if (!updates.isEmpty())
+							{
+								warning(5046, "Strict: ext clause missing 'wr' updates", imop.location);
+								detail("Missing", updates.toString());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Populate transitive calls and updates. The method starts by populating transitiveCalls,
+	 * by recursing into the call graph. Then it loops through the transitiveCalls, adding
+	 * the localUpdates to the transitiveUpdates for this operation.
+	 */
+	private void populateTransitiveUpdates(Environment globals, TCStatement body,
+		TCDefinitionSet transitiveCalls, TCNameSet transitiveUpdates, TCNameSet localUpdates)
+	{
+		TCDefinitionSet exCalls = new TCDefinitionSet();
+		TCDefinitionSet imCalls = new TCDefinitionSet();
+
+		for (TCNameToken op: body.apply(new TCStatementOpCallFinder(), globals))
+		{
+			TCDefinition def = globals.findName(op, NameScope.GLOBAL);
+
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				exCalls.add(def);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				imCalls.add(def);
+			}
+		}
+
+		transitiveCalls.addAll(exCalls);	// add local calls
+		transitiveCalls.addAll(imCalls);
+
+		for (TCDefinition def: exCalls)
+		{
+			TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+			populateTransitiveUpdates(exop, globals);
+			transitiveCalls.addAll(exop.transitiveCalls);
+		}
+
+		for (TCDefinition def: imCalls)
+		{
+			TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+			populateTransitiveUpdates(imop, globals);
+			transitiveCalls.addAll(imop.transitiveCalls);
+		}
+
+		// transitiveCalls is now complete for opdef and all of the ops it calls. So now
+		// go through the transitiveCalls to add the localUpdates for each to
+		// transitiveUpdates.
+
+		transitiveUpdates.addAll(localUpdates);		// add local updates
+
+		for (TCDefinition def: transitiveCalls)
+		{
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+				transitiveUpdates.addAll(exop.localUpdates);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+				transitiveUpdates.addAll(imop.localUpdates);
+			}
+		}
+	}
+
+	/**
+	 * Populate the transitive updates of one explicit opcall.
+	 */
+	private void populateTransitiveUpdates(TCExplicitOperationDefinition opdef, Environment globals)
+	{
+		if (opdef.transitiveCalls == null)		// Not done yet
+		{
+			opdef.transitiveCalls = new TCDefinitionSet();
+			opdef.transitiveUpdates = new TCNameSet();
+
+			populateTransitiveUpdates(globals, opdef.body,
+				opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
+		}
+	}
+
+	/**
+	 * Populate the transitive updates of one implicit opcall.
+	 */
+	private void populateTransitiveUpdates(TCImplicitOperationDefinition opdef, Environment globals)
+	{
+		if (opdef.transitiveCalls == null)		// Not done yet
+		{
+			opdef.transitiveCalls = new TCDefinitionSet();
+			opdef.transitiveUpdates = new TCNameSet();
+
+			if (opdef.body != null)
+			{
+				populateTransitiveUpdates(globals, opdef.body,
+					opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
+			}
+		}
+	}
+
+	/**
+	 * Report a TC error.
+	 */
 	public static void report(int number, String problem, LexLocation location)
 	{
 		if (suspended) return;	
@@ -206,6 +415,9 @@ abstract public class TypeChecker
 		}
 	}
 
+	/**
+	 * Report a TC warning.
+	 */
 	public static void warning(int number, String problem, LexLocation location)
 	{
 		if (suspended) return;

@@ -298,5 +298,8 @@ public class ModuleTypeChecker extends TypeChecker
 
     	// Check for inter-definition cyclic dependencies before initialization
     	cyclicDependencyCheck(alldefs);
+
+		// Calculate the transitive update sets for the operations
+		populateTransitiveUpdates(alldefs);
 	}
 }

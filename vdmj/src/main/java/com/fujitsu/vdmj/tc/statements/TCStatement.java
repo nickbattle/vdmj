@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.statements.visitors.TCLocalUpdatesVisitor;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementExitChecker;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementStateUpdates;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
@@ -213,6 +214,12 @@ public abstract class TCStatement extends TCNode
 	{
 		TCStatementStateUpdates visitor = new TCStatementStateUpdates();
 		return this.apply(visitor, env);
+	}
+
+	public TCNameSet localUpdates()
+	{
+		TCLocalUpdatesVisitor visitor = new TCLocalUpdatesVisitor();
+		return this.apply(visitor, null);
 	}
 
 	/**
