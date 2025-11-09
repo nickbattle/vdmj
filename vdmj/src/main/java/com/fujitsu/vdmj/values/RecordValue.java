@@ -60,11 +60,30 @@ public class RecordValue extends Value
 		}
 
 		Iterator<TCField> fi = type.fields.iterator();
+		boolean allowUndefined = values.isUndefined() && type.isState();
 
 		for (Value v: values)
 		{
 			TCField f = fi.next();
-			fieldmap.add(f.tag, v.convertTo(f.type, ctxt), !f.equalityAbstraction);
+			Value fval = null;
+
+			try
+			{
+				fval = v.convertTo(f.type, ctxt);
+			}
+			catch (ValueException e)
+			{
+				if (e.number == 4132 && allowUndefined)
+				{
+					fval = v;	// Undefined values allow in mk_Sigma initializers (for QC)
+				}
+				else
+				{
+					throw e;
+				}
+			}
+
+			fieldmap.add(f.tag, fval, !f.equalityAbstraction);
 		}
 		
 		checkInvariant(ctxt);
