@@ -215,40 +215,80 @@ abstract public class TypeChecker
 			}
 		}
 
-		// If strict mode enabled, check for operations that have "ext" clauses, which
-		// are narrower than their transitive update sets.
+		// If strict mode enabled, check for various things using the transitive sets.
 
 		if (Settings.strict)
 		{
-			for (TCDefinition def: alldefs)
+			checkTransitiveExtClauses(alldefs);
+			checkTransitivePures(alldefs);
+		}
+		
+		return;
+	}
+
+	/**
+	 * Check that "pure" operations have empty transitive update sets.
+	 */
+	private void checkTransitivePures(TCDefinitionList alldefs)
+	{
+		for (TCDefinition def: alldefs)
+		{
+			if (def.accessSpecifier.isPure)
 			{
+				TCNameSet transitiveUpdates = null;
+
 				if (def instanceof TCImplicitOperationDefinition)
 				{
 					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+					transitiveUpdates = imop.transitiveUpdates;
+				}
+				else if (def instanceof TCExplicitOperationDefinition)
+				{
+					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+					transitiveUpdates = exop.transitiveUpdates;
+				}
 
-					if (imop.externals != null && imop.transitiveUpdates != null)
+				if (transitiveUpdates != null && !transitiveUpdates.isEmpty())
+				{
+					warning(5047, "Strict: pure operation updates state", def.location);
+					detail("Updates", transitiveUpdates.toString());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check for operations that have "ext" clauses which are narrower than their
+	 * transitive update sets.
+	 */
+	private void checkTransitiveExtClauses(TCDefinitionList alldefs)
+	{
+		for (TCDefinition def: alldefs)
+		{
+			if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+
+				if (imop.externals != null && imop.transitiveUpdates != null)
+				{
+					for (TCExternalClause ext: imop.externals)
 					{
-						for (TCExternalClause ext: imop.externals)
+						if (ext.mode.is(Token.WRITE))
 						{
-							if (ext.mode.is(Token.WRITE))
-							{
-								TCNameSet updates = new TCNameSet();
-								updates.addAll(imop.transitiveUpdates);
-								updates.removeAll(ext.identifiers);
+							TCNameSet updates = new TCNameSet();
+							updates.addAll(imop.transitiveUpdates);
+							updates.removeAll(ext.identifiers);
 
-								if (!updates.isEmpty())
-								{
-									warning(5046, "Strict: ext clause missing 'wr' updates", imop.location);
-									detail("Missing", updates.toString());
-								}
+							if (!updates.isEmpty())
+							{
+								warning(5046, "Strict: ext clause missing 'wr' updates", imop.location);
+								detail("Missing", updates.toString());
 							}
 						}
 					}
 				}
 			}
 		}
-		
-		return;
 	}
 
 	/**

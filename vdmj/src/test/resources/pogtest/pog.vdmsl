@@ -15,7 +15,7 @@ types
     size : real;
 
 operations
-	call(a:nat) == return;
+	call(a:nat) == sv := a;
 	bang(a:nat) == exit "BANG";
 
 	op1(z:nat) r:real ==
