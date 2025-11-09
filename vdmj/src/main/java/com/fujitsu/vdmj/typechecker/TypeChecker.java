@@ -384,6 +384,11 @@ abstract public class TypeChecker
 				populateTransitiveUpdates(globals, opdef.body,
 					opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
 			}
+			else if (opdef.externals == null && opdef.stateDefinition != null)
+			{
+				// No body, so if there is no ext clause, we assume all state is modifiable
+				opdef.transitiveUpdates = opdef.stateDefinition.getStateNames();
+			}
 		}
 	}
 

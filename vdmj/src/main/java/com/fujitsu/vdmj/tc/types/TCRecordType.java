@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.types;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -91,6 +92,14 @@ public class TCRecordType extends TCInvariantType
 	public boolean isTag()
 	{
 		return true;
+	}
+
+	public boolean isState()
+	{
+		return 
+			this.definitions != null &&
+			this.definitions.size() > 0 &&
+			this.definitions.get(0) instanceof TCStateDefinition;
 	}
 
 	@Override

@@ -102,4 +102,17 @@ public class ValueList extends Vector<Value>
 
 		return nseq;
 	}
+
+	public boolean isUndefined()
+	{
+		for (Value k: this)
+		{
+			if (k.isUndefined())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

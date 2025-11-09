@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStateInitExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -309,6 +310,18 @@ public class TCStateDefinition extends TCDefinition
 
 		ftype.definitions = new TCDefinitionList(def);
 		return def;
+	}
+
+	public TCNameSet getStateNames()
+	{
+		TCNameSet names = new TCNameSet();
+
+		for (TCField field: fields)
+		{
+			names.add(field.tagname);
+		}
+
+		return names;
 	}
 	
 	@Override
