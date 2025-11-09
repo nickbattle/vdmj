@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.VDMError;
@@ -46,6 +47,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementOpCallFinder;
 
@@ -210,6 +212,39 @@ abstract public class TypeChecker
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
 				populateTransitiveUpdates(imop, globals);
+			}
+		}
+
+		// If strict mode enabled, check for operations that have "ext" clauses, which
+		// are narrower than their transitive update sets.
+
+		if (Settings.strict)
+		{
+			for (TCDefinition def: alldefs)
+			{
+				if (def instanceof TCImplicitOperationDefinition)
+				{
+					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+
+					if (imop.externals != null && imop.transitiveUpdates != null)
+					{
+						for (TCExternalClause ext: imop.externals)
+						{
+							if (ext.mode.is(Token.WRITE))
+							{
+								TCNameSet updates = new TCNameSet();
+								updates.addAll(imop.transitiveUpdates);
+								updates.removeAll(ext.identifiers);
+
+								if (!updates.isEmpty())
+								{
+									warning(5046, "Strict: ext clause missing 'wr' updates", imop.location);
+									detail("Missing", updates.toString());
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		
