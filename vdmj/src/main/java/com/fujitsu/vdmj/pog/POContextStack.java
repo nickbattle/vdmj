@@ -662,6 +662,22 @@ public class POContextStack extends Stack<POContext>
 		return getAmbiguousVariables().contains(var);
 	}
 
+	/**
+	 * Get the initial POStatus from the stack, by looking for POUncheckedStatus entries.
+	 */
+	public POStatus getInitialStatus()
+	{
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POUncheckedContext)
+			{
+				return POStatus.UNCHECKED;
+			}
+		}
+
+		return POStatus.UNPROVED;
+	}
+
 	private String indentNewLines(String line, String indent)
 	{
 		StringBuilder sb = new StringBuilder();

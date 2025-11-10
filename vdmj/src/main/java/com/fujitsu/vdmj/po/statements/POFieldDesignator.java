@@ -70,6 +70,12 @@ public class POFieldDesignator extends POStateDesignator
 	}
 
 	@Override
+	public boolean isObjectDesignator()
+	{
+		return clsType != null;		// This is an object field update, not a record field
+	}
+
+	@Override
 	public String toString()
 	{
 		return object + "." + field;
