@@ -260,8 +260,6 @@ public class POContextStack extends Stack<POContext>
 				called = idef.superdef;
 			}
 
-			PODefinition caller = getDefinition();
-			
 			if (called instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imp = (POImplicitOperationDefinition)called;
@@ -286,27 +284,9 @@ public class POContextStack extends Stack<POContext>
 				}
 				else // remote module
 				{
-					if (caller.moduleDefinition != null)
+					if (!imp.accessSpecifier.isPure)
 					{
-						if (caller.moduleDefinition.mappedFrom.stateExported)
-						{
-							if (!imp.accessSpecifier.isPure)
-							{
-								names.addAll(imp.transitiveUpdates.matching(from.module));
-							}
-						}
-						else
-						{
-							// Module hasn't exported anything that can change state
-							// so no names affected.
-						}
-					}
-					else if (caller.classDefinition != null)
-					{
-						if (!imp.accessSpecifier.isPure)
-						{
-							names.addAll(imp.transitiveUpdates.matching(from.module));
-						}
+						names.addAll(imp.transitiveUpdates.matching(from.module));
 					}
 				}
 				
@@ -354,27 +334,9 @@ public class POContextStack extends Stack<POContext>
 				}
 				else // remote module
 				{
-					if (caller.moduleDefinition != null)
+					if (!exop.accessSpecifier.isPure)
 					{
-						if (caller.moduleDefinition.mappedFrom.stateExported)
-						{
-							if (!exop.accessSpecifier.isPure)
-							{
-								names.addAll(exop.transitiveUpdates.matching(from.module));
-							}
-						}
-						else
-						{
-							// Module hasn't exported anything that can change state
-							// so no names affected.
-						}
-					}
-					else if (caller.classDefinition != null)
-					{
-						if (!exop.accessSpecifier.isPure)
-						{
-							names.addAll(exop.transitiveUpdates.matching(from.module));
-						}
+						names.addAll(exop.transitiveUpdates.matching(from.module));
 					}
 				}
 
