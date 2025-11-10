@@ -98,7 +98,8 @@ public class POAssignmentContext extends POContext
 	 * For x(i) := E updates, it is "x ++ {i |-&gt; E}"
 	 * For x.fld := E updates, it is "mu(x, {fld |-&gt; E})"
 	 * 
-	 * More complex combinations nest these expressions.
+	 * More complex combinations nest these expressions. Note that if the designator is
+	 * actually an object field update, we can't handle this case.
 	 */
 	private POExpression updateExpression(POStateDesignator designator, POExpression update)
 	{
@@ -127,6 +128,13 @@ public class POAssignmentContext extends POContext
 		else if (designator instanceof POFieldDesignator)
 		{
 			POFieldDesignator fld = (POFieldDesignator)designator;
+
+			if (fld.clsType != null)
+			{
+				// This is an object field assignment, which we can't "mu". So
+				// we just return the original expression here.
+				return update;
+			}
 			
 			PORecordModifierList muUpdates = new PORecordModifierList();
 			muUpdates.add(new PORecordModifier(fld.field, update));

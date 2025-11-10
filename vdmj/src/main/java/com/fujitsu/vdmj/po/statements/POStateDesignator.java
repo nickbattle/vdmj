@@ -77,6 +77,16 @@ public abstract class POStateDesignator extends PONode
 	abstract public POExpressionList getExpressions();
 
 	/**
+	 * Test whether the assignment is to an object field, which cannot be handled yet.
+	 * The grammar parses "obj.field := value" as a POStateDesignator rather than a
+	 * POObjectFieldDesignator, so this has to be checked in some cases.
+	 */
+	public boolean isObjectDesignator()
+	{
+		return false;
+	}
+
+	/**
 	 * @param ctxt
 	 */
 	public ProofObligationList getProofObligations(POContextStack ctxt)

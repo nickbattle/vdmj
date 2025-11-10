@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.pog.POAssignmentContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POResolveContext;
+import com.fujitsu.vdmj.pog.POUncheckedContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -109,10 +110,13 @@ public class POAssignmentStatement extends POStatement
 		
 		TCNameToken update = designator.updatedVariableName();
 		
-		// If the expression is unambiguous, we can disambiguate the state being updated.
-		
-		if (!pogState.isAmbiguous())
+		if (designator.isObjectDesignator())
 		{
+			ctxt.push(new POUncheckedContext("object assignment", location));
+		}
+		else if (!pogState.isAmbiguous())
+		{
+			// If the expression is unambiguous, we can disambiguate the state being updated.
 			ctxt.push(new POAssignmentContext(designator, targetType, expression));
 			
 			// We can disambiguate variables in an assignment that assigns unambiguous values,

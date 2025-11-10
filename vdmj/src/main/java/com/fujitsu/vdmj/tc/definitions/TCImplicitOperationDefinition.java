@@ -240,14 +240,22 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		if (externals != null)
 		{
+			TCNameSet done = new TCNameSet();
+
     		for (TCExternalClause clause: externals)
     		{
     			TypeComparator.checkComposeTypes(clause.type, base, false);
     			
     			for (TCNameToken exname: clause.identifiers)
     			{
-    				TCDefinition sdef = base.findName(exname, NameScope.STATE);
+					if (done.contains(exname))
+					{
+						exname.report(3031, "Repeated ext state variable " + exname);
+					}
+
+					done.add(exname);
     				clause.typeResolve(base);
+    				TCDefinition sdef = base.findName(exname, NameScope.STATE);
 
     				if (sdef == null)
     				{

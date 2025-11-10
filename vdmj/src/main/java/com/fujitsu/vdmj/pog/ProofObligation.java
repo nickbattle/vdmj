@@ -87,7 +87,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.location = location;
 		this.kind = kind;
 		this.name = ctxt.getName();
-		this.status = POStatus.UNPROVED;
+		this.status = ctxt.getInitialStatus();
 		this.definition = ctxt.getDefinition();
 		this.number = 0;
 		this.isCheckable = true;	// Set false for some operation POs

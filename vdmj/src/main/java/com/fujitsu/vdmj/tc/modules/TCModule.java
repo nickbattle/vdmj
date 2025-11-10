@@ -67,8 +67,6 @@ public class TCModule extends TCNode
 	public boolean isFlat = false;
 	/** List of comments before module */
 	public LexCommentList comments;
-	/** True if the module exports allow state to be modified */
-	public boolean stateExported;
 
 	/**
 	 * Create a module from the given name and definitions.
@@ -149,22 +147,10 @@ public class TCModule extends TCNode
 
 	public void processExports()
 	{
-		stateExported = false;
-		
 		if (exports != null)
 		{
 			exportdefs.clear();
 			exportdefs.addAll(exports.getDefinitions(defs));
-			ModuleEnvironment env = new ModuleEnvironment(this);
-
-			for (TCDefinition export: exportdefs)
-			{
-				if (export.updatesState(env))
-				{
-					stateExported = true;
-					break;
-				}
-			}
 		}
 	}
 
