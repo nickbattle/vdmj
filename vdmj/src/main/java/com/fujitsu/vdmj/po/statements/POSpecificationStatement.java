@@ -35,12 +35,12 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -115,24 +115,32 @@ public class POSpecificationStatement extends POStatement
 		
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt, env));
-		}
-
-		if (errors != null)
-		{
-			ctxt.push(new POAmbiguousContext("statement throws exceptions", ctxt.getStateVariables(), location));
-		}
-		else if (!writeList.isEmpty())
-		{
+			int popto = ctxt.size();
 			addOldContext(ctxt);
-			ctxt.push(new POForAllContext(writeList, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(postcondition));		// post => ...
+			obligations.addAll(SatisfiabilityObligation.getAllPOs(this, stateDefinition, ctxt, env));
+			ctxt.popTo(popto);
+				
+			if (precondition != null)
+			{
+				ctxt.push(new POImpliesContext(precondition));
+			}
+
+			addOldContext(ctxt);
+
+			if (!writeList.isEmpty())
+			{
+				ctxt.push(new POForAllContext(writeList, env));
+			}
+			else
+			{
+				ctxt.push(new POForAllContext(ctxt.getStateVariables(), env));
+			}
+
+			ctxt.push(new POImpliesContext(postcondition));
 		}
 		else
 		{
-			addOldContext(ctxt);
-			ctxt.push(new POForAllContext(ctxt.getStateVariables(), env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(postcondition));						// post => ...
+			obligations.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 		}
 
 		return obligations;

@@ -1047,7 +1047,7 @@ public class StatementReader extends SyntaxReader
 	{
 		checkFor(Token.SEQ_OPEN, 2241, "Expecting '['");
 		DefinitionReader dr = getDefinitionReader();
-		ASTSpecificationStatement stmt = dr.readSpecification(token, true);
+		ASTSpecificationStatement stmt = dr.readSpecification(token, true, true);
 		checkFor(Token.SEQ_CLOSE, 2242, "Expecting ']' after specification statement");
 		return stmt;
 	}

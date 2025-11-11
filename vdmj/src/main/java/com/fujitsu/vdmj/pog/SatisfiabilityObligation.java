@@ -25,10 +25,10 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
@@ -139,51 +139,15 @@ public class SatisfiabilityObligation extends ProofObligation
 			for (TCNameToken name: names)
 			{
 				TCDefinition def = env.findName(name, NameScope.NAMESANDSTATE);
-				sb.append(sep);
-
-				if (def != null)
+				
+				if (def != null && !def.name.isOld())
 				{
+					sb.append(sep);
 					sb.append(def.name);
 					sb.append(":");
 					sb.append(def.getType());
+					sep = ", ";
 				}
-				else
-				{
-					PODefinition podef = ctxt.getDefinition();
-
-					if (podef instanceof POExplicitOperationDefinition)
-					{
-						POExplicitOperationDefinition exop = (POExplicitOperationDefinition)podef;
-
-						for (PODefinition pdef: exop.paramDefinitions)
-						{
-							if (pdef.name.equals(name))
-							{
-								sb.append(pdef.name);
-								sb.append(":");
-								sb.append(pdef.getType());
-								break;
-							}
-						}
-					}
-					else if (podef instanceof POImplicitOperationDefinition)
-					{
-						POImplicitOperationDefinition imop = (POImplicitOperationDefinition)podef;
-
-						for (POPatternListTypePair pdef: imop.parameterPatterns)
-						{
-							if (pdef.patterns.getAllVariableNames().contains(name))
-							{
-								sb.append(name);
-								sb.append(":");
-								sb.append(pdef.type);
-								break;
-							}
-						}
-					}
-				}
-
-				sep = ", ";
 			}
 
 			sb.append(" & ");
@@ -192,7 +156,6 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(spec.postcondition);
 
 		source = ctxt.getSource(sb.toString().replaceAll("~", "\\$"));
-		markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 	}
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
@@ -317,4 +280,22 @@ public class SatisfiabilityObligation extends ProofObligation
 			separator = ", ";
 		}
 	}
+
+	/**
+	 * Create an obligation for each of the alternative stacks contained in the ctxt.
+	 * This happens with operation POs that push POAltContexts onto the stack.
+	 */
+	public static List<ProofObligation> getAllPOs(POSpecificationStatement spec,
+		PODefinition stateDefinition, POContextStack ctxt, Environment env)
+	{
+		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new SatisfiabilityObligation(spec, stateDefinition, choice, env));
+		}
+		
+		return results;
+	}
+
 }
