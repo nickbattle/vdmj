@@ -34,25 +34,30 @@ public class POImpliesContext extends POContext
 	public final String exp;
 	private final TCNameSet reasonsAbout;
 
-	public POImpliesContext(POExpression... preconditions)
+	public POImpliesContext(String op, POExpression... conditions)
 	{
 		this.reasonsAbout = new TCNameSet();
 		StringBuilder sb = new StringBuilder();
 		String sep = "";
 		
-		for (POExpression precondition: preconditions)
+		for (POExpression condition: conditions)
 		{
-			if (precondition != null)	// null for missing loop invariant
+			if (condition != null)	// null for missing loop invariant
 			{
 				sb.append(sep);
-				sb.append(precondition.toString().replaceAll("~", "\\$"));
-				sep = " and ";
+				sb.append(condition.toString().replaceAll("~", "\\$"));
+				sep = " " + op + " ";
 
-				this.reasonsAbout.addAll(precondition.getVariableNames());
+				this.reasonsAbout.addAll(condition.getVariableNames());
 			}
 		}
 		
 		this.exp = sb.toString();
+	}
+
+	public POImpliesContext(POExpression... conditions)
+	{
+		this("and", conditions);
 	}
 
 	public POImpliesContext(POExplicitOperationDefinition def)
