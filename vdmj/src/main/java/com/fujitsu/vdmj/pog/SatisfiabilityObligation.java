@@ -115,8 +115,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		source = ctxt.getSource(sb.toString());
 	}
 
-	public SatisfiabilityObligation(POSpecificationStatement spec,
-		PODefinition stateDefinition, POContextStack ctxt, Environment env)
+	public SatisfiabilityObligation(POSpecificationStatement spec, POContextStack ctxt, Environment env)
 	{
 		super(spec.location, POType.OP_SATISFIABILITY, ctxt);
 		StringBuilder sb = new StringBuilder();
@@ -286,16 +285,15 @@ public class SatisfiabilityObligation extends ProofObligation
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
 	public static List<ProofObligation> getAllPOs(POSpecificationStatement spec,
-		PODefinition stateDefinition, POContextStack ctxt, Environment env)
+		POContextStack ctxt, Environment env)
 	{
 		Vector<ProofObligation> results = new Vector<ProofObligation>();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new SatisfiabilityObligation(spec, stateDefinition, choice, env));
+			results.add(new SatisfiabilityObligation(spec, choice, env));
 		}
 		
 		return results;
 	}
-
 }
