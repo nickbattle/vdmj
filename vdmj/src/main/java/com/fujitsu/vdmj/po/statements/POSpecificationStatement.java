@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.pog.AssertionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
@@ -112,20 +113,17 @@ public class POSpecificationStatement extends POStatement
 			}
 		}
 
-		if (precondition != null)
-		{
-			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
-		}
-
-		obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
-		
 		int popto = ctxt.size();
 		addOldContext(ctxt);
 		obligations.addAll(SatisfiabilityObligation.getAllPOs(this, ctxt, env));
 		ctxt.popTo(popto);
+
+		obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
 			
 		if (precondition != null)
 		{
+			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(AssertionObligation.getAllPOs(location, precondition, ctxt));
 			ctxt.push(new POImpliesContext(precondition));
 		}
 

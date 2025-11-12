@@ -57,6 +57,7 @@ public enum POType
 	LOOP_MEASURE("loop measure"),
 	OP_PRE_CONDITION("operation pre condition"),
 	OP_POST_CONDITION("operation post condition"),
+	SPEC_PRE_CONDITION("specification precondition"),
 	OPERATION_PATTERNS("operation parameter patterns"),
 	OP_SATISFIABILITY("operation satisfiability", true),
 	STMT_SATISFIABILITY("statement satisfiability", true),

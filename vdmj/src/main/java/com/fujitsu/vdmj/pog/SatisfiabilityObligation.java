@@ -117,7 +117,7 @@ public class SatisfiabilityObligation extends ProofObligation
 
 	public SatisfiabilityObligation(POSpecificationStatement spec, POContextStack ctxt, Environment env)
 	{
-		super(spec.location, POType.OP_SATISFIABILITY, ctxt);
+		super(spec.location, POType.STMT_SATISFIABILITY, ctxt);
 		StringBuilder sb = new StringBuilder();
 		TCNameSet names = new TCNameSet();
 
