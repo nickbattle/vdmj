@@ -91,8 +91,8 @@ public class POWhileStatement extends POStatement
 			ctxt.push(new POLetDefContext(measure.getDefinition()));	// let loop_measure_n = <exp> in ...
 
 			statement.getProofObligations(ctxt, pogState, env);			// build context, ignore POs
-			obligations.addAll(LoopMeasureObligation.getAllPOs(statement.location, ctxt, measure));
-			obligations.lastElement().setMessage("check measure after each while body");
+			obligations.addAll(LoopMeasureObligation.getAllPOs(statement.location, ctxt, measure).
+				setMessage("check measure after each while body"));
 
 			ctxt.popTo(popto);
 		}
@@ -112,15 +112,15 @@ public class POWhileStatement extends POStatement
 		/**
 		 * The initial case verifies that the invariant is true before the loop starts.
 		 */
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before while condition");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant).
+			setMessage("check invariant before while condition"));
 		
 		/**
 		 * Then we verify that if we can start the loop, we will meet the invariant.
 		 */
 		ctxt.push(new POImpliesContext(this.exp));					// while C => ...
-		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before first while body");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
+			setMessage("check invariant before first while body"));
 		// No ctxt.pop here, because we always check that the loop is entered.
 
 		/**
@@ -130,8 +130,8 @@ public class POWhileStatement extends POStatement
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant, this.exp));		// invariant && while C => ...
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
-		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant preserved by while body");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
+			setMessage("check invariant preserved by while body"));
 
 		/**
 		 * The context stack now contains everything from the statement block, but we want to

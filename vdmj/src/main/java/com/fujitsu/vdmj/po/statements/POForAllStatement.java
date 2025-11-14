@@ -143,8 +143,8 @@ public class POForAllStatement extends POStatement
 		 * is empty therefore, but there are no loop variables bound.
 		 */
 		ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant).
+			setMessage("check invariant before for-loop"));
 		ctxt.pop();
 
 		PODefinitionList podefs = remPattern.getDefinitions(setType.setof);
@@ -189,8 +189,8 @@ public class POForAllStatement extends POStatement
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
-		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("invariant preservation for next for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
+			setMessage("invariant preservation for next for-loop"));
 
 		/**
 		 * The context stack now contains everything from the statement block, but we want to

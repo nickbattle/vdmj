@@ -154,8 +154,8 @@ public class POForPatternBindStatement extends POStatement
 		 * The initial case verifies that the invariant is true before the loop.
 		 */
 		ctxt.push(new POLetDefContext(ghostDef));			// let ghost = [] in
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant).
+			setMessage("check invariant before for-loop"));
 		ctxt.pop();
 
 		if (patternBind.pattern != null)					// for p in [a,b,c] do
@@ -237,8 +237,8 @@ public class POForPatternBindStatement extends POStatement
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));
-		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("invariant preservation for next for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
+			setMessage("invariant preservation for next for-loop"));
 
 		/**
 		 * The context stack now contains everything from the statement block, but we want to

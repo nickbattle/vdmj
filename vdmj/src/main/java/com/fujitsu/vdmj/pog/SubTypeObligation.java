@@ -25,9 +25,6 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
@@ -670,10 +667,10 @@ public class SubTypeObligation extends ProofObligation
 	 * Create an obligation for each of the alternative stacks contained in the ctxt.
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
-	public static List<ProofObligation> getAllPOs(
+	public static ProofObligationList getAllPOs(
 			POExpression exp, TCType etype, TCType atype, POContextStack ctxt)
 	{
-		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		ProofObligationList results = new ProofObligationList();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
@@ -683,9 +680,9 @@ public class SubTypeObligation extends ProofObligation
 		return results;
 	}
 
-	public static List<ProofObligation> getAllPOs(LexLocation call, PODefinition opdef, TCType atype, POContextStack ctxt)
+	public static ProofObligationList getAllPOs(LexLocation call, PODefinition opdef, TCType atype, POContextStack ctxt)
 	{
-		Vector<ProofObligation> results = new Vector<ProofObligation>();
+		ProofObligationList results = new ProofObligationList();
 		
 		for (POContextStack choice: ctxt.getAlternatives(false))	// Note, include the returns
 		{
