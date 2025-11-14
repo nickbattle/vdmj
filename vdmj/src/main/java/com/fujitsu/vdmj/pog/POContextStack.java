@@ -59,6 +59,11 @@ import com.fujitsu.vdmj.util.Utils;
 public class POContextStack extends Stack<POContext>
 {
 	/**
+	 * A limit to the number of path expansions that are permitted in getAlternatives().
+	 */
+	private static final int ALT_PATH_LIMIT = 100;
+
+	/**
 	 * The pushAt/popTo methods allow a push to record the current stack size and then
 	 * pop items back to that size easily. It is used in operation PO handling, where
 	 * persistent contexts (like a state update) are not popped symmetrically.
@@ -137,7 +142,15 @@ public class POContextStack extends Stack<POContext>
 				
 				for (POContextStack substack: alt.alternatives)
 				{
-					for (POContextStack alternative: substack.getAlternatives(excludeReturns))
+					List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns);
+
+					while (subalternatives.size() * results.size() > ALT_PATH_LIMIT)
+					{
+						// Remove alternatives until the resulting size is within the limit
+						subalternatives.remove(0);
+					}
+
+					for (POContextStack alternative: subalternatives)
 					{
 						for (POContextStack original: results)
 						{
