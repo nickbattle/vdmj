@@ -30,6 +30,8 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -103,6 +105,14 @@ public class PogCommand extends AnalysisCommand
 			}
 
 			printf("%s", list.toString());
+		}
+
+		if (argv.length == 1)
+		{
+			for (PODefinition def: POContextStack.getReducedDefinitions())
+			{
+				printf("POs missing for %s\n", def.name.getExplicit(true));
+			}
 		}
 		
 		return null;

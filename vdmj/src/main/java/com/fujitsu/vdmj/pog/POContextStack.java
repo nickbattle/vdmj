@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
@@ -62,6 +63,24 @@ public class POContextStack extends Stack<POContext>
 	 * A limit to the number of path expansions that are permitted in getAlternatives().
 	 */
 	private static final int ALT_PATH_LIMIT = 100;
+
+	/**
+	 * Definitions which have had the paths reduced, due to excessive branching.
+	 */
+	private static PODefinitionSet reducedDefinitions = new PODefinitionSet();
+	
+	public static PODefinitionSet getReducedDefinitions()
+	{
+		return reducedDefinitions;
+	}
+
+	/**
+	 * Clear the reduced definitions for a new POG run.
+	 */
+	public static void reset()
+	{
+		reducedDefinitions = new PODefinitionSet();
+	}
 
 	/**
 	 * The pushAt/popTo methods allow a push to record the current stack size and then
@@ -138,17 +157,12 @@ public class POContextStack extends Stack<POContext>
 			if (ctxt instanceof POAltContext)
 			{
 				POAltContext alt = (POAltContext)ctxt;
-				List<POContextStack> toAdd = new Vector<POContextStack>();
+				List<POContextStack> newResults = new Vector<POContextStack>();
+				boolean tooComplex = false;
 				
 				for (POContextStack substack: alt.alternatives)
 				{
 					List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns);
-
-					while (subalternatives.size() * results.size() > ALT_PATH_LIMIT)
-					{
-						// Remove alternatives until the resulting size is within the limit
-						subalternatives.remove(0);
-					}
 
 					for (POContextStack alternative: subalternatives)
 					{
@@ -162,13 +176,33 @@ public class POContextStack extends Stack<POContext>
 								combined.addAll(alternative);
 							}
 
-							toAdd.add(combined);
+							newResults.add(combined);
 						}
+					}
+
+					if (newResults.size() > ALT_PATH_LIMIT)
+					{
+						if (getDefinition() != null)
+						{
+							// Add the name to list of definitions that are too complex.
+							reducedDefinitions.add(getDefinition());
+						}
+						
+						tooComplex = true;
+						break;
 					}
 				}
 				
 				results.clear();
-				results.addAll(toAdd);
+
+				if (tooComplex)
+				{
+					results.addAll(newResults.subList(0, ALT_PATH_LIMIT-1));
+				}
+				else
+				{
+					results.addAll(newResults);
+				}
 			}
 			else
 			{

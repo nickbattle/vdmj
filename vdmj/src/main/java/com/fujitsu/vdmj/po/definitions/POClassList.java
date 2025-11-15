@@ -70,10 +70,12 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	public ProofObligationList getProofObligations()
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		POContextStack.reset();
 		
 		for (POClassDefinition c: this)
 		{
-			obligations.addAll(c.getProofObligations(new POContextStack(), new POGState(), new PublicClassEnvironment(tcclasses)));
+			obligations.addAll(c.getProofObligations(
+				new POContextStack(), new POGState(), new PublicClassEnvironment(tcclasses)));
 		}
 
 		return obligations;
