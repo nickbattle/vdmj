@@ -167,49 +167,51 @@ public class POContextStack extends Stack<POContext>
 				List<POContextStack> newResults = new Vector<POContextStack>();
 				int remaining = limit;
 				
-				for (POContextStack substack: alt.alternatives)
+				try
 				{
-					List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
-
-					remaining = remaining - subalternatives.size();
-					if (remaining < 1) remaining = 1;
-
-					for (POContextStack alternative: subalternatives)
+					for (POContextStack substack: alt.alternatives)
 					{
-						for (POContextStack original: results)
-						{
-							POContextStack combined = new POContextStack();
-							combined.addAll(original);
+						List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
 
-							if (!original.returnsEarly())
+						remaining = remaining - subalternatives.size();
+						if (remaining < 1) remaining = 1;
+
+						for (POContextStack alternative: subalternatives)
+						{
+							for (POContextStack original: results)
 							{
-								combined.addAll(alternative);
+								POContextStack combined = new POContextStack();
+								combined.addAll(original);
+
+								if (!original.returnsEarly())
+								{
+									combined.addAll(alternative);
+								}
+
+								newResults.add(combined);
+
+								if (newResults.size() > limit)
+								{
+									throw new IllegalArgumentException();	// Too many
+								}
 							}
-
-							newResults.add(combined);
 						}
 					}
-
-					if (newResults.size() > limit)
+				}
+				catch (IllegalArgumentException e)		// newResults too large
+				{
+					if (getDefinition() != null)
 					{
-						if (getDefinition() != null)
-						{
-							// Add the name to list of definitions that are too complex.
-							reducedDefinitions.add(getDefinition());
-						}
-						
-						break;
+						// Add the name to list of definitions that are too complex.
+						reducedDefinitions.add(getDefinition());
 					}
-				}
-				
-				results.clear();
 
-				if (newResults.size() > limit)
-				{
-					results.addAll(newResults.subList(0, limit));
+					// Trim newResults to the limit
+					newResults = newResults.subList(0, limit);
 				}
-				else
+				finally		// rebuild the results
 				{
+					results.clear();
 					results.addAll(newResults);
 				}
 			}
