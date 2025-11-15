@@ -60,12 +60,14 @@ import com.fujitsu.vdmj.util.Utils;
 public class POContextStack extends Stack<POContext>
 {
 	/**
-	 * A limit to the number of path expansions that are permitted in getAlternatives().
+	 * A limit to the number of path expansions that are permitted in one top-level
+	 * call to getAlternatives() -- ie. one operation analysis.
 	 */
-	private static final int ALT_PATH_LIMIT = 100;
+	private static final int ALT_PATH_LIMIT = 200;
 
 	/**
-	 * Definitions which have had the paths reduced, due to excessive branching.
+	 * Definitions which have had their ALT paths reduced, due to excessive branching,
+	 * to meet the value above.
 	 */
 	private static PODefinitionSet reducedDefinitions = new PODefinitionSet();
 	
@@ -75,7 +77,7 @@ public class POContextStack extends Stack<POContext>
 	}
 
 	/**
-	 * Clear the reduced definitions for a new POG run.
+	 * Clear the reduced definitions globally, for a new POG run.
 	 */
 	public static void reset()
 	{
@@ -144,10 +146,15 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
-		return getAlternatives(true);	// exclude ending paths by default
+		return getAlternatives(true, ALT_PATH_LIMIT);	// exclude ending paths by default
 	}
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
+	{
+		return getAlternatives(excludeReturns, ALT_PATH_LIMIT);	// exclude ending paths by default
+	}
+	
+	private List<POContextStack> getAlternatives(boolean excludeReturns, int limit)
 	{
 		List<POContextStack> results = new Vector<POContextStack>();
 		results.add(new POContextStack());
@@ -158,11 +165,14 @@ public class POContextStack extends Stack<POContext>
 			{
 				POAltContext alt = (POAltContext)ctxt;
 				List<POContextStack> newResults = new Vector<POContextStack>();
-				boolean tooComplex = false;
+				int remaining = limit;
 				
 				for (POContextStack substack: alt.alternatives)
 				{
-					List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns);
+					List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
+
+					remaining = remaining - subalternatives.size();
+					if (remaining < 1) remaining = 1;
 
 					for (POContextStack alternative: subalternatives)
 					{
@@ -180,7 +190,7 @@ public class POContextStack extends Stack<POContext>
 						}
 					}
 
-					if (newResults.size() > ALT_PATH_LIMIT)
+					if (newResults.size() > limit)
 					{
 						if (getDefinition() != null)
 						{
@@ -188,16 +198,15 @@ public class POContextStack extends Stack<POContext>
 							reducedDefinitions.add(getDefinition());
 						}
 						
-						tooComplex = true;
 						break;
 					}
 				}
 				
 				results.clear();
 
-				if (tooComplex)
+				if (newResults.size() > limit)
 				{
-					results.addAll(newResults.subList(0, ALT_PATH_LIMIT-1));
+					results.addAll(newResults.subList(0, limit));
 				}
 				else
 				{
