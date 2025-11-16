@@ -217,7 +217,14 @@ public class POContextStack extends Stack<POContext>
 			}
 			else
 			{
-				if (ctxt.returnsEarly())
+				if (ctxt.stops())
+				{
+					// An error statement is reached, so this control path aborts here and
+					// no further obligations are produced.
+
+					return new Vector<POContextStack>();
+				}
+				else if (ctxt.returnsEarly())
 				{
 					// This stack plays no part in further obligations, including any
 					// alternatives it contains. So immediately return nothing if we
