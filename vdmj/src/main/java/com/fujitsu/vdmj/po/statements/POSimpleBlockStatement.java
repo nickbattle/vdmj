@@ -74,7 +74,7 @@ abstract public class POSimpleBlockStatement extends POStatement
 		{
 			obligations.addAll(stmt.getProofObligations(ctxt, pogState, env));
 			
-			if (stmt.getStmttype().isReturn())
+			if (stmt.isReturn())
 			{
 				break;
 			}

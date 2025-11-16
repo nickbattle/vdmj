@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.annotations.POLoopAnnotations;
 import com.fujitsu.vdmj.po.annotations.POLoopInvariantList;
 import com.fujitsu.vdmj.po.annotations.POLoopMeasureAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
@@ -65,6 +66,24 @@ public class POWhileStatement extends POStatement
 	public String toString()
 	{
 		return "while " + exp + " do " + statement;
+	}
+
+	/**
+	 * This complements the typecheck of the while loop, which doesn't include the void
+	 * return value for while loops to avoid too many suprious following errors.
+	 */
+	@Override
+	public boolean isReturn()
+	{
+		if (exp instanceof POBooleanLiteralExpression)
+		{
+			POBooleanLiteralExpression ble = (POBooleanLiteralExpression)exp;
+			return !ble.value.value;	// "while true do" never returns
+		}
+		else
+		{
+			return false;	// while may never execute, so it may not return.
+		}
 	}
 
 	@Override
