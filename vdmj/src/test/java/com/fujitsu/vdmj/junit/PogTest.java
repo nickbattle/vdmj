@@ -215,20 +215,19 @@ public class PogTest extends TestCase
 		/* 13 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let ABC : set of nat1 = {} in\n      (ax = sums(ABC)))))\n",
 		/* 14 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (({1, 2, 3} <> {}) =>\n      (forall ax:nat, ABC:set of nat1, z:nat1 &\n        (((ABC psubset {1, 2, 3}) and (z in set ({1, 2, 3} \\ ABC))) and (ax = sums(ABC)) =>\n          (let ax : nat = (ax + z) in\n            (let ABC : set of nat1 = (ABC union {z}) in\n              (ax = sums(ABC)))))))))\n",
 		/* 15 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (({1, 2, 3} <> {}) =>\n      (let ABC : set of nat1 = {1, 2, 3} in\n        (forall ax:nat &\n          ((ax = sums(ABC)) =>\n            ax <> 0))))))\n",
-		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (({1, 2, 3} = {}) =>\n      (-- Did not enter loop at 46:9\n        (let ABC : set of nat1 = {} in\n          ((ax = sums(ABC)) =>\n            ax <> 0))))))\n",
-		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [] in\n      (ax = sumq(DONE_60$)))))\n",
-		/* 18 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
-		/* 19 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (([0, 1, 2, 3] <> []) =>\n      (forall ax:nat, z:nat, DONE_60$:seq of nat &\n        (((DONE_60$ ^ [z]) = ([0, 1, 2, 3](1, ..., ((len DONE_60$) + 1)))) and (ax = sumq(DONE_60$)) =>\n          (let ax : nat = (ax + z) in\n            (let DONE_60$ : seq of nat = (DONE_60$ ^ [z]) in\n              (ax = sumq(DONE_60$)))))))))\n",
-		/* 20 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (([0, 1, 2, 3] <> []) =>\n      (let DONE_60$ : seq of nat = [0, 1, 2, 3] in\n        (forall ax:nat &\n          ((ax = sumq(DONE_60$)) =>\n            ax <> 0))))))\n",
-		/* 21 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (([0, 1, 2, 3] = []) =>\n      (-- Did not enter loop at 60:9\n        (let DONE_60$ : seq of nat = [] in\n          ((ax = sumq(DONE_60$)) =>\n            ax <> 0))))))\n",
-		/* 22 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
+		/* 16 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (let DONE_60$ : seq of nat = [] in\n      (ax = sumq(DONE_60$)))))\n",
+		/* 17 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (forall z in seq [0, 1, 2, 3] & \n      z in set elems [0, 1])))\n",
+		/* 18 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (([0, 1, 2, 3] <> []) =>\n      (forall ax:nat, z:nat, DONE_60$:seq of nat &\n        (((DONE_60$ ^ [z]) = ([0, 1, 2, 3](1, ..., ((len DONE_60$) + 1)))) and (ax = sumq(DONE_60$)) =>\n          (let ax : nat = (ax + z) in\n            (let DONE_60$ : seq of nat = (DONE_60$ ^ [z]) in\n              (ax = sumq(DONE_60$)))))))))\n",
+		/* 19 */ "(forall size:nat &\n  (let ax : nat = 0 in\n    (([0, 1, 2, 3] <> []) =>\n      (let DONE_60$ : seq of nat = [0, 1, 2, 3] in\n        (forall ax:nat &\n          ((ax = sumq(DONE_60$)) =>\n            ax <> 0))))))\n",
+		/* 20 */ "(forall s:seq of nat &\n  is_(measure_sumq(s), nat))\n",
+		/* 21 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
+		/* 22 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    measure_sumq(s) > measure_sumq(tl s)))\n",
 		/* 23 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
-		/* 24 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    measure_sumq(s) > measure_sumq(tl s)))\n",
-		/* 25 */ "(forall s:seq of nat &\n  (not (s = []) =>\n    s <> []))\n",
-		/* 26 */ "(forall s:set of nat &\n  is_(measure_sums(s), nat))\n",
-		/* 27 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    exists e in set s & true))\n",
-		/* 28 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    (forall e in set s &\n      measure_sums(s) > measure_sums(s \\ {e}))))\n"
+		/* 24 */ "(forall s:set of nat &\n  is_(measure_sums(s), nat))\n",
+		/* 25 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    exists e in set s & true))\n",
+		/* 26 */ "(forall s:set of nat &\n  (not (s = {}) =>\n    (forall e in set s &\n      measure_sums(s) > measure_sums(s \\ {e}))))\n"
 	};
+
 	public void testVDMSL() throws Exception
 	{
 		runPOG("expectedSL", Dialect.VDM_SL, "/pogtest/pog.vdmsl", expectedSL);
@@ -347,8 +346,11 @@ public class PogTest extends TestCase
 
 		for (ProofObligation po: polist)
 		{
-			Console.out.print(sep + "\t\t/* " + ++i + " */ \"" +
-				po.source.replaceAll("\n", "\\\\n") + "\"");
+			String quoted = po.source.
+				replaceAll("\\\\", "\\\\\\\\").
+				replaceAll("\n", "\\\\n");
+
+			Console.out.print(sep + "\t\t/* " + ++i + " */ \"" + quoted + "\"");
 
 			sep = ",\n";
 		}

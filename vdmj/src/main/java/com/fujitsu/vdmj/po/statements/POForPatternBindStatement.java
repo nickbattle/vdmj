@@ -70,6 +70,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -273,11 +274,15 @@ public class POForPatternBindStatement extends POStatement
 		 * Finally, the loop may not have been entered if the sequence is empty, so we create
 		 * another alternative path with this condition and nothing else.
 		 */
-		ctxt.push(new POImpliesContext(isEmpty()));
-		ctxt.push(new POCommentContext("Did not enter loop", location));
-		ctxt.push(new POLetDefContext(ghostDef));						// let ghost = [] in
-		ctxt.push(new POImpliesContext(invariant));						// invariant => ...
-		ctxt.popInto(popto, altCtxt.add());
+
+		if (!(sequenceType instanceof TCSeq1Type))		// seq1 will always enter the loop
+		{
+			ctxt.push(new POImpliesContext(isEmpty()));
+			ctxt.push(new POCommentContext("Did not enter loop", location));
+			ctxt.push(new POLetDefContext(ghostDef));						// let ghost = [] in
+			ctxt.push(new POImpliesContext(invariant));						// invariant => ...
+			ctxt.popInto(popto, altCtxt.add());
+		}
 
 		// The three alternatives in one added.
 		ctxt.push(altCtxt);

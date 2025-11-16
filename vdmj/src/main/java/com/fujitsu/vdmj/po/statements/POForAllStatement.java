@@ -62,6 +62,7 @@ import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -225,11 +226,14 @@ public class POForAllStatement extends POStatement
 		 * Finally, the loop may not have been entered if the set is empty, so we create
 		 * another alternative path with this condition and nothing else.
 		 */
-		ctxt.push(new POImpliesContext(isEmpty(eset)));
-		ctxt.push(new POCommentContext("Did not enter loop", location));
-		ctxt.push(new POLetDefContext(ghostDef));					// let ghost = {} in
-		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
-		ctxt.popInto(popto, altCtxt.add());
+		if (!(setType instanceof TCSet1Type))	// set1 will always enter the loop
+		{
+			ctxt.push(new POImpliesContext(isEmpty(eset)));
+			ctxt.push(new POCommentContext("Did not enter loop", location));
+			ctxt.push(new POLetDefContext(ghostDef));					// let ghost = {} in
+			ctxt.push(new POImpliesContext(invariant));					// invariant => ...
+			ctxt.popInto(popto, altCtxt.add());
+		}
 
 		// The three alternatives in one added.
 		ctxt.push(altCtxt);
