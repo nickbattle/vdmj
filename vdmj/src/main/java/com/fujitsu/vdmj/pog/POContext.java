@@ -184,4 +184,13 @@ abstract public class POContext
 	{
 		return false;
 	}
+
+	/**
+	 * This is only true for ErrorContexts, used by "error" statements to prevent
+	 * any further POG on this path.
+	 */
+	public boolean stops()
+	{
+		return false;
+	}
 }

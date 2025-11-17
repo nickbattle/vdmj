@@ -123,8 +123,8 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 	}
 
 	/**
-	 * Use the operation's pure and ext clauses to try to determine the variable
-	 * access. This is also called from the expression visitor.
+	 * Use the operation's pure and ext clauses, and transitiveUpdates to determine
+	 * the variables updated. This is also called from the expression visitor.
 	 */
 	public TCNameSet operationCall(LexLocation from, PODefinition def)
 	{
@@ -137,10 +137,6 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 		else if (def.accessSpecifier.isPure)
 		{
 			// No updates by definition of pure
-		}
-		else if (!def.location.sameModule(from))
-		{
-			all.addAll(ctxt.getStateVariables());	// Remote call may call back!
 		}
 		else if (def instanceof POImplicitOperationDefinition)
 		{
@@ -158,12 +154,13 @@ public class POStatementStateUpdates extends POLeafStatementVisitor<TCNameToken,
 			}
 			else
 			{
-				all.addAll(ctxt.getStateVariables());
+				all.addAll(imp.transitiveUpdates.matching(from.module));
 			}
 		}
 		else if (def instanceof POExplicitOperationDefinition)
 		{
-			all.addAll(ctxt.getStateVariables());
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
+			all.addAll(exop.transitiveUpdates.matching(from.module));
 		}
 
 		return all;

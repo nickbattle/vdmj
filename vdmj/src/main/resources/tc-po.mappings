@@ -278,7 +278,7 @@ map TCObjectSelfDesignator{location} to POObjectSelfDesignator(location);
 map TCPeriodicStatement{opname, args, stmttype} to POPeriodicStatement(opname, args) set stmttype;
 map TCReturnStatement{location, expression, stmttype} to POReturnStatement(location, expression) set stmttype;
 map TCSkipStatement{location, stmttype} to POSkipStatement(location) set stmttype;
-map TCSpecificationStatement{location, externals, precondition, postcondition, errors, stateDefinition, stmttype} to POSpecificationStatement(location, externals, precondition, postcondition, errors, stateDefinition) set stmttype;
+map TCSpecificationStatement{location, externals, precondition, postcondition, errors, stmttype} to POSpecificationStatement(location, externals, precondition, postcondition, errors) set stmttype;
 map TCSporadicStatement{opname, args, stmttype} to POSporadicStatement(opname, args) set stmttype;
 map TCStartStatement{location, objects, stmttype} to POStartStatement(location, objects) set stmttype;
 map TCStateDesignator{} to POStateDesignator();

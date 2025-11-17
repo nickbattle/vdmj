@@ -24,18 +24,18 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
-import com.fujitsu.vdmj.pog.POAmbiguousContext;
+import com.fujitsu.vdmj.pog.AssertionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSpecificationStatement extends POStatement
@@ -54,12 +55,10 @@ public class POSpecificationStatement extends POStatement
 	public final POExpression precondition;
 	public final POExpression postcondition;
 	public final POErrorCaseList errors;
-	public final POStateDefinition stateDefinition;
 
 	public POSpecificationStatement(LexLocation location,
 		POExternalClauseList externals, POExpression precondition,
-		POExpression postcondition, POErrorCaseList errors,
-		POStateDefinition stateDefinition)
+		POExpression postcondition, POErrorCaseList errors)
 	{
 		super(location);
 
@@ -67,7 +66,6 @@ public class POSpecificationStatement extends POStatement
 		this.precondition = precondition;
 		this.postcondition = postcondition;
 		this.errors = errors;
-		this.stateDefinition = stateDefinition;
 	}
 
 	@Override
@@ -85,6 +83,7 @@ public class POSpecificationStatement extends POStatement
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		TCNameList writeList = new TCNameList();
+		POExpressionList postList = new POExpressionList(postcondition);
 
 		if (externals != null)
 		{
@@ -99,41 +98,49 @@ public class POSpecificationStatement extends POStatement
 
 		if (errors != null)
 		{
+			TCBooleanType bool = new TCBooleanType(location);
+
 			for (POErrorCase err: errors)
 			{
 				obligations.addAll(err.left.getProofObligations(ctxt, pogState, env));
 				obligations.addAll(err.right.getProofObligations(ctxt, pogState, env));
+
+				postList.add(new POAndExpression(
+					err.left,
+					new LexKeywordToken(Token.AND, location),
+					err.right,
+					bool, bool));
 			}
 		}
 
+		int popto = ctxt.size();
+		addOldContext(ctxt);
+		obligations.addAll(SatisfiabilityObligation.getAllPOs(this, ctxt, env));
+		ctxt.popTo(popto);
+
+		obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
+			
 		if (precondition != null)
 		{
 			obligations.addAll(precondition.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(AssertionObligation.getAllPOs(location, precondition, ctxt));
+			ctxt.push(new POImpliesContext(precondition));
 		}
 
-		obligations.addAll(postcondition.getProofObligations(ctxt, pogState, env));
-		
-		if (Settings.dialect == Dialect.VDM_SL)
-		{
-			obligations.add(new SatisfiabilityObligation(this, stateDefinition, ctxt, env));
-		}
+		addOldContext(ctxt);
 
-		if (errors != null)
+		if (!writeList.isEmpty())
 		{
-			ctxt.push(new POAmbiguousContext("statement throws exceptions", ctxt.getStateVariables(), location));
-		}
-		else if (!writeList.isEmpty())
-		{
-			addOldContext(ctxt);
-			ctxt.push(new POForAllContext(writeList, env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(postcondition));		// post => ...
+			ctxt.push(new POForAllContext(writeList, env));
 		}
 		else
 		{
-			addOldContext(ctxt);
-			ctxt.push(new POForAllContext(ctxt.getStateVariables(), env));		// forall <changed variables>
-			ctxt.push(new POImpliesContext(postcondition));						// post => ...
+			ctxt.push(new POForAllContext(ctxt.getStateVariables(), env));
 		}
+
+		POExpression[] array = new POExpression[postList.size()];
+		postList.toArray(array);
+		ctxt.push(new POImpliesContext("or", array));
 
 		return obligations;
 	}

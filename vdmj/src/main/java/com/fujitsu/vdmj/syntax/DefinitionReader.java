@@ -1310,7 +1310,7 @@ public class DefinitionReader extends SyntaxReader
 			body = readOperationBody();
 		}
 
-		ASTSpecificationStatement spec = readSpecification(opName.location, body == null);
+		ASTSpecificationStatement spec = readSpecification(opName.location, body == null, false);
 
 		ASTImplicitOperationDefinition def = new ASTImplicitOperationDefinition(
 			idToName(opName), parameterPatterns, resultPattern, body, spec);
@@ -1319,7 +1319,7 @@ public class DefinitionReader extends SyntaxReader
 	}
 
 	public ASTSpecificationStatement readSpecification(
-		LexLocation location, boolean postMandatory)
+		LexLocation location, boolean postMandatory, boolean statement)
 		throws ParserException, LexException
 	{
 		ASTExternalClauseList externals = null;
@@ -1352,7 +1352,15 @@ public class DefinitionReader extends SyntaxReader
 
 		if (postMandatory)	// Mandatory for standard implicit operations
 		{
-			checkFor(Token.POST, 2105, "Implicit operation must define == <stmt> or post condition");
+			if (statement)
+			{
+				checkFor(Token.POST, 2105, "Specification statement must define post condition");
+			}
+			else
+			{
+				checkFor(Token.POST, 2105, "Implicit operation must define == <stmt> or post condition");
+			}
+
 			postcondition = expr.readExpression();
 		}
 		else

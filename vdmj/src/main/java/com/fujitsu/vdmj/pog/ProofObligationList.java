@@ -359,4 +359,17 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		return count;
 	}
+
+	/**
+	 * Set a comment on the last obligation added.
+	 */
+	public ProofObligationList setMessage(String message)
+	{
+		for (ProofObligation po: this)
+		{
+			po.setMessage(message);
+		}
+
+		return this;
+	}
 }

@@ -156,8 +156,8 @@ public class POForIndexStatement extends POStatement
 		 */
 		POAssignmentDefinition def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
 		ctxt.push(new POLetDefContext(def));						// eg. let x = 1 in
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant).
+			setMessage("check invariant before for-loop"));
 		ctxt.pop();
 
 		/**
@@ -177,8 +177,8 @@ public class POForIndexStatement extends POStatement
 
 		def = new POAssignmentDefinition(var, vardef.getType(), varPlusBy(eby), vardef.getType());
 		ctxt.add(new POLetDefContext(def));							// let x = x + by in
-		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("invariant preservation for next for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
+			setMessage("invariant preservation for next for-loop"));
 
 		/**
 		 * The context stack now contains everything from the statement block, but we want to

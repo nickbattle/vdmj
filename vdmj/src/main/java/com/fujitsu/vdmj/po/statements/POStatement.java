@@ -108,6 +108,14 @@ public abstract class POStatement extends PONode
 	}
 
 	/**
+	 * Test whether this DOES cause a statement block to return.
+	 */
+	public boolean isReturn()
+	{
+		return stmttype.isReturn();
+	}
+
+	/**
 	 * State variables updated by this statement.
 	 */
 	public TCNameSet updatesState(POContextStack ctxt)

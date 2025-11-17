@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.modules;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -47,6 +48,7 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
+		POContextStack.reset();
 		
 		for (POModule m: this)
 		{

@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
@@ -58,6 +59,31 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class POContextStack extends Stack<POContext>
 {
+	/**
+	 * A limit to the number of path expansions that are permitted in one top-level
+	 * call to getAlternatives() -- ie. one operation analysis.
+	 */
+	private static final int ALT_PATH_LIMIT = 200;
+
+	/**
+	 * Definitions which have had their ALT paths reduced, due to excessive branching,
+	 * to meet the value above.
+	 */
+	private static PODefinitionSet reducedDefinitions = new PODefinitionSet();
+	
+	public static PODefinitionSet getReducedDefinitions()
+	{
+		return reducedDefinitions;
+	}
+
+	/**
+	 * Clear the reduced definitions globally, for a new POG run.
+	 */
+	public static void reset()
+	{
+		reducedDefinitions = new PODefinitionSet();
+	}
+
 	/**
 	 * The pushAt/popTo methods allow a push to record the current stack size and then
 	 * pop items back to that size easily. It is used in operation PO handling, where
@@ -120,10 +146,15 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
-		return getAlternatives(true);	// exclude ending paths by default
+		return getAlternatives(true, ALT_PATH_LIMIT);	// exclude ending paths by default
 	}
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
+	{
+		return getAlternatives(excludeReturns, ALT_PATH_LIMIT);	// exclude ending paths by default
+	}
+	
+	private List<POContextStack> getAlternatives(boolean excludeReturns, int limit)
 	{
 		List<POContextStack> results = new Vector<POContextStack>();
 		results.add(new POContextStack());
@@ -133,33 +164,67 @@ public class POContextStack extends Stack<POContext>
 			if (ctxt instanceof POAltContext)
 			{
 				POAltContext alt = (POAltContext)ctxt;
-				List<POContextStack> toAdd = new Vector<POContextStack>();
+				List<POContextStack> newResults = new Vector<POContextStack>();
+				int remaining = limit;
 				
-				for (POContextStack substack: alt.alternatives)
+				try
 				{
-					for (POContextStack alternative: substack.getAlternatives(excludeReturns))
+					for (POContextStack substack: alt.alternatives)
 					{
-						for (POContextStack original: results)
+						List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
+
+						remaining = remaining - subalternatives.size();
+						if (remaining < 1) remaining = 1;
+
+						for (POContextStack alternative: subalternatives)
 						{
-							POContextStack combined = new POContextStack();
-							combined.addAll(original);
-
-							if (!original.returnsEarly())
+							for (POContextStack original: results)
 							{
-								combined.addAll(alternative);
-							}
+								POContextStack combined = new POContextStack();
+								combined.addAll(original);
 
-							toAdd.add(combined);
+								if (!original.returnsEarly())
+								{
+									combined.addAll(alternative);
+								}
+
+								newResults.add(combined);
+
+								if (newResults.size() > limit)
+								{
+									throw new IllegalArgumentException();	// Too many
+								}
+							}
 						}
 					}
 				}
-				
-				results.clear();
-				results.addAll(toAdd);
+				catch (IllegalArgumentException e)		// newResults too large
+				{
+					if (getDefinition() != null)
+					{
+						// Add the name to list of definitions that are too complex.
+						reducedDefinitions.add(getDefinition());
+					}
+
+					// Trim newResults to the limit
+					newResults = newResults.subList(0, limit);
+				}
+				finally		// rebuild the results
+				{
+					results.clear();
+					results.addAll(newResults);
+				}
 			}
 			else
 			{
-				if (ctxt.returnsEarly())
+				if (ctxt.stops())
+				{
+					// An error statement is reached, so this control path aborts here and
+					// no further obligations are produced.
+
+					return new Vector<POContextStack>();
+				}
+				else if (ctxt.returnsEarly())
 				{
 					// This stack plays no part in further obligations, including any
 					// alternatives it contains. So immediately return nothing if we

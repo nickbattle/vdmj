@@ -24,15 +24,16 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
-public class MapApplyObligation extends ProofObligation
+public class AssertionObligation extends ProofObligation
 {
-	private MapApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
+	private AssertionObligation(LexLocation location, POExpression expression, POContextStack ctxt)
 	{
-		super(root.location, POType.MAP_APPLY, ctxt);
-		source = ctxt.getSource(poExpression + " in set dom " + root);
-		setObligationVars(ctxt, poExpression, root);
+		super(location, POType.SPEC_PRE_CONDITION, ctxt);
+		source = ctxt.getSource(expression.toString());
+		setObligationVars(ctxt, expression);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
@@ -40,13 +41,13 @@ public class MapApplyObligation extends ProofObligation
 	 * Create an obligation for each of the alternative stacks contained in the ctxt.
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
-	public static ProofObligationList getAllPOs(POExpression root, POExpression poExpression, POContextStack ctxt)
+	public static ProofObligationList getAllPOs(LexLocation location, POExpression exp, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new MapApplyObligation(root, poExpression, choice));
+			results.add(new AssertionObligation(location, exp, choice));
 		}
 		
 		return results;

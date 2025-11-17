@@ -62,6 +62,7 @@ import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -143,8 +144,8 @@ public class POForAllStatement extends POStatement
 		 * is empty therefore, but there are no loop variables bound.
 		 */
 		ctxt.push(new POLetDefContext(ghostDef));		// let ghost = {} in
-		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant));
-		obligations.lastElement().setMessage("check invariant before for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(invariant.location, ctxt, invariant).
+			setMessage("check invariant before for-loop"));
 		ctxt.pop();
 
 		PODefinitionList podefs = remPattern.getDefinitions(setType.setof);
@@ -189,8 +190,8 @@ public class POForAllStatement extends POStatement
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 
 		ctxt.push(new POLetDefContext(ghostUpdate(ghostDef)));					// ghost := ghost union {x}
-		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant));
-		obligations.lastElement().setMessage("invariant preservation for next for-loop");
+		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
+			setMessage("invariant preservation for next for-loop"));
 
 		/**
 		 * The context stack now contains everything from the statement block, but we want to
@@ -225,11 +226,14 @@ public class POForAllStatement extends POStatement
 		 * Finally, the loop may not have been entered if the set is empty, so we create
 		 * another alternative path with this condition and nothing else.
 		 */
-		ctxt.push(new POImpliesContext(isEmpty(eset)));
-		ctxt.push(new POCommentContext("Did not enter loop", location));
-		ctxt.push(new POLetDefContext(ghostDef));					// let ghost = {} in
-		ctxt.push(new POImpliesContext(invariant));					// invariant => ...
-		ctxt.popInto(popto, altCtxt.add());
+		if (!(setType instanceof TCSet1Type))	// set1 will always enter the loop
+		{
+			ctxt.push(new POImpliesContext(isEmpty(eset)));
+			ctxt.push(new POCommentContext("Did not enter loop", location));
+			ctxt.push(new POLetDefContext(ghostDef));					// let ghost = {} in
+			ctxt.push(new POImpliesContext(invariant));					// invariant => ...
+			ctxt.popInto(popto, altCtxt.add());
+		}
 
 		// The three alternatives in one added.
 		ctxt.push(altCtxt);
