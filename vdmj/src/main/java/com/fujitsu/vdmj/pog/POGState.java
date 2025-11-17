@@ -88,6 +88,14 @@ public class POGState
 	}
 
 	/**
+	 * As above, except search outer frames.
+	 */
+	public boolean isLocalName(TCNameToken name)
+	{
+		return hasLocalName(name) || (outerState != null && outerState.isLocalName(name));
+	}
+
+	/**
 	 * Declare new "dcl" local(s).
 	 */
 	public void addDclLocal(TCNameToken name)
