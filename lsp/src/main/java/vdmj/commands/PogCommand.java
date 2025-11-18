@@ -116,7 +116,8 @@ public class PogCommand extends AnalysisCommand
 			{
 				for (PODefinition def: POContextStack.getReducedDefinitions())
 				{
-					Console.out.printf("POs missing for %s\n", def.name.getExplicit(true));
+					Console.out.printf("POs missing for %s (%d paths)\n",
+						def.name.getExplicit(true), def.getAlternativePaths());
 				}
 			}
 

@@ -151,7 +151,7 @@ public class POContextStack extends Stack<POContext>
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
 	{
-		return getAlternatives(excludeReturns, ALT_PATH_LIMIT);	// exclude ending paths by default
+		return getAlternatives(excludeReturns, ALT_PATH_LIMIT);
 	}
 	
 	private List<POContextStack> getAlternatives(boolean excludeReturns, int limit)
@@ -219,7 +219,7 @@ public class POContextStack extends Stack<POContext>
 			{
 				if (ctxt.stops())
 				{
-					// An error statement is reached, so this control path aborts here and
+					// An "error" statement is reached, so this control path aborts here and
 					// no further obligations are produced.
 
 					return new Vector<POContextStack>();
@@ -251,6 +251,33 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return results;
+	}
+
+	/**
+	 * Calculate the number of alternative paths for the current stack. This is used in
+	 * error reporting when an operation is too complex.
+	 */
+	public long countAlternatives()
+	{
+		long count = 1;
+
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POAltContext)
+			{
+				POAltContext alt = (POAltContext)ctxt;
+				long newcount = 0;
+
+				for (POContextStack substack: alt.alternatives)
+				{
+					newcount += count * substack.countAlternatives();
+				}
+
+				count = newcount;
+			}
+		}
+
+		return count;
 	}
 
 	/**

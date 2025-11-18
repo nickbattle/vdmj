@@ -111,7 +111,8 @@ public class PogCommand extends AnalysisCommand
 		{
 			for (PODefinition def: POContextStack.getReducedDefinitions())
 			{
-				printf("POs missing for %s\n", def.name.getExplicit(true));
+				printf("POs missing for %s (%d paths)\n",
+					def.name.getExplicit(true), def.getAlternativePaths());
 			}
 		}
 		

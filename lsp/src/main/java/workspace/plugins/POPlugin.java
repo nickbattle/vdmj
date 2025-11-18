@@ -245,12 +245,15 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		// Add dummy POs for any operations with missing POs.
 		for (PODefinition def: POContextStack.getReducedDefinitions())
 		{
+			long paths = def.getAlternativePaths();
+
 			poList.add(new JSONObject(
 					"id",		0,		// Appears at the start of the list
 					"kind", 	"Missing POs",
 					"name",		new JSONArray(def.name.getModule(), def.name.getName()),
 					"location",	Utils.lexLocationToLocation(def.location),
-					"source",	new JSONArray("Operation is too complex to analyse. Some POs missing."),
+					"source",	new JSONArray(
+						"Operation is too complex (" + paths + " paths). Some POs missing."),
 					"status",	POStatus.FAILED.toString()));
 		}
 

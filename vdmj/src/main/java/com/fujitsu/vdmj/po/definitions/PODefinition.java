@@ -213,6 +213,15 @@ public abstract class PODefinition extends PONode implements Comparable<PODefini
 	}
 
 	/**
+	 * The number of alternative context paths through an operation. This is defined by
+	 * explicit and implicit operations only.
+	 */
+	public long getAlternativePaths()
+	{
+		return 0;
+	}
+
+	/**
 	 * Implemented by all definitions to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg);

@@ -81,6 +81,8 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final PODefinitionSet transitiveCalls;
 	public final TCNameSet transitiveUpdates;
 
+	public long alternativePaths = 0;
+
 	public POExplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name, TCOperationType type,
 		POPatternList parameters, POExpression precondition,
@@ -201,13 +203,13 @@ public class POExplicitOperationDefinition extends PODefinition
 				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 			}
 			
+			alternativePaths = ctxt.countAlternatives();
 			ctxt.popTo(popto);
 		}
 		else if (classDefinition != null)
 		{
-			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), true));
+			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 			ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
-			ctxt.pop();
 			
 			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
 			{
@@ -219,6 +221,8 @@ public class POExplicitOperationDefinition extends PODefinition
 			}
 				
 			obligations.addAll(oblist);
+			alternativePaths = ctxt.countAlternatives();
+			ctxt.popTo(popto);
 		}
 		else	// Flat spec with no state defined
 		{
@@ -230,6 +234,7 @@ public class POExplicitOperationDefinition extends PODefinition
 				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 			}
 			
+			alternativePaths = ctxt.countAlternatives();
 			ctxt.popTo(popto);
 		}
 
@@ -286,6 +291,12 @@ public class POExplicitOperationDefinition extends PODefinition
 	public TCTypeSet getPossibleExceptions()
 	{
 		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
+	}
+
+	@Override
+	public long getAlternativePaths()
+	{
+		return alternativePaths;
 	}
 
 	@Override
