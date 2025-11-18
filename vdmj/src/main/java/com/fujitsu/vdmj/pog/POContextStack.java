@@ -30,6 +30,7 @@ import java.util.ListIterator;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
@@ -59,12 +60,6 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class POContextStack extends Stack<POContext>
 {
-	/**
-	 * A limit to the number of path expansions that are permitted in one top-level
-	 * call to getAlternatives() -- ie. one operation analysis.
-	 */
-	private static final int ALT_PATH_LIMIT = 200;
-
 	/**
 	 * Definitions which have had their ALT paths reduced, due to excessive branching,
 	 * to meet the value above.
@@ -146,12 +141,13 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
-		return getAlternatives(true, ALT_PATH_LIMIT);	// exclude ending paths by default
+		// exclude return paths by default
+		return getAlternatives(true);
 	}
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
 	{
-		return getAlternatives(excludeReturns, ALT_PATH_LIMIT);
+		return getAlternatives(excludeReturns, Properties.pog_max_alt_paths);
 	}
 	
 	private List<POContextStack> getAlternatives(boolean excludeReturns, int limit)
