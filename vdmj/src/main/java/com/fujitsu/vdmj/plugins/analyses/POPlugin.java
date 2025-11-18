@@ -45,6 +45,8 @@ import com.fujitsu.vdmj.plugins.commands.PogCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 /**
@@ -141,6 +143,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				{
 					println("Generated " + plural(list.size(), "proof obligation", "s") + ":\n");
 					printf("%s", list.toString());
+
+					for (PODefinition def: POContextStack.getReducedDefinitions())
+					{
+						printf("POs missing for %s\n", def.name.getExplicit(true));
+					}
 					
 					if (list.countErrors() > 0)
 					{
