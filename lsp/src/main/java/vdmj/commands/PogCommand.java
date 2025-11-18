@@ -25,6 +25,8 @@
 package vdmj.commands;
 
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -109,6 +111,14 @@ public class PogCommand extends AnalysisCommand
 
 			// Use stdout, to match the QC command output format
 			Console.out.print(sb.toString());
+
+			if (argv.length == 1)
+			{
+				for (PODefinition def: POContextStack.getReducedDefinitions())
+				{
+					Console.out.printf("POs missing for %s\n", def.name.getExplicit(true));
+				}
+			}
 
 			return new DAPMessageList(request);
 		}

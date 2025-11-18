@@ -33,6 +33,9 @@ import java.util.Vector;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -239,6 +242,17 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			poList.add(json);
 		}
 
+		// Add dummy POs for any operations with missing POs.
+		for (PODefinition def: POContextStack.getReducedDefinitions())
+		{
+			poList.add(new JSONObject(
+					"id",		0,		// Appears at the start of the list
+					"kind", 	"Missing POs",
+					"name",		new JSONArray(def.name.getModule(), def.name.getName()),
+					"location",	Utils.lexLocationToLocation(def.location),
+					"source",	new JSONArray("Operation is too complex to analyse. Some POs missing."),
+					"status",	POStatus.FAILED.toString()));
+		}
 
 		RPCMessageList response = new RPCMessageList(request, poList);
 		response.addAll(MessageHub.getInstance().getDiagnosticResponses());
