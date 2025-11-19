@@ -528,7 +528,8 @@ public class QuickCheck
 				execResult = new BooleanValue(false);
 				timedOut = true;
 			}
-			else if (e.number == 4024)	// 'not yet specified' expression reached
+			else if (e.number == 4024 ||	// 'not yet specified' expression reached
+					 e.number == 4)			// 'Cannot get bind values for type' (from a func call?)
 			{
 				// MAYBE, in effect - execCompleted will be false
 				execResult = new BooleanValue(!po.isExistential());

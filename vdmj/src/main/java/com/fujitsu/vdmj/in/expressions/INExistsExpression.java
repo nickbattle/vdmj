@@ -77,22 +77,25 @@ public class INExistsExpression extends INExpression
 
 			for (INMultipleBind mb: bindList)
 			{
-				ValueList bvals = null;
-
 				if (bindsUsed)
 				{
-					bvals = mb.getBindValues(ctxt, false);
+					ValueList bvals = mb.getBindValues(ctxt, false);
+
+					for (INPattern p: mb.plist)
+					{
+						Quantifier q = new Quantifier(p, bvals);
+						quantifiers.add(q);
+					}
 				}
 				else
 				{
 					// None of the bindings are used, so just set undefined
-					bvals = new ValueList(new UndefinedValue());
-				}
 
-				for (INPattern p: mb.plist)
-				{
-					Quantifier q = new Quantifier(p, bvals);
-					quantifiers.add(q);
+					for (INPattern p: mb.plist)
+					{
+						Quantifier q = new Quantifier(p);
+						quantifiers.add(q);
+					}
 				}
 			}
 

@@ -44,24 +44,38 @@ public class Quantifier
 		this.nvlist = new Vector<NameValuePairList>(values.size());
 	}
 
+	public Quantifier(INPattern pattern)
+	{
+		this.pattern = pattern;
+		this.values = null;
+		this.nvlist = new Vector<NameValuePairList>(1);
+	}
+
 	public int size(Context ctxt, boolean allPossibilities)
 	{
-		for (Value value: values)
+		if (values == null)		// Create one undefined binding for the pattern names
 		{
-			try
+			nvlist.add(pattern.getUndefinedValues());
+		}
+		else
+		{
+			for (Value value: values)
 			{
-				if (allPossibilities)
+				try
 				{
-					nvlist.addAll(pattern.getAllNamedValues(value, ctxt));
+					if (allPossibilities)
+					{
+						nvlist.addAll(pattern.getAllNamedValues(value, ctxt));
+					}
+					else
+					{
+						nvlist.add(pattern.getNamedValues(value, ctxt));
+					}
 				}
-				else
+				catch (PatternMatchException e)
 				{
-					nvlist.add(pattern.getNamedValues(value, ctxt));
+					// Should never happen
 				}
-			}
-			catch (PatternMatchException e)
-			{
-				// Should never happen
 			}
 		}
 		
