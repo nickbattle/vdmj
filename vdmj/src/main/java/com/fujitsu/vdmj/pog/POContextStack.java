@@ -165,6 +165,15 @@ public class POContextStack extends Stack<POContext>
 				
 				try
 				{
+					// First add the returnsEarly originals once, because these won't change
+					for (POContextStack original: results)
+					{
+						if (original.returnsEarly())
+						{
+							newResults.add(original);
+						}					
+					}
+
 					for (POContextStack substack: alt.alternatives)
 					{
 						List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
@@ -176,19 +185,17 @@ public class POContextStack extends Stack<POContext>
 						{
 							for (POContextStack original: results)
 							{
-								POContextStack combined = new POContextStack();
-								combined.addAll(original);
-
 								if (!original.returnsEarly())
 								{
+									POContextStack combined = new POContextStack();
+									combined.addAll(original);
 									combined.addAll(alternative);
-								}
+									newResults.add(combined);
 
-								newResults.add(combined);
-
-								if (newResults.size() > limit)
-								{
-									throw new IllegalArgumentException();	// Too many
+									if (newResults.size() > limit)
+									{
+										throw new IllegalArgumentException();	// Too many
+									}
 								}
 							}
 						}
