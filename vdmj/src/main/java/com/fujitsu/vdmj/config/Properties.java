@@ -67,7 +67,11 @@ public class Properties
 	
 	/** The maximum TC errors reported before "Too many errors". */
 	public static int tc_max_errors = 100;
-	
+
+
+	/** The maximum number of paths in an operation before POG starts limiting them */
+	public static int pog_max_alt_paths = 200;
+
 	
 	/** The default timeslice (statements executed) for a FCFS policy */
 	public static int scheduler_fcfs_timeslice = 10;
@@ -202,6 +206,8 @@ public class Properties
 		tc_skip_recursive_check = get(vdmj, "vdmj.tc.skip_recursive_check", false);
 		tc_skip_cyclic_check = get(vdmj, "vdmj.tc.skip_cyclic_check", false);
 		tc_max_errors = get(vdmj, "vdmj.tc.max_errors", 100);
+
+		pog_max_alt_paths = get(vdmj, "vdmj.pog.max_alt_paths", 200);
 		
 		scheduler_fcfs_timeslice = get(vdmj, "vdmj.scheduler.fcfs_timeslice", 10);
 		scheduler_virtual_timeslice = get(vdmj, "vdmj.scheduler.virtual_timeslice", 10000);

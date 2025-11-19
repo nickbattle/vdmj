@@ -134,9 +134,9 @@ public class POAssignmentStatement extends POStatement
 			ctxt.push(new POAmbiguousContext("assignment", new TCNameList(update), exp.location));
 		}
 
-		if (!inConstructor &&
-			(classDefinition != null && classDefinition.invariant != null) ||
-			(stateDefinition != null && stateDefinition.invExpression != null))
+		if (!inConstructor && !pogState.isLocalName(update) &&
+			((classDefinition != null && classDefinition.invariant != null) ||
+			 (stateDefinition != null && stateDefinition.invExpression != null)))
 		{
 			obligations.addAll(StateInvariantObligation.getAllPOs(this, ctxt));
 		}

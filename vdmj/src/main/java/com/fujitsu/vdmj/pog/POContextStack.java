@@ -30,6 +30,7 @@ import java.util.ListIterator;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
@@ -59,12 +60,6 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class POContextStack extends Stack<POContext>
 {
-	/**
-	 * A limit to the number of path expansions that are permitted in one top-level
-	 * call to getAlternatives() -- ie. one operation analysis.
-	 */
-	private static final int ALT_PATH_LIMIT = 200;
-
 	/**
 	 * Definitions which have had their ALT paths reduced, due to excessive branching,
 	 * to meet the value above.
@@ -146,12 +141,13 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public List<POContextStack> getAlternatives()
 	{
-		return getAlternatives(true, ALT_PATH_LIMIT);	// exclude ending paths by default
+		// exclude return paths by default
+		return getAlternatives(true);
 	}
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
 	{
-		return getAlternatives(excludeReturns, ALT_PATH_LIMIT);	// exclude ending paths by default
+		return getAlternatives(excludeReturns, Properties.pog_max_alt_paths);
 	}
 	
 	private List<POContextStack> getAlternatives(boolean excludeReturns, int limit)
@@ -165,10 +161,25 @@ public class POContextStack extends Stack<POContext>
 			{
 				POAltContext alt = (POAltContext)ctxt;
 				List<POContextStack> newResults = new Vector<POContextStack>();
+				List<POContextStack> dontReturn = new Vector<POContextStack>();
 				int remaining = limit;
 				
 				try
 				{
+					// First add the returnsEarly originals once, because these won't change
+					for (POContextStack original: results)
+					{
+						if (original.returnsEarly())
+						{
+							newResults.add(original);
+						}
+						else
+						{
+							dontReturn.add(original);
+						}				
+					}
+
+					// Then append the alternative expansions to the dontReturn remainers
 					for (POContextStack substack: alt.alternatives)
 					{
 						List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
@@ -178,16 +189,11 @@ public class POContextStack extends Stack<POContext>
 
 						for (POContextStack alternative: subalternatives)
 						{
-							for (POContextStack original: results)
+							for (POContextStack original: dontReturn)
 							{
 								POContextStack combined = new POContextStack();
 								combined.addAll(original);
-
-								if (!original.returnsEarly())
-								{
-									combined.addAll(alternative);
-								}
-
+								combined.addAll(alternative);
 								newResults.add(combined);
 
 								if (newResults.size() > limit)
@@ -219,7 +225,7 @@ public class POContextStack extends Stack<POContext>
 			{
 				if (ctxt.stops())
 				{
-					// An error statement is reached, so this control path aborts here and
+					// An "error" statement is reached, so this control path aborts here and
 					// no further obligations are produced.
 
 					return new Vector<POContextStack>();
@@ -251,6 +257,33 @@ public class POContextStack extends Stack<POContext>
 		}
 		
 		return results;
+	}
+
+	/**
+	 * Calculate the number of alternative paths for the current stack. This is used in
+	 * error reporting when an operation is too complex.
+	 */
+	public long countAlternatives()
+	{
+		long count = 1;
+
+		for (POContext ctxt: this)
+		{
+			if (ctxt instanceof POAltContext)
+			{
+				POAltContext alt = (POAltContext)ctxt;
+				long newcount = 0;
+
+				for (POContextStack substack: alt.alternatives)
+				{
+					newcount += count * substack.countAlternatives();
+				}
+
+				count = newcount;
+			}
+		}
+
+		return count;
 	}
 
 	/**

@@ -105,9 +105,9 @@ public class POCasesStatement extends POStatement
 			int before = ctxt.size();
 			obligations.addAll(others.getProofObligations(ctxt, pogState, env));
 			hasEffect = hasEffect || ctxt.size() > before;
-			ctxt.copyInto(base, altContext.add());
 		}
-
+		
+		ctxt.copyInto(base, altContext.add());	// Even if no others
 		ctxt.popTo(base);
 
 		if (hasEffect)

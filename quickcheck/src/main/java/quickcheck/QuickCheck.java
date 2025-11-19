@@ -250,7 +250,11 @@ public class QuickCheck
 			
 			for (Integer n: poList)
 			{
-				if (n > 0 && n <= all.size())
+				if (n == 0)
+				{
+					continue;	// Zero used for dummy "Missing POs"
+				}
+				else if (n > 0 && n <= all.size())
 				{
 					chosenPOs.add(all.get(n-1));
 				}
