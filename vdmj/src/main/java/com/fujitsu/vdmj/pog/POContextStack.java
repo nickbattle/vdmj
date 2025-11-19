@@ -161,6 +161,7 @@ public class POContextStack extends Stack<POContext>
 			{
 				POAltContext alt = (POAltContext)ctxt;
 				List<POContextStack> newResults = new Vector<POContextStack>();
+				List<POContextStack> dontReturn = new Vector<POContextStack>();
 				int remaining = limit;
 				
 				try
@@ -171,9 +172,14 @@ public class POContextStack extends Stack<POContext>
 						if (original.returnsEarly())
 						{
 							newResults.add(original);
-						}					
+						}
+						else
+						{
+							dontReturn.add(original);
+						}				
 					}
 
+					// Then append the alternative expansions to the dontReturn remainers
 					for (POContextStack substack: alt.alternatives)
 					{
 						List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
@@ -183,19 +189,16 @@ public class POContextStack extends Stack<POContext>
 
 						for (POContextStack alternative: subalternatives)
 						{
-							for (POContextStack original: results)
+							for (POContextStack original: dontReturn)
 							{
-								if (!original.returnsEarly())
-								{
-									POContextStack combined = new POContextStack();
-									combined.addAll(original);
-									combined.addAll(alternative);
-									newResults.add(combined);
+								POContextStack combined = new POContextStack();
+								combined.addAll(original);
+								combined.addAll(alternative);
+								newResults.add(combined);
 
-									if (newResults.size() > limit)
-									{
-										throw new IllegalArgumentException();	// Too many
-									}
+								if (newResults.size() > limit)
+								{
+									throw new IllegalArgumentException();	// Too many
 								}
 							}
 						}
