@@ -523,7 +523,7 @@ public class LSPPlugin extends AnalysisPlugin
 								
 								for (File file: found)
 								{
-									Diag.fine("Glob: %s", file);
+									Diag.fine("Matched: %s", file);
 								}
 								
 								contents.addAll(found);

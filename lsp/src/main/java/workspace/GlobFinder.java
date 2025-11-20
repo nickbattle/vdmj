@@ -65,7 +65,9 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 
 	private void match(Path file)
 	{
-		if (matcher.matches(file))
+		Path simple = file.getFileName();	// Get the last part of the name
+
+		if (matcher.matches(file) || matcher.matches(simple))
 		{
 			// Note, use the absolute file here, rather than canonical. The former
 			// will respect symlink-opened folder names/files, whereas the canoncial
