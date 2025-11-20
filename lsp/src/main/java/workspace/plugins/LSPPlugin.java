@@ -517,7 +517,8 @@ public class LSPPlugin extends AnalysisPlugin
 							try
 							{
 								GlobFinder finder = new GlobFinder(source);
-								Files.walkFileTree(Paths.get(""), finder);
+								// Use rootUri rather than cwd, to allow for symlinks
+								Files.walkFileTree(Paths.get(rootUri.toURI()), finder);
 								List<File> found = finder.getMatches();
 								
 								for (File file: found)

@@ -67,14 +67,10 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 	{
 		if (matcher.matches(file))
 		{
-			try
-			{
-				matches.add(file.toFile().getCanonicalFile());
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
+			// Note, use the absolute file here, rather than canonical. The former
+			// will respect symlink-opened folder names/files, whereas the canoncial
+			// method converts them to non-symlinked names (which don't match later).
+			matches.add(file.toFile().getAbsoluteFile());
 		}
 	}
 
