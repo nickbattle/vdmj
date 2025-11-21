@@ -73,6 +73,11 @@ public class GlobTest
 		assertEquals(3, finder.getMatches().size());
 		System.out.println(finder.getMatches());
 		
+		finder = new GlobFinder("*.vdmsl");	// All three, because of "simple" match
+		Files.walkFileTree(Paths.get(temp.getAbsolutePath()), finder);
+		assertEquals(3, finder.getMatches().size());
+		System.out.println(finder.getMatches());
+		
 		finder = new GlobFinder("**subfolder");		// Find both
 		Files.walkFileTree(Paths.get(temp.getAbsolutePath()), finder);
 		assertEquals(2, finder.getMatches().size());

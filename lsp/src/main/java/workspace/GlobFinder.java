@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -95,23 +94,5 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 	{
 		Diag.error(exc);
 		return FileVisitResult.CONTINUE;
-	}
-	
-	public static void main(String[] args) throws IOException
-	{
-		Diag.init(true);
-		
-		for (int i=0; i<args.length; i++)
-		{
-			GlobFinder finder = new GlobFinder(args[i]);
-			Files.walkFileTree(Paths.get(""), finder);
-			
-			System.out.println("Pattern " + args[i] + "...");
-			
-			for (File file: finder.getMatches())
-			{
-				System.out.println(file);
-			}
-		}
 	}
 }
