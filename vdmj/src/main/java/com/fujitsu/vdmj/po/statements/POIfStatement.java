@@ -83,12 +83,12 @@ public class POIfStatement extends POStatement
 		POExpression extracted = extractOpCalls(ifExp, obligations, pogState, ctxt, env);
 		obligations.addAll(extracted.getProofObligations(ctxt, pogState, env));
 		
-		int base = ctxt.pushAt(new POImpliesContext(ifExp));
+		int base = ctxt.pushAt(new POImpliesContext(extracted));
 		obligations.addAll(thenStmt.getProofObligations(ctxt, pogState, env));
 		hasEffect = ctxt.size() > base + 1;
 		ctxt.popInto(base, altContext.add());
 
-		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
+		ctxt.push(new PONotImpliesContext(extracted));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
