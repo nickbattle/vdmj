@@ -539,8 +539,8 @@ public class DefinitionReader extends SyntaxReader
 				def.setAnnotations(annotations);
 				def.setComments(comments);
 
-				// Force all type defs (invs) to be static
-				def.setAccessSpecifier(access.getStatic(true));
+				// Force all type defs (invs) to be static and pure
+				def.setAccessSpecifier(access.getModified(true, true));
 				list.add(def);
 
 				if (!newSection())
@@ -577,7 +577,7 @@ public class DefinitionReader extends SyntaxReader
 				def.setComments(comments);
 
 				// Force all values to be static
-				def.setAccessSpecifier(access.getStatic(true));
+				def.setAccessSpecifier(access.getModified(true, false));
 				list.add(def);
 
 				if (!newSection())
@@ -615,8 +615,8 @@ public class DefinitionReader extends SyntaxReader
 
 				if (Settings.release == Release.VDM_10)
 				{
-					// Force all functions to be static for VDM-10
-					def.setAccessSpecifier(access.getStatic(true));
+					// Force all functions to be static and pure for VDM-10
+					def.setAccessSpecifier(access.getModified(true, true));
 				}
 				else
 				{

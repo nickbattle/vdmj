@@ -52,9 +52,9 @@ public class ASTAccessSpecifier extends ASTNode
 		this.isPure = pure;
 	}
 
-	public ASTAccessSpecifier getStatic(boolean asStatic)
+	public ASTAccessSpecifier getModified(boolean asStatic, boolean asPure)
 	{
-		return new ASTAccessSpecifier(asStatic, isAsync, access, isPure);
+		return new ASTAccessSpecifier(asStatic, isAsync, access, asPure);
 	}
 
 	@Override

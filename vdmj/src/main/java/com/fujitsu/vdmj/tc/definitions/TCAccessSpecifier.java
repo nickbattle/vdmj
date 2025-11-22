@@ -51,9 +51,9 @@ public class TCAccessSpecifier extends TCNode
 		this.isPure = pure;
 	}
 
-	public TCAccessSpecifier getStatic(boolean asStatic)
+	public TCAccessSpecifier getModified(boolean asStatic, boolean asPure)
 	{
-		return new TCAccessSpecifier(asStatic, isAsync, access, isPure);
+		return new TCAccessSpecifier(asStatic, isAsync, access, asPure);
 	}
 
 	public boolean narrowerThan(TCAccessSpecifier other)

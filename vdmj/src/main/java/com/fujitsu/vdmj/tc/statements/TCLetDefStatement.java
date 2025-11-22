@@ -79,7 +79,7 @@ public class TCLetDefStatement extends TCStatement
 				{
 					TCClassDefinition cdef = env.findClassDefinition();
 					d.setClassDefinition(cdef);
-					d.setAccessSpecifier(d.accessSpecifier.getStatic(true));
+					d.setAccessSpecifier(d.accessSpecifier.getModified(true, true));
 				}
 
 				d.typeCheck(local, scope);
