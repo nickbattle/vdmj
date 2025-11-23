@@ -262,7 +262,7 @@ public class LSPPlugin extends AnalysisPlugin
 		throws Exception
 	{
 		this.clientInfo = clientInfo;
-		this.rootUri = rootUri;
+		this.rootUri = rootUri;			// Note, this can be a symlink path, so don't use getCanonicalName!
 		this.clientCapabilities = clientCapabilities;
 		this.openFiles.clear();
 		
@@ -517,12 +517,13 @@ public class LSPPlugin extends AnalysisPlugin
 							try
 							{
 								GlobFinder finder = new GlobFinder(source);
-								Files.walkFileTree(Paths.get(""), finder);
+								// Use rootUri rather than cwd, to allow for symlinked projects
+								Files.walkFileTree(Paths.get(rootUri.toURI()), finder);
 								List<File> found = finder.getMatches();
 								
 								for (File file: found)
 								{
-									Diag.fine("Glob: %s", file);
+									Diag.fine("Matched: %s", file);
 								}
 								
 								contents.addAll(found);
@@ -535,8 +536,9 @@ public class LSPPlugin extends AnalysisPlugin
 						}
 						else
 						{
-							// Use canonical file to allow "./folder/file"
-							File item = new File(rootUri, source).getCanonicalFile();
+							File item = new File(rootUri, source);
+							// Get rid of any "./" or "/./" parts via NIO.
+							item = item.toPath().normalize().toFile();
 							contents.add(item);
 						}
 					}

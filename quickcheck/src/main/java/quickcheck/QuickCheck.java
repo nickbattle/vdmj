@@ -528,13 +528,12 @@ public class QuickCheck
 				execResult = new BooleanValue(false);
 				timedOut = true;
 			}
-			else if (e.number == 4024 ||	// 'not yet specified' expression reached
-					 e.number == 4)			// 'Cannot get bind values for type' (from a func call?)
+			else if (maybeException(e))
 			{
 				// MAYBE, in effect - execCompleted will be false
 				execResult = new BooleanValue(!po.isExistential());
 			}
-			else if (internalException(e))
+			else if (internalException(e))	// PP/RT issues
 			{
 				execResult = new UndefinedValue();	// Gives MAYBE
 				po.clearAnalysis();
@@ -582,6 +581,24 @@ public class QuickCheck
 			verbose("PO #%d, stopped evaluation.\n", po.number);
 			INAnnotation.suspend(false);
 			Properties.in_undefined_evals = false;		// Always disable on restore
+		}
+	}
+
+	/**
+	 * These exceptions should cause a MAYBE result, because they indicate that something
+	 * about the specification is incomplete or "a known issue"
+	 */
+	private boolean maybeException(ContextException e)
+	{
+		switch (e.number)
+		{
+			case 4024:	// 'not yet specified' expression reached
+			case 4051:	// Cannot apply implicit function
+			case 4:		// 'Cannot get bind values for type' (from a func call?)
+				return true;
+
+			default:
+				return false;
 		}
 	}
 

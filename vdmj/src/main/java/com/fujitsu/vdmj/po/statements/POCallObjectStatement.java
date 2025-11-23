@@ -117,7 +117,10 @@ public class POCallObjectStatement extends POStatement
 		
 		if (rtype != null && getStmttype().isReturn() && !TypeComparator.isSubType(getStmttype(), rtype))
 		{
-			obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
+			if (!isConstructor(fdef))	// Can return their superclass' type (see TC)
+			{
+				obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
+			}
 		}
 		
 		return obligations;

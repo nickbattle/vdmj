@@ -35,6 +35,9 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POInheritedDefinition;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionOperationExtractor;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
@@ -287,6 +290,31 @@ public abstract class POStatement extends PONode
 			return definitions;		// Caller decides if this is ambiguous
 		}
 	}
+
+	/**
+	 * Test whether a definition is a class constructor.
+	 */
+	public static boolean isConstructor(PODefinition def)
+	{
+		if (def instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition op = (POExplicitOperationDefinition)def;
+			return op.isConstructor;
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition op = (POImplicitOperationDefinition)def;
+			return op.isConstructor;
+		}
+		else if (def instanceof POInheritedDefinition)
+		{
+			POInheritedDefinition op = (POInheritedDefinition)def;
+			return isConstructor(op.superdef);
+		}
+		
+		return false;
+	}
+
 
 	/**
 	 * Implemented by all definitions to allow visitor processing.

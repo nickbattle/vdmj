@@ -6,5 +6,5 @@ end A
 class Test
 functions
 	f: A -> nat
-	f(a) == a.iv;
+	f(a) == a.iv;	-- allowed, as object is passed as data?
 end Test

@@ -632,7 +632,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		// their expression can directly refer to instance variables, even
 		// though at runtime these are passed via a "self" parameter.
 
-		def.setAccessSpecifier(accessSpecifier.getStatic(false));
+		def.setAccessSpecifier(accessSpecifier.getModified(false, true));
 		def.classDefinition = classDefinition;
 		def.stateDefinition = stateDefinition;
 		return def;
@@ -680,7 +680,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		// their expression can directly refer to instance variables, even
 		// though at runtime these are passed via a "self" parameter.
 
-		def.setAccessSpecifier(accessSpecifier.getStatic(false));
+		def.setAccessSpecifier(accessSpecifier.getModified(false, true));
 		def.classDefinition = classDefinition;
 		def.stateDefinition = stateDefinition;
 		return def;
