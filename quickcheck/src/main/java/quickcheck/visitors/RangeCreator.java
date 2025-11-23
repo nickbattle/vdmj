@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassInvariantDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -233,14 +234,15 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			if (def instanceof TCInstanceVariableDefinition)
 			{
 				TCInstanceVariableDefinition idef = (TCInstanceVariableDefinition)def;
-				boolean generateValue = false;
+				boolean generateValue = true;
 
-				if (idef.expression != null)	// Use initializer, if there is one
+				if (!(idef.expression instanceof TCUndefinedExpression))	// Use initializer, if there is one
 				{
 					try
 					{
 						INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(idef.expression);
 						members.put(new NameValuePair(idef.name, inexp.eval(ctxt)));
+						generateValue = false;
 					}
 					catch (Exception e)
 					{
