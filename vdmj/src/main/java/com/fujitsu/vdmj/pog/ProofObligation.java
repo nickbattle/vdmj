@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.pog;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -278,6 +279,42 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			this.reasonsAbout.addAll(set);
 		}
+	}
+
+	/**
+	 * Analyse a context stack and break it into a map of PO line numbers to contexts.
+	 * The lines are individual forall or exists contexts in the stack.
+	 */
+	@SuppressWarnings("unused")
+	private Stack<Context> analyseContext(Context path)
+	{
+		Stack<Context> stack = new Stack<Context>();
+		int level = 1;
+		Context current = new Context(path.location, "Path " + level, null);
+		Context ctxt = path;
+		
+		while (ctxt != null && ctxt.outer != null)
+		{
+			for (TCNameToken key: ctxt.keySet())
+			{
+				// Only update unknown values, so "most recent" values show
+				if (!current.containsKey(key))
+				{
+					current.put(key, ctxt.get(key));
+				}
+			}
+
+			if (ctxt.title.equals("forall") || ctxt.title.equals("exists"))
+			{
+				stack.push(current);
+				level++;
+				current = new Context(ctxt.location, "Path " + level, null);
+			}
+
+			ctxt = ctxt.outer;
+		}
+
+		return stack;
 	}
 	
 	/**
