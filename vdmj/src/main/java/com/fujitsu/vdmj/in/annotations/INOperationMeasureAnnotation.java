@@ -55,8 +55,6 @@ public class INOperationMeasureAnnotation extends INAnnotation
 
 	public void called(Context ctxt) throws ValueException
 	{
-		String message = null;
-
 		try
 		{
 			long tid = Thread.currentThread().getId();
@@ -76,7 +74,7 @@ public class INOperationMeasureAnnotation extends INAnnotation
 
 				if (lastMeasure != null && currentMeasure.compareTo(lastMeasure) >= 0)
 				{
-					message = "Measure failure: current " + currentMeasure + ", previous " + lastMeasure;
+					String message = "Measure failure: current " + currentMeasure + ", previous " + lastMeasure;
 					measureValues.clear();	// Re-initialise measure counters etc. for failure
 					throw new ValueException(4146, message, ctxt);
 				}
@@ -86,7 +84,7 @@ public class INOperationMeasureAnnotation extends INAnnotation
 		}
 		catch (Exception e)
 		{
-			message = "Operation measure failed: " + e.getMessage();
+			String message = "Operation measure failed: " + e.getMessage();
 			throw new ValueException(4146, message, ctxt);
 		}
 	}
