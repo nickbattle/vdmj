@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.ExitException;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -400,7 +401,18 @@ public class OperationValue extends Value
 				}
 			}
 
-    		rv = body.eval(argContext);
+			try
+			{
+    			rv = body.eval(argContext);
+			}
+			catch (ExitException e)
+			{
+				// If operations throw exceptions, we don't know how to handle the measure
+				// so we nullify the annotation from here on.
+				
+				measure = null;
+				throw e;
+			}
 
 			if (measure != null)
 			{

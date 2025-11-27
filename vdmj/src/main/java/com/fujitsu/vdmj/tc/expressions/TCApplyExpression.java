@@ -35,7 +35,9 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -161,6 +163,20 @@ public class TCApplyExpression extends TCExpression
 			{
 				TCFieldExpression exp = (TCFieldExpression)root;
 				opdef = env.findName(exp.memberName, scope);
+			}
+
+			if (opdef != null && opdef == enclfunc)
+			{
+				if (opdef instanceof TCExplicitOperationDefinition)
+				{
+					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)opdef;
+					exop.recursive = true;
+				}
+				else if (opdef instanceof TCImplicitOperationDefinition)
+				{
+					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)opdef;
+					imop.recursive = true;
+				}
 			}
 			
 			TCOperationType ot = type.getOperation();

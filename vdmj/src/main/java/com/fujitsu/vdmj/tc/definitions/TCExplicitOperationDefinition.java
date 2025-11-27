@@ -80,6 +80,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
 	public TCTypeSet possibleExceptions = null;
+	public boolean recursive = false;	// Direct recursive call
 	public TCNameSet localUpdates = null;
 	public TCNameSet transitiveUpdates = null;
 	public TCDefinitionSet transitiveCalls = null;

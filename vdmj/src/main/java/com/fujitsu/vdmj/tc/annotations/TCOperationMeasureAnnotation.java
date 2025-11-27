@@ -54,7 +54,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	public void tcAfter(TCDefinition def, TCType optype, Environment env, NameScope scope)
 	{
 		if (!def.isOperation())
 		{
@@ -62,11 +62,51 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 		}
 		else if (args.size() != 1)
 		{
-			name.report(6007, "@OperationMeasure arg: <numeric expression>");
+			name.report(6006, "@OperationMeasure arg: <numeric expression>");
 		}
 		else
 		{
-			Environment params = getParamEnvironment(def, env);
+			TCDefinitionList defs = new TCDefinitionList();
+			Environment params = null;
+
+			if (def instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+
+				if (!exop.recursive)
+				{
+					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
+				}
+
+				Iterator<TCType> titer = exop.type.parameters.iterator();
+
+				for (TCPattern p: exop.parameterPatterns)
+				{
+					TCType ptype = titer.next();
+					defs.addAll(p.getDefinitions(ptype, ptype.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
+				}
+
+				params = new FlatEnvironment(defs, env);
+			}
+			else if (def instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+
+				if (!imop.recursive)
+				{
+					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
+				}
+
+				TCDefinitionList paramDefinitions = new TCDefinitionList();
+
+				for (TCPatternListTypePair ptp: imop.parameterPatterns)
+				{
+					paramDefinitions.addAll(ptp.getDefinitions(ptp.type.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
+				}
+
+				params = new FlatEnvironment(defs, env);
+			}
+
 			TCType type = args.firstElement().typeCheck(params, null, scope, null);
 
 			if (type.isNumeric(type.location))
@@ -85,35 +125,6 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 				name.detail("Actual", type.toString());
 			}
 		}
-	}
-
-	private Environment getParamEnvironment(TCDefinition def, Environment env)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		if (def instanceof TCExplicitOperationDefinition)
-		{
-			TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-			Iterator<TCType> titer = exop.type.parameters.iterator();
-
-			for (TCPattern p: exop.parameterPatterns)
-			{
-				TCType ptype = titer.next();
-				defs.addAll(p.getDefinitions(ptype, ptype.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
-			}
-		}
-		else if (def instanceof TCImplicitOperationDefinition)
-		{
-			TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-			TCDefinitionList paramDefinitions = new TCDefinitionList();
-
-			for (TCPatternListTypePair ptp: imop.parameterPatterns)
-			{
-				paramDefinitions.addAll(ptp.getDefinitions(ptp.type.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
-			}
-		}
-
-		return new FlatEnvironment(defs, env);
 	}
 
 	@Override
