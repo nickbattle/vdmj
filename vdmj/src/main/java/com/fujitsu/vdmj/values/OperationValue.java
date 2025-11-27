@@ -30,6 +30,7 @@ import java.util.ListIterator;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.in.annotations.INOperationMeasureAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INExplicitOperationDefinition;
 import com.fujitsu.vdmj.in.definitions.INImplicitOperationDefinition;
@@ -100,6 +101,7 @@ public class OperationValue extends Value
 
 	private long priority = 0;
 	private boolean traceRT = true;
+	private INOperationMeasureAnnotation measure = null;
 
 	public OperationValue(INExplicitOperationDefinition def,
 		FunctionValue precondition, FunctionValue postcondition,
@@ -385,7 +387,25 @@ public class OperationValue extends Value
     			abort(4166, "Cannot call impure operation: " + name, ctxt);
     		}
 
+			if (measure != null)
+			{
+				try
+				{
+					ctxt.threadState.setAtomic(true);
+					measure.called(argContext);
+				}
+				finally
+				{
+					ctxt.threadState.setAtomic(false);
+				}
+			}
+
     		rv = body.eval(argContext);
+
+			if (measure != null)
+			{
+				measure.returned();
+			}
 
     		if (isConstructor)
     		{
@@ -794,6 +814,11 @@ public class OperationValue extends Value
 	public String toTitle()
 	{
 		return name.getName() + Utils.listToString("(", paramPatterns, ", ", ")");
+	}
+
+	public void setMeasure(INOperationMeasureAnnotation measure)
+	{
+		this.measure = measure;
 	}
 
 	@Override

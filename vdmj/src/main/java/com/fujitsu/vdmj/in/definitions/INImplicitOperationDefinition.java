@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
+import com.fujitsu.vdmj.in.annotations.INOperationMeasureAnnotation;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
@@ -134,6 +135,16 @@ public class INImplicitOperationDefinition extends INDefinition
 
 		OperationValue op =	new OperationValue(this, prefunc, postfunc, stateDefinition);
 		nvl.add(new NameValuePair(name, op));
+
+		if (annotations != null)
+		{
+			INOperationMeasureAnnotation measure = annotations.getInstance(INOperationMeasureAnnotation.class);
+
+			if (measure != null)
+			{
+				op.setMeasure(measure);
+			}
+		}
 
 		if (predef != null)
 		{

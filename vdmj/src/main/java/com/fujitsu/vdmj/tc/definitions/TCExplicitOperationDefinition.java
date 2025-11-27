@@ -181,9 +181,9 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		scope = NameScope.NAMESANDSTATE;
 		if (annotations != null) annotations.tcBefore(this, base, scope);
 
-		scope = NameScope.NAMESANDSTATE;
 		TCTypeList ptypes = type.parameters;
 		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);

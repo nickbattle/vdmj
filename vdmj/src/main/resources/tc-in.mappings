@@ -351,6 +351,7 @@ unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 # Annotations
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.in.annotations;
 map TCLoopMeasureAnnotation{name, args, stmt, measureName} to INLoopMeasureAnnotation(name, args, stmt, measureName);
+map TCOperationMeasureAnnotation{name, args} to INOperationMeasureAnnotation(name, args);
 map TCLoopAnnotations{invariants, measure} to INLoopAnnotations(invariants, measure);
 map TCLoopInvariantList{ghostDef} to INLoopInvariantList(this, ghostDef);
 map TCLoopInvariantAnnotation{name, args, hasLoopVars} to INLoopInvariantAnnotation(name, args, hasLoopVars);

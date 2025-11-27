@@ -371,6 +371,7 @@ map ASTVoidType{location} to TCVoidType(location);
 package com.fujitsu.vdmj.ast.annotations to com.fujitsu.vdmj.tc.annotations;
 map ASTLoopInvariantAnnotation{name, args} to TCLoopInvariantAnnotation(name, args);
 map ASTLoopMeasureAnnotation{name, args} to TCLoopMeasureAnnotation(name, args);
+map ASTOperationMeasureAnnotation{name, args} to TCOperationMeasureAnnotation(name, args);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;
