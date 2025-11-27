@@ -84,7 +84,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		else if (CancellableThread.currentlyRunning() != null)
 		{
 			Diag.error("Running " + CancellableThread.currentlyRunning());
-			return new RPCMessageList(request, RPCErrors.InternalError, "Running " + CancellableThread.currentlyRunning());
+			return new RPCMessageList(request, RPCErrors.InternalError, "Still running " + CancellableThread.currentlyRunning());
 		}
 		
 		DAPPlugin manager = DAPPlugin.getInstance();
