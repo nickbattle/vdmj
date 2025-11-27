@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -39,26 +40,23 @@ public class POOperationMeasureAnnotation extends POAnnotation
 
 	private final static String NAME = "MEASURE_";
 	private final TCNameToken measureName;
+	private final POExpression expression;
 	
 	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
 		measureName = new TCNameToken(location, location.module, NAME + location.startLine);
+		expression = args.get(0);
 	}
 
-	public POAssignmentDefinition getDefinition()
+	public POAssignmentDefinition getDefinition()	// let MEASURE_? = <expression> in...
 	{
 		TCNaturalType mtype = new TCNaturalType(location);
-		return new POAssignmentDefinition(measureName, mtype, args.get(0), mtype);
-	}
-
-	public String getSource()
-	{
-		return args.get(0) + " < " + measureName;
+		return new POAssignmentDefinition(measureName, mtype, expression, mtype);
 	}
 
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		return RecursiveObligation.getAllPOs(location, args.get(0), measureName, ctxt);
+		return RecursiveObligation.getAllPOs(location, expression, measureName, ctxt);
 	}
 }

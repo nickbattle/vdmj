@@ -73,7 +73,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			{
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
 
-				if (!exop.recursive)
+				if (!exop.directlyRecursive)
 				{
 					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
 				}
@@ -92,7 +92,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
 
-				if (!imop.recursive)
+				if (!imop.directlyRecursive)
 				{
 					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
 				}

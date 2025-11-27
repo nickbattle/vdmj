@@ -55,38 +55,30 @@ public class INOperationMeasureAnnotation extends INAnnotation
 
 	public void called(Context ctxt) throws ValueException
 	{
-		try
+		long tid = Thread.currentThread().getId();
+		Stack<Value> stack = measureValues.get(tid);
+
+		Value currentMeasure = args.firstElement().eval(ctxt).deref();	// UpdatableValue
+
+		if (stack == null)
 		{
-			long tid = Thread.currentThread().getId();
-			Stack<Value> stack = measureValues.get(tid);
-
-			Value currentMeasure = args.firstElement().eval(ctxt).deref();	// UpdatableValue
-
-			if (stack == null)
-			{
-				stack = new Stack<Value>();
-				measureValues.put(tid, stack);
-			}
-
-			if (!stack.isEmpty())	// Not the first call
-			{
-				Value lastMeasure = stack.peek();
-
-				if (lastMeasure != null && currentMeasure.compareTo(lastMeasure) >= 0)
-				{
-					String message = "Measure failure: current " + currentMeasure + ", previous " + lastMeasure;
-					measureValues.clear();	// Re-initialise measure counters etc. for failure
-					throw new ValueException(4146, message, ctxt);
-				}
-			}
-
-			stack.push(currentMeasure);
+			stack = new Stack<Value>();
+			measureValues.put(tid, stack);
 		}
-		catch (Exception e)
+
+		if (!stack.isEmpty())	// Not the first call
 		{
-			String message = "Operation measure failed: " + e.getMessage();
-			throw new ValueException(4146, message, ctxt);
+			Value lastMeasure = stack.peek();
+
+			if (lastMeasure != null && currentMeasure.compareTo(lastMeasure) >= 0)
+			{
+				String message = "Measure failure: current " + currentMeasure + ", previous " + lastMeasure;
+				measureValues.clear();	// Re-initialise measure counters etc. for failure
+				throw new ValueException(4146, message, ctxt);
+			}
 		}
+
+		stack.push(currentMeasure);
 	}
 
 	public void returned()

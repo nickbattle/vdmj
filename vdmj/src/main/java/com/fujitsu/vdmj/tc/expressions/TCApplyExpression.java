@@ -170,12 +170,12 @@ public class TCApplyExpression extends TCExpression
 				if (opdef instanceof TCExplicitOperationDefinition)
 				{
 					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)opdef;
-					exop.recursive = true;
+					exop.directlyRecursive = true;
 				}
 				else if (opdef instanceof TCImplicitOperationDefinition)
 				{
 					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)opdef;
-					imop.recursive = true;
+					imop.directlyRecursive = true;
 				}
 			}
 			
