@@ -104,10 +104,31 @@ public class POCallObjectStatement extends POStatement
 			i++;
 		}
 
-		// Precondition calling is not defined for PP dialects...
 		ProofObligationList checks = new ProofObligationList();
 		POFieldExpression field = new POFieldExpression(designator.getExpression(), fieldname, classname);
-		checks.addAll(OperationPreConditionObligation.getAllPOs(location, field, args, FunctionApplyObligation.UNKNOWN, ctxt));
+
+		if (fdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)fdef;
+
+			if (exop.precondition != null)
+			{
+				checks.addAll(OperationPreConditionObligation.getAllPOs(
+					location, field, args, FunctionApplyObligation.UNKNOWN, ctxt));
+			}
+		}
+		else if (fdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)fdef;
+
+			if (imop.precondition != null)
+			{
+				checks.addAll(OperationPreConditionObligation.getAllPOs(
+					location, field, args, FunctionApplyObligation.UNKNOWN, ctxt));
+			}
+		}
+
+		// Precondition calling is not defined for PP dialects...
 		checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 		obligations.addAll(checks);
 
@@ -117,7 +138,9 @@ public class POCallObjectStatement extends POStatement
 		
 		if (rtype != null && getStmttype().isReturn() && !TypeComparator.isSubType(getStmttype(), rtype))
 		{
-			if (!isConstructor(fdef))	// Can return their superclass' type (see TC)
+			PODefinition calledFrom = ctxt.getDefinition();
+
+			if (!calledFrom.isConstructor())	// Strange subtype rules don't apply to ctors
 			{
 				obligations.addAll(SubTypeObligation.getAllPOs(location, ctxt.getDefinition(), getStmttype(), ctxt));
 			}
