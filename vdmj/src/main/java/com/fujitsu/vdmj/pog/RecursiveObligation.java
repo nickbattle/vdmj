@@ -30,9 +30,11 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -54,7 +56,19 @@ public class RecursiveObligation extends ProofObligation
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 	}
-	
+
+	private RecursiveObligation(LexLocation location, POExpression measure, TCNameToken measureName, POContextStack ctxt)
+	{
+		super(location, POType.RECURSIVE, ctxt);
+		
+		mutuallyRecursive = false;
+		
+		String lhs = measureName.toString();
+		String rhs = measure.toString();
+
+		source = ctxt.getSource(greater(0, lhs, rhs));
+	}
+
 	private String getLHS(PODefinition def)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -236,6 +250,19 @@ public class RecursiveObligation extends ProofObligation
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
 			results.add(new RecursiveObligation(location, defs, apply, choice));
+		}
+		
+		return results;
+	}
+
+	public static ProofObligationList getAllPOs(LexLocation location,
+		POExpression measure, TCNameToken measureName, POContextStack ctxt)
+	{
+		ProofObligationList results = new ProofObligationList();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new RecursiveObligation(location, measure, measureName, choice));
 		}
 		
 		return results;
