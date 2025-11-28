@@ -97,11 +97,9 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
 				}
 
-				TCDefinitionList paramDefinitions = new TCDefinitionList();
-
 				for (TCPatternListTypePair ptp: imop.parameterPatterns)
 				{
-					paramDefinitions.addAll(ptp.getDefinitions(ptp.type.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
+					defs.addAll(ptp.getDefinitions(ptp.type.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
 				}
 
 				params = new FlatEnvironment(defs, env);

@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.annotations.POOperationMeasureAnnotation;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
@@ -82,6 +83,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final TCNameSet transitiveUpdates;
 
 	public long alternativePaths = 0;
+	public POOperationMeasureAnnotation measure = null;
 
 	public POExplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name, TCOperationType type,
@@ -117,6 +119,11 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.localUpdates = localUpdates;
 		this.transitiveCalls = transitiveCalls;
 		this.transitiveUpdates = transitiveUpdates;
+
+		if (annotations != null)
+		{
+			this.measure = annotations.getInstance(POOperationMeasureAnnotation.class);
+		}
 	}
 
 	@Override
@@ -196,6 +203,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		{
 			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 			addOldContext(ctxt);
+			addMeasure(ctxt);
+
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
@@ -277,6 +286,14 @@ public class POExplicitOperationDefinition extends PODefinition
 			{
 				ctxt.push(new POLetDefContext(olddefs));
 			}
+		}
+	}
+
+	private void addMeasure(POContextStack ctxt)
+	{
+		if (measure != null)
+		{
+			ctxt.push(new POLetDefContext(measure.getDefinition()));
 		}
 	}
 

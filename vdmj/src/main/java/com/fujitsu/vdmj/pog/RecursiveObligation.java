@@ -25,16 +25,15 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POOperationMeasureAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
-import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -57,14 +56,14 @@ public class RecursiveObligation extends ProofObligation
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 	}
 
-	private RecursiveObligation(LexLocation location, POExpression measure, TCNameToken measureName, POContextStack ctxt)
+	private RecursiveObligation(LexLocation location, POOperationMeasureAnnotation measure, POContextStack ctxt)
 	{
 		super(location, POType.RECURSIVE, ctxt);
 		
 		mutuallyRecursive = false;
 		
-		String lhs = measureName.toString();
-		String rhs = measure.toString();
+		String lhs = measure.measureName.toString();
+		String rhs = measure.expression.toString();
 
 		source = ctxt.getSource(greater(0, lhs, rhs));
 	}
@@ -256,13 +255,13 @@ public class RecursiveObligation extends ProofObligation
 	}
 
 	public static ProofObligationList getAllPOs(LexLocation location,
-		POExpression measure, TCNameToken measureName, POContextStack ctxt)
+		POOperationMeasureAnnotation measure, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new RecursiveObligation(location, measure, measureName, choice));
+			results.add(new RecursiveObligation(location, measure, choice));
 		}
 		
 		return results;
