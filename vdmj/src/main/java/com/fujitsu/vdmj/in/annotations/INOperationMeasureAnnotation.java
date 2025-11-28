@@ -84,6 +84,13 @@ public class INOperationMeasureAnnotation extends INAnnotation
 	public void returned()
 	{
 		long tid = Thread.currentThread().getId();
-		measureValues.get(tid).pop();
+		Stack<Value> stack = measureValues.get(tid);
+		
+		stack.pop();
+
+		if (stack.isEmpty())
+		{
+			measureValues.remove(tid);
+		}
 	}
 }
