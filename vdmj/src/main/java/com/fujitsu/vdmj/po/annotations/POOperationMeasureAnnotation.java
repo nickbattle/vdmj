@@ -104,8 +104,12 @@ public class POOperationMeasureAnnotation extends POAnnotation
 			}
 		}
 
-		ctxt.add(new POLetDefContext(defs));
+		// This simulates a call to "measure_op(args)", updating the param values
 
-		return RecursiveObligation.getAllPOs(location, this, ctxt);
+		ctxt.add(new POLetDefContext(defs));
+		ProofObligationList result = RecursiveObligation.getAllPOs(location, this, ctxt);
+		ctxt.pop();
+
+		return result;
 	}
 }
