@@ -218,6 +218,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		else if (classDefinition != null)
 		{
 			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
+			addMeasure(ctxt);
 			ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
 			
 			if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
@@ -236,6 +237,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		else	// Flat spec with no state defined
 		{
 			int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
+			addMeasure(ctxt);
 			obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
