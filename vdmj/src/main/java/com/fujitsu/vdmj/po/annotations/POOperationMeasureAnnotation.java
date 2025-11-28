@@ -47,15 +47,14 @@ public class POOperationMeasureAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	private final static String NAME = "MEASURE_";
 	public final TCNameToken measureName;
 	public final POExpression expression;
 	
-	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args)
+	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args, TCNameToken measureName)
 	{
 		super(name, args);
-		measureName = new TCNameToken(location, location.module, NAME + location.startLine);
-		expression = args.get(0);
+		this.expression = args.get(0);
+		this.measureName = measureName;
 	}
 
 	public POAssignmentDefinition getDefinition()	// let MEASURE_? = <expression> in...

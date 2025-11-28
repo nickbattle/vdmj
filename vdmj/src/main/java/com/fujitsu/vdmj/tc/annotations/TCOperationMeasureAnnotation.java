@@ -33,7 +33,9 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -48,6 +50,8 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
+	public TCNameToken measureName = null;
+
 	public TCOperationMeasureAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
@@ -60,9 +64,9 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 		{
 			name.report(6006, "@OperationMeasure only applies to operations");
 		}
-		else if (args.size() != 1)
+		else if (args.size() != 1 && args.size() != 2)
 		{
-			name.report(6006, "@OperationMeasure arg: <numeric expression>");
+			name.report(6006, "@OperationMeasure args: <numeric expression>, [<measure name>]");
 		}
 		else
 		{
@@ -122,6 +126,32 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 				name.report(6007, "@OperationMeasure argument must be numeric");
 				name.detail("Actual", type.toString());
 			}
+
+			if (args.size() == 2)	// Ghost name given
+			{
+				if (args.get(1) instanceof TCVariableExpression)
+				{
+					TCVariableExpression variable = (TCVariableExpression)args.get(1);
+
+					if (env.findName(variable.name, scope) != null)
+					{
+						args.get(1).report(6006, "@LoopMeasure ghost already in scope");
+					}
+					
+					measureName = variable.name;
+				}
+				else
+				{
+					args.get(1).report(6006, "@OperationMeasure ghost must be a name");
+					args.get(1).detail("Actual", args.get(1));
+				}
+			}
+			else
+			{
+				measureName = new TCNameToken(def.location,
+					def.location.module, "MEASURE_" + def.location.startLine + "$");
+			}
+
 		}
 	}
 
