@@ -44,7 +44,7 @@ public class RecursiveObligation extends ProofObligation
 	
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
-		super(location, POType.RECURSIVE, ctxt);
+		super(location, POType.FUNC_RECURSIVE, ctxt);
 		
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
@@ -58,7 +58,7 @@ public class RecursiveObligation extends ProofObligation
 
 	private RecursiveObligation(LexLocation location, POOperationMeasureAnnotation measure, POContextStack ctxt)
 	{
-		super(location, POType.RECURSIVE, ctxt);
+		super(location, POType.OP_RECURSIVE, ctxt);
 		
 		mutuallyRecursive = false;
 		
