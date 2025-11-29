@@ -14,11 +14,21 @@
 # | 1 package(s)     | 5 file(s)            | java     |       67 |      236 |        6 |      417 |      726 |
 # +------------------+----------------------+----------+----------+----------+----------+----------+----------+
 
-echo -n "Total Java source lines = "
+COUNTS=/tmp/sum$$
 
-mvn io.github.orhankupusoglu:sloc-maven-plugin:sloc |
-	grep "package(s)" |
-	cut -f8 -d \| |
-	awk '{ sum += $1 } END { print sum }'
+function sum()
+{
+    echo -n "Total $1 lines = "
+    cut -f$2 -d \| $COUNTS | awk '{ sum += $1 } END { print sum }'
+}
+
+trap "rm -f $COUNTS" EXIT INT
+
+mvn io.github.orhankupusoglu:sloc-maven-plugin:sloc | grep "package(s)" > $COUNTS
+
+sum "Java source" 8
+sum Javadoc 7
+sum comment 6
+sum blank 5
 
 # eof
