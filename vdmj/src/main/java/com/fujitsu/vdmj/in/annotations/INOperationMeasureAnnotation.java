@@ -58,7 +58,17 @@ public class INOperationMeasureAnnotation extends INAnnotation
 		long tid = Thread.currentThread().getId();
 		Stack<Value> stack = measureValues.get(tid);
 
-		Value currentMeasure = args.firstElement().eval(ctxt).deref();	// UpdatableValue
+		Value currentMeasure = null;
+
+		try
+		{
+			ctxt.threadState.setAtomic(true);
+			currentMeasure = args.firstElement().eval(ctxt).deref();	// UpdatableValue
+		}
+		finally
+		{
+			ctxt.threadState.setAtomic(false);
+		}
 
 		if (stack == null)
 		{

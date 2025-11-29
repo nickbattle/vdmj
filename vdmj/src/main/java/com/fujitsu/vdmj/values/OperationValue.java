@@ -390,15 +390,7 @@ public class OperationValue extends Value
 
 			if (measure != null)
 			{
-				try
-				{
-					ctxt.threadState.setAtomic(true);
-					measure.called(argContext);
-				}
-				finally
-				{
-					ctxt.threadState.setAtomic(false);
-				}
+				measure.called(argContext);
 			}
 
 			try
