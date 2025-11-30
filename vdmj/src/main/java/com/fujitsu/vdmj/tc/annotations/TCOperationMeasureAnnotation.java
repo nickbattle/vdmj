@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.annotations;
 
 import java.util.Iterator;
+import java.util.List;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -58,6 +59,18 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 	}
 
 	@Override
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		// Just check for duplicates here. Most checks are done in tcAfter,
+		List<TCAnnotation> measures = def.annotations.getInstances(TCOperationMeasureAnnotation.class);
+
+		if (measures.size() > 1)
+		{
+			name.report(6006, "Only one @OperationMeasure allowed per operation");
+		}
+	}
+
+	@Override
 	public void tcAfter(TCDefinition def, TCType optype, Environment env, NameScope scope)
 	{
 		if (!def.isOperation())
@@ -66,7 +79,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 		}
 		else if (args.size() != 1 && args.size() != 2)
 		{
-			name.report(6006, "@OperationMeasure args: <numeric expression>, [<measure name>]");
+			name.report(6006, "@OperationMeasure args: (<numeric expression> [, <measure name>])");
 		}
 		else
 		{
@@ -111,7 +124,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 
 			TCType type = args.firstElement().typeCheck(params, null, scope, null);
 
-			if (type.isNumeric(type.location))
+			if (!type.isUnknown(type.location) && type.isNumeric(type.location))
 			{
 				TCNumericType ntype = type.getNumeric();
 
@@ -135,7 +148,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 
 					if (env.findName(variable.name, scope) != null)
 					{
-						args.get(1).report(6006, "@LoopMeasure ghost already in scope");
+						args.get(1).report(6006, "@OperationMeasure ghost already in scope");
 					}
 					
 					measureName = variable.name;
@@ -151,7 +164,6 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 				measureName = new TCNameToken(def.location,
 					def.location.module, "MEASURE_" + def.location.startLine + "$");
 			}
-
 		}
 	}
 
