@@ -30,7 +30,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
+import com.fujitsu.vdmj.tc.TCRecursiveFunctions;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
@@ -125,7 +125,7 @@ public class TCApplyExpression extends TCExpression
 			
 			if (enclfunc != null && calling != null)
 			{
-				TCRecursiveLoops.getInstance().addApplyExp(enclfunc, this, calling);
+				TCRecursiveFunctions.getInstance().addApplyExp(enclfunc, this, calling);
 			}
 		}
 
@@ -437,7 +437,7 @@ public class TCApplyExpression extends TCExpression
 	
 	public void typeCheckCycles(TCDefinition parent, TCDefinition called)
 	{
-		TCDefinitionListList cycles = TCRecursiveLoops.getInstance().getCycles(parent.name);
+		TCDefinitionListList cycles = TCRecursiveFunctions.getInstance().getCycles(parent.name);
 		
 		if (cycles != null)
 		{
@@ -452,7 +452,7 @@ public class TCApplyExpression extends TCExpression
 					if (cycle.get(1).equals(called))	// The parent cycle involves this next apply call
 					{
 						recursiveCycles.add(cycle);
-						cycleNames.add(TCRecursiveLoops.getInstance().getCycleNames(cycle));
+						cycleNames.add(TCRecursiveFunctions.getInstance().getCycleNames(cycle));
 						mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f] not [f, f]
 						checkCycleMeasures(cycle);
 					}
