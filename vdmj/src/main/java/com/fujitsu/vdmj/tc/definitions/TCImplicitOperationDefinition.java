@@ -89,6 +89,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCTypeSet possibleExceptions = null;
 	public boolean directlyRecursive = false;
 	public TCNameSet localUpdates = null;
+	public TCDefinitionSet localCalls = null;
 	public TCNameSet transitiveUpdates = null;
 	public TCDefinitionSet transitiveCalls = null;
 
@@ -522,6 +523,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 				}
 			}
 		}
+
+		localCalls = new TCDefinitionSet();		// Set later
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}

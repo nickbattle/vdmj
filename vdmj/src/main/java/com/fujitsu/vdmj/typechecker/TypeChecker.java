@@ -297,7 +297,8 @@ abstract public class TypeChecker
 	 * the localUpdates to the transitiveUpdates for this operation.
 	 */
 	private void populateTransitiveUpdates(Environment globals, TCStatement body,
-		TCDefinitionSet transitiveCalls, TCNameSet transitiveUpdates, TCNameSet localUpdates)
+		TCDefinitionSet transitiveCalls, TCNameSet transitiveUpdates,
+		TCDefinitionSet localCalls, TCNameSet localUpdates)
 	{
 		TCDefinitionSet exCalls = new TCDefinitionSet();
 		TCDefinitionSet imCalls = new TCDefinitionSet();
@@ -309,15 +310,16 @@ abstract public class TypeChecker
 			if (def instanceof TCExplicitOperationDefinition)
 			{
 				exCalls.add(def);
+				localCalls.add(def);
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
 			{
 				imCalls.add(def);
+				localCalls.add(def);
 			}
 		}
 
-		transitiveCalls.addAll(exCalls);	// add local calls
-		transitiveCalls.addAll(imCalls);
+		transitiveCalls.addAll(localCalls);		// add local calls
 
 		for (TCDefinition def: exCalls)
 		{
@@ -365,7 +367,8 @@ abstract public class TypeChecker
 			opdef.transitiveUpdates = new TCNameSet();
 
 			populateTransitiveUpdates(globals, opdef.body,
-				opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
+				opdef.transitiveCalls, opdef.transitiveUpdates,
+				opdef.localCalls, opdef.localUpdates);
 		}
 	}
 
@@ -382,7 +385,8 @@ abstract public class TypeChecker
 			if (opdef.body != null)
 			{
 				populateTransitiveUpdates(globals, opdef.body,
-					opdef.transitiveCalls, opdef.transitiveUpdates, opdef.localUpdates);
+					opdef.transitiveCalls, opdef.transitiveUpdates,
+					opdef.localCalls, opdef.localUpdates);
 			}
 			else if (opdef.externals == null && opdef.stateDefinition != null)
 			{
