@@ -192,6 +192,9 @@ abstract public class TypeChecker
 	 * Populate the transitiveUpdates field of operation definitions, to include every
 	 * localUpdates set by itself and the operations it calls transitively.
 	 */
+
+	private TCDefinitionList repeatList;
+
 	protected void populateTransitiveUpdates(TCDefinitionList alldefs)
 	{
 		if (getErrorCount() > 0)
@@ -200,18 +203,47 @@ abstract public class TypeChecker
 		}
 
 		Environment globals = new FlatEnvironment(alldefs, null);
+		repeatList = new TCDefinitionList(); 
 
 		for (TCDefinition def: alldefs)
 		{
 			if (def instanceof TCExplicitOperationDefinition)
 			{
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-				populateTransitiveUpdates(exop, globals);
+				exop.localCalls = new TCDefinitionSet();
+				populateTransitiveUpdates(new Stack<TCDefinition>(), exop, globals);
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-				populateTransitiveUpdates(imop, globals);
+				imop.localCalls = new TCDefinitionSet();
+				populateTransitiveUpdates(new Stack<TCDefinition>(), imop, globals);
+			}
+		}
+
+		int retries = 3;	// Rarely more than one?
+
+		while (!repeatList.isEmpty() && retries > 0)
+		{
+			TCDefinitionList todo = new TCDefinitionList();
+			todo.addAll(repeatList);
+			repeatList.clear();
+			retries--;
+
+			for (TCDefinition def: todo)
+			{
+				if (def instanceof TCExplicitOperationDefinition)
+				{
+					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+					exop.transitiveCalls = null;	// force retry
+					populateTransitiveUpdates(new Stack<TCDefinition>(), exop, globals);
+				}
+				else if (def instanceof TCImplicitOperationDefinition)
+				{
+					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+					imop.transitiveCalls = null;	// force retry
+					populateTransitiveUpdates(new Stack<TCDefinition>(), imop, globals);
+				}
 			}
 		}
 
@@ -296,7 +328,7 @@ abstract public class TypeChecker
 	 * by recursing into the call graph. Then it loops through the transitiveCalls, adding
 	 * the localUpdates to the transitiveUpdates for this operation.
 	 */
-	private void populateTransitiveUpdates(Environment globals, TCStatement body,
+	private void populateTransitiveUpdates(Stack<TCDefinition> path, Environment globals, TCStatement body,
 		TCDefinitionSet transitiveCalls, TCNameSet transitiveUpdates,
 		TCDefinitionSet localCalls, TCNameSet localUpdates)
 	{
@@ -324,15 +356,19 @@ abstract public class TypeChecker
 		for (TCDefinition def: exCalls)
 		{
 			TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-			populateTransitiveUpdates(exop, globals);
+			path.push(exop);
+			populateTransitiveUpdates(path, exop, globals);
 			transitiveCalls.addAll(exop.transitiveCalls);
+			path.pop();
 		}
 
 		for (TCDefinition def: imCalls)
 		{
 			TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
-			populateTransitiveUpdates(imop, globals);
+			path.push(imop);
+			populateTransitiveUpdates(path, imop, globals);
 			transitiveCalls.addAll(imop.transitiveCalls);
+			path.pop();
 		}
 
 		// transitiveCalls is now complete for opdef and all of the ops it calls. So now
@@ -359,23 +395,30 @@ abstract public class TypeChecker
 	/**
 	 * Populate the transitive updates of one explicit opcall.
 	 */
-	private void populateTransitiveUpdates(TCExplicitOperationDefinition opdef, Environment globals)
+	private void populateTransitiveUpdates(Stack<TCDefinition> path,
+		TCExplicitOperationDefinition opdef, Environment globals)
 	{
 		if (opdef.transitiveCalls == null)		// Not done yet
 		{
 			opdef.transitiveCalls = new TCDefinitionSet();
 			opdef.transitiveUpdates = new TCNameSet();
 
-			populateTransitiveUpdates(globals, opdef.body,
+			populateTransitiveUpdates(path, globals, opdef.body,
 				opdef.transitiveCalls, opdef.transitiveUpdates,
 				opdef.localCalls, opdef.localUpdates);
+		}
+		else if (path.contains(opdef) && path.size() > 1)
+		{
+			// opdef is in progress, and this is a subcall
+			repeatList.add(path.get(path.size() - 2));
 		}
 	}
 
 	/**
 	 * Populate the transitive updates of one implicit opcall.
 	 */
-	private void populateTransitiveUpdates(TCImplicitOperationDefinition opdef, Environment globals)
+	private void populateTransitiveUpdates(Stack<TCDefinition> path,
+		TCImplicitOperationDefinition opdef, Environment globals)
 	{
 		if (opdef.transitiveCalls == null)		// Not done yet
 		{
@@ -384,7 +427,7 @@ abstract public class TypeChecker
 
 			if (opdef.body != null)
 			{
-				populateTransitiveUpdates(globals, opdef.body,
+				populateTransitiveUpdates(path, globals, opdef.body,
 					opdef.transitiveCalls, opdef.transitiveUpdates,
 					opdef.localCalls, opdef.localUpdates);
 			}
@@ -393,6 +436,11 @@ abstract public class TypeChecker
 				// No body, so if there is no ext clause, we assume all state is modifiable
 				opdef.transitiveUpdates = opdef.stateDefinition.getStateNames();
 			}
+		}
+		else if (path.contains(opdef) && path.size() > 1)
+		{
+			// opdef is in progress, and this is a subcall
+			repeatList.add(path.get(path.size() - 2));
 		}
 	}
 
