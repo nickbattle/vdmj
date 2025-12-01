@@ -64,7 +64,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 		// Just check for duplicates here. Most checks are done in tcAfter,
 		List<TCAnnotation> measures = def.annotations.getInstances(TCOperationMeasureAnnotation.class);
 
-		if (measures.size() > 1)
+		if (measures.size() > 1 && measures.get(1) == this)
 		{
 			name.report(6006, "Only one @OperationMeasure allowed per operation");
 		}
