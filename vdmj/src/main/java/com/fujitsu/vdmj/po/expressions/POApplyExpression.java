@@ -31,6 +31,8 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
@@ -190,6 +192,25 @@ public class POApplyExpression extends POExpression
 		else if (type.isOperation(location))
 		{
 			obligations.addAll(POCallStatement.checkPrecondition(location, opdef, args, ctxt));
+
+			if (opdef instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+				if (exop.measure != null)
+				{
+					obligations.addAll(exop.measure.getProofObligations(this, ctxt));
+				}
+			}
+			else if (opdef instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+
+				if (imop.measure != null)
+				{
+					obligations.addAll(imop.measure.getProofObligations(this, ctxt));
+				}
+			}
 		}
 		
 		TCTypeList paramTypes = type.isFunction(location) ?

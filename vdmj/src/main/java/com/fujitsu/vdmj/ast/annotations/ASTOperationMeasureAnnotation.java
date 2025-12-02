@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2019 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,15 +22,16 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc;
+package com.fujitsu.vdmj.ast.annotations;
 
-import java.util.HashMap;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-
-public class TCRecursiveMap extends HashMap<TCNameToken, TCDefinitionListList> implements Mappable
+public class ASTOperationMeasureAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
+
+	public ASTOperationMeasureAnnotation(LexIdentifierToken name)
+	{
+		super(name);
+	}
 }

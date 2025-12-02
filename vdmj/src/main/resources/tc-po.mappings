@@ -357,6 +357,7 @@ map TCLoopAnnotations{invariants, measure} to POLoopAnnotations(invariants, meas
 map TCLoopInvariantList{ghostDef} to POLoopInvariantList(this, ghostDef);
 map TCLoopInvariantAnnotation{name, args, hasLoopVars} to POLoopInvariantAnnotation(name, args, hasLoopVars);
 map TCLoopMeasureAnnotation{name, args, stmt, measureName} to POLoopMeasureAnnotation(name, args, stmt, measureName);
+map TCOperationMeasureAnnotation{name, args, measureName} to POOperationMeasureAnnotation(name, args, measureName);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;

@@ -44,7 +44,7 @@ public class INVariableExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return name.toString();
+		return name.toExplicitString(location);
 	}
 
 	@Override

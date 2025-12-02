@@ -47,11 +47,11 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
  * A class to hold recursive loop data, which is used to detect mutual recursion and
  * missing measure functions.
  */
-public class TCRecursiveLoops extends TCNode
+public class TCRecursiveFunctions extends TCNode
 {
 	private static final int LOOP_SIZE_LIMIT = 8;
 	private static final long serialVersionUID = 1L;
-	private static TCRecursiveLoops INSTANCE = null;
+	private static TCRecursiveFunctions INSTANCE = null;
 	
 	private static class Apply
 	{
@@ -64,15 +64,15 @@ public class TCRecursiveLoops extends TCNode
 			this.calling = calling;
 		}
 	}
-	
-	private Map<TCDefinition, List<Apply>> applymap = null;
-	private TCRecursiveMap recursiveLoops = null;
 
-	public static TCRecursiveLoops getInstance()
+	private Map<TCDefinition, List<Apply>> applymap = null;
+	private HashMap<TCNameToken, TCDefinitionListList> recursiveLoops = null;
+
+	public static TCRecursiveFunctions getInstance()
 	{
 		if (INSTANCE == null)
 		{
-			INSTANCE = new TCRecursiveLoops();
+			INSTANCE = new TCRecursiveFunctions();
 		}
 		
 		return INSTANCE;
@@ -80,7 +80,7 @@ public class TCRecursiveLoops extends TCNode
 
 	public void reset()
 	{
-		recursiveLoops = new TCRecursiveMap();
+		recursiveLoops = new HashMap<TCNameToken, TCDefinitionListList>();
 		applymap = new HashMap<TCDefinition, List<Apply>>();
 	}
 	

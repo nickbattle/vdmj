@@ -80,7 +80,9 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
 	public TCTypeSet possibleExceptions = null;
+	public boolean directlyRecursive = false;
 	public TCNameSet localUpdates = null;
+	public TCDefinitionSet localCalls = null;
 	public TCNameSet transitiveUpdates = null;
 	public TCDefinitionSet transitiveCalls = null;
 
@@ -181,9 +183,9 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		scope = NameScope.NAMESANDSTATE;
 		if (annotations != null) annotations.tcBefore(this, base, scope);
 
-		scope = NameScope.NAMESANDSTATE;
 		TCTypeList ptypes = type.parameters;
 		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
@@ -357,6 +359,8 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		{
 			localUpdates = body.localUpdates();
 		}
+
+		localCalls = new TCDefinitionSet();		// Set later
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
