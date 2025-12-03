@@ -24,9 +24,11 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -35,7 +37,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
@@ -64,9 +65,9 @@ public class POContextStack extends Stack<POContext>
 	 * Definitions which have had their ALT paths reduced, due to excessive branching,
 	 * to meet the value above.
 	 */
-	private static PODefinitionSet reducedDefinitions = new PODefinitionSet();
+	private static Map<PODefinition, Long> reducedDefinitions = new HashMap<PODefinition, Long>();
 	
-	public static PODefinitionSet getReducedDefinitions()
+	public static Map<PODefinition, Long> getReducedDefinitions()
 	{
 		return reducedDefinitions;
 	}
@@ -76,7 +77,7 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public static void reset()
 	{
-		reducedDefinitions = new PODefinitionSet();
+		reducedDefinitions = new HashMap<PODefinition, Long>();
 	}
 
 	/**
@@ -147,10 +148,10 @@ public class POContextStack extends Stack<POContext>
 	
 	public List<POContextStack> getAlternatives(boolean excludeReturns)
 	{
-		return getAlternatives(excludeReturns, Properties.pog_max_alt_paths);
+		return getAlternatives(this, excludeReturns, Properties.pog_max_alt_paths);
 	}
 	
-	private List<POContextStack> getAlternatives(boolean excludeReturns, int limit)
+	private List<POContextStack> getAlternatives(POContextStack origin, boolean excludeReturns, int limit)
 	{
 		List<POContextStack> results = new Vector<POContextStack>();
 		results.add(new POContextStack());
@@ -182,7 +183,7 @@ public class POContextStack extends Stack<POContext>
 					// Then append the alternative expansions to the dontReturn remainers
 					for (POContextStack substack: alt.alternatives)
 					{
-						List<POContextStack> subalternatives = substack.getAlternatives(excludeReturns, remaining);
+						List<POContextStack> subalternatives = substack.getAlternatives(origin, excludeReturns, remaining);
 
 						remaining = remaining - subalternatives.size();
 						if (remaining < 1) remaining = 1;
@@ -209,7 +210,7 @@ public class POContextStack extends Stack<POContext>
 					if (getDefinition() != null)
 					{
 						// Add the name to list of definitions that are too complex.
-						reducedDefinitions.add(getDefinition());
+						reducedDefinitions.put(getDefinition(), origin.countAlternatives());
 					}
 
 					// Trim newResults to the limit
@@ -263,7 +264,7 @@ public class POContextStack extends Stack<POContext>
 	 * Calculate the number of alternative paths for the current stack. This is used in
 	 * error reporting when an operation is too complex.
 	 */
-	public long countAlternatives()
+	private long countAlternatives()
 	{
 		long count = 1;
 

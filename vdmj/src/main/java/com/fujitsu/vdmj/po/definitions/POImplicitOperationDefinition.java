@@ -91,7 +91,6 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final PODefinitionSet transitiveCalls;
 	public final TCNameSet transitiveUpdates;
 
-	public long alternativePaths = 0;
 	public POOperationMeasureAnnotation measure = null;
 
 	public POImplicitOperationDefinition(POAnnotationList annotations,
@@ -244,7 +243,6 @@ public class POImplicitOperationDefinition extends PODefinition
 					obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 				}
 				
-				alternativePaths = ctxt.countAlternatives();
 				ctxt.popTo(popto);
 			}
 			else if (classDefinition != null)
@@ -262,7 +260,6 @@ public class POImplicitOperationDefinition extends PODefinition
 					oblist.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 				}
 				
-				alternativePaths = ctxt.countAlternatives();
 				obligations.addAll(oblist);
 				ctxt.popTo(popto);
 			}
@@ -277,7 +274,6 @@ public class POImplicitOperationDefinition extends PODefinition
 					obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 				}
 				
-				alternativePaths = ctxt.countAlternatives();
 				ctxt.popTo(popto);
 			}
 
@@ -372,12 +368,6 @@ public class POImplicitOperationDefinition extends PODefinition
 		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
 	}
 
-	@Override
-	public long getAlternativePaths()
-	{
-		return alternativePaths;
-	}
-	
 	@Override
 	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
 	{

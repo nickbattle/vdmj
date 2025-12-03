@@ -243,9 +243,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 
 		// Add dummy POs for any operations with missing POs.
-		for (PODefinition def: POContextStack.getReducedDefinitions())
+		Map<PODefinition,Long> reduced = POContextStack.getReducedDefinitions();
+
+		for (PODefinition def: reduced.keySet())
 		{
-			long paths = def.getAlternativePaths();
+			long paths = reduced.get(def);
 
 			poList.add(new JSONObject(
 					"id",		0,		// Appears at the start of the list
