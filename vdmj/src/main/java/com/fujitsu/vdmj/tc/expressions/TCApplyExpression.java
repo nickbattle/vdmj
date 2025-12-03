@@ -435,79 +435,74 @@ public class TCApplyExpression extends TCExpression
 		return start  + Utils.listToString(args) + (close ? ")" : ", ");
 	}
 	
-	public void typeCheckCycles(TCDefinition parent, TCDefinition called)
+	public void typeCheckCycles(TCDefinitionListList cycles, TCDefinition parent, TCDefinition called)
 	{
-		TCDefinitionListList cycles = TCRecursiveFunctions.getInstance().getCycles(parent.name);
-		
-		if (cycles != null)
-		{
-			List<List<String>> cycleNames = new Vector<List<String>>();
-			recursiveCycles = new TCDefinitionListList();
-			boolean mutuallyRecursive = false;
+		List<List<String>> cycleNames = new Vector<List<String>>();
+		recursiveCycles = new TCDefinitionListList();
+		boolean mutuallyRecursive = false;
 
-			for (TCDefinitionList cycle: cycles)
+		for (TCDefinitionList cycle: cycles)
+		{
+			if (cycle.size() >= 2)
 			{
-				if (cycle.size() >= 2)
+				if (cycle.get(1).equals(called))	// The parent cycle involves this next apply call
 				{
-					if (cycle.get(1).equals(called))	// The parent cycle involves this next apply call
-					{
-						recursiveCycles.add(cycle);
-						cycleNames.add(TCRecursiveFunctions.getInstance().getCycleNames(cycle));
-						mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f] not [f, f]
-						checkCycleMeasures(cycle);
-					}
+					recursiveCycles.add(cycle);
+					cycleNames.add(TCRecursiveFunctions.getInstance().getCycleNames(cycle));
+					mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f] not [f, f]
+					checkCycleMeasures(cycle);
 				}
 			}
+		}
+		
+		if (cycleNames.isEmpty())
+		{
+			// No recursion via this "called" apply
+			return;
+		}
+		
+		if (parent instanceof TCExplicitFunctionDefinition)
+		{
+			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)parent;
+			def.recursive = true;
 			
-			if (cycleNames.isEmpty())
+			if (def.measureExp == null)
 			{
-				// No recursion via this "called" apply
-				return;
+				if (mutuallyRecursive)
+				{
+					def.warning(5013, "Mutually recursive cycle has no measure");
+					
+					for (List<String> cycleName: cycleNames)
+					{
+						def.detail("Cycle", cycleName);
+					}
+				}
+				else
+				{
+					def.warning(5012, "Recursive function has no measure");
+				}
 			}
+		}
+		else if (parent instanceof TCImplicitFunctionDefinition)
+		{
+			TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)parent;
+			def.recursive = true;
 			
-			if (parent instanceof TCExplicitFunctionDefinition)
+			if (def.measureExp == null)
 			{
-				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)parent;
-  				def.recursive = true;
-  				
-  				if (def.measureExp == null)
-  				{
-  					if (mutuallyRecursive)
-  					{
-  						def.warning(5013, "Mutually recursive cycle has no measure");
-  						
-  						for (List<String> cycleName: cycleNames)
-  						{
-  							def.detail("Cycle", cycleName);
-  						}
-  					}
-  					else
-  					{
-  						def.warning(5012, "Recursive function has no measure");
-  					}
-  				}
-			}
-			else if (parent instanceof TCImplicitFunctionDefinition)
-			{
-				TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)parent;
-   				def.recursive = true;
- 				
-  				if (def.measureExp == null)
-  				{
-  					if (mutuallyRecursive)
-  					{
-  						def.warning(5013, "Mutually recursive cycle has no measure");
-  						
-  						for (List<String> cycleName: cycleNames)
-  						{
-  							def.detail("Cycle", cycleName);
-  						}
-  					}
-  					else
-  					{
-  						def.warning(5012, "Recursive function has no measure");
-  					}
-  				}
+				if (mutuallyRecursive)
+				{
+					def.warning(5013, "Mutually recursive cycle has no measure");
+					
+					for (List<String> cycleName: cycleNames)
+					{
+						def.detail("Cycle", cycleName);
+					}
+				}
+				else
+				{
+					def.warning(5012, "Recursive function has no measure");
+				}
 			}
 		}
 	}

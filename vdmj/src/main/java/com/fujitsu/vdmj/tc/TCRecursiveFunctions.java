@@ -125,9 +125,14 @@ public class TCRecursiveFunctions extends TCNode
 
 		for (TCDefinition parent: applymap.keySet())
 		{
-			for (Apply pair: applymap.get(parent))
+			TCDefinitionListList cycles = recursiveLoops.get(parent.name);
+
+			if (cycles != null)
 			{
-				pair.apply.typeCheckCycles(parent, pair.calling);
+				for (Apply pair: applymap.get(parent))
+				{
+					pair.apply.typeCheckCycles(cycles, parent, pair.calling);
+				}
 			}
 		}
 		
@@ -149,9 +154,14 @@ public class TCRecursiveFunctions extends TCNode
 
 		for (TCDefinition parent: applymap.keySet())
 		{
-			for (Apply pair: applymap.get(parent))
+			TCDefinitionListList cycles = recursiveLoops.get(parent.name);
+
+			if (cycles != null)
 			{
-				pair.apply.typeCheckCycles(parent, pair.calling);
+				for (Apply pair: applymap.get(parent))
+				{
+					pair.apply.typeCheckCycles(cycles, parent, pair.calling);
+				}
 			}
 		}
 		
