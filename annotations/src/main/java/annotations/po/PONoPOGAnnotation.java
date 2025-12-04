@@ -24,6 +24,8 @@
 
 package annotations.po;
 
+import java.util.Iterator;
+
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -48,6 +50,7 @@ public class PONoPOGAnnotation extends POAnnotation
 	public void poAfter(PODefinition def, ProofObligationList obligations, POContextStack ctxt)
 	{
 		obligations.clear();
+		POContextStack.getReducedDefinitions().remove(def);
 	}
 
 	@Override
@@ -66,11 +69,28 @@ public class PONoPOGAnnotation extends POAnnotation
 	public void poAfter(POModule module, ProofObligationList obligations)
 	{
 		obligations.clear();
+		removeReducedDefinitions(module.name.getName());
 	}
 	
 	@Override
 	public void poAfter(POClassDefinition clazz, ProofObligationList obligations)
 	{
 		obligations.clear();
+		removeReducedDefinitions(clazz.name.getName());
+	}
+
+	private void removeReducedDefinitions(String module)
+	{
+		Iterator<PODefinition> iter = POContextStack.getReducedDefinitions().keySet().iterator();
+
+		while (iter.hasNext())
+		{
+			PODefinition def = iter.next();
+
+			if (def.location.module.equals(module))
+			{
+				iter.remove();
+			}
+		}
 	}
 }

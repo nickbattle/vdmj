@@ -63,7 +63,7 @@ public class POContextStack extends Stack<POContext>
 {
 	/**
 	 * Definitions which have had their ALT paths reduced, due to excessive branching,
-	 * to meet the value above.
+	 * to meet Properties.pog_max_alt_paths.
 	 */
 	private static Map<PODefinition, Long> reducedDefinitions = new HashMap<PODefinition, Long>();
 	
@@ -77,7 +77,7 @@ public class POContextStack extends Stack<POContext>
 	 */
 	public static void reset()
 	{
-		reducedDefinitions = new HashMap<PODefinition, Long>();
+		reducedDefinitions.clear();
 	}
 
 	/**
