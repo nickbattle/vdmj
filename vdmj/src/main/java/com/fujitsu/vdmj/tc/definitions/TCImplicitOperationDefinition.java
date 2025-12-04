@@ -87,7 +87,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCStateDefinition stateDefinition;
 	public TCType actualResult;
 	public TCTypeSet possibleExceptions = null;
-	public boolean directlyRecursive = false;
+	public boolean recursive = false;
+	
 	public TCNameSet localUpdates = null;
 	public TCDefinitionSet localCalls = null;
 	public TCNameSet transitiveUpdates = null;

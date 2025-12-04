@@ -90,9 +90,9 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			{
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
 
-				if (!exop.directlyRecursive)
+				if (!exop.recursive)
 				{
-					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
+					name.report(6006, "@OperationMeasure: " + def.name + " is not recursive");
 				}
 
 				Iterator<TCType> titer = exop.type.parameters.iterator();
@@ -109,9 +109,9 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
 
-				if (!imop.directlyRecursive)
+				if (!imop.recursive)
 				{
-					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
+					name.report(6006, "@OperationMeasure: " + def.name + " is not recursive");
 				}
 
 				for (TCPatternListTypePair ptp: imop.parameterPatterns)

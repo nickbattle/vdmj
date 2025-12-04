@@ -35,8 +35,6 @@ import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -87,20 +85,16 @@ public class TCRecursiveFunctions
 	
 	public void addApplyExp(TCDefinition parent, TCApplyExpression apply, TCDefinition calling)
 	{
-		if (calling instanceof TCExplicitFunctionDefinition ||
-			calling instanceof TCImplicitFunctionDefinition)
+		if (!applymap.containsKey(parent))
 		{
-			if (!applymap.containsKey(parent))
-			{
-				applymap.put(parent, new Vector<Apply>());
-				callmap.put(parent.name, new TCNameSet());
-			}
-			
-			applymap.get(parent).add(new Apply(apply, calling));
-			callmap.get(parent.name).add(calling.name);
-			defmap.put(parent.name, parent);
-			defmap.put(calling.name, calling);
+			applymap.put(parent, new Vector<Apply>());
+			callmap.put(parent.name, new TCNameSet());
 		}
+		
+		applymap.get(parent).add(new Apply(apply, calling));
+		callmap.get(parent.name).add(calling.name);
+		defmap.put(parent.name, parent);
+		defmap.put(calling.name, calling);
 	}
 	
 	public void typeCheck()

@@ -78,6 +78,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final TCType actualResult;
 	public final boolean isConstructor;
 	public final TCTypeSet possibleExceptions;
+	
 	public final TCNameSet localUpdates;
 	public final PODefinitionSet transitiveCalls;
 	public final TCNameSet transitiveUpdates;
