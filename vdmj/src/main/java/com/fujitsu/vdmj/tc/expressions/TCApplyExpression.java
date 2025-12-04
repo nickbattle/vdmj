@@ -164,21 +164,6 @@ public class TCApplyExpression extends TCExpression
 				TCFieldExpression exp = (TCFieldExpression)root;
 				opdef = env.findName(exp.memberName, scope);
 			}
-
-			// TODO remove this?
-			if (opdef != null && opdef == encldef)
-			{
-				if (opdef instanceof TCExplicitOperationDefinition)
-				{
-					TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)opdef;
-					exop.recursive = true;
-				}
-				else if (opdef instanceof TCImplicitOperationDefinition)
-				{
-					TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)opdef;
-					imop.recursive = true;
-				}
-			}
 			
 			TCOperationType ot = type.getOperation();
 			ot.typeResolve(env);
