@@ -32,7 +32,6 @@ import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
-import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
@@ -41,16 +40,14 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 /**
  * A class to hold recursive loop data, which is used to detect mutual recursion and
  * missing measure functions.
  */
-public class TCRecursiveFunctions extends TCNode
+public class TCRecursiveFunctions
 {
 	private static final int LOOP_SIZE_LIMIT = 8;
-	private static final long serialVersionUID = 1L;
 	private static TCRecursiveFunctions INSTANCE = null;
 	
 	private static class Apply
@@ -66,7 +63,9 @@ public class TCRecursiveFunctions extends TCNode
 	}
 
 	private Map<TCDefinition, List<Apply>> applymap = null;
-	private HashMap<TCNameToken, TCDefinitionListList> recursiveLoops = null;
+	private Map<TCNameToken, TCNameSet> callmap = null;
+	private Map<TCNameToken, TCDefinition> defmap = null;
+	private Map<TCNameToken, TCDefinitionListList> recursiveLoops = null;
 
 	public static TCRecursiveFunctions getInstance()
 	{
@@ -82,6 +81,8 @@ public class TCRecursiveFunctions extends TCNode
 	{
 		recursiveLoops = new HashMap<TCNameToken, TCDefinitionListList>();
 		applymap = new HashMap<TCDefinition, List<Apply>>();
+		callmap = new HashMap<TCNameToken, TCNameSet>();
+		defmap = new  HashMap<TCNameToken, TCDefinition>();
 	}
 	
 	public void addApplyExp(TCDefinition parent, TCApplyExpression apply, TCDefinition calling)
@@ -92,34 +93,25 @@ public class TCRecursiveFunctions extends TCNode
 			if (!applymap.containsKey(parent))
 			{
 				applymap.put(parent, new Vector<Apply>());
+				callmap.put(parent.name, new TCNameSet());
 			}
 			
 			applymap.get(parent).add(new Apply(apply, calling));
+			callmap.get(parent.name).add(calling.name);
+			defmap.put(parent.name, parent);
+			defmap.put(calling.name, calling);
 		}
 	}
 	
-	private Map<TCNameToken, TCNameSet> getCallMap()
+	public void typeCheck()
 	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
-		for (TCDefinition def: applymap.keySet())
-		{
-			callmap.put(def.name, def.getCallMap());
-		}
-		
-		return callmap;
-	}
-	
-	public void typeCheck(TCClassList classes)
-	{
-		Map<TCNameToken, TCNameSet> callmap = getCallMap();
 		recursiveLoops.clear();
 		
 		for (TCNameToken name: callmap.keySet())
 		{
 			for (Stack<TCNameToken> cycle: reachable(name, callmap))
 			{
-				addCycle(name, classes.findDefinitions(cycle));
+				addCycle(name, findDefinitions(cycle));
 			}
 		}
 
@@ -138,61 +130,36 @@ public class TCRecursiveFunctions extends TCNode
 		
 		reset();	// save space!
 	}
-	
-	public void typeCheck(TCModuleList modules)
+
+	private TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
 	{
-		Map<TCNameToken, TCNameSet> callmap = getCallMap();
-		recursiveLoops.clear();
+		TCDefinitionList list = new TCDefinitionList();
 		
-		for (TCNameToken name: callmap.keySet())
+		for (TCNameToken name: stack)
 		{
-			for (Stack<TCNameToken> cycle: reachable(name, callmap))
-			{
-				addCycle(name, modules.findDefinitions(cycle));
-			}
-		}
-
-		for (TCDefinition parent: applymap.keySet())
-		{
-			TCDefinitionListList cycles = recursiveLoops.get(parent.name);
-
-			if (cycles != null)
-			{
-				for (Apply pair: applymap.get(parent))
-				{
-					pair.apply.typeCheckCycles(cycles, parent, pair.calling);
-				}
-			}
+			list.add(defmap.get(name));
 		}
 		
-		reset();	// save space!
+		return list.contains(null) ? null : list;	// Usually local func definitions
 	}
 
 	private void addCycle(TCNameToken name, TCDefinitionList defs)
 	{
 		if (defs != null)
 		{
-			TCDefinitionListList existing = getCycles(name);
+			TCDefinitionListList existing = recursiveLoops.get(name);
 			
 			if (existing == null)
 			{
-				TCDefinitionListList list = new TCDefinitionListList();
-				list.add(defs);
-				recursiveLoops.put(name, list);
+				existing = new TCDefinitionListList();
+				recursiveLoops.put(name, existing);
 			}
-			else
-			{
-				existing.add(defs);
-			}
+			
+			existing.add(defs);
 		}
 	}
 
-	public TCDefinitionListList getCycles(TCNameToken name)
-	{
-		return recursiveLoops.get(name);
-	}
-	
-	public List<String> getCycleNames(TCDefinitionList cycle)
+	public List<String> toStrings(TCDefinitionList cycle)
 	{
 		List<String> calls = new Vector<String>();
 

@@ -161,7 +161,7 @@ public class ClassTypeChecker extends TypeChecker
 		}
 		
 		// Look for recursive loops
-		TCRecursiveFunctions.getInstance().typeCheck(classes);
+		TCRecursiveFunctions.getInstance().typeCheck();
 
 		TCDefinitionList allDefs = new TCDefinitionList();
 

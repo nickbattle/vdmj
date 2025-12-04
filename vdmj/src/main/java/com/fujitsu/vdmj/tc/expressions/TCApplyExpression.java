@@ -448,7 +448,7 @@ public class TCApplyExpression extends TCExpression
 				if (cycle.get(1).equals(called))	// The parent cycle involves this next apply call
 				{
 					recursiveCycles.add(cycle);
-					cycleNames.add(TCRecursiveFunctions.getInstance().getCycleNames(cycle));
+					cycleNames.add(TCRecursiveFunctions.getInstance().toStrings(cycle));
 					mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f] not [f, f]
 					checkCycleMeasures(cycle);
 				}

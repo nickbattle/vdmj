@@ -252,8 +252,8 @@ public class ModuleTypeChecker extends TypeChecker
 			}
 		}
 		
-		// Prepare to look for recursive loops
-		TCRecursiveFunctions.getInstance().typeCheck(modules);
+		// Look for recursive loops
+		TCRecursiveFunctions.getInstance().typeCheck();
 
 		// Report any discrepancies between the final checked types of
 		// definitions and their explicit imported types.

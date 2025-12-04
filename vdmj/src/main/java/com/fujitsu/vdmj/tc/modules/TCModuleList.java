@@ -27,8 +27,6 @@ package com.fujitsu.vdmj.tc.modules;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
-
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
@@ -38,9 +36,7 @@ import com.fujitsu.vdmj.mapper.FileList;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 
 public class TCModuleList extends TCMappedList<ASTModule, TCModule>
@@ -151,33 +147,5 @@ public class TCModuleList extends TCMappedList<ASTModule, TCModule>
 		}
 
 		return rv;
-	}
-
-	public TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
-	{
-		TCDefinitionList list = new TCDefinitionList();
-		
-		for (TCNameToken name: stack)
-		{
-			list.add(findDefinition(name));
-		}
-		
-		return list.contains(null) ? null : list;	// Usually local func definitions
-	}
-
-	private TCDefinition findDefinition(TCNameToken sought)
-	{
-		for (TCModule module: this)
-		{
-			for (TCDefinition def: module.defs)
-			{
-				if (def.name != null && def.name.equals(sought))
-				{
-					return def;
-				}
-			}
-		}
-		
-		return null;
 	}
 }

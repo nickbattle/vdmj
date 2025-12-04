@@ -27,8 +27,6 @@ package com.fujitsu.vdmj.tc.definitions;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
-
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.tc.TCMappedList;
@@ -144,33 +142,5 @@ public class TCClassList extends TCMappedList<ASTClassDefinition, TCClassDefinit
 		}
 
 		return sb.toString();
-	}
-
-	public TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
-	{
-		TCDefinitionList list = new TCDefinitionList();
-		
-		for (TCNameToken name: stack)
-		{
-			list.add(findDefinition(name));
-		}
-		
-		return list.contains(null) ? null : list;	// Usually local func definitions
-	}
-
-	private TCDefinition findDefinition(TCNameToken sought)
-	{
-		for (TCClassDefinition clazz: this)
-		{
-			for (TCDefinition def: clazz.definitions)
-			{
-				if (def.name != null && def.name.equals(sought))
-				{
-					return def;
-				}
-			}
-		}
-		
-		return null;
 	}
 }

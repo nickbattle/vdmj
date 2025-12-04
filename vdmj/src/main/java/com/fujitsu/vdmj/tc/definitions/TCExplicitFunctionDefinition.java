@@ -34,8 +34,6 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCFunctionCallFinder;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -694,26 +692,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public boolean isSubclassResponsibility()
 	{
 		return body instanceof TCSubclassResponsibilityExpression;
-	}
-	
-	@Override
-	public TCNameSet getCallMap()
-	{
-		TCFunctionCallFinder finder = new TCFunctionCallFinder();
-		TCNameSet found = new TCNameSet();
-		found.addAll(body.apply(finder, null));
-		
-		if (predef != null)
-		{
-			found.addAll(predef.getCallMap());
-		}
-		
-		if (postdef != null)
-		{
-			found.addAll(postdef.getCallMap());
-		}
-
-		return found;
 	}
 
 	@Override
