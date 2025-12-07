@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
+import com.fujitsu.vdmj.tc.annotations.TCOperationMeasureAnnotation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
@@ -47,6 +48,7 @@ import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCSubclassResponsibilityStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePairList;
@@ -94,6 +96,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCNameSet transitiveUpdates = null;
 	public TCDefinitionSet transitiveCalls = null;
 
+	public TCExplicitFunctionDefinition measureDef;
 	public boolean isConstructor = false;
 
 	public TCImplicitOperationDefinition(TCAnnotationList annotations,
@@ -528,6 +531,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		localCalls = new TCDefinitionSet();		// Set later
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
+
+		measureDef = getMeasureDefinition(base);	// Must be after the tcAfter
 	}
 
 	@Override
@@ -555,6 +560,11 @@ public class TCImplicitOperationDefinition extends TCDefinition
     		{
     			return postdef;
     		}
+
+			if (measureDef != null && measureDef.findName(sought, incState) != null)
+			{
+				return measureDef;
+			}
 		}
 
 		return null;
@@ -605,6 +615,59 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		list.add(plist);
 		return list;
+	}
+
+	/**
+	 * An operation measure is similar to a precondition, being passed the operation's
+	 * parameters and a state value.
+	 */
+	private TCExplicitFunctionDefinition getMeasureDefinition(Environment base)
+	{
+		TCOperationMeasureAnnotation annotation = null;
+
+		if (annotations != null)
+		{
+			annotation = annotations.getInstance(TCOperationMeasureAnnotation.class);
+		}
+
+		if (annotation == null)
+		{
+			return null;
+		}
+
+		TCPatternListList parameters = new TCPatternListList();
+		TCPatternList plist = new TCPatternList();
+
+		for (TCPatternListTypePair pl: parameterPatterns)
+		{
+			plist.addAll(pl.patterns);
+		}
+
+		if (stateDefinition != null)
+		{
+			plist.add(new TCIdentifierPattern(stateDefinition.name.getOldName()));
+		}
+		else if (base.isVDMPP() && !accessSpecifier.isStatic)
+		{
+			plist.add(new TCIdentifierPattern(classDefinition.name.getSelfName()));
+		}
+
+		parameters.add(plist);
+
+		TCFunctionType pretype = type.getPreType(stateDefinition, classDefinition, false);
+		TCFunctionType mtype = new TCFunctionType(location, pretype.parameters, false, annotation.type);
+
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getMeasureName(location),
+			null, mtype, parameters, annotation.args.get(0), null, null, false, null);
+
+		// Operation measure functions are effectively not static as
+		// their expression can directly refer to instance variables, even
+		// though at runtime these are passed via a "self" parameter.
+
+		def.setAccessSpecifier(accessSpecifier.getModified(false, true));
+		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
+		return def;
 	}
 
 	private TCExplicitFunctionDefinition getPreDefinition(Environment base)

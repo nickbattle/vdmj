@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
@@ -45,6 +46,7 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -132,6 +134,14 @@ public class POCallStatement extends POStatement
 		else
 		{
 			obligations.addAll(checkPrecondition(location, opdef, args, ctxt));
+		}
+
+		if (recursiveCycles != null)	// name is a func/op in a recursive loop
+		{
+			for (PODefinitionList loop: recursiveCycles)
+			{
+				obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+			}
 		}
 
 		ctxt.makeOperationCall(location, opdef, args, null, getStmttype().isReturn(), pogState, env);
@@ -261,6 +271,58 @@ public class POCallStatement extends POStatement
 			
 			return list;
 		}
+	}
+	
+	/**
+	 * Create a measure application string from this apply, turning the root function
+	 * name into the measure name passed. 
+	 */
+	public String getMeasureApply(String measure)
+	{
+		StringBuilder sb = new StringBuilder(name.getMeasureName(location).getName());
+		sb.append("(");
+		String separator = "";
+		
+		for (POExpression arg: args)
+		{
+			sb.append(separator);
+			sb.append(Utils.deBracketed(arg));
+			separator = ", ";
+		}
+
+		if (opdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+			if (exop.stateDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(exop.stateDefinition.toPattern(false, location));
+			}
+			else if (exop.classDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(exop.classDefinition.toPattern(false, location));
+			}
+		}
+		else if (opdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+
+			if (imop.stateDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(imop.stateDefinition.toPattern(false, location));
+			}
+			else if (imop.classDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(imop.classDefinition.toPattern(false, location));
+			}
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override

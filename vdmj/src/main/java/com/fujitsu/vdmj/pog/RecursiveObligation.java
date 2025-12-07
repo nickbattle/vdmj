@@ -35,6 +35,8 @@ import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
+import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
@@ -58,16 +60,32 @@ public class RecursiveObligation extends ProofObligation
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 	}
 
-	private RecursiveObligation(LexLocation location, POOperationMeasureAnnotation measure, POContextStack ctxt)
+	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
 	{
 		super(location, POType.OP_RECURSIVE, ctxt);
 		
-		mutuallyRecursive = false;
+		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
-		String lhs = measure.measureName.toString();
-		String rhs = measure.expression.toString();
+		int measureLexical = getLex(getMeasureType(defs.get(0)));
+		
+		String lhs = getLHS(defs.get(0));
+		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
-		source = ctxt.getSource(greater(0, lhs, rhs));
+		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
+	}
+
+	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
+	{
+		super(location, POType.OP_RECURSIVE, ctxt);
+		
+		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
+		
+		int measureLexical = getLex(getMeasureType(defs.get(0)));
+		
+		String lhs = getLHS(defs.get(0));
+		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
+
+		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 	}
 
 	private String getLHS(PODefinition def)
@@ -143,6 +161,17 @@ public class RecursiveObligation extends ProofObligation
 				sep = ", ";
 			}
 
+			if (edef.stateDefinition != null)
+			{
+				sb.append(sep);
+				sb.append(edef.stateDefinition.toPattern(false, location));
+			}
+			else if (edef.classDefinition != null)
+			{
+				sb.append(sep);
+				sb.append(edef.classDefinition.toPattern(false, location));
+			}
+
 			sb.append(")");
 		}
 		else if (def instanceof POImplicitOperationDefinition)
@@ -150,17 +179,27 @@ public class RecursiveObligation extends ProofObligation
 			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)def;
 			sb.append(getMeasureName(idef));
 			sb.append("(");
+			String sep = "";
 
 			for (POPatternListTypePair pltp: idef.parameterPatterns)
 			{
-				String sep = "";
-				
 				for (POPattern p: pltp.patterns)
 				{
 					sb.append(sep);
 					sb.append(p.removeIgnorePatterns());
 					sep = ", ";
 				}
+			}
+
+			if (idef.stateDefinition != null)
+			{
+				sb.append(sep);
+				sb.append(idef.stateDefinition.toPattern(false, location));
+			}
+			else if (idef.classDefinition != null)
+			{
+				sb.append(sep);
+				sb.append(idef.classDefinition.toPattern(false, location));
 			}
 
 			sb.append(")");
@@ -190,7 +229,7 @@ public class RecursiveObligation extends ProofObligation
 			}
 		}
 		
-		// @OperationMeasures do this
+		// @OperationMeasures are always measure_op
 		return "measure_" + def.name.getName();
 	}
 
@@ -312,6 +351,30 @@ public class RecursiveObligation extends ProofObligation
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
 			results.add(new RecursiveObligation(location, defs, apply, choice));
+		}
+		
+		return results;
+	}
+
+	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
+	{
+		ProofObligationList results = new ProofObligationList();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new RecursiveObligation(location, defs, call, choice));
+		}
+		
+		return results;
+	}
+
+	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
+	{
+		ProofObligationList results = new ProofObligationList();
+		
+		for (POContextStack choice: ctxt.getAlternatives())
+		{
+			results.add(new RecursiveObligation(location, defs, call, choice));
 		}
 		
 		return results;

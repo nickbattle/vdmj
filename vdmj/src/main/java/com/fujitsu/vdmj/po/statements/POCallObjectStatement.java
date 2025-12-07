@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -41,6 +43,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -58,11 +61,13 @@ public class POCallObjectStatement extends POStatement
 	public final TCIdentifierToken fieldname;
 	public final POExpressionList args;
 	public final PODefinition fdef;
+	public final PODefinitionListList recursiveCycles;
 
 	public LexNameToken field = null;
 
 	public POCallObjectStatement(LexLocation location, POObjectDesignator designator,
-		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args, PODefinition fdef)
+		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args, PODefinition fdef,
+		PODefinitionListList recursiveCycles)
 	{
 		super(location);
 
@@ -71,6 +76,7 @@ public class POCallObjectStatement extends POStatement
 		this.fieldname = fieldname;
 		this.args = args;
 		this.fdef = fdef;
+		this.recursiveCycles = recursiveCycles;
 	}
 
 	@Override
@@ -132,6 +138,14 @@ public class POCallObjectStatement extends POStatement
 		checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 		obligations.addAll(checks);
 
+		if (recursiveCycles != null)	// name is a func/op in a recursive loop
+		{
+			for (PODefinitionList loop: recursiveCycles)
+			{
+				obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+			}
+		}
+
 		ctxt.makeOperationCall(location, fdef, args, null, getStmttype().isReturn(), pogState, env);
 		
 		TCType rtype = pogState.getResultType();
@@ -182,6 +196,58 @@ public class POCallObjectStatement extends POStatement
 			
 			return list;
 		}
+	}
+	
+	/**
+	 * Create a measure application string from this apply, turning the root function
+	 * name into the measure name passed. 
+	 */
+	public String getMeasureApply(String measure)
+	{
+		StringBuilder sb = new StringBuilder(classname.getMeasureName(location).getName());
+		sb.append("(");
+		String separator = "";
+		
+		for (POExpression arg: args)
+		{
+			sb.append(separator);
+			sb.append(Utils.deBracketed(arg));
+			separator = ", ";
+		}
+
+		if (fdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)fdef;
+
+			if (exop.stateDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(exop.stateDefinition.toPattern(false, location));
+			}
+			else if (exop.classDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(exop.classDefinition.toPattern(false, location));
+			}
+		}
+		else if (fdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)fdef;
+
+			if (imop.stateDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(imop.stateDefinition.toPattern(false, location));
+			}
+			else if (imop.classDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(imop.classDefinition.toPattern(false, location));
+			}
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override

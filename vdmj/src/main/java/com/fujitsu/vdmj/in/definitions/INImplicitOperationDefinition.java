@@ -64,6 +64,8 @@ public class INImplicitOperationDefinition extends INDefinition
 	public final INExplicitFunctionDefinition postdef;
 	public final INStateDefinition stateDefinition;
 	public final TCOperationType type;		// Created from params/result
+	public final INExplicitFunctionDefinition measureDef;
+
 
 	public INImplicitOperationDefinition(INAnnotationList annotations,
 		INAccessSpecifier accessSpecifier, TCNameToken name,
@@ -71,7 +73,7 @@ public class INImplicitOperationDefinition extends INDefinition
 		INPatternTypePair result, INStatement body,
 		INExpression precondition, INExpression postcondition, INErrorCaseList errors, boolean isConstructor,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef, INStateDefinition stateDefinition,
-		INClassDefinition classDefinition)
+		INClassDefinition classDefinition, INExplicitFunctionDefinition measureDef)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -87,6 +89,7 @@ public class INImplicitOperationDefinition extends INDefinition
 		this.postdef = postdef;
 		this.stateDefinition = stateDefinition;
 		this.classDefinition = classDefinition;
+		this.measureDef = measureDef;
 
 		TCTypeList ptypes = new TCTypeList();
 
@@ -154,6 +157,12 @@ public class INImplicitOperationDefinition extends INDefinition
 		if (postdef != null)
 		{
 			nvl.add(new NameValuePair(postdef.name, postfunc));
+		}
+		
+		if (measureDef != null && measureDef.name.isMeasureName())
+		{
+			NameValuePairList names = measureDef.getNamedValues(ctxt);
+			nvl.addAll(names);
 		}
 
 		return nvl;

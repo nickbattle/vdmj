@@ -56,6 +56,7 @@ public class INExplicitOperationDefinition extends INDefinition
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
 	public final INStateDefinition stateDefinition;
+	public final INExplicitFunctionDefinition measureDef;
 
 	public INExplicitOperationDefinition(INAnnotationList annotations,
 		INAccessSpecifier accessSpecifier,
@@ -63,7 +64,8 @@ public class INExplicitOperationDefinition extends INDefinition
 		INPatternList parameters, INExpression precondition,
 		INExpression postcondition, INStatement body, boolean isConstructor,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef,
-		INStateDefinition stateDefinition, INClassDefinition classDefinition)
+		INStateDefinition stateDefinition, INClassDefinition classDefinition,
+	INExplicitFunctionDefinition measureDef)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -78,6 +80,7 @@ public class INExplicitOperationDefinition extends INDefinition
 		this.postdef = postdef;
 		this.stateDefinition = stateDefinition;
 		this.classDefinition = classDefinition;
+		this.measureDef = measureDef;
 	}
 
 	@Override
@@ -128,6 +131,12 @@ public class INExplicitOperationDefinition extends INDefinition
 		if (postdef != null)
 		{
 			nvl.add(new NameValuePair(postdef.name, postfunc));
+		}
+		
+		if (measureDef != null && measureDef.name.isMeasureName())
+		{
+			NameValuePairList names = measureDef.getNamedValues(ctxt);
+			nvl.addAll(names);
 		}
 
 		return nvl;

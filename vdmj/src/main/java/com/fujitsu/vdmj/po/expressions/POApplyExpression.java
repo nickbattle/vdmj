@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
@@ -266,6 +268,37 @@ public class POApplyExpression extends POExpression
 			sb.append(separator);
 			sb.append(Utils.deBracketed(arg));
 			separator = ", ";
+		}
+
+		if (opdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+			if (exop.stateDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(exop.stateDefinition.toPattern(false, location));
+			}
+			else if (exop.classDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(exop.classDefinition.toPattern(false, location));
+			}
+		}
+		else if (opdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+
+			if (imop.stateDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(imop.stateDefinition.toPattern(false, location));
+			}
+			else if (imop.classDefinition != null)
+			{
+				sb.append(separator);
+				sb.append(imop.classDefinition.toPattern(false, location));
+			}
 		}
 
 		sb.append(")");
