@@ -100,7 +100,8 @@ public class RecursiveObligation extends ProofObligation
 			}
 		}
 
-		return null;
+		markUnchecked(ProofObligation.MISSING_MEASURE);
+		return getLHS(def);		// eg. "measure_op(args, state)"
 	}
 
 	private String getLHS(PODefinition def)
