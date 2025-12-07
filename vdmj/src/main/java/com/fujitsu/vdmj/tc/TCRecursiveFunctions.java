@@ -32,12 +32,17 @@ import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.tc.annotations.TCOperationMeasureAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
-import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * A class to hold recursive loop data, which is used to detect mutual recursion and
@@ -50,12 +55,12 @@ public class TCRecursiveFunctions
 	
 	private static class Apply
 	{
-		public final TCApplyExpression apply;
+		public final TCDefinitionListList loops;
 		public final TCDefinition calling;
 		
-		public Apply(TCApplyExpression apply, TCDefinition calling)
+		public Apply(TCDefinitionListList loops, TCDefinition calling)
 		{
-			this.apply = apply;
+			this.loops = loops;
 			this.calling = calling;
 		}
 	}
@@ -83,7 +88,7 @@ public class TCRecursiveFunctions
 		defmap = new  HashMap<TCNameToken, TCDefinition>();
 	}
 	
-	public void addApplyExp(TCDefinition parent, TCApplyExpression apply, TCDefinition calling)
+	public void addCaller(TCDefinition parent, TCDefinitionListList loops, TCDefinition calling)
 	{
 		if (!applymap.containsKey(parent))
 		{
@@ -91,7 +96,7 @@ public class TCRecursiveFunctions
 			callmap.put(parent.name, new TCNameSet());
 		}
 		
-		applymap.get(parent).add(new Apply(apply, calling));
+		applymap.get(parent).add(new Apply(loops, calling));
 		callmap.get(parent.name).add(calling.name);
 		defmap.put(parent.name, parent);
 		defmap.put(calling.name, calling);
@@ -117,7 +122,7 @@ public class TCRecursiveFunctions
 			{
 				for (Apply pair: applymap.get(parent))
 				{
-					pair.apply.typeCheckCycles(cycles, parent, pair.calling);
+					typeCheckCycles(cycles, parent, pair.calling, pair.loops);
 				}
 			}
 		}
@@ -152,8 +157,183 @@ public class TCRecursiveFunctions
 			existing.add(defs);
 		}
 	}
+	
+	private void typeCheckCycles(TCDefinitionListList cycles,
+		TCDefinition parent, TCDefinition calling, TCDefinitionListList loops)
+	{
+		List<List<String>> cycleNames = new Vector<List<String>>();
+		boolean mutuallyRecursive = false;
+		loops.clear();
 
-	public List<String> toStrings(TCDefinitionList cycle)
+		for (TCDefinitionList cycle: cycles)
+		{
+			if (cycle.size() >= 2)
+			{
+				if (cycle.get(1).equals(calling))	// The parent cycle involves this next call
+				{
+					loops.add(cycle);
+					cycleNames.add(toStrings(cycle));
+					mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f] not [f, f]
+					checkCycleMeasures(cycle);
+				}
+			}
+		}
+		
+		if (cycleNames.isEmpty())
+		{
+			// No recursion via this "parent calling" 
+			return;
+		}
+		
+		if (parent instanceof TCExplicitFunctionDefinition)
+		{
+			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)parent;
+			def.recursive = true;
+			
+			if (def.measureExp == null)
+			{
+				missingMeasureWarning(mutuallyRecursive, def, cycleNames);
+			}
+		}
+		else if (parent instanceof TCImplicitFunctionDefinition)
+		{
+			TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)parent;
+			def.recursive = true;
+			
+			if (def.measureExp == null)
+			{
+				missingMeasureWarning(mutuallyRecursive, def, cycleNames);
+			}
+		}
+		else if (parent instanceof TCExplicitOperationDefinition)
+		{
+			TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)parent;
+			exop.recursive = true;
+			
+			if (exop.annotations == null ||
+				exop.annotations.getInstance(TCOperationMeasureAnnotation.class) == null)
+			{
+				missingMeasureWarning(mutuallyRecursive, exop, cycleNames);
+			}
+		}
+		else if (parent instanceof TCImplicitOperationDefinition)
+		{
+			TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)parent;
+			imop.recursive = true;
+
+			if (imop.annotations == null ||
+				imop.annotations.getInstance(TCOperationMeasureAnnotation.class) == null)
+			{
+				missingMeasureWarning(mutuallyRecursive, imop, cycleNames);
+			}
+		}
+	}
+
+	private void missingMeasureWarning(boolean mutuallyRecursive, TCDefinition def, List<List<String>> cycleNames)
+	{
+		if (mutuallyRecursive)
+		{
+			def.warning(5013, "Mutually recursive cycle has no measure");
+			
+			for (List<String> cycleName: cycleNames)
+			{
+				def.detail("Cycle", cycleName);
+			}
+		}
+		else
+		{
+			String message = def.isFunction() ?
+				"Recursive function has no measure" :
+				"Recursive operation has no measure";
+
+			def.warning(5012, message);
+		}
+	}
+
+	private void checkCycleMeasures(TCDefinitionList cycle)
+	{
+		for (int i = 0; i < cycle.size()-2; i++)
+		{
+			TCDefinition d1 = cycle.get(i);
+			TCDefinition d2 = cycle.get(i+1);
+			StringBuilder sb1 = new StringBuilder();
+			StringBuilder sb2 = new StringBuilder();
+			
+			TCType a = measureType(d1, sb1);
+			TCType b = measureType(d2, sb2);
+			
+			if (a != null && b != null && !a.equals(b))
+			{
+				d1.report(3364, "Recursive cycle measures return different types");
+				d1.detail(sb1.toString(), a);
+				d1.detail(sb2.toString(), b);
+			}
+		}
+	}
+
+	private TCType measureType(TCDefinition def, StringBuilder mname)
+	{
+		if (def instanceof TCExplicitFunctionDefinition)
+		{
+			TCExplicitFunctionDefinition expl = (TCExplicitFunctionDefinition)def;
+
+			if (expl.measureName != null)
+			{
+				mname.append(expl.measureName);
+			}
+			else
+			{
+				mname.append(def.name.toString());
+			}
+
+			return expl.measureDef != null ? expl.measureDef.type.result : null;
+		}
+		else if (def instanceof TCImplicitFunctionDefinition)
+		{
+			TCImplicitFunctionDefinition impl = (TCImplicitFunctionDefinition)def;
+
+			if (impl.measureName != null)
+			{
+				mname.append(impl.measureName);
+			}
+			else
+			{
+				mname.append(def.name.toString());
+			}
+
+			return impl.measureDef != null ? impl.measureDef.type.result : null;
+		}
+		else if (def instanceof TCExplicitOperationDefinition)
+		{
+			if (def.annotations != null)
+			{
+				TCOperationMeasureAnnotation measure = def.annotations.getInstance(TCOperationMeasureAnnotation.class);
+
+				if (measure != null)
+				{
+					mname.append(def.name.toString());
+					return measure.args.get(1).getType();
+				}
+			}	
+		}
+		else if (def instanceof TCImplicitOperationDefinition)
+		{
+			if (def.annotations != null)
+			{
+				TCOperationMeasureAnnotation measure = def.annotations.getInstance(TCOperationMeasureAnnotation.class);
+
+				if (measure != null)
+				{
+					mname.append(def.name.toString());
+					return measure.args.get(1).getType();
+				}
+			}	
+		}
+		
+		return null;
+	}
+
+	private List<String> toStrings(TCDefinitionList cycle)
 	{
 		List<String> calls = new Vector<String>();
 

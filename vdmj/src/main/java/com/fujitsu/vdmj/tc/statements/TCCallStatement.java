@@ -24,8 +24,10 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.tc.TCRecursiveFunctions;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -46,6 +48,8 @@ public class TCCallStatement extends TCStatement
 	public final TCNameToken name;
 	public final TCExpressionList args;
 
+	// Used by PO
+	private TCDefinitionListList recursiveCycles = null;
 	private TCDefinition opdef = null;
 	
 	public TCCallStatement(TCNameToken name, TCExpressionList args)
@@ -113,9 +117,9 @@ public class TCCallStatement extends TCStatement
 		{
     		TCOperationType optype = type.getOperation();
     		optype.typeResolve(env);
-    		TCDefinition encl = env.getEnclosingDefinition();
+    		TCDefinition encldef = env.getEnclosingDefinition();
     		
-    		if (encl != null && encl.isPure() && !optype.isPure())
+    		if (encldef != null && encldef.isPure() && !optype.isPure())
     		{
     			report(3339, "Cannot call impure operation from a pure operation");
     		}
@@ -127,6 +131,12 @@ public class TCCallStatement extends TCStatement
     		{
     			name.setTypeQualifier(optype.parameters);
     		}
+
+			if (encldef != null && opdef != null)
+			{
+				recursiveCycles = new TCDefinitionListList();
+				TCRecursiveFunctions.getInstance().addCaller(encldef, recursiveCycles, opdef);
+			}
 
     		checkArgTypes(optype.parameters, atypes);
     		return checkReturnType(constraint, optype.result, mandatory);
