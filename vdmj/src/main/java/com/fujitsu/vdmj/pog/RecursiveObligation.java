@@ -29,7 +29,9 @@ import com.fujitsu.vdmj.po.annotations.POOperationMeasureAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -48,7 +50,7 @@ public class RecursiveObligation extends ProofObligation
 		
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
-		int measureLexical = getLex(getMeasureDef(defs.get(0)));
+		int measureLexical = getLex(getMeasureType(defs.get(0)));
 		
 		String lhs = getLHS(defs.get(0));
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
@@ -127,6 +129,42 @@ public class RecursiveObligation extends ProofObligation
 
 			sb.append(")");
 		}
+		else if (def instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition edef = (POExplicitOperationDefinition)def;
+			sb.append(getMeasureName(edef));
+			sb.append("(");
+			String sep = "";
+			
+			for (POPattern p: edef.parameterPatterns)
+			{
+				sb.append(sep);
+				sb.append(p.removeIgnorePatterns());
+				sep = ", ";
+			}
+
+			sb.append(")");
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)def;
+			sb.append(getMeasureName(idef));
+			sb.append("(");
+
+			for (POPatternListTypePair pltp: idef.parameterPatterns)
+			{
+				String sep = "";
+				
+				for (POPattern p: pltp.patterns)
+				{
+					sb.append(sep);
+					sb.append(p.removeIgnorePatterns());
+					sep = ", ";
+				}
+			}
+
+			sb.append(")");
+		}
 		
 		return sb.toString();
 	}
@@ -141,10 +179,6 @@ public class RecursiveObligation extends ProofObligation
 			{
 				return edef.measureName.getName();
 			}
-			else
-			{
-				return "measure_" + edef.name.getName();
-			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
@@ -154,57 +188,86 @@ public class RecursiveObligation extends ProofObligation
 			{
 				return idef.measureName.getName();
 			}
-			else
-			{
-				return "measure_" + idef.name.getName();
-			}
 		}
-		else
-		{
-			return null;
-		}
+		
+		// @OperationMeasures do this
+		return "measure_" + def.name.getName();
 	}
 
-	private POExplicitFunctionDefinition getMeasureDef(PODefinition def)
+	private TCType getMeasureType(PODefinition def)
 	{
 		if (def instanceof POExplicitFunctionDefinition)
 		{
 			POExplicitFunctionDefinition edef = (POExplicitFunctionDefinition)def;
-			return edef.measureDef;
+
+			if (edef.measureDef != null)
+			{
+				return edef.measureDef.getType();
+			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
 			POImplicitFunctionDefinition idef = (POImplicitFunctionDefinition)def;
-			return idef.measureDef;
+
+			if (idef.measureDef != null)
+			{
+				return idef.measureDef.getType();
+			}
 		}
-		else
+		else if (def instanceof POExplicitOperationDefinition ||
+				 def instanceof POImplicitOperationDefinition)
 		{
-			return null;
+			if (def.annotations != null)
+			{
+				POOperationMeasureAnnotation measure = def.annotations.getInstance(POOperationMeasureAnnotation.class);
+				
+				if (measure != null)
+				{
+					return measure.type;
+				}
+			}
 		}
+		
+		return null;
 	}
 
-	private int getLex(POExplicitFunctionDefinition mdef)
+	private int getLex(TCType type)
 	{
-		if (mdef == null)
+		if (type == null)
 		{
 			return 0;
 		}
 		
-		TCFunctionType ftype = (TCFunctionType) mdef.getType();
-		
-		while (ftype.result instanceof TCFunctionType)	// Skip curries
+		if (type instanceof TCFunctionType)
 		{
-			ftype = (TCFunctionType)ftype.result;
+			TCFunctionType ftype = (TCFunctionType) type;
+			
+			while (ftype.result instanceof TCFunctionType)	// Skip curries
+			{
+				ftype = (TCFunctionType)ftype.result;
+			}
+
+			if (ftype.result instanceof TCProductType)
+			{
+				TCProductType ptype = (TCProductType)ftype.result;
+				return ptype.types.size();
+			}
+			else
+			{
+				return 0;
+			}
 		}
-		
-		if (ftype.result instanceof TCProductType)
+		else	// @OperationMeasure
 		{
-			TCProductType type = (TCProductType)ftype.result;
-			return type.types.size();
-		}
-		else
-		{
-			return 0;
+			if (type instanceof TCProductType)
+			{
+				TCProductType ptype = (TCProductType)type;
+				return ptype.types.size();
+			}
+			else
+			{
+				return 0;
+			}
 		}
 	}
 
@@ -254,16 +317,18 @@ public class RecursiveObligation extends ProofObligation
 		return results;
 	}
 
-	public static ProofObligationList getAllPOs(LexLocation location,
-		POOperationMeasureAnnotation measure, POContextStack ctxt)
-	{
-		ProofObligationList results = new ProofObligationList();
+	// TODO Remove me?
+
+	// public static ProofObligationList getAllPOs(LexLocation location,
+	// 	POOperationMeasureAnnotation measure, POContextStack ctxt)
+	// {
+	// 	ProofObligationList results = new ProofObligationList();
 		
-		for (POContextStack choice: ctxt.getAlternatives())
-		{
-			results.add(new RecursiveObligation(location, measure, choice));
-		}
+	// 	for (POContextStack choice: ctxt.getAlternatives())
+	// 	{
+	// 		results.add(new RecursiveObligation(location, measure, choice));
+	// 	}
 		
-		return results;
-	}
+	// 	return results;
+	// }
 }

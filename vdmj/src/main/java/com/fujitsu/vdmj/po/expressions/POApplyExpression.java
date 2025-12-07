@@ -27,8 +27,6 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
-import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
@@ -116,21 +114,6 @@ public class POApplyExpression extends POExpression
 				getFuncOpObligations(ctxt, obligations);	// Below
 			}
 	
-			if (type.isFunction(location))
-			{
-				if (recursiveCycles != null)	// name is a function in a recursive loop
-				{
-					/**
-					 * All of the functions in the loop will generate similar obligations,
-					 * so the "add" method eliminates any duplicates.
-					 */
-					for (PODefinitionList loop: recursiveCycles)
-					{
-						obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
-					}
-				}
-			}
-	
 			if (type.isSeq(location))
 			{
 				TCSeqType st = type.getSeq();
@@ -179,6 +162,18 @@ public class POApplyExpression extends POExpression
 	 */
 	public void getFuncOpObligations(POContextStack ctxt, ProofObligationList obligations)
 	{
+		if (recursiveCycles != null)	// name is a func/op in a recursive loop
+		{
+			/**
+			 * All of the func/ops in the loop will generate similar obligations,
+			 * so the "add" method eliminates any duplicates.
+			 */
+			for (PODefinitionList loop: recursiveCycles)
+			{
+				obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+			}
+		}
+
 		String prename = root.getPreName();
 
 		if (type.isFunction(location) && prename != null && !prename.isEmpty())
@@ -189,24 +184,26 @@ public class POApplyExpression extends POExpression
 		{
 			obligations.addAll(POCallStatement.checkPrecondition(location, opdef, args, ctxt));
 
-			if (opdef instanceof POExplicitOperationDefinition)
-			{
-				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+			// TODO Remove me?
 
-				if (exop.measure != null)
-				{
-					obligations.addAll(exop.measure.getProofObligations(this, ctxt));
-				}
-			}
-			else if (opdef instanceof POImplicitOperationDefinition)
-			{
-				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+			// if (opdef instanceof POExplicitOperationDefinition)
+			// {
+			// 	POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
 
-				if (imop.measure != null)
-				{
-					obligations.addAll(imop.measure.getProofObligations(this, ctxt));
-				}
-			}
+			// 	if (exop.measure != null)
+			// 	{
+			// 		obligations.addAll(exop.measure.getProofObligations(this, ctxt));
+			// 	}
+			// }
+			// else if (opdef instanceof POImplicitOperationDefinition)
+			// {
+			// 	POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+
+			// 	if (imop.measure != null)
+			// 	{
+			// 		obligations.addAll(imop.measure.getProofObligations(this, ctxt));
+			// 	}
+			// }
 		}
 		
 		TCTypeList paramTypes = type.isFunction(location) ?

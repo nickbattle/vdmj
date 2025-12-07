@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.typechecker;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.tc.TCRecursiveFunctions;
+import com.fujitsu.vdmj.tc.TCRecursiveCycles;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -188,7 +188,7 @@ public class ModuleTypeChecker extends TypeChecker
 		}
 		
 		// Prepare to look for recursive loops
-		TCRecursiveFunctions.getInstance().reset();
+		TCRecursiveCycles.getInstance().reset();
 
 		// Proceed to type check all definitions, considering types, values
 		// and remaining definitions, in that order.
@@ -253,7 +253,7 @@ public class ModuleTypeChecker extends TypeChecker
 		}
 		
 		// Look for recursive loops
-		TCRecursiveFunctions.getInstance().typeCheck();
+		TCRecursiveCycles.getInstance().typeCheck();
 
 		// Report any discrepancies between the final checked types of
 		// definitions and their explicit imported types.

@@ -48,10 +48,10 @@ import com.fujitsu.vdmj.tc.types.TCType;
  * A class to hold recursive loop data, which is used to detect mutual recursion and
  * missing measure functions.
  */
-public class TCRecursiveFunctions
+public class TCRecursiveCycles
 {
 	private static final int LOOP_SIZE_LIMIT = 8;
-	private static TCRecursiveFunctions INSTANCE = null;
+	private static TCRecursiveCycles INSTANCE = null;
 	
 	private static class Apply
 	{
@@ -70,11 +70,11 @@ public class TCRecursiveFunctions
 	private Map<TCNameToken, TCDefinition> defmap = null;
 	private Map<TCNameToken, TCDefinitionListList> recursiveLoops = null;
 
-	public static TCRecursiveFunctions getInstance()
+	public static TCRecursiveCycles getInstance()
 	{
 		if (INSTANCE == null)
 		{
-			INSTANCE = new TCRecursiveFunctions();
+			INSTANCE = new TCRecursiveCycles();
 		}
 		
 		return INSTANCE;
@@ -312,7 +312,7 @@ public class TCRecursiveFunctions
 				if (measure != null)
 				{
 					mname.append(def.name.toString());
-					return measure.args.get(1).getType();
+					return measure.args.get(0).getType();
 				}
 			}	
 		}
@@ -325,7 +325,7 @@ public class TCRecursiveFunctions
 				if (measure != null)
 				{
 					mname.append(def.name.toString());
-					return measure.args.get(1).getType();
+					return measure.args.get(0).getType();
 				}
 			}	
 		}

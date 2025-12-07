@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.tc.TCRecursiveFunctions;
+import com.fujitsu.vdmj.tc.TCRecursiveCycles;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
@@ -118,7 +118,7 @@ public class TCApplyExpression extends TCExpression
 			if (encldef != null && calling != null && calling.isFunctionOrOperation())
 			{
 				recursiveCycles = new TCDefinitionListList();
-				TCRecursiveFunctions.getInstance().addCaller(encldef, recursiveCycles, calling);
+				TCRecursiveCycles.getInstance().addCaller(encldef, recursiveCycles, calling);
 			}
 		}
 

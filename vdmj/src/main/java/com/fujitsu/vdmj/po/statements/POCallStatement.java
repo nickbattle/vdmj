@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -58,13 +59,15 @@ public class POCallStatement extends POStatement
 	public final TCNameToken name;
 	public final POExpressionList args;
 	public final PODefinition opdef;
+	public final PODefinitionListList recursiveCycles;
 
-	public POCallStatement(TCNameToken name, POExpressionList args, PODefinition opdef)
+	public POCallStatement(TCNameToken name, POExpressionList args, PODefinition opdef, PODefinitionListList recursiveCycles)
 	{
 		super(name.getLocation());
 		this.name = name;
 		this.args = args;
 		this.opdef = opdef;
+		this.recursiveCycles = recursiveCycles;
 	}
 
 	@Override

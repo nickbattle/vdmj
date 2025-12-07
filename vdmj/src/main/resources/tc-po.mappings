@@ -242,7 +242,7 @@ map TCAssignmentStatementList{} to POAssignmentStatementList(this);
 map TCAtomicStatement{location, assignments, stmttype} to POAtomicStatement(location, assignments) set stmttype;
 map TCBlockStatement{location, assignmentDefs, statements, stmttype} to POBlockStatement(location, assignmentDefs, statements) set stmttype;
 map TCCallObjectStatement{location, designator, classname, fieldname, args, fdef, stmttype} to POCallObjectStatement(location, designator, classname, fieldname, args, fdef) set stmttype;
-map TCCallStatement{name, args, opdef, stmttype} to POCallStatement(name, args, opdef) set stmttype;
+map TCCallStatement{name, args, opdef, recursiveCycles, stmttype} to POCallStatement(name, args, opdef, recursiveCycles) set stmttype;
 map TCCasesStatement{location, exp, cases, others, expType, stmttype} to POCasesStatement(location, exp, cases, others, expType) set stmttype;
 map TCCaseStmtAlternative{exp, pattern, statement} to POCaseStmtAlternative(exp, pattern, statement);
 map TCCaseStmtAlternativeList{} to POCaseStmtAlternativeList(this);
@@ -357,7 +357,7 @@ map TCLoopAnnotations{invariants, measure} to POLoopAnnotations(invariants, meas
 map TCLoopInvariantList{ghostDef} to POLoopInvariantList(this, ghostDef);
 map TCLoopInvariantAnnotation{name, args, hasLoopVars} to POLoopInvariantAnnotation(name, args, hasLoopVars);
 map TCLoopMeasureAnnotation{name, args, stmt, measureName} to POLoopMeasureAnnotation(name, args, stmt, measureName);
-map TCOperationMeasureAnnotation{name, args, measureName} to POOperationMeasureAnnotation(name, args, measureName);
+map TCOperationMeasureAnnotation{name, args, measureName, type} to POOperationMeasureAnnotation(name, args, measureName, type);
 
 # Java - usually unmappeds
 unmapped java.lang.Boolean;

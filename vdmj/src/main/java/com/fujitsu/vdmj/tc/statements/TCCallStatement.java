@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import com.fujitsu.vdmj.tc.TCRecursiveFunctions;
+import com.fujitsu.vdmj.tc.TCRecursiveCycles;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
@@ -135,7 +135,7 @@ public class TCCallStatement extends TCStatement
 			if (encldef != null && opdef != null)
 			{
 				recursiveCycles = new TCDefinitionListList();
-				TCRecursiveFunctions.getInstance().addCaller(encldef, recursiveCycles, opdef);
+				TCRecursiveCycles.getInstance().addCaller(encldef, recursiveCycles, opdef);
 			}
 
     		checkArgTypes(optype.parameters, atypes);

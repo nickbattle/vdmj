@@ -27,7 +27,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.tc.TCRecursiveFunctions;
+import com.fujitsu.vdmj.tc.TCRecursiveCycles;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
@@ -201,7 +201,7 @@ public class TCCallObjectStatement extends TCStatement
 			if (encldef != null && fdef != null)
 			{
 				recursiveCycles = new TCDefinitionListList();
-				TCRecursiveFunctions.getInstance().addCaller(encldef, recursiveCycles, fdef);
+				TCRecursiveCycles.getInstance().addCaller(encldef, recursiveCycles, fdef);
 			}
 
 			checkArgTypes(optype.parameters, atypes);	// Not necessary?
