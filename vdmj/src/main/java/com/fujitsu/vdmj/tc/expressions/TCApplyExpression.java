@@ -60,6 +60,7 @@ public class TCApplyExpression extends TCExpression
 	// Used by PO
 	public TCDefinitionListList recursiveCycles = null;
 	public TCDefinition opdef = null;
+	public Boolean inFunction = null;
 
 	public TCApplyExpression(TCExpression root, TCExpressionList args)
 	{
@@ -93,7 +94,7 @@ public class TCApplyExpression extends TCExpression
 
 		TCDefinition encldef = env.getEnclosingDefinition();
 
-		boolean inFunction = env.isFunctional();
+		this.inFunction = env.isFunctional();
 		boolean inOperation = !inFunction;
 		boolean inReserved = (encldef == null || encldef.name == null) ? false : encldef.name.isReserved();
 			

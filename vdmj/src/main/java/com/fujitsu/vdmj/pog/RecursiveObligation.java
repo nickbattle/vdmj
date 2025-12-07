@@ -401,19 +401,4 @@ public class RecursiveObligation extends ProofObligation
 		
 		return results;
 	}
-
-	// TODO Remove me?
-
-	// public static ProofObligationList getAllPOs(LexLocation location,
-	// 	POOperationMeasureAnnotation measure, POContextStack ctxt)
-	// {
-	// 	ProofObligationList results = new ProofObligationList();
-		
-	// 	for (POContextStack choice: ctxt.getAlternatives())
-	// 	{
-	// 		results.add(new RecursiveObligation(location, measure, choice));
-	// 	}
-		
-	// 	return results;
-	// }
 }

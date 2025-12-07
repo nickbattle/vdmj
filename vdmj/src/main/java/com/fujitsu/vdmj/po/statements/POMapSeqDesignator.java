@@ -68,7 +68,7 @@ public class POMapSeqDesignator extends POStateDesignator
 		TCTypeList argtypes = new TCTypeList();
 		TCType type = new TCUnknownType(location);
 		argtypes.add(type);
-		return new POApplyExpression(root, args , type, argtypes, null, null);
+		return new POApplyExpression(root, args , type, argtypes, null, null, null);
 	}
 
 	@Override

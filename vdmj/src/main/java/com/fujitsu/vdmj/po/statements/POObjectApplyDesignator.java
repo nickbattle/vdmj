@@ -51,6 +51,6 @@ public class POObjectApplyDesignator extends POObjectDesignator
 	@Override
 	public POExpression getExpression()
 	{
-		return new POApplyExpression(object.getExpression(), args, null, null, null, null);
+		return new POApplyExpression(object.getExpression(), args, null, null, null, null, null);
 	}
 }

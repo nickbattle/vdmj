@@ -183,7 +183,8 @@ public class POExpressionOperationExtractor extends POExpressionVisitor<POExpres
 				node.type,
 				node.argtypes,
 				node.recursiveCycles,
-				node.opdef);
+				node.opdef,
+				node.inFunction);
 
 		extracted.setExptype(node.getExptype());
 

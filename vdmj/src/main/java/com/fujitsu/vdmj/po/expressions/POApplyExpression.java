@@ -59,9 +59,10 @@ public class POApplyExpression extends POExpression
 	public final TCTypeList argtypes;
 	public final PODefinitionListList recursiveCycles;
 	public final PODefinition opdef;
+	public final Boolean inFunction;
 
 	public POApplyExpression(POExpression root, POExpressionList args,
-		TCType type, TCTypeList argtypes, PODefinitionListList recursiveCycles, PODefinition opdef)
+		TCType type, TCTypeList argtypes, PODefinitionListList recursiveCycles, PODefinition opdef, Boolean inFunction)
 	{
 		super(root);
 		this.root = root;
@@ -70,6 +71,7 @@ public class POApplyExpression extends POExpression
 		this.argtypes = argtypes;
 		this.recursiveCycles = recursiveCycles;
 		this.opdef = opdef;
+		this.inFunction = inFunction;
 	}
 
 	@Override
@@ -173,7 +175,7 @@ public class POApplyExpression extends POExpression
 			 */
 			for (PODefinitionList loop: recursiveCycles)
 			{
-				POType potype = type.isOperation(location) ? POType.OP_RECURSIVE : POType.FUNC_RECURSIVE;
+				POType potype = inFunction ? POType.FUNC_RECURSIVE : POType.OP_RECURSIVE;
 				obligations.addAll(RecursiveObligation.getAllPOs(location, potype, loop, this, ctxt));
 			}
 		}
@@ -187,27 +189,6 @@ public class POApplyExpression extends POExpression
 		else if (type.isOperation(location))
 		{
 			obligations.addAll(POCallStatement.checkPrecondition(location, opdef, args, ctxt));
-
-			// TODO Remove me?
-
-			// if (opdef instanceof POExplicitOperationDefinition)
-			// {
-			// 	POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
-
-			// 	if (exop.measure != null)
-			// 	{
-			// 		obligations.addAll(exop.measure.getProofObligations(this, ctxt));
-			// 	}
-			// }
-			// else if (opdef instanceof POImplicitOperationDefinition)
-			// {
-			// 	POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
-
-			// 	if (imop.measure != null)
-			// 	{
-			// 		obligations.addAll(imop.measure.getProofObligations(this, ctxt));
-			// 	}
-			// }
 		}
 		
 		TCTypeList paramTypes = type.isFunction(location) ?

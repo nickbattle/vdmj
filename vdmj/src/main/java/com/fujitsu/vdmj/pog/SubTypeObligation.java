@@ -122,7 +122,7 @@ public class SubTypeObligation extends ProofObligation
 			}
 			
 			TCFunctionType type = (TCFunctionType)func.getType();
-			body = new POApplyExpression(root, args, type, type.parameters, null, null);
+			body = new POApplyExpression(root, args, type, type.parameters, null, null, null);
 		}
 		else
 		{
@@ -159,7 +159,7 @@ public class SubTypeObligation extends ProofObligation
 			}
 
 			TCFunctionType type = (TCFunctionType)func.getType();
-			body = new POApplyExpression(root, args, type, type.parameters, null, null);
+			body = new POApplyExpression(root, args, type, type.parameters, null, null, null);
 		}
 		else
 		{
