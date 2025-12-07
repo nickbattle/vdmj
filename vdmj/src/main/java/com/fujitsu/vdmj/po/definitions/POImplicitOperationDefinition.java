@@ -90,8 +90,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final TCNameSet localUpdates;
 	public final PODefinitionSet transitiveCalls;
 	public final TCNameSet transitiveUpdates;
-
-	public POOperationMeasureAnnotation measure = null;
+	public final POExplicitFunctionDefinition measureDef;
 
 	public POImplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name,
@@ -111,7 +110,8 @@ public class POImplicitOperationDefinition extends PODefinition
 		TCTypeSet possibleExceptions,
 		TCNameSet localUpdates,
 		PODefinitionSet transitiveCalls,
-		TCNameSet transitiveUpdates)
+		TCNameSet transitiveUpdates,
+		POExplicitFunctionDefinition measureDef)
 	{
 		super(name.getLocation(), name);
 		
@@ -134,11 +134,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		this.localUpdates = localUpdates;
 		this.transitiveCalls = transitiveCalls;
 		this.transitiveUpdates = transitiveUpdates;
-
-		if (annotations != null)
-		{
-			this.measure = annotations.getInstance(POOperationMeasureAnnotation.class);
-		}
+		this.measureDef = measureDef;
 	}
 
 	@Override
@@ -234,7 +230,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			{
 				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 				addOldContext(ctxt);
-				// addMeasure(ctxt);
+				addMeasure(ctxt);
 
 				obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
@@ -248,7 +244,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			else if (classDefinition != null)
 			{
 				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
-				// addMeasure(ctxt);
+				addMeasure(ctxt);
 				ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
 				
 				if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
@@ -266,7 +262,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			else	// Flat spec with no state defined
 			{
 				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
-				// addMeasure(ctxt);
+				addMeasure(ctxt);
 				obligations.addAll(body.getProofObligations(ctxt, pogState, env));
 
 				if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
@@ -330,15 +326,18 @@ public class POImplicitOperationDefinition extends PODefinition
 		}
 	}
 
-	// TODO Remove me
+	private void addMeasure(POContextStack ctxt)
+	{
+		if (annotations != null)
+		{
+			POOperationMeasureAnnotation measure = annotations.getInstance(POOperationMeasureAnnotation.class);
 
-	// private void addMeasure(POContextStack ctxt)
-	// {
-	// 	if (measure != null)
-	// 	{
-	// 		ctxt.push(new POLetDefContext(measure.getDefinition()));
-	// 	}
-	// }
+			if (measure != null)
+			{
+				ctxt.push(new POLetDefContext(measure.getDefinition()));
+			}
+		}
+	}
 
 	public POPatternListList getListParamPatternList()
 	{

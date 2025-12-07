@@ -46,15 +46,15 @@ public class RecursiveObligation extends ProofObligation
 {
 	public final boolean mutuallyRecursive;
 	
-	private RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	private RecursiveObligation(LexLocation location, POType potype, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
-		super(location, POType.FUNC_RECURSIVE, ctxt);
+		super(location, potype, ctxt);
 		
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
 		
-		String lhs = getLHS(defs.get(0));
+		String lhs = potype == POType.OP_RECURSIVE ? getGhostName(defs.get(0)) : getLHS(defs.get(0));
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
@@ -68,7 +68,7 @@ public class RecursiveObligation extends ProofObligation
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
 		
-		String lhs = getLHS(defs.get(0));
+		String lhs = getGhostName(defs.get(0));
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
@@ -82,10 +82,25 @@ public class RecursiveObligation extends ProofObligation
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
 		
-		String lhs = getLHS(defs.get(0));
+		String lhs = getGhostName(defs.get(0));
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
+	}
+
+	private String getGhostName(PODefinition def)
+	{
+		if (def.annotations != null)
+		{
+			POOperationMeasureAnnotation measure = def.annotations.getInstance(POOperationMeasureAnnotation.class);
+			
+			if (measure != null)
+			{
+				return measure.ghostName.getName();
+			}
+		}
+
+		return null;
 	}
 
 	private String getLHS(PODefinition def)
@@ -253,17 +268,22 @@ public class RecursiveObligation extends ProofObligation
 				return idef.measureDef.getType();
 			}
 		}
-		else if (def instanceof POExplicitOperationDefinition ||
-				 def instanceof POImplicitOperationDefinition)
+		else if (def instanceof POExplicitOperationDefinition)
 		{
-			if (def.annotations != null)
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
+
+			if (exop.measureDef != null)
 			{
-				POOperationMeasureAnnotation measure = def.annotations.getInstance(POOperationMeasureAnnotation.class);
-				
-				if (measure != null)
-				{
-					return measure.type;
-				}
+				return exop.measureDef.getType();
+			}
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
+
+			if (imop.measureDef != null)
+			{
+				return imop.measureDef.getType();
 			}
 		}
 		
@@ -343,14 +363,15 @@ public class RecursiveObligation extends ProofObligation
 	/**
 	 * Create an obligation for each of the alternative stacks contained in the ctxt.
 	 * This happens with operation POs that push POAltContexts onto the stack.
+	 * @param potype 
 	 */
-	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	public static ProofObligationList getAllPOs(LexLocation location, POType potype, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new RecursiveObligation(location, defs, apply, choice));
+			results.add(new RecursiveObligation(location, potype, defs, apply, choice));
 		}
 		
 		return results;

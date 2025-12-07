@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
@@ -172,7 +173,8 @@ public class POApplyExpression extends POExpression
 			 */
 			for (PODefinitionList loop: recursiveCycles)
 			{
-				obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+				POType potype = type.isOperation(location) ? POType.OP_RECURSIVE : POType.FUNC_RECURSIVE;
+				obligations.addAll(RecursiveObligation.getAllPOs(location, potype, loop, this, ctxt));
 			}
 		}
 

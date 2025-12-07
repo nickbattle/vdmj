@@ -51,8 +51,8 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public TCNameToken measureName = null;
-	public TCType type;		// nar or product of nats
+	public TCNameToken ghostName = null;
+	public TCType type;		// nat or product of nats
 
 	public TCOperationMeasureAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -148,7 +148,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 						args.get(1).report(6006, "@OperationMeasure ghost already in scope");
 					}
 					
-					measureName = variable.name;
+					ghostName = variable.name;
 				}
 				else
 				{
@@ -158,7 +158,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			}
 			else
 			{
-				measureName = new TCNameToken(def.location,
+				ghostName = new TCNameToken(def.location,
 					def.location.module, "MEASURE_" + def.location.startLine + "$");
 			}
 		}

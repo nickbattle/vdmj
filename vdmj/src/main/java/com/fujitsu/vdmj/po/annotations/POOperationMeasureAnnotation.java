@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -34,25 +35,26 @@ public class POOperationMeasureAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public final TCNameToken measureName;
+	public final TCNameToken ghostName;
 	public final POExpression expression;
 	public final TCType type;
 	
-	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args, TCNameToken measureName, TCType type)
+	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args, TCNameToken ghostName, TCType type)
 	{
 		super(name, args);
 		this.expression = args.get(0);
-		this.measureName = measureName;
+		this.ghostName = ghostName;
 		this.type = type;
 	}
 
+	
+	public POAssignmentDefinition getDefinition()	// let MEASURE_? = <expression> in...
+	{
+			return new POAssignmentDefinition(
+				ghostName, expression.getExptype(), expression, expression.getExptype());
+	}
+		
 	// TODO Remove me?
-
-	// public POAssignmentDefinition getDefinition()	// let MEASURE_? = <expression> in...
-	// {
-	// 	TCNaturalType mtype = new TCNaturalType(location);
-	// 	return new POAssignmentDefinition(measureName, mtype, expression, mtype);
-	// }
 
 	// public ProofObligationList getProofObligations(POApplyExpression apply, POContextStack ctxt)
 	// {
