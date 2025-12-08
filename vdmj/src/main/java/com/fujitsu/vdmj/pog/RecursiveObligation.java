@@ -60,7 +60,7 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
-		uncheckedPP();
+		uncheckedPP(defs.get(0), defs.get(1));
 	}
 
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
@@ -75,7 +75,7 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
-		uncheckedPP();
+		uncheckedPP(defs.get(0), defs.get(1));
 	}
 
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
@@ -90,14 +90,19 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
-		uncheckedPP();
+		uncheckedPP(defs.get(0), defs.get(1));
 	}
 
-	private void uncheckedPP()
+	private void uncheckedPP(PODefinition first, PODefinition second)
 	{
 		if (Settings.dialect != Dialect.VDM_SL)
 		{
-			markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+			if (!first.classDefinition.hasNew() ||
+				first != second && !second.classDefinition.hasNew())
+			{
+				// We cannot call new A(x,y,z) to construct an object, so...
+				markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+			}
 		}
 	}
 
@@ -199,7 +204,6 @@ public class RecursiveObligation extends ProofObligation
 			{
 				sb.append(sep);
 				sb.append(edef.classDefinition.toNew());
-				markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 			}
 
 			sb.append(")");
@@ -230,7 +234,6 @@ public class RecursiveObligation extends ProofObligation
 			{
 				sb.append(sep);
 				sb.append(idef.classDefinition.toNew());
-				markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 			}
 
 			sb.append(")");

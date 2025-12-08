@@ -427,11 +427,11 @@ public class TCExplicitOperationDefinition extends TCDefinition
     		{
     			return postdef;
     		}
+		}
 
-			if (measureDef != null && measureDef.findName(sought, scope) != null)
-			{
-				return measureDef;
-			}
+		if (measureDef != null && measureDef.findName(sought, scope) != null)
+		{
+			return measureDef;
 		}
 
 		return null;
@@ -509,6 +509,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		def.setAccessSpecifier(accessSpecifier.getModified(false, true));
 		def.classDefinition = classDefinition;
 		def.stateDefinition = stateDefinition;
+		def.typeResolve(base);
 		return def;
 	}
 

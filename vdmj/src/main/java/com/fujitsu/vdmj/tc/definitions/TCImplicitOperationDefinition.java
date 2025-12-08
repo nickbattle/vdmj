@@ -562,11 +562,11 @@ public class TCImplicitOperationDefinition extends TCDefinition
     		{
     			return postdef;
     		}
+		}
 
-			if (measureDef != null && measureDef.findName(sought, incState) != null)
-			{
-				return measureDef;
-			}
+		if (measureDef != null && measureDef.findName(sought, incState) != null)
+		{
+			return measureDef;
 		}
 
 		return null;
@@ -669,6 +669,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		def.setAccessSpecifier(accessSpecifier.getModified(false, true));
 		def.classDefinition = classDefinition;
 		def.stateDefinition = stateDefinition;
+		def.typeResolve(base);
 		return def;
 	}
 

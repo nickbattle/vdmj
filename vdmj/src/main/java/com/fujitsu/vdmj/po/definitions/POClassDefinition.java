@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
@@ -163,7 +164,7 @@ public class POClassDefinition extends PODefinition
 	 */
 	public boolean hasNew()
 	{
-		TCTypeList allvars = new TCTypeList();
+		TCTypeList allvars = new TCTypeList();		// In declaration order
 		
 		for (PODefinition field: definitions)
 		{
@@ -180,7 +181,7 @@ public class POClassDefinition extends PODefinition
 			{
 				POExplicitOperationDefinition op = (POExplicitOperationDefinition)field;
 				
-				if (op.isConstructor)
+				if (op.isConstructor && op.accessSpecifier.access == Token.PUBLIC)
 				{
 					if (op.type.parameters.equals(allvars))
 					{
@@ -188,6 +189,19 @@ public class POClassDefinition extends PODefinition
 					}
 				}
 			}
+			else if (field instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition op = (POImplicitOperationDefinition)field;
+				
+				if (op.isConstructor && op.accessSpecifier.access == Token.PUBLIC)
+				{
+					if (op.type.parameters.equals(allvars))
+					{
+						return true;
+					}
+				}
+			}
+
 		}
 		
 		return false;
