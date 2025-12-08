@@ -60,7 +60,7 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
-		uncheckedPP(defs.get(0), defs.get(1));
+		uncheckedTests(defs.get(0), defs.get(1));
 	}
 
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
@@ -75,7 +75,7 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
-		uncheckedPP(defs.get(0), defs.get(1));
+		uncheckedTests(defs.get(0), defs.get(1));
 	}
 
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
@@ -90,12 +90,16 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
-		uncheckedPP(defs.get(0), defs.get(1));
+		uncheckedTests(defs.get(0), defs.get(1));
 	}
 
-	private void uncheckedPP(PODefinition first, PODefinition second)
+	private void uncheckedTests(PODefinition first, PODefinition second)
 	{
-		if (Settings.dialect != Dialect.VDM_SL)
+		boolean isOp = 
+			second instanceof POExplicitOperationDefinition ||
+			second instanceof POImplicitOperationDefinition;
+
+		if (isOp && Settings.dialect != Dialect.VDM_SL)
 		{
 			if (!first.classDefinition.hasNew() ||
 				first != second && !second.classDefinition.hasNew())
@@ -103,6 +107,13 @@ public class RecursiveObligation extends ProofObligation
 				// We cannot call new A(x,y,z) to construct an object, so...
 				markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 			}
+		}
+
+		if (isOp && !first.location.sameModule(second.location))
+		{
+			// Can't do inter-module/class recursive operation checks, until we can resolve how
+			// to pass state via measure_ops.
+			markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 		}
 	}
 
@@ -250,7 +261,7 @@ public class RecursiveObligation extends ProofObligation
 			
 			if (edef.measureName != null)
 			{
-				return edef.measureName.getName();
+				return edef.measureName.toExplicitString(location);
 			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
@@ -259,12 +270,29 @@ public class RecursiveObligation extends ProofObligation
 			
 			if (idef.measureName != null)
 			{
-				return idef.measureName.getName();
+				return idef.measureName.toExplicitString(location);
 			}
 		}
-		
-		// @OperationMeasures are always measure_op
-		return "measure_" + def.name.getName();
+		else if (def instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition edef = (POExplicitOperationDefinition)def;
+			
+			if (edef.measureDef.name != null)
+			{
+				return edef.measureDef.name.toExplicitString(location);
+			}
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)def;
+			
+			if (idef.measureDef.name != null)
+			{
+				return idef.measureDef.name.toExplicitString(location);
+			}
+		}
+
+		return null;
 	}
 
 	private TCType getMeasureType(PODefinition def)

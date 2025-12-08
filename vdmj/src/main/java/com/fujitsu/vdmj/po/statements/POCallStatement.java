@@ -279,7 +279,7 @@ public class POCallStatement extends POStatement
 	 */
 	public String getMeasureApply(String measure)
 	{
-		StringBuilder sb = new StringBuilder(name.getMeasureName(location).getName());
+		StringBuilder sb = new StringBuilder(measure);
 		sb.append("(");
 		String separator = "";
 		
