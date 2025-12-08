@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class RecursiveObligation extends ProofObligation
 {
@@ -277,7 +278,7 @@ public class RecursiveObligation extends ProofObligation
 		{
 			POExplicitOperationDefinition edef = (POExplicitOperationDefinition)def;
 			
-			if (edef.measureDef.name != null)
+			if (edef.measureDef != null && edef.measureDef.name != null)
 			{
 				return edef.measureDef.name.toExplicitString(location);
 			}
@@ -286,13 +287,13 @@ public class RecursiveObligation extends ProofObligation
 		{
 			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)def;
 			
-			if (idef.measureDef.name != null)
+			if (idef.measureDef != null && idef.measureDef.name != null)
 			{
 				return idef.measureDef.name.toExplicitString(location);
 			}
 		}
 
-		return null;
+		return "measure_" + def.name.toExplicitString(location);		// Fallback?
 	}
 
 	private TCType getMeasureType(PODefinition def)
@@ -334,7 +335,7 @@ public class RecursiveObligation extends ProofObligation
 			}
 		}
 		
-		return null;
+		return new TCUnknownType(location);
 	}
 
 	private int getLex(TCType type)
@@ -343,8 +344,7 @@ public class RecursiveObligation extends ProofObligation
 		{
 			return 0;
 		}
-		
-		if (type instanceof TCFunctionType)
+		else if (type instanceof TCFunctionType)
 		{
 			TCFunctionType ftype = (TCFunctionType) type;
 			
@@ -363,17 +363,9 @@ public class RecursiveObligation extends ProofObligation
 				return 0;
 			}
 		}
-		else	// @OperationMeasure
+		else
 		{
-			if (type instanceof TCProductType)
-			{
-				TCProductType ptype = (TCProductType)type;
-				return ptype.types.size();
-			}
-			else
-			{
-				return 0;
-			}
+			return 0;
 		}
 	}
 
