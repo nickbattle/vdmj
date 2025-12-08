@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POOperationMeasureAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -58,6 +60,7 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
+		uncheckedPP();
 	}
 
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
@@ -72,6 +75,7 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
+		uncheckedPP();
 	}
 
 	private RecursiveObligation(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
@@ -86,6 +90,15 @@ public class RecursiveObligation extends ProofObligation
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
+		uncheckedPP();
+	}
+
+	private void uncheckedPP()
+	{
+		if (Settings.dialect != Dialect.VDM_SL)
+		{
+			markUnchecked(ProofObligation.UNCHECKED_VDMPP);
+		}
 	}
 
 	private String getGhostName(PODefinition def)
@@ -185,7 +198,8 @@ public class RecursiveObligation extends ProofObligation
 			else if (edef.classDefinition != null)
 			{
 				sb.append(sep);
-				sb.append(edef.classDefinition.toPattern(false, location));
+				sb.append(edef.classDefinition.toNew());
+				markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 			}
 
 			sb.append(")");
@@ -215,7 +229,8 @@ public class RecursiveObligation extends ProofObligation
 			else if (idef.classDefinition != null)
 			{
 				sb.append(sep);
-				sb.append(idef.classDefinition.toPattern(false, location));
+				sb.append(idef.classDefinition.toNew());
+				markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 			}
 
 			sb.append(")");

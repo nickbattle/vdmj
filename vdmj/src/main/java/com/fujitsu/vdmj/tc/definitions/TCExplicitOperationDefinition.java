@@ -151,6 +151,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			postdef.markUsed();
 		}
 
+		// getMeasureDefinition called after typecheck
 	}
 
 	@Override
@@ -366,7 +367,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			localUpdates = body.localUpdates();
 		}
 
-		localCalls = new TCDefinitionSet();		// Set later
+		localCalls = new TCDefinitionSet();			// Set later
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 

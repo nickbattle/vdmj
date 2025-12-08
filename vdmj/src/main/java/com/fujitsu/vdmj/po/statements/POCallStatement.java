@@ -302,7 +302,7 @@ public class POCallStatement extends POStatement
 			else if (exop.classDefinition != null)
 			{
 				sb.append(separator);
-				sb.append(exop.classDefinition.toPattern(false, location));
+				sb.append(exop.classDefinition.toNew());
 			}
 		}
 		else if (opdef instanceof POImplicitOperationDefinition)
@@ -317,7 +317,7 @@ public class POCallStatement extends POStatement
 			else if (imop.classDefinition != null)
 			{
 				sb.append(separator);
-				sb.append(imop.classDefinition.toPattern(false, location));
+				sb.append(imop.classDefinition.toNew());
 			}
 		}
 
