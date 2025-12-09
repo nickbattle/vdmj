@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 public class POSaveStateContext extends POContext
 {
 	private static int count = 0;
+	private static POSaveStateContext last = null;
 
 	private static final String OLDNAME = "$oldState";
 	private static final String NEWNAME = "$newState";
@@ -48,7 +49,7 @@ public class POSaveStateContext extends POContext
 
 	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
-		this.number = count;
+		this.number = count++;
 		this.from = from;
 		this.oldAndNew = oldAndNew;
 
@@ -81,21 +82,33 @@ public class POSaveStateContext extends POContext
 			this.state = null;	// Produces nothing in getSource
 			this.clazz = null;
 		}
+
+		last = this;
 	}
 
-	public static void advance()
+	public static void reset()
 	{
-		count = count + 1;
+		count = 0;
 	}
 
 	public static String getOldName()
 	{
-		return OLDNAME + count;
+		return last == null ? null : last.oldName();
 	}
 
 	public static String getNewName()
 	{
-		return NEWNAME + count;
+		return last == null ? null : last.newName();
+	}
+
+	private String oldName()
+	{
+		return OLDNAME + (number == 0 ? "" : number);
+	}
+
+	private String newName()
+	{
+		return NEWNAME + (number == 0 ? "" : number);
 	}
 
 	@Override
@@ -108,7 +121,7 @@ public class POSaveStateContext extends POContext
 			if (state.location.sameModule(from))
 			{
 				sb.append("let ");
-				sb.append(OLDNAME + number);
+				sb.append(oldName());
 				sb.append(" = ");
 				sb.append(state.toPattern(false, from));
 				sb.append(" in");
@@ -116,14 +129,14 @@ public class POSaveStateContext extends POContext
 			else
 			{
 				sb.append("forall ");
-				sb.append(OLDNAME + number);
+				sb.append(oldName());
 				sb.append(":");
 				sb.append(state.name.toExplicitString(from));
 
 				if (oldAndNew)
 				{
 					sb.append(", ");
-					sb.append(NEWNAME + number);
+					sb.append(newName());
 					sb.append(":");
 					sb.append(state.name.toExplicitString(from));
 				}

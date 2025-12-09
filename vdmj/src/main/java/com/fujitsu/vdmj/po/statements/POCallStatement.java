@@ -218,7 +218,6 @@ public class POCallStatement extends POStatement
 					
 					if (targetState != null)
 					{
-						POSaveStateContext.advance();
 						ctxt.push(new POSaveStateContext(predef, location, false));
 						preargs.add(new POVariableExpression(targetState.getPatternName(location), null));
 					}

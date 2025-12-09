@@ -56,7 +56,6 @@ public class RecursiveObligation extends ProofObligation
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
-		addRemoteState(apply.opdef, ctxt);
 		
 		String lhs = potype == POType.OP_RECURSIVE ? getGhostName(defs.get(0)) : getLHS(defs.get(0));
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
@@ -72,7 +71,6 @@ public class RecursiveObligation extends ProofObligation
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
-		addRemoteState(call.opdef, ctxt);
 		
 		String lhs = getGhostName(defs.get(0));
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
@@ -86,7 +84,6 @@ public class RecursiveObligation extends ProofObligation
 		super(location, POType.OP_RECURSIVE, ctxt);
 		
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
-		addRemoteState(call.fdef, ctxt);
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
 		
@@ -95,29 +92,6 @@ public class RecursiveObligation extends ProofObligation
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 		uncheckedTests(defs.get(0), defs.get(1));
-	}
-
-	/**
-	 * If we are measuring an operation call in a remote module/class, we have to
-	 * create a quantifier for the state as well as checking preconditions.
-	 */
-	private void addRemoteState(PODefinition opdef, POContextStack ctxt)
-	{
-		if (opdef != null && !opdef.location.sameModule(location))
-		{
-			ctxt.push(new POSaveStateContext(opdef, location, false));
-
-			if (opdef instanceof POExplicitOperationDefinition)
-			{
-				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
-
-				if (exop.predef != null)
-				{
-					ctxt.push(new POCommentContext(
-						exop.predef.name.toExplicitString(location) + "(...) =>", location));
-				}
-			}
-		}
 	}
 
 	private void uncheckedTests(PODefinition first, PODefinition second)
@@ -134,13 +108,6 @@ public class RecursiveObligation extends ProofObligation
 				// We cannot call new A(x,y,z) to construct an object, so...
 				markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 			}
-		}
-
-		if (isOp && !first.location.sameModule(second.location))
-		{
-			// Can't do inter-module/class recursive operation checks, until we can resolve how
-			// to pass state via measure_ops.
-			markUnchecked(ProofObligation.NOT_YET_SUPPORTED);
 		}
 	}
 
@@ -465,36 +432,69 @@ public class RecursiveObligation extends ProofObligation
 	public static ProofObligationList getAllPOs(LexLocation location, POType potype, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
+		int popto = addRemoteState(location, apply.opdef, ctxt);
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
 			results.add(new RecursiveObligation(location, potype, defs, apply, choice));
 		}
 		
+		ctxt.popTo(popto);
 		return results;
 	}
 
 	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
+		int popto = addRemoteState(location, call.opdef, ctxt);
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
 			results.add(new RecursiveObligation(location, defs, call, choice));
 		}
 		
+		ctxt.popTo(popto);
 		return results;
 	}
 
 	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
+		int popto = addRemoteState(location, call.fdef, ctxt);
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
 			results.add(new RecursiveObligation(location, defs, call, choice));
 		}
 		
+		ctxt.popTo(popto);
 		return results;
+	}
+
+	/**
+	 * If we are measuring an operation call in a remote module/class, we have to
+	 * create a quantifier for the state and check any preconditions.
+	 */
+	private static int addRemoteState(LexLocation location, PODefinition opdef, POContextStack ctxt)
+	{
+		int popto = ctxt.size();
+
+		if (opdef != null && !opdef.location.sameModule(location))
+		{
+			ctxt.push(new POSaveStateContext(opdef, location, false));
+
+			if (opdef instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+				if (exop.predef != null)
+				{
+					ctxt.push(new POCommentContext(
+						exop.predef.name.toExplicitString(location) + "(...) =>", location));
+				}
+			}
+		}
+
+		return popto;
 	}
 }
