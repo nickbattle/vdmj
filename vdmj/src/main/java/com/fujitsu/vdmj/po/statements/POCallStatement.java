@@ -281,43 +281,75 @@ public class POCallStatement extends POStatement
 	{
 		StringBuilder sb = new StringBuilder(measure);
 		sb.append("(");
-		String separator = "";
+		String sep = "";
 		
 		for (POExpression arg: args)
 		{
-			sb.append(separator);
+			sb.append(sep);
 			sb.append(Utils.deBracketed(arg));
-			separator = ", ";
+			sep = ", ";
 		}
 
 		if (opdef instanceof POExplicitOperationDefinition)
 		{
-			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+			POExplicitOperationDefinition edef = (POExplicitOperationDefinition)opdef;
 
-			if (exop.stateDefinition != null)
+			if (edef.stateDefinition != null)
 			{
-				sb.append(separator);
-				sb.append(exop.stateDefinition.toPattern(false, location));
+				sb.append(sep);
+
+				if (!edef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.stateDefinition.toPattern(false, location));
+				}
 			}
-			else if (exop.classDefinition != null)
+			else if (edef.classDefinition != null)
 			{
-				sb.append(separator);
-				sb.append(exop.classDefinition.toNew());
+				sb.append(sep);
+
+				if (!edef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.classDefinition.toNew());
+				}
 			}
 		}
 		else if (opdef instanceof POImplicitOperationDefinition)
 		{
-			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)opdef;
+			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)opdef;
 
-			if (imop.stateDefinition != null)
+			if (idef.stateDefinition != null)
 			{
-				sb.append(separator);
-				sb.append(imop.stateDefinition.toPattern(false, location));
+				sb.append(sep);
+
+				if (!idef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.stateDefinition.toPattern(false, location));
+				}
 			}
-			else if (imop.classDefinition != null)
+			else if (idef.classDefinition != null)
 			{
-				sb.append(separator);
-				sb.append(imop.classDefinition.toNew());
+				sb.append(sep);
+
+				if (!idef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.classDefinition.toNew());
+				}
 			}
 		}
 

@@ -407,7 +407,7 @@ public class POContextStack extends Stack<POContext>
 				}
 				else if (imp.postdef != null)
 				{
-					push(new POSaveStateContext(imp.postdef, from, imp.postdef != null));
+					push(new POSaveStateContext(imp.postdef, from, true));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
@@ -457,7 +457,7 @@ public class POContextStack extends Stack<POContext>
 				}
 				else if (exop.postdef != null)
 				{
-					push(new POSaveStateContext(exop.postdef, from, exop.postdef != null));
+					push(new POSaveStateContext(exop.postdef, from, true));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));

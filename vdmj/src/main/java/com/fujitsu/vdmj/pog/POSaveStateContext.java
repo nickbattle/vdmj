@@ -28,7 +28,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 
 public class POSaveStateContext extends POContext
@@ -44,23 +46,35 @@ public class POSaveStateContext extends POContext
 	private final int number;
 	private final boolean oldAndNew;
 
-	public POSaveStateContext(PODefinition fdef, LexLocation from, boolean oldAndNew)
+	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
 		this.number = count;
 		this.from = from;
 		this.oldAndNew = oldAndNew;
 
-		if (fdef instanceof POExplicitFunctionDefinition)
+		if (def instanceof POExplicitFunctionDefinition)
 		{
-			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)fdef;
+			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)def;
 			this.state = exfn.stateDefinition;
 			this.clazz = exfn.classDefinition;
 		}
-		else if (fdef instanceof POImplicitFunctionDefinition)
+		else if (def instanceof POImplicitFunctionDefinition)
 		{
-			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)fdef;
+			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)def;
 			this.state = imfn.stateDefinition;
 			this.clazz = imfn.classDefinition;
+		}
+		else if (def instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
+			this.state = exop.stateDefinition;
+			this.clazz = exop.classDefinition;
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
+			this.state = imop.stateDefinition;
+			this.clazz = imop.classDefinition;
 		}
 		else
 		{

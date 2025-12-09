@@ -56,6 +56,7 @@ public class RecursiveObligation extends ProofObligation
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
+		addRemoteState(apply.opdef, ctxt);
 		
 		String lhs = potype == POType.OP_RECURSIVE ? getGhostName(defs.get(0)) : getLHS(defs.get(0));
 		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
@@ -71,6 +72,7 @@ public class RecursiveObligation extends ProofObligation
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
+		addRemoteState(call.opdef, ctxt);
 		
 		String lhs = getGhostName(defs.get(0));
 		String rhs = call.getMeasureApply(getMeasureName(defs.get(1)));
@@ -84,6 +86,7 @@ public class RecursiveObligation extends ProofObligation
 		super(location, POType.OP_RECURSIVE, ctxt);
 		
 		mutuallyRecursive = (defs.size() > 2);	// Simple recursion = [f, f]
+		addRemoteState(call.fdef, ctxt);
 		
 		int measureLexical = getLex(getMeasureType(defs.get(0)));
 		
@@ -92,6 +95,29 @@ public class RecursiveObligation extends ProofObligation
 
 		source = ctxt.getSource(greater(measureLexical, lhs, rhs));
 		uncheckedTests(defs.get(0), defs.get(1));
+	}
+
+	/**
+	 * If we are measuring an operation call in a remote module/class, we have to
+	 * create a quantifier for the state as well as checking preconditions.
+	 */
+	private void addRemoteState(PODefinition opdef, POContextStack ctxt)
+	{
+		if (opdef != null && !opdef.location.sameModule(location))
+		{
+			ctxt.push(new POSaveStateContext(opdef, location, false));
+
+			if (opdef instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)opdef;
+
+				if (exop.predef != null)
+				{
+					ctxt.push(new POCommentContext(
+						exop.predef.name.toExplicitString(location) + "(...) =>", location));
+				}
+			}
+		}
 	}
 
 	private void uncheckedTests(PODefinition first, PODefinition second)
@@ -210,12 +236,28 @@ public class RecursiveObligation extends ProofObligation
 			if (edef.stateDefinition != null)
 			{
 				sb.append(sep);
-				sb.append(edef.stateDefinition.toPattern(false, location));
+
+				if (!def.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.stateDefinition.toPattern(false, location));
+				}
 			}
 			else if (edef.classDefinition != null)
 			{
 				sb.append(sep);
-				sb.append(edef.classDefinition.toNew());
+
+				if (!def.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.classDefinition.toNew());
+				}
 			}
 
 			sb.append(")");
@@ -240,12 +282,28 @@ public class RecursiveObligation extends ProofObligation
 			if (idef.stateDefinition != null)
 			{
 				sb.append(sep);
-				sb.append(idef.stateDefinition.toPattern(false, location));
+
+				if (!def.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.stateDefinition.toPattern(false, location));
+				}
 			}
 			else if (idef.classDefinition != null)
 			{
 				sb.append(sep);
-				sb.append(idef.classDefinition.toNew());
+
+				if (!def.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.classDefinition.toNew());
+				}
 			}
 
 			sb.append(")");
