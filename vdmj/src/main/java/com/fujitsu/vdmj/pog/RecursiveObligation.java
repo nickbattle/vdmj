@@ -35,11 +35,15 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.statements.POCallObjectStatement;
 import com.fujitsu.vdmj.po.statements.POCallStatement;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -475,13 +479,13 @@ public class RecursiveObligation extends ProofObligation
 	 * If we are measuring an operation call in a remote module/class, we have to
 	 * create a quantifier for the state and check any preconditions.
 	 */
-	private static int addRemoteState(LexLocation location, PODefinition opdef, POContextStack ctxt)
+	private static int addRemoteState(LexLocation from, PODefinition opdef, POContextStack ctxt)
 	{
 		int popto = ctxt.size();
 
-		if (opdef != null && !opdef.location.sameModule(location))
+		if (opdef != null && !opdef.location.sameModule(from))
 		{
-			ctxt.push(new POSaveStateContext(opdef, location, false));
+			ctxt.push(new POSaveStateContext(opdef, from, false));
 
 			if (opdef instanceof POExplicitOperationDefinition)
 			{
@@ -489,12 +493,39 @@ public class RecursiveObligation extends ProofObligation
 
 				if (exop.predef != null)
 				{
-					ctxt.push(new POCommentContext(
-						exop.predef.name.toExplicitString(location) + "(...) =>", location));
+					ctxt.push(new POImpliesContext(preApply(from, exop.predef)));
 				}
 			}
 		}
 
 		return popto;
+	}
+
+	private static POExpression preApply(LexLocation from, POExplicitFunctionDefinition predef)
+	{
+		POExpressionList args = new POExpressionList();
+
+		for (POPattern arg: predef.paramPatternList.get(0))
+		{
+			args.add(arg.getMatchingExpression());
+		}
+
+		if (!args.isEmpty())
+		{
+			args.remove(args.size() - 1);
+			TCNameToken state = new TCNameToken(predef.location, predef.name.getModule(), POSaveStateContext.getOldName());
+			args.add(new POVariableExpression(state, null));
+		}
+
+		boolean remote = !predef.location.sameModule(from);
+
+		return new POApplyExpression(
+			new POVariableExpression(predef.name.getExplicit(remote), null),
+			args,
+			predef.getType(),
+			null,
+			null,
+			null,
+			null);
 	}
 }
