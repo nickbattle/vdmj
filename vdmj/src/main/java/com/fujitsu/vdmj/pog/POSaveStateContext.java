@@ -146,7 +146,31 @@ public class POSaveStateContext extends POContext
 		}
 		else if (clazz != null)
 		{
-			// Not defined!?
+			if (clazz.location.sameModule(from))
+			{
+				sb.append("let ");
+				sb.append(oldName());
+				sb.append(" = ");
+				sb.append(clazz.toPattern(false, from));
+				sb.append(" in");
+			}
+			else
+			{
+				sb.append("forall ");
+				sb.append(oldName());
+				sb.append(":");
+				sb.append(clazz.name);
+
+				if (oldAndNew)
+				{
+					sb.append(", ");
+					sb.append(newName());
+					sb.append(":");
+					sb.append(clazz.name);
+				}
+
+				sb.append(" &");
+			}
 		}
 
 		return sb.toString();
