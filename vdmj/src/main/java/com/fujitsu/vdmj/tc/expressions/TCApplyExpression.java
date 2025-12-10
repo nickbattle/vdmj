@@ -369,6 +369,11 @@ public class TCApplyExpression extends TCExpression
 				fname = fie.impdef.name;
 			}
 		}
+		else if (root instanceof TCFieldExpression)
+		{
+			TCFieldExpression fex = (TCFieldExpression)root;
+			fname = fex.memberName;
+		}
 			
 		if (fname != null)
 		{

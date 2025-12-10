@@ -521,6 +521,19 @@ public class RecursiveObligation extends ProofObligation
 			null,
 			null,
 			null,
-			null);
+			null)
+		{
+			/**
+			 * This expression will be added to a POImpliesContext, which uses the expression's
+			 * toString(). But an expression's toString does not qualify the name, as it has no
+			 * "from" context to use. So here, we override the toString, depending on the remote
+			 * flag above.
+			 */
+			@Override
+			public String toString()
+			{
+				return (remote ? predef.location.module + "`" : "") + super.toString();
+			}
+		};
 	}
 }
