@@ -78,21 +78,6 @@ public class POApplyExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		if (root instanceof POVariableExpression)
-		{
-			POVariableExpression v = (POVariableExpression)root;
-			// Exclude the param types from the TCNameToken...
-			
-			if (!v.name.getModule().equals(location.module))
-			{
-				return v.name.getModule() + "`" + v.name.getName() + "("+ Utils.listToString(args) + ")";
-			}
-			else
-			{
-				return v.name.getName() + "("+ Utils.listToString(args) + ")";
-			}
-		}
-
 		return root + "("+ Utils.listToString(args) + ")";
 	}
 

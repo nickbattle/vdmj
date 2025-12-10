@@ -436,7 +436,7 @@ public class RecursiveObligation extends ProofObligation
 	public static ProofObligationList getAllPOs(LexLocation location, POType potype, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
-		int popto = addRemoteState(location, apply.opdef, ctxt);
+		int popto = addRemoteState(location, apply.args, apply.opdef, ctxt);
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
@@ -450,7 +450,7 @@ public class RecursiveObligation extends ProofObligation
 	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POCallStatement call, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
-		int popto = addRemoteState(location, call.opdef, ctxt);
+		int popto = addRemoteState(location, call.args, call.opdef, ctxt);
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
@@ -464,7 +464,7 @@ public class RecursiveObligation extends ProofObligation
 	public static ProofObligationList getAllPOs(LexLocation location, PODefinitionList defs, POCallObjectStatement call, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
-		int popto = addRemoteState(location, call.fdef, ctxt);
+		int popto = addRemoteState(location, call.args, call.fdef, ctxt);
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
@@ -479,7 +479,7 @@ public class RecursiveObligation extends ProofObligation
 	 * If we are measuring an operation call in a remote module/class, we have to
 	 * create a quantifier for the state and check any preconditions.
 	 */
-	private static int addRemoteState(LexLocation from, PODefinition opdef, POContextStack ctxt)
+	private static int addRemoteState(LexLocation from, POExpressionList args, PODefinition opdef, POContextStack ctxt)
 	{
 		int popto = ctxt.size();
 
@@ -493,7 +493,7 @@ public class RecursiveObligation extends ProofObligation
 
 				if (exop.predef != null)
 				{
-					ctxt.push(new POImpliesContext(preApply(from, exop.predef)));
+					ctxt.push(new POImpliesContext(preApply(from, args, exop.predef)));
 				}
 			}
 		}
@@ -501,27 +501,22 @@ public class RecursiveObligation extends ProofObligation
 		return popto;
 	}
 
-	private static POExpression preApply(LexLocation from, POExplicitFunctionDefinition predef)
+	private static POExpression preApply(LexLocation from, POExpressionList callargs, POExplicitFunctionDefinition predef)
 	{
-		POExpressionList args = new POExpressionList();
-
-		for (POPattern arg: predef.paramPatternList.get(0))
+		POExpressionList preargs = new POExpressionList();
+		preargs.addAll(callargs);
+		
+		if (predef.stateDefinition != null || predef.classDefinition != null)
 		{
-			args.add(arg.getMatchingExpression());
-		}
-
-		if (!args.isEmpty())
-		{
-			args.remove(args.size() - 1);
 			TCNameToken state = new TCNameToken(predef.location, predef.name.getModule(), POSaveStateContext.getOldName());
-			args.add(new POVariableExpression(state, null));
+			preargs.add(new POVariableExpression(state, null));
 		}
 
 		boolean remote = !predef.location.sameModule(from);
 
 		return new POApplyExpression(
 			new POVariableExpression(predef.name.getExplicit(remote), null),
-			args,
+			preargs,
 			predef.getType(),
 			null,
 			null,

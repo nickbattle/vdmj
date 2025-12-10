@@ -53,16 +53,10 @@ public class POVariableExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		if (!name.getModule().equals(location.module))
-		{
-			return name.getModule() + "`" + name.getName() + (name.isOld() ? "~" : "");
-		}
-		else
-		{
-			return name.getName() + (name.isOld() ? "~" : "");
-		}
+		// Exclude any PP parameters, but respect explicit flag
+		return name.getName() + (name.isOld() ? "~" : "");
 	}
-	
+
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
