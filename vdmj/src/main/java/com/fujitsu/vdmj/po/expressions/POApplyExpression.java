@@ -223,6 +223,10 @@ public class POApplyExpression extends POExpression
 			POFuncInstantiationExpression fie = (POFuncInstantiationExpression)root;
 			start = measure + "[" + Utils.listToString(fie.actualTypes) + "]";
 		}
+		else if (root instanceof POFieldExpression)
+		{
+			start = measure;
+		}
 		else
 		{
 			start = root.toString();
