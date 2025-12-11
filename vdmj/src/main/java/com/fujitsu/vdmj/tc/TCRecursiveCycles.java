@@ -336,10 +336,18 @@ public class TCRecursiveCycles
 	private List<String> toStrings(TCDefinitionList cycle)
 	{
 		List<String> calls = new Vector<String>();
+		Set<String> modules = new HashSet<String>();
 
 		for (TCDefinition d: cycle)
 		{
-			calls.add(d.name.getExplicit(true).toString());	// ie. include PP param types
+			modules.add(d.name.getModule());
+		}
+
+		boolean explicit = (modules.size() > 1);	// Explicit names, if multiple module/classes
+
+		for (TCDefinition d: cycle)
+		{
+			calls.add(d.name.getExplicit(explicit).toString());	// include PP param types
 		}
 		
 		return calls;
