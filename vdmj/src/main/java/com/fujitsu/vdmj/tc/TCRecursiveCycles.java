@@ -339,7 +339,7 @@ public class TCRecursiveCycles
 
 		for (TCDefinition d: cycle)
 		{
-			calls.add(d.name.toString());	// ie. include PP param types
+			calls.add(d.name.getExplicit(true).toString());	// ie. include PP param types
 		}
 		
 		return calls;
