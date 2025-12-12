@@ -21,7 +21,7 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.tc;
+package com.fujitsu.vdmj.typechecker;
 
 import java.util.HashMap;
 import java.util.HashSet;
