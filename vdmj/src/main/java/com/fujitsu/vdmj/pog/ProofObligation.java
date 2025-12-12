@@ -97,6 +97,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.reasonsAbout = null;
 		
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
+		POSaveStateContext.reset();				// Reset "olsState" count too
 	}
 	
 	public void clearAnalysis()
