@@ -56,6 +56,8 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -63,6 +65,7 @@ import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -90,9 +93,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final TCNameSet localUpdates;
 	public final PODefinitionSet transitiveCalls;
 	public final TCNameSet transitiveUpdates;
-
-	public long alternativePaths = 0;
-	public POOperationMeasureAnnotation measure = null;
+	public final POExplicitFunctionDefinition measureDef;
 
 	public POImplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name,
@@ -112,7 +113,8 @@ public class POImplicitOperationDefinition extends PODefinition
 		TCTypeSet possibleExceptions,
 		TCNameSet localUpdates,
 		PODefinitionSet transitiveCalls,
-		TCNameSet transitiveUpdates)
+		TCNameSet transitiveUpdates,
+		POExplicitFunctionDefinition measureDef)
 	{
 		super(name.getLocation(), name);
 		
@@ -135,11 +137,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		this.localUpdates = localUpdates;
 		this.transitiveCalls = transitiveCalls;
 		this.transitiveUpdates = transitiveUpdates;
-
-		if (annotations != null)
-		{
-			this.measure = annotations.getInstance(POOperationMeasureAnnotation.class);
-		}
+		this.measureDef = measureDef;
 	}
 
 	@Override
@@ -174,11 +172,29 @@ public class POImplicitOperationDefinition extends PODefinition
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
 
+		TCDefinitionList pdefs = new TCDefinitionList();
+		int i = 0;
+
+		if (result != null)
+		{
+			for (PODefinition arg: result.pattern.getDefinitions(result.type))
+			{
+				pdefs.add(new TCLocalDefinition(location, arg.name, arg.getType()));
+			}
+		}
+
 		for (POPatternListTypePair pltp: parameterPatterns)
 		{
+			TCType ptype = type.parameters.get(i++);
+
 			for (POPattern p: pltp.patterns)
 			{
 				pids.addAll(p.getVariableNames());
+
+				for (PODefinition arg: p.getDefinitions(ptype))
+				{
+					pdefs.add(new TCLocalDefinition(location, arg.name, arg.getType()));
+				}
 			}
 			
 			if (!pltp.patterns.alwaysMatches())
@@ -186,6 +202,8 @@ public class POImplicitOperationDefinition extends PODefinition
 				matchNeeded = true;
 			}
 		}
+
+		Environment local = new FlatEnvironment(pdefs, env);
 
 		if (pids.hasDuplicates() || matchNeeded)
 		{
@@ -200,7 +218,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		if (precondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
 			ctxt.push(new PONameContext(new TCNameList(predef.name)));
-			obligations.addAll(predef.getProofObligations(ctxt, pogState, env));
+			obligations.addAll(predef.getProofObligations(ctxt, pogState, local));
 			ctxt.pop();
 		}
 
@@ -218,7 +236,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			}
 			else
 			{
-				obligations.addAll(postdef.getProofObligations(ctxt, pogState, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, pogState, local));
 			}
 			
 			ctxt.pop();
@@ -237,21 +255,20 @@ public class POImplicitOperationDefinition extends PODefinition
 				addOldContext(ctxt);
 				addMeasure(ctxt);
 
-				obligations.addAll(body.getProofObligations(ctxt, pogState, env));
+				obligations.addAll(body.getProofObligations(ctxt, pogState, local));
 
 				if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 				{
 					obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 				}
 				
-				alternativePaths = ctxt.countAlternatives();
 				ctxt.popTo(popto);
 			}
 			else if (classDefinition != null)
 			{
 				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 				addMeasure(ctxt);
-				ProofObligationList oblist = body.getProofObligations(ctxt, pogState, env);
+				ProofObligationList oblist = body.getProofObligations(ctxt, pogState, local);
 				
 				if (Settings.release != Release.VDM_10)		// Uses the obj_C pattern in OperationDefContext
 				{
@@ -262,7 +279,6 @@ public class POImplicitOperationDefinition extends PODefinition
 					oblist.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 				}
 				
-				alternativePaths = ctxt.countAlternatives();
 				obligations.addAll(oblist);
 				ctxt.popTo(popto);
 			}
@@ -270,14 +286,13 @@ public class POImplicitOperationDefinition extends PODefinition
 			{
 				int popto = ctxt.pushAt(new POOperationDefinitionContext(this, (precondition != null), true));
 				addMeasure(ctxt);
-				obligations.addAll(body.getProofObligations(ctxt, pogState, env));
+				obligations.addAll(body.getProofObligations(ctxt, pogState, local));
 
 				if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 				{
 					obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 				}
 				
-				alternativePaths = ctxt.countAlternatives();
 				ctxt.popTo(popto);
 			}
 
@@ -336,9 +351,14 @@ public class POImplicitOperationDefinition extends PODefinition
 
 	private void addMeasure(POContextStack ctxt)
 	{
-		if (measure != null)
+		if (annotations != null)
 		{
-			ctxt.push(new POLetDefContext(measure.getDefinition()));
+			POOperationMeasureAnnotation measure = annotations.getInstance(POOperationMeasureAnnotation.class);
+
+			if (measure != null)
+			{
+				ctxt.push(new POLetDefContext(measure.getDefinition()));
+			}
 		}
 	}
 
@@ -372,12 +392,6 @@ public class POImplicitOperationDefinition extends PODefinition
 		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
 	}
 
-	@Override
-	public long getAlternativePaths()
-	{
-		return alternativePaths;
-	}
-	
 	@Override
 	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
 	{

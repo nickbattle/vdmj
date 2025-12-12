@@ -31,6 +31,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -143,11 +144,12 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				{
 					println("Generated " + plural(list.size(), "proof obligation", "s") + ":\n");
 					printf("%s", list.toString());
+					Map<PODefinition, Long> reduced = POContextStack.getReducedDefinitions();
 
-					for (PODefinition def: POContextStack.getReducedDefinitions())
+					for (PODefinition def: reduced.keySet())
 					{
 						printf("POs missing for %s (%d paths)\n",
-							def.name.getExplicit(true), def.getAlternativePaths());
+							def.name.getExplicit(true), reduced.get(def));
 					}
 					
 					if (list.countErrors() > 0)

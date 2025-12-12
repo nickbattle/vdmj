@@ -28,12 +28,15 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 
 public class POSaveStateContext extends POContext
 {
 	private static int count = 0;
+	private static POSaveStateContext last = null;
 
 	private static final String OLDNAME = "$oldState";
 	private static final String NEWNAME = "$newState";
@@ -44,44 +47,68 @@ public class POSaveStateContext extends POContext
 	private final int number;
 	private final boolean oldAndNew;
 
-	public POSaveStateContext(PODefinition fdef, LexLocation from, boolean oldAndNew)
+	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
-		this.number = count;
+		this.number = count++;
 		this.from = from;
 		this.oldAndNew = oldAndNew;
 
-		if (fdef instanceof POExplicitFunctionDefinition)
+		if (def instanceof POExplicitFunctionDefinition)
 		{
-			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)fdef;
+			POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)def;
 			this.state = exfn.stateDefinition;
 			this.clazz = exfn.classDefinition;
 		}
-		else if (fdef instanceof POImplicitFunctionDefinition)
+		else if (def instanceof POImplicitFunctionDefinition)
 		{
-			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)fdef;
+			POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)def;
 			this.state = imfn.stateDefinition;
 			this.clazz = imfn.classDefinition;
+		}
+		else if (def instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
+			this.state = exop.stateDefinition;
+			this.clazz = exop.classDefinition;
+		}
+		else if (def instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
+			this.state = imop.stateDefinition;
+			this.clazz = imop.classDefinition;
 		}
 		else
 		{
 			this.state = null;	// Produces nothing in getSource
 			this.clazz = null;
 		}
+
+		last = this;
 	}
 
-	public static void advance()
+	public static void reset()
 	{
-		count = count + 1;
+		count = 0;
 	}
 
 	public static String getOldName()
 	{
-		return OLDNAME + count;
+		return last == null ? null : last.oldName();
 	}
 
 	public static String getNewName()
 	{
-		return NEWNAME + count;
+		return last == null ? null : last.newName();
+	}
+
+	private String oldName()
+	{
+		return OLDNAME + (number == 0 ? "" : number);
+	}
+
+	private String newName()
+	{
+		return NEWNAME + (number == 0 ? "" : number);
 	}
 
 	@Override
@@ -94,7 +121,7 @@ public class POSaveStateContext extends POContext
 			if (state.location.sameModule(from))
 			{
 				sb.append("let ");
-				sb.append(OLDNAME + number);
+				sb.append(oldName());
 				sb.append(" = ");
 				sb.append(state.toPattern(false, from));
 				sb.append(" in");
@@ -102,14 +129,14 @@ public class POSaveStateContext extends POContext
 			else
 			{
 				sb.append("forall ");
-				sb.append(OLDNAME + number);
+				sb.append(oldName());
 				sb.append(":");
 				sb.append(state.name.toExplicitString(from));
 
 				if (oldAndNew)
 				{
 					sb.append(", ");
-					sb.append(NEWNAME + number);
+					sb.append(newName());
 					sb.append(":");
 					sb.append(state.name.toExplicitString(from));
 				}
@@ -119,7 +146,31 @@ public class POSaveStateContext extends POContext
 		}
 		else if (clazz != null)
 		{
-			// Not defined!?
+			if (clazz.location.sameModule(from))
+			{
+				sb.append("let ");
+				sb.append(oldName());
+				sb.append(" = ");
+				sb.append(clazz.toPattern(false, from));
+				sb.append(" in");
+			}
+			else
+			{
+				sb.append("forall ");
+				sb.append(oldName());
+				sb.append(":");
+				sb.append(clazz.name);
+
+				if (oldAndNew)
+				{
+					sb.append(", ");
+					sb.append(newName());
+					sb.append(":");
+					sb.append(clazz.name);
+				}
+
+				sb.append(" &");
+			}
 		}
 
 		return sb.toString();

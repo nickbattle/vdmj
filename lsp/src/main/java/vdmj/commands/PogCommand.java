@@ -24,6 +24,8 @@
 
 package vdmj.commands;
 
+import java.util.Map;
+
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -111,13 +113,15 @@ public class PogCommand extends AnalysisCommand
 
 			// Use stdout, to match the QC command output format
 			Console.out.print(sb.toString());
+			Map<PODefinition, Long> reduced = POContextStack.getReducedDefinitions();
 
-			if (argv.length == 1)
+			if (argv.length == 1 && !reduced.isEmpty())
 			{
-				for (PODefinition def: POContextStack.getReducedDefinitions())
+				for (PODefinition def: reduced.keySet())
 				{
+					Long alternatives = reduced.get(def);
 					Console.out.printf("POs missing for %s (%d paths)\n",
-						def.name.getExplicit(true), def.getAlternativePaths());
+						def.name.getExplicit(true), alternatives);
 				}
 			}
 

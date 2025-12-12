@@ -27,8 +27,10 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.tc.TCRecursiveCycles;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
@@ -61,6 +63,9 @@ public class TCCallObjectStatement extends TCStatement
 	public final boolean explicit;
 
 	public TCNameToken field = null;
+
+	// Used by PO
+	public TCDefinitionListList recursiveCycles = null;
 	public TCDefinition fdef = null;
 
 	public TCCallObjectStatement(TCObjectDesignator designator, TCNameToken classname, TCIdentifierToken fieldname, TCExpressionList args)
@@ -184,14 +189,21 @@ public class TCCallObjectStatement extends TCStatement
 		{
 			TCOperationType optype = type.getOperation();
 			optype.typeResolve(env);
-    		TCDefinition encl = env.getEnclosingDefinition();
+    		TCDefinition encldef = env.getEnclosingDefinition();
     		
-    		if (encl != null && encl.isPure() && !optype.isPure())
+    		if (encldef != null && encldef.isPure() && !optype.isPure())
     		{
     			report(3339, "Cannot call impure operation from a pure operation");
     		}
 
     		field.setTypeQualifier(optype.parameters);
+
+			if (encldef != null && fdef != null)
+			{
+				recursiveCycles = new TCDefinitionListList();
+				TCRecursiveCycles.getInstance().addCaller(encldef, recursiveCycles, fdef);
+			}
+
 			checkArgTypes(optype.parameters, atypes);	// Not necessary?
 			return checkReturnType(constraint, optype.result, mandatory);
 		}

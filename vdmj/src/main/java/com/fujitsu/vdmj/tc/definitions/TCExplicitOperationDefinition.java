@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
+import com.fujitsu.vdmj.tc.annotations.TCOperationMeasureAnnotation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
@@ -46,6 +47,7 @@ import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCSubclassResponsibilityStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -80,11 +82,14 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
 	public TCTypeSet possibleExceptions = null;
-	public boolean directlyRecursive = false;
+	public boolean recursive = false;
+	
 	public TCNameSet localUpdates = null;
 	public TCDefinitionSet localCalls = null;
 	public TCNameSet transitiveUpdates = null;
 	public TCDefinitionSet transitiveCalls = null;
+	
+	public TCExplicitFunctionDefinition measureDef;
 
 	public TCExplicitOperationDefinition(TCAnnotationList annotations,
 		TCAccessSpecifier accessSpecifier, TCNameToken name,
@@ -145,6 +150,8 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			postdef = getPostDefinition(base);
 			postdef.markUsed();
 		}
+
+		// getMeasureDefinition called after typecheck
 	}
 
 	@Override
@@ -360,9 +367,11 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			localUpdates = body.localUpdates();
 		}
 
-		localCalls = new TCDefinitionSet();		// Set later
+		localCalls = new TCDefinitionSet();			// Set later
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
+
+		measureDef = getMeasureDefinition(base);	// Must be after the tcAfter
 	}
 
 	@Override
@@ -420,6 +429,11 @@ public class TCExplicitOperationDefinition extends TCDefinition
     		}
 		}
 
+		if (measureDef != null && measureDef.findName(sought, scope) != null)
+		{
+			return measureDef;
+		}
+
 		return null;
 	}
 
@@ -439,9 +453,64 @@ public class TCExplicitOperationDefinition extends TCDefinition
     		{
     			defs.add(postdef);
     		}
+
+			if (measureDef != null)
+			{
+				defs.add(measureDef);
+			}
 		}
 
 		return defs;
+	}
+
+	/**
+	 * An operation measure is similar to a precondition, being passed the operation's
+	 * parameters and a state value.
+	 */
+	private TCExplicitFunctionDefinition getMeasureDefinition(Environment base)
+	{
+		TCOperationMeasureAnnotation annotation = null;
+
+		if (annotations != null)
+		{
+			annotation = annotations.getInstance(TCOperationMeasureAnnotation.class);
+		}
+
+		if (annotation == null)
+		{
+			return null;
+		}
+
+		TCPatternListList parameters = new TCPatternListList();
+		TCPatternList plist = new TCPatternList();
+		plist.addAll(parameterPatterns);
+
+		if (stateDefinition != null)
+		{
+			plist.add(new TCIdentifierPattern(stateDefinition.name.getOldName()));
+		}
+		else if (base.isVDMPP() && !accessSpecifier.isStatic)
+		{
+			plist.add(new TCIdentifierPattern(classDefinition.name.getSelfName()));
+		}
+
+		parameters.add(plist);
+
+		TCFunctionType pretype = type.getPreType(stateDefinition, classDefinition, false);
+		TCFunctionType mtype = new TCFunctionType(location, pretype.parameters, false, annotation.type);
+
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getMeasureName(location),
+			null, mtype, parameters, annotation.args.get(0), null, null, false, null);
+
+		// Operation measure functions are effectively not static as
+		// their expression can directly refer to instance variables, even
+		// though at runtime these are passed via a "self" parameter.
+
+		def.setAccessSpecifier(accessSpecifier.getModified(false, true));
+		def.classDefinition = classDefinition;
+		def.stateDefinition = stateDefinition;
+		def.typeResolve(base);
+		return def;
 	}
 
 	private TCExplicitFunctionDefinition getPreDefinition(Environment base)

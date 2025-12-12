@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -39,8 +41,10 @@ import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.OperationPreConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
+import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -58,11 +62,13 @@ public class POCallObjectStatement extends POStatement
 	public final TCIdentifierToken fieldname;
 	public final POExpressionList args;
 	public final PODefinition fdef;
+	public final PODefinitionListList recursiveCycles;
 
 	public LexNameToken field = null;
 
 	public POCallObjectStatement(LexLocation location, POObjectDesignator designator,
-		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args, PODefinition fdef)
+		TCNameToken classname, TCIdentifierToken fieldname, POExpressionList args, PODefinition fdef,
+		PODefinitionListList recursiveCycles)
 	{
 		super(location);
 
@@ -71,6 +77,7 @@ public class POCallObjectStatement extends POStatement
 		this.fieldname = fieldname;
 		this.args = args;
 		this.fdef = fdef;
+		this.recursiveCycles = recursiveCycles;
 	}
 
 	@Override
@@ -132,6 +139,14 @@ public class POCallObjectStatement extends POStatement
 		checks.markUnchecked(ProofObligation.UNCHECKED_VDMPP);
 		obligations.addAll(checks);
 
+		if (recursiveCycles != null)	// name is a func/op in a recursive loop
+		{
+			for (PODefinitionList loop: recursiveCycles)
+			{
+				obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+			}
+		}
+
 		ctxt.makeOperationCall(location, fdef, args, null, getStmttype().isReturn(), pogState, env);
 		
 		TCType rtype = pogState.getResultType();
@@ -182,6 +197,90 @@ public class POCallObjectStatement extends POStatement
 			
 			return list;
 		}
+	}
+	
+	/**
+	 * Create a measure application string from this apply, turning the root function
+	 * name into the measure name passed. 
+	 */
+	public String getMeasureApply(String measure)
+	{
+		StringBuilder sb = new StringBuilder(measure);
+		sb.append("(");
+		String sep = "";
+		
+		for (POExpression arg: args)
+		{
+			sb.append(sep);
+			sb.append(Utils.deBracketed(arg));
+			sep = ", ";
+		}
+
+		if (fdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition edef = (POExplicitOperationDefinition)fdef;
+
+			if (edef.stateDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!edef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.stateDefinition.toPattern(false, location));
+				}
+			}
+			else if (edef.classDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!edef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.classDefinition.toNew());
+				}
+			}
+		}
+		else if (fdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)fdef;
+
+			if (idef.stateDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!idef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.stateDefinition.toPattern(false, location));
+				}
+			}
+			else if (idef.classDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!idef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.classDefinition.toNew());
+				}
+			}
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override

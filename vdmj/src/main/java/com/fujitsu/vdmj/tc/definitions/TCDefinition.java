@@ -566,16 +566,6 @@ public abstract class TCDefinition extends TCNode implements Comparable<TCDefini
 	{
 		this.comments = comments;
 	}
-	
-	/**
-	 * Get a set of function names that are called from this definition. This
-	 * is used in mutually recursive function processing. It is only defined
-	 * for explicit/implicit functions!
-	 */
-	public TCNameSet getCallMap()
-	{
-		return new TCNameSet();
-	}
 
 	/**
 	 * Implemented by all definitions to allow visitor processing.

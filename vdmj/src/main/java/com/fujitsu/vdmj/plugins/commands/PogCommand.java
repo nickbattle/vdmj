@@ -28,6 +28,8 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Map;
+
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -107,12 +109,14 @@ public class PogCommand extends AnalysisCommand
 			printf("%s", list.toString());
 		}
 
-		if (argv.length == 1)
+		Map<PODefinition, Long> reduced = POContextStack.getReducedDefinitions();
+
+		if (argv.length == 1 && !reduced.isEmpty())
 		{
-			for (PODefinition def: POContextStack.getReducedDefinitions())
+			for (PODefinition def: reduced.keySet())
 			{
 				printf("POs missing for %s (%d paths)\n",
-					def.name.getExplicit(true), def.getAlternativePaths());
+					def.name.getExplicit(true), reduced.get(def));
 			}
 		}
 		

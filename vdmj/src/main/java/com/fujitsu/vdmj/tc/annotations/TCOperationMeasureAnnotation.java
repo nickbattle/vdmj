@@ -40,8 +40,8 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
-import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
+import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
@@ -51,7 +51,8 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public TCNameToken measureName = null;
+	public TCNameToken ghostName = null;
+	public TCType type;		// nat or product of nats
 
 	public TCOperationMeasureAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -89,12 +90,6 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			if (def instanceof TCExplicitOperationDefinition)
 			{
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
-
-				if (!exop.directlyRecursive)
-				{
-					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
-				}
-
 				Iterator<TCType> titer = exop.type.parameters.iterator();
 
 				for (TCPattern p: exop.parameterPatterns)
@@ -109,11 +104,6 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
 
-				if (!imop.directlyRecursive)
-				{
-					name.report(6006, "@OperationMeasure: " + def.name + " is not directly recursive");
-				}
-
 				for (TCPatternListTypePair ptp: imop.parameterPatterns)
 				{
 					defs.addAll(ptp.getDefinitions(ptp.type.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
@@ -122,22 +112,29 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 				params = new FlatEnvironment(defs, env);
 			}
 
-			TCType type = args.firstElement().typeCheck(params, null, scope, null);
+			type = args.firstElement().typeCheck(params, null, scope, null);
 
-			if (!type.isUnknown(type.location) && type.isNumeric(type.location))
+			if (!type.isNumeric(name.getLocation()))
 			{
-				TCNumericType ntype = type.getNumeric();
-
-				if (ntype.getWeight() > 2)		// NOT nat1, nat or int => rat or real
+				if (type.isProduct(type.location))
 				{
-					name.report(6007, "@OperationMeasure argument must be type nat");
-					name.detail("Actual", ntype.toString());
+					TCProductType pt = type.getProduct();
+
+					for (TCType t: pt.types)
+					{
+						if (!t.isNumeric(name.getLocation()))
+						{
+							name.report(6007, "Measure is not a nat, or a nat tuple");
+							name.detail("Actual", type.toString());
+							break;
+						}
+					}
 				}
-			}
-			else
-			{
-				name.report(6007, "@OperationMeasure argument must be numeric");
-				name.detail("Actual", type.toString());
+				else
+				{
+					name.report(6007, "Measure is not a nat, or a nat tuple");
+					name.detail("Actual", type.toString());
+				}
 			}
 
 			if (args.size() == 2)	// Ghost name given
@@ -151,7 +148,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 						args.get(1).report(6006, "@OperationMeasure ghost already in scope");
 					}
 					
-					measureName = variable.name;
+					ghostName = variable.name;
 				}
 				else
 				{
@@ -161,7 +158,7 @@ public class TCOperationMeasureAnnotation extends TCAnnotation
 			}
 			else
 			{
-				measureName = new TCNameToken(def.location,
+				ghostName = new TCNameToken(def.location,
 					def.location.module, "MEASURE_" + def.location.startLine + "$");
 			}
 		}

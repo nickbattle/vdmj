@@ -78,12 +78,11 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final TCType actualResult;
 	public final boolean isConstructor;
 	public final TCTypeSet possibleExceptions;
+	public final POExplicitFunctionDefinition measureDef;
+	
 	public final TCNameSet localUpdates;
 	public final PODefinitionSet transitiveCalls;
 	public final TCNameSet transitiveUpdates;
-
-	public long alternativePaths = 0;
-	public POOperationMeasureAnnotation measure = null;
 
 	public POExplicitOperationDefinition(POAnnotationList annotations,
 		TCNameToken name, TCOperationType type,
@@ -98,7 +97,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		TCTypeSet possibleExceptions,
 		TCNameSet localUpdates,
 		PODefinitionSet transitiveCalls,
-		TCNameSet transitiveUpdates)
+		TCNameSet transitiveUpdates,
+		POExplicitFunctionDefinition measureDef)
 	{
 		super(name.getLocation(), name);
 
@@ -119,11 +119,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.localUpdates = localUpdates;
 		this.transitiveCalls = transitiveCalls;
 		this.transitiveUpdates = transitiveUpdates;
-
-		if (annotations != null)
-		{
-			this.measure = annotations.getInstance(POOperationMeasureAnnotation.class);
-		}
+		this.measureDef = measureDef;
 	}
 
 	@Override
@@ -212,7 +208,6 @@ public class POExplicitOperationDefinition extends PODefinition
 				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 			}
 			
-			alternativePaths = ctxt.countAlternatives();
 			ctxt.popTo(popto);
 		}
 		else if (classDefinition != null)
@@ -231,7 +226,6 @@ public class POExplicitOperationDefinition extends PODefinition
 			}
 				
 			obligations.addAll(oblist);
-			alternativePaths = ctxt.countAlternatives();
 			ctxt.popTo(popto);
 		}
 		else	// Flat spec with no state defined
@@ -245,7 +239,6 @@ public class POExplicitOperationDefinition extends PODefinition
 				obligations.addAll(OperationPostConditionObligation.getAllPOs(this, ctxt));
 			}
 			
-			alternativePaths = ctxt.countAlternatives();
 			ctxt.popTo(popto);
 		}
 
@@ -293,9 +286,14 @@ public class POExplicitOperationDefinition extends PODefinition
 
 	private void addMeasure(POContextStack ctxt)
 	{
-		if (measure != null)
+		if (annotations != null)
 		{
-			ctxt.push(new POLetDefContext(measure.getDefinition()));
+			POOperationMeasureAnnotation measure = annotations.getInstance(POOperationMeasureAnnotation.class);
+
+			if (measure != null)
+			{
+				ctxt.push(new POLetDefContext(measure.getDefinition()));
+			}
 		}
 	}
 
@@ -310,12 +308,6 @@ public class POExplicitOperationDefinition extends PODefinition
 	public TCTypeSet getPossibleExceptions()
 	{
 		return possibleExceptions == null || possibleExceptions.isEmpty() ? null : possibleExceptions;
-	}
-
-	@Override
-	public long getAlternativePaths()
-	{
-		return alternativePaths;
 	}
 
 	@Override

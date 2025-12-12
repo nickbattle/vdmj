@@ -28,6 +28,8 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -44,6 +46,7 @@ import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -58,13 +61,15 @@ public class POCallStatement extends POStatement
 	public final TCNameToken name;
 	public final POExpressionList args;
 	public final PODefinition opdef;
+	public final PODefinitionListList recursiveCycles;
 
-	public POCallStatement(TCNameToken name, POExpressionList args, PODefinition opdef)
+	public POCallStatement(TCNameToken name, POExpressionList args, PODefinition opdef, PODefinitionListList recursiveCycles)
 	{
 		super(name.getLocation());
 		this.name = name;
 		this.args = args;
 		this.opdef = opdef;
+		this.recursiveCycles = recursiveCycles;
 	}
 
 	@Override
@@ -129,6 +134,14 @@ public class POCallStatement extends POStatement
 		else
 		{
 			obligations.addAll(checkPrecondition(location, opdef, args, ctxt));
+		}
+
+		if (recursiveCycles != null)	// name is a func/op in a recursive loop
+		{
+			for (PODefinitionList loop: recursiveCycles)
+			{
+				obligations.addAll(RecursiveObligation.getAllPOs(location, loop, this, ctxt));
+			}
 		}
 
 		ctxt.makeOperationCall(location, opdef, args, null, getStmttype().isReturn(), pogState, env);
@@ -205,7 +218,6 @@ public class POCallStatement extends POStatement
 					
 					if (targetState != null)
 					{
-						POSaveStateContext.advance();
 						ctxt.push(new POSaveStateContext(predef, location, false));
 						preargs.add(new POVariableExpression(targetState.getPatternName(location), null));
 					}
@@ -258,6 +270,90 @@ public class POCallStatement extends POStatement
 			
 			return list;
 		}
+	}
+	
+	/**
+	 * Create a measure application string from this apply, turning the root function
+	 * name into the measure name passed. 
+	 */
+	public String getMeasureApply(String measure)
+	{
+		StringBuilder sb = new StringBuilder(measure);
+		sb.append("(");
+		String sep = "";
+		
+		for (POExpression arg: args)
+		{
+			sb.append(sep);
+			sb.append(Utils.deBracketed(arg));
+			sep = ", ";
+		}
+
+		if (opdef instanceof POExplicitOperationDefinition)
+		{
+			POExplicitOperationDefinition edef = (POExplicitOperationDefinition)opdef;
+
+			if (edef.stateDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!edef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.stateDefinition.toPattern(false, location));
+				}
+			}
+			else if (edef.classDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!edef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(edef.classDefinition.toNew());
+				}
+			}
+		}
+		else if (opdef instanceof POImplicitOperationDefinition)
+		{
+			POImplicitOperationDefinition idef = (POImplicitOperationDefinition)opdef;
+
+			if (idef.stateDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!idef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.stateDefinition.toPattern(false, location));
+				}
+			}
+			else if (idef.classDefinition != null)
+			{
+				sb.append(sep);
+
+				if (!idef.location.sameModule(location))
+				{
+					sb.append(POSaveStateContext.getOldName());
+				}
+				else
+				{
+					sb.append(idef.classDefinition.toNew());
+				}
+			}
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override

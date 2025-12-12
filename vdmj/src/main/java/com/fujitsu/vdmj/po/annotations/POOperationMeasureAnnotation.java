@@ -25,91 +25,32 @@
 package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
-import com.fujitsu.vdmj.po.definitions.POValueDefinition;
-import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.po.types.POPatternListTypePair;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POLetDefContext;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POOperationMeasureAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public final TCNameToken measureName;
+	public final TCNameToken ghostName;
 	public final POExpression expression;
+	public final TCType type;
 	
-	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args, TCNameToken measureName)
+	public POOperationMeasureAnnotation(TCIdentifierToken name, POExpressionList args, TCNameToken ghostName, TCType type)
 	{
 		super(name, args);
 		this.expression = args.get(0);
-		this.measureName = measureName;
+		this.ghostName = ghostName;
+		this.type = type;
 	}
 
-	public POAssignmentDefinition getDefinition()	// let MEASURE_? = <expression> in...
+	public POAssignmentDefinition getDefinition()	// let MEASURE_<name>$ = <expression> in...
 	{
-		TCNaturalType mtype = new TCNaturalType(location);
-		return new POAssignmentDefinition(measureName, mtype, expression, mtype);
-	}
-
-	public ProofObligationList getProofObligations(POApplyExpression apply, POContextStack ctxt)
-	{
-		// Add assignments for each parameter and then re-evaluate the measure
-
-		PODefinitionList defs = new PODefinitionList();
-
-		if (apply.opdef instanceof POExplicitOperationDefinition)
-		{
-			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)apply.opdef;
-			int nargs = exop.parameterPatterns.size();
-
-			for (int a = 0; a < nargs; a++)
-			{
-				POPattern param = exop.parameterPatterns.get(a);
-				TCType type = exop.type.parameters.get(a);
-				POExpression arg = apply.args.get(a);
-				POValueDefinition vdef = new POValueDefinition(
-					null, param, type, arg, arg.getExptype(), null);
-
-				defs.add(vdef);
-			}
-		}
-		else if (apply.opdef instanceof POImplicitOperationDefinition)
-		{
-			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)apply.opdef;
-			int a = 0;
-
-			for (POPatternListTypePair pair: imop.parameterPatterns)
-			{
-				for (POPattern param: pair.patterns)
-				{
-					POExpression arg = apply.args.get(a++);
-					POValueDefinition vdef = new POValueDefinition(
-						null, param, pair.type, arg, arg.getExptype(), null);
-
-					defs.add(vdef);
-				}
-			}
-		}
-
-		// This simulates a call to "measure_op(args)", updating the param values
-
-		ctxt.add(new POLetDefContext(defs));
-		ctxt.setComment("Arguments to recursive call");
-		ProofObligationList result = RecursiveObligation.getAllPOs(location, this, ctxt);
-		ctxt.pop();
-
-		return result;
+		// Perhaps this should be a call to measure_op(args, state)? But the expression works.
+		return new POAssignmentDefinition(
+			ghostName, expression.getExptype(), expression, expression.getExptype());
 	}
 }
