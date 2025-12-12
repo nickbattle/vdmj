@@ -54,7 +54,7 @@ public class POVariableExpression extends POExpression
 	public String toString()
 	{
 		// Exclude any PP parameters, but respect explicit flag
-		return name.getName() + (name.isOld() ? "~" : "");
+		return name.getLex().toString();
 	}
 
 	@Override
