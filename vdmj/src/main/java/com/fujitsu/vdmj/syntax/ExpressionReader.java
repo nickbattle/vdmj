@@ -817,7 +817,9 @@ public class ExpressionReader extends SyntaxReader
 		// If we've collected as many applicators as we can, but we're still
 		// just a variable, this is a bare variable expression. In VDM++, these
 		// are always qualified (ie. x refers to C`x where it was declared, not
-		// an overriding version lower down).
+		// an overriding version lower down). The "original" field of the
+		// ASTVariableExpression is there to remember the name as entered, which
+		// is used in toStrings.
 
 		if (Settings.dialect != Dialect.VDM_SL && exp instanceof ASTVariableExpression)
 		{

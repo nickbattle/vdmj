@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.typechecker;
 
-import com.fujitsu.vdmj.tc.TCRecursiveCycles;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;

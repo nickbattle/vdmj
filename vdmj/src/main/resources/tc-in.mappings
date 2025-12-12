@@ -163,7 +163,7 @@ map TCUnaryExpression{} to INUnaryExpression();
 map TCUnaryMinusExpression{location, exp} to INUnaryMinusExpression(location, exp);
 map TCUnaryPlusExpression{location, exp} to INUnaryPlusExpression(location, exp);
 map TCUndefinedExpression{location} to INUndefinedExpression(location);
-map TCVariableExpression{name} to INVariableExpression(name);
+map TCVariableExpression{name, original} to INVariableExpression(name, original);
 
 # annotations
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.in.annotations;

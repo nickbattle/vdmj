@@ -42,19 +42,26 @@ public class POVariableExpression extends POExpression
 
 	public final TCNameToken name;
 	public final PODefinition vardef;
+	public final String original;
 
 	public POVariableExpression(TCNameToken name, PODefinition vardef)
+	{
+		this(name, vardef, name.getLex().toString());
+	}
+
+	public POVariableExpression(TCNameToken name, PODefinition vardef, String original)
 	{
 		super(name.getLocation());
 		this.name = name;
 		this.vardef = vardef;
+		this.original = original;
 	}
 
 	@Override
 	public String toString()
 	{
-		// Exclude any PP parameters, but respect explicit flag
-		return name.getLex().toString();
+		// The original name as entered in the source (no PP parameters)
+		return original;
 	}
 
 	@Override
