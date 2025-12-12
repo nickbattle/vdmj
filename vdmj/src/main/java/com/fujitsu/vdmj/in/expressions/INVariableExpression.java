@@ -34,17 +34,24 @@ public class INVariableExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 
 	public final TCNameToken name;
+	public final String original;
 
 	public INVariableExpression(TCNameToken name)
 	{
+		this(name, name.toString());
+	}
+
+	public INVariableExpression(TCNameToken name, String original)
+	{
 		super(name.getLocation());
 		this.name = name;
+		this.original = original;
 	}
 
 	@Override
 	public String toString()
 	{
-		return name.toExplicitString(location);
+		return original;
 	}
 
 	@Override

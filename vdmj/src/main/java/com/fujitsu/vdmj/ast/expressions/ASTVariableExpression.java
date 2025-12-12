@@ -32,19 +32,19 @@ public class ASTVariableExpression extends ASTExpression
 	private static final long serialVersionUID = 1L;
 
 	public LexNameToken name;
-	public final String original;
+	public final String original;	// Used by toStrings
 
 	public ASTVariableExpression(LexNameToken name)
 	{
 		super(name.location);
 		this.name = name;
-		this.original = name.name;
+		this.original = name.toString();
 	}
 
 	@Override
 	public String toString()
 	{
-		return name.toString();
+		return original;
 	}
 
 	@Override

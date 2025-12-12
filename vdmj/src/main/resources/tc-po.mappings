@@ -164,7 +164,7 @@ map TCUnaryExpression{} to POUnaryExpression();
 map TCUnaryMinusExpression{location, exp, exptype} to POUnaryMinusExpression(location, exp) set exptype;
 map TCUnaryPlusExpression{location, exp, exptype} to POUnaryPlusExpression(location, exp) set exptype;
 map TCUndefinedExpression{location, exptype} to POUndefinedExpression(location) set exptype;
-map TCVariableExpression{name, vardef, exptype} to POVariableExpression(name, vardef) set exptype;
+map TCVariableExpression{name, vardef, original, exptype} to POVariableExpression(name, vardef, original) set exptype;
 
 # annotations
 package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
