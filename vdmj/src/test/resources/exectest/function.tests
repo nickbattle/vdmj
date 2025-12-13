@@ -3,6 +3,8 @@
 inv_T(mk_T(1)) = true
 inv_U(1) = true
 inv_U(20) = false
+is_(123, U!) = true
+is_(123, U) = false
 fact(4) = 24
 inc(1) = 2
 pre_inc(1) = true

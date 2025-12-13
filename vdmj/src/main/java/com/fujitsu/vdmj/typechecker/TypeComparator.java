@@ -785,7 +785,7 @@ public class TypeComparator
     		{
     			TCNamedType nt = (TCNamedType)sub;
 
-       			if (nt.invdef == null || invignore)
+       			if (nt.invdef == null || nt.isMaximal() ||  invignore)
        			{
         			sub = nt.type;
         			continue;
@@ -796,7 +796,7 @@ public class TypeComparator
     		{
     			TCNamedType nt = (TCNamedType)sup;
 
-       			if (nt.invdef == null || invignore)
+       			if (nt.invdef == null || nt.isMaximal() || invignore)
        			{
         			sup = nt.type;
         			continue;
@@ -1194,7 +1194,7 @@ public class TypeComparator
     		{
     			TCNamedType nt = (TCNamedType)a;
 
-       			if (nt.invdef == null)
+       			if (nt.invdef == null || nt.isMaximal())
        			{
         			a = nt.type;
         			continue;
@@ -1205,7 +1205,7 @@ public class TypeComparator
     		{
     			TCNamedType nt = (TCNamedType)b;
 
-       			if (nt.invdef == null)
+       			if (nt.invdef == null || nt.isMaximal())
        			{
         			b = nt.type;
         			continue;
