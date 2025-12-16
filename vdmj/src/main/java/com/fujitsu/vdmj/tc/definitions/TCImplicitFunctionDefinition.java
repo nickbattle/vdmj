@@ -386,7 +386,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		// Note that the measure_f has the precondition of the function it measures.
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(mexpType), getParamPatternList(), measureExp, precondition, null, false, null);
+				typeParams, type.getMeasureType(mexpType, false), getParamPatternList(), measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.implicitDefinitions(base);

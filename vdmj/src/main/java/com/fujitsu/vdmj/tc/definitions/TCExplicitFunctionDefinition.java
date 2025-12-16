@@ -391,7 +391,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		// Note that the measure_f has the precondition of the function it measures.
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(mexpType), paramPatternList, measureExp, precondition, null, false, null);
+				typeParams, type.getMeasureType(mexpType,  isCurried), paramPatternList, measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.implicitDefinitions(base);
@@ -440,13 +440,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				if (!mtype.parameters.toString().equals(type.parameters.toString()))
 				{
 					mname.report(3303, "Measure parameters different to function");
-					detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result));
+					detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result, isCurried));
 				}
 			}
 			else if (isCurried && !(mtype.result instanceof TCFunctionType))
 			{
 				mname.report(3303, "Measure parameters different to function");
-				detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result));
+				detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result, isCurried));
 			}
 			else if (!TypeComparator.compatible(mtype.parameters, type.parameters))
 			{
