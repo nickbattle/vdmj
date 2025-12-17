@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
@@ -727,7 +728,9 @@ public class QuickCheck
 					}
 					else
 					{
-						po.setCounterexample(globals.getCounterexample());
+						Context path = globals.getCounterexample();
+						po.setCounterexample(path);
+						// getExplanation(po, path, sresults.inExpression);
 					}
 
 					if (execException != null)
@@ -747,6 +750,45 @@ public class QuickCheck
 		}
 	}
 	
+	private String getExplanation(ProofObligation po, Context path, INExpression inExpression)
+	{
+		/**
+		 * Generate a list of context strings, for every layer of the path, in execution order.
+		 */
+		TreeMap<Integer, String> explanation = new TreeMap<Integer, String>();
+		String[] source = po.source.split("\\n");
+
+		while (path != null)
+		{
+			if (path.outer != null)		// Don't add global frame
+			{
+				if (path.title.equals("type params"))
+				{
+					if (!path.isEmpty())
+					{
+						explanation.put(0, "types: " + stringOfContext(path));
+					}
+				}
+				else
+				{
+					explanation.put(path.location.startLine, path.title + " " + stringOfContext(path));
+				}
+			}
+
+			path = path.outer;
+		}
+
+		// Show each line of the PO, together with the context
+		StringBuilder sb = new StringBuilder();
+
+		for (int line: explanation.keySet())
+		{
+			sb.append(source[line - 1]);
+		}
+
+		return sb.toString();
+	}
+
 	private void applyHeuristics(ProofObligation po)
 	{
 		if (po.status == POStatus.MAYBE)
@@ -794,7 +836,7 @@ public class QuickCheck
 
 	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
 	{
-		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);
+		IterableContext ictxt = new IterableContext(po.location, "type params", ctxt);
 
 		if (po.getTypeParams() != null)
 		{
