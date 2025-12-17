@@ -82,6 +82,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	private TCExpression checkedExpression = null;
 	private boolean existential = false;
 	private boolean hasObligations = false;
+	private String explanation = null;
 
 	public ProofObligation(LexLocation location, POType kind, POContextStack ctxt)
 	{
@@ -448,5 +449,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setHasObligations(boolean hasObligations)
 	{
 		this.hasObligations = hasObligations; 
+	}
+
+	public void setExplanation(String explanation)
+	{
+		this.explanation = explanation;
+	}
+
+	public String getExplanation()
+	{
+		return explanation;
 	}
 }

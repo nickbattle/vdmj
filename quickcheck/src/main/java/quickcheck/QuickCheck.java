@@ -544,6 +544,7 @@ public class QuickCheck
 			{
 				execResult = new BooleanValue(false);
 				execException = e;
+				globals.setCounterexample(e.ctxt);
 			}
 		}
 		catch (QuickCheckException e)
@@ -730,7 +731,7 @@ public class QuickCheck
 					{
 						Context path = globals.getCounterexample();
 						po.setCounterexample(path);
-						// getExplanation(po, path, sresults.inExpression);
+						po.setExplanation(getExplanation(po, path, execException, sresults.inExpression));
 					}
 
 					if (execException != null)
@@ -750,13 +751,15 @@ public class QuickCheck
 		}
 	}
 	
-	private String getExplanation(ProofObligation po, Context path, INExpression inExpression)
+	/**
+	 * Generate a list of context strings, for every layer of the path, in execution order.
+	 * Interleave these with the source of the PO and add any exceptions at the end.
+	 */
+	private String getExplanation(ProofObligation po, Context path, ContextException execException, INExpression inExpression)
 	{
-		/**
-		 * Generate a list of context strings, for every layer of the path, in execution order.
-		 */
-		TreeMap<Integer, String> explanation = new TreeMap<Integer, String>();
-		String[] source = po.source.split("\\n");
+		TreeMap<Integer, String> contexts = new TreeMap<Integer, String>();
+		String[] source = po.source.split("\n");
+		StringBuilder explanation = new StringBuilder();
 
 		while (path != null)
 		{
@@ -766,27 +769,69 @@ public class QuickCheck
 				{
 					if (!path.isEmpty())
 					{
-						explanation.put(0, "types: " + stringOfContext(path));
+						explanation.append("Types: ");
+						explanation.append(stringOfContext(path));
+						explanation.append("\n");
 					}
 				}
 				else
 				{
-					explanation.put(path.location.startLine, path.title + " " + stringOfContext(path));
+					contexts.put(path.location.startLine, "=> " + stringOfContext(path));
 				}
 			}
 
 			path = path.outer;
 		}
 
-		// Show each line of the PO, together with the context
-		StringBuilder sb = new StringBuilder();
+		// List each line of the PO, together with the context values
+		String sep = "";
+		int lastLine = 0;
 
-		for (int line: explanation.keySet())
+		for (int line: contexts.keySet())
 		{
-			sb.append(source[line - 1]);
+			explanation.append(sep);
+			explanation.append(line);
+			explanation.append(": ");
+			explanation.append(source[line - 1].stripLeading());
+			explanation.append("\n");
+			explanation.append(contexts.get(line));
+			sep = "\n";
+			lastLine = line;
 		}
 
-		return sb.toString();
+		// If the ContextException is within the PO source, list this line at the end
+
+		if (execException != null)
+		{
+			explanation.append("\n");
+
+			if (execException.location.file.getName().equals("console") &&
+				execException.location.startLine <= source.length)
+			{
+				int line = execException.location.startLine;
+				explanation.append(line);
+				explanation.append(": ");
+				explanation.append(source[line - 1].stripLeading());
+				explanation.append("\n");
+			}
+
+			explanation.append("=> ");
+			explanation.append(execException.toString());
+		}
+		else	// No exception, just returns false.
+		{
+			for (int line = lastLine + 1; line <= source.length; line++)
+			{
+				explanation.append("\n");
+				explanation.append(line);
+				explanation.append(": ");
+				explanation.append(source[line - 1].stripLeading());
+			}
+
+			explanation.append("\n=> returns false");
+		}
+
+		return explanation.toString();
 	}
 
 	private void applyHeuristics(ProofObligation po)
@@ -988,7 +1033,8 @@ public class QuickCheck
 			{
 				if (po.counterexample != null)
 				{
-					String cex = stringOfContext(po.counterexample);
+					// String cex = stringOfContext(po.counterexample);
+					String cex = po.getExplanation();
 					
 					if (cex == null)
 					{
@@ -996,7 +1042,7 @@ public class QuickCheck
 					}
 					else
 					{
-						infoln("Counterexample: " + cex);
+						infoln("Counterexample:\n" + cex);
 					}
 				}
 				
@@ -1036,10 +1082,10 @@ public class QuickCheck
 			sep = ", ";
 		}
 		
-		if (path.location.startLine != 1)
-		{
-			result.append(" @PO line #" + path.location.startLine);
-		}
+		// if (path.location.startLine != 1)
+		// {
+		// 	result.append(" @PO line #" + path.location.startLine);
+		// }
 
 		return result.toString();
 	}
