@@ -734,10 +734,10 @@ public class QuickCheck
 						po.setExplanation(getExplanation(po, path, execException, sresults.inExpression));
 					}
 
-					if (execException != null)
-					{
-						po.setMessage("Causes " + execException.getMessage());
-					}
+					// if (execException != null)
+					// {
+					// 	po.setMessage("Causes " + execException.getMessage());
+					// }
 				}
 				
 				applyHeuristics(po);
@@ -776,7 +776,7 @@ public class QuickCheck
 				}
 				else
 				{
-					contexts.put(path.location.startLine, "=> " + stringOfContext(path));
+					contexts.put(path.location.startLine, stringOfContext(path));
 				}
 			}
 
@@ -790,10 +790,9 @@ public class QuickCheck
 		for (int line: contexts.keySet())
 		{
 			explanation.append(sep);
-			explanation.append(line);
-			explanation.append(": ");
+			explanation.append(String.format("%2d: ", line));
 			explanation.append(source[line - 1].stripLeading());
-			explanation.append("\n");
+			explanation.append("\n    => ");
 			explanation.append(contexts.get(line));
 			sep = "\n";
 			lastLine = line;
@@ -809,13 +808,12 @@ public class QuickCheck
 				execException.location.startLine <= source.length)
 			{
 				int line = execException.location.startLine;
-				explanation.append(line);
-				explanation.append(": ");
+				explanation.append(String.format("%2d: ", line));
 				explanation.append(source[line - 1].stripLeading());
 				explanation.append("\n");
 			}
 
-			explanation.append("=> ");
+			explanation.append("    => ");
 			explanation.append(execException.toString());
 		}
 		else	// No exception, just returns false.
@@ -823,12 +821,11 @@ public class QuickCheck
 			for (int line = lastLine + 1; line <= source.length; line++)
 			{
 				explanation.append("\n");
-				explanation.append(line);
-				explanation.append(": ");
+				explanation.append(String.format("%2d: ", line));
 				explanation.append(source[line - 1].stripLeading());
 			}
 
-			explanation.append("\n=> returns false");
+			explanation.append("\n    => returns false");
 		}
 
 		return explanation.toString();
