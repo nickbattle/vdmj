@@ -731,7 +731,7 @@ public class QuickCheck
 					{
 						Context path = globals.getCounterexample();
 						po.setCounterexample(path);
-						po.setExplanation(getExplanation(po, path, execException, sresults.inExpression));
+						po.setExplanation(getExplanation(po, path, execException));
 					}
 
 					// if (execException != null)
@@ -755,11 +755,13 @@ public class QuickCheck
 	 * Generate a list of context strings, for every layer of the path, in execution order.
 	 * Interleave these with the source of the PO and add any exceptions at the end.
 	 */
-	private String getExplanation(ProofObligation po, Context path, ContextException execException, INExpression inExpression)
+	private String getExplanation(ProofObligation po, Context path, ContextException execException)
 	{
 		TreeMap<Integer, String> contexts = new TreeMap<Integer, String>();
 		String[] source = po.source.split("\n");
 		StringBuilder explanation = new StringBuilder();
+
+		// Note that PO sources are in file "console".
 
 		while (path != null)
 		{
@@ -774,7 +776,7 @@ public class QuickCheck
 						explanation.append("\n");
 					}
 				}
-				else
+				else if (path.location.file.getName().equals("console"))
 				{
 					contexts.put(path.location.startLine, stringOfContext(path));
 				}
