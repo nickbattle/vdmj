@@ -733,11 +733,6 @@ public class QuickCheck
 						po.setCounterexample(path);
 						po.setExplanation(getExplanation(po, path, execException));
 					}
-
-					// if (execException != null)
-					// {
-					// 	po.setMessage("Causes " + execException.getMessage());
-					// }
 				}
 				
 				applyHeuristics(po);
@@ -1023,7 +1018,7 @@ public class QuickCheck
 			infof(" in %ss", duration);
 		}
 		
-		infof("\n");
+		infoln("");
 		
 		if (!nominal)
 		{
@@ -1036,7 +1031,6 @@ public class QuickCheck
 			{
 				if (po.counterexample != null)
 				{
-					// String cex = stringOfContext(po.counterexample);
 					String cex = po.getExplanation();
 					
 					if (cex == null)
@@ -1049,7 +1043,16 @@ public class QuickCheck
 					}
 				}
 				
-				infof("----\n%s\n", po.toString());
+				infoln("----");
+				int line = 0;
+
+				for (String text: po.toString().split("\n"))
+				{
+					infof("%2d: %s\n", line, text);
+					line++;
+				}
+
+				infoln("");
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
@@ -1085,11 +1088,6 @@ public class QuickCheck
 			sep = ", ";
 		}
 		
-		// if (path.location.startLine != 1)
-		// {
-		// 	result.append(" @PO line #" + path.location.startLine);
-		// }
-
 		return result.toString();
 	}
 
@@ -1099,7 +1097,6 @@ public class QuickCheck
 		println("");
 		println("  -?|-help           - show command help");
 		println("  -q|-v|-n           - run with minimal, verbose, basic output");
-	//	println("  -e|-u              - show eval errors, or use undefined");
 		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");
