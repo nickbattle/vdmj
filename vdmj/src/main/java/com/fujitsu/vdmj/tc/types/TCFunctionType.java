@@ -66,12 +66,12 @@ public class TCFunctionType extends TCType
 		return type;
 	}
 
-	public TCFunctionType getMeasureType(TCType actual)
+	public TCFunctionType getMeasureType(TCType actual, boolean isCurried)
 	{
-		if (result instanceof TCFunctionType)	// Curried
+		if (result instanceof TCFunctionType && isCurried)
 		{
 			TCFunctionType fresult = (TCFunctionType)result;
-			return new TCFunctionType(location, parameters, false, fresult.getMeasureType(actual));
+			return new TCFunctionType(location, parameters, false, fresult.getMeasureType(actual, isCurried));
 		}
 		
 		TCTypeList cparams = new TCTypeList();

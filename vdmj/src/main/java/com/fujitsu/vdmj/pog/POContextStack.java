@@ -518,7 +518,27 @@ public class POContextStack extends Stack<POContext>
 		}
 		else if (classDefinition != null)
 		{
-			return null;	// Can't handle VDM++/RT pre/post function state
+			StringBuilder sb = new StringBuilder();
+
+			if (predef != null)
+			{
+				sb.append(predef.name.toExplicitString(from));
+			}
+
+			if (postdef != null)
+			{
+				if (sb.length() > 0) sb.append(", ");
+				sb.append(postdef.name.toExplicitString(from));
+			}
+
+			if (sb.length() > 0)	// Return commented out version
+			{
+				sb.insert(0, "/* Undefined PP/RT ");
+				sb.append(" */ true");
+				return sb.toString();
+			}
+
+			return null;
 		}
 
 		/*

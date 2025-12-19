@@ -151,7 +151,7 @@ public class POSaveStateContext extends POContext
 				sb.append("let ");
 				sb.append(oldName());
 				sb.append(" = ");
-				sb.append(clazz.toPattern(false, from));
+				sb.append("undefined");		// Can't create a saved object state?
 				sb.append(" in");
 			}
 			else

@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
@@ -543,6 +544,7 @@ public class QuickCheck
 			{
 				execResult = new BooleanValue(false);
 				execException = e;
+				globals.setCounterexample(e.ctxt);
 			}
 		}
 		catch (QuickCheckException e)
@@ -727,13 +729,15 @@ public class QuickCheck
 					}
 					else
 					{
-						po.setCounterexample(globals.getCounterexample());
+						Context path = globals.getCounterexample();
+						po.setCounterexample(path);
+						po.setExplanation(getExplanation(po, path, execException));
 					}
 
-					if (execException != null)
-					{
-						po.setMessage("Causes " + execException.getMessage());
-					}
+					// if (execException != null)
+					// {
+					// 	po.setMessage("Causes " + execException.getMessage());
+					// }
 				}
 				
 				applyHeuristics(po);
@@ -747,6 +751,92 @@ public class QuickCheck
 		}
 	}
 	
+	/**
+	 * Generate a list of context strings, for every layer of the path, in execution order.
+	 * Interleave these with the source of the PO and add any exceptions at the end.
+	 */
+	private String getExplanation(ProofObligation po, Context path, ContextException execException)
+	{
+		TreeMap<Integer, String> contexts = new TreeMap<Integer, String>();
+		String[] source = po.source.split("\n");
+		StringBuilder explanation = new StringBuilder();
+
+		// Note that PO sources are in file "console".
+
+		while (path != null)
+		{
+			if (path.outer != null)		// Don't add global frame
+			{
+				if (path.title.equals("type params"))
+				{
+					if (!path.isEmpty())
+					{
+						explanation.append("Types: ");
+						explanation.append(stringOfContext(path));
+						explanation.append("\n");
+					}
+				}
+				else if (path.location.file.getName().equals("console"))
+				{
+					contexts.put(path.location.startLine, stringOfContext(path));
+				}
+			}
+
+			path = path.outer;
+		}
+
+		// List each line of the PO, together with the context values
+		String sep = "";
+		int lastLine = 0;
+
+		for (int line: contexts.keySet())
+		{
+			explanation.append(sep);
+			explanation.append(String.format("%2d: ", line));
+			explanation.append(source[line - 1].stripLeading());
+			explanation.append("\n    => ");
+			explanation.append(contexts.get(line));
+			sep = "\n";
+			lastLine = line;
+		}
+
+		// If the ContextException is within the PO source, list this line at the end
+
+		if (execException != null)
+		{
+			explanation.append("\n");
+
+			if (execException.location.file.getName().equals("console") &&
+				execException.location.startLine <= source.length)
+			{
+				int exline = execException.location.startLine;
+
+				for (int line = lastLine + 1; line <= exline; line++)
+				{
+					explanation.append(String.format("%2d: ", line));
+					explanation.append(source[line - 1].stripLeading());
+					explanation.append("\n");
+				}
+			}
+
+			explanation.append("    => ");
+			explanation.append(execException.toString());
+		}
+		else	// No exception, just returns false.
+		{
+			for (int line = lastLine + 1; line <= source.length; line++)
+			{
+				explanation.append("\n");
+				explanation.append(String.format("%2d: ", line));
+				explanation.append(source[line - 1].stripLeading());
+			}
+
+			explanation.append("\n    => returns false");
+		}
+
+		return explanation.toString();
+	}
+
 	private void applyHeuristics(ProofObligation po)
 	{
 		if (po.status == POStatus.MAYBE)
@@ -794,7 +884,7 @@ public class QuickCheck
 
 	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
 	{
-		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);
+		IterableContext ictxt = new IterableContext(po.location, "type params", ctxt);
 
 		if (po.getTypeParams() != null)
 		{
@@ -946,7 +1036,8 @@ public class QuickCheck
 			{
 				if (po.counterexample != null)
 				{
-					String cex = stringOfContext(po.counterexample);
+					// String cex = stringOfContext(po.counterexample);
+					String cex = po.getExplanation();
 					
 					if (cex == null)
 					{
@@ -954,7 +1045,7 @@ public class QuickCheck
 					}
 					else
 					{
-						infoln("Counterexample: " + cex);
+						infoln("Counterexample:\n" + cex);
 					}
 				}
 				
@@ -994,10 +1085,10 @@ public class QuickCheck
 			sep = ", ";
 		}
 		
-		if (path.location.startLine != 1)
-		{
-			result.append(" @PO line #" + path.location.startLine);
-		}
+		// if (path.location.startLine != 1)
+		// {
+		// 	result.append(" @PO line #" + path.location.startLine);
+		// }
 
 		return result.toString();
 	}
