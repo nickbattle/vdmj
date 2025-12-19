@@ -773,7 +773,12 @@ public class QuickCheck
 				}
 				else if (path.location.file.getName().equals("console"))
 				{
-					contexts.put(path.location.startLine, stringOfContext(path));
+					String ctxt = stringOfContext(path);
+
+					if (ctxt != null)	// Not an empty path
+					{
+						contexts.put(path.location.startLine, ctxt);
+					}
 				}
 			}
 

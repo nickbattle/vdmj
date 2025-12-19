@@ -75,7 +75,6 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
@@ -366,15 +365,17 @@ public class FixedQCStrategy extends QCStrategy
 	{
 		INMultipleTypeBind tb = (INMultipleTypeBind)bind;
 		
-		if (tb.type instanceof TCNamedType)
-		{
-			TCNamedType nt = (TCNamedType)tb.type;
-			return tb.plist.toString() + ":" + nt.typename.getExplicit(false);
-		}
-		else
-		{
-			return tb.plist.toString() + ":" + tb.type.toString();
-		}
+		// if (tb.type instanceof TCNamedType)
+		// {
+		// 	TCNamedType nt = (TCNamedType)tb.type;
+		// 	return tb.plist.toString() + ":" + nt.typename.getExplicit(false);
+		// }
+		// else
+		// {
+		// 	return tb.plist.toString() + ":" + tb.type.toString();
+		// }
+
+		return tb.toString();
 	}
 
 	private void createRangeFile(QuickCheck qc, String filename)
