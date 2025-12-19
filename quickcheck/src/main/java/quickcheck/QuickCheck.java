@@ -809,10 +809,14 @@ public class QuickCheck
 			if (execException.location.file.getName().equals("console") &&
 				execException.location.startLine <= source.length)
 			{
-				int line = execException.location.startLine;
-				explanation.append(String.format("%2d: ", line));
-				explanation.append(source[line - 1].stripLeading());
-				explanation.append("\n");
+				int exline = execException.location.startLine;
+
+				for (int line = lastLine + 1; line <= exline; line++)
+				{
+					explanation.append(String.format("%2d: ", line));
+					explanation.append(source[line - 1].stripLeading());
+					explanation.append("\n");
+				}
 			}
 
 			explanation.append("    => ");
