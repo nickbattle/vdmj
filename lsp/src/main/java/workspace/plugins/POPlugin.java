@@ -231,12 +231,20 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				name.add(part);
 			}
 
+			// Use the annotated explanation, if we have one.
+			String source = po.getExplanation();
+
+			if (source == null)
+			{
+				source = po.getSource();
+			}
+
 			JSONObject json = new JSONObject(
 					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
-					"source",	splitPO(po.source),
+					"source",	splitPO(source),
 					"status",	po.status.toString());
 			
 			poList.add(json);

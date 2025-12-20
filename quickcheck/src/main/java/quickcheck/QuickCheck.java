@@ -785,53 +785,51 @@ public class QuickCheck
 			path = path.outer;
 		}
 
-		// List each line of the PO, together with the context values
-		String sep = "";
-		int lastLine = 0;
+		// List each line of the PO, together with any context values or exceptions
+		int exLine = 0;
 
-		for (int line: contexts.keySet())
+		if (execException != null &&
+			execException.location.file.getName().equals("console") &&
+			execException.location.startLine <= source.length)
 		{
-			explanation.append(sep);
-			explanation.append(String.format("%2d: ", line));
-			explanation.append(source[line - 1].stripLeading());
-			explanation.append("\n    => ");
-			explanation.append(contexts.get(line));
-			sep = "\n";
-			lastLine = line;
+			exLine = execException.location.startLine;
 		}
 
-		// If the ContextException is within the PO source, list this line at the end
+		String indent = " ";		// Enough to line up with first char, eg. "f" of (forall...
+		int lineNo = 1;
 
-		if (execException != null)
+		for (String poLine: source)
 		{
+			explanation.append(poLine);
 			explanation.append("\n");
 
-			if (execException.location.file.getName().equals("console") &&
-				execException.location.startLine <= source.length)
+			if (contexts.containsKey(lineNo))
 			{
-				int exline = execException.location.startLine;
-
-				for (int line = lastLine + 1; line <= exline; line++)
-				{
-					explanation.append(String.format("%2d: ", line));
-					explanation.append(source[line - 1].stripLeading());
-					explanation.append("\n");
-				}
-			}
-
-			explanation.append("    => ");
-			explanation.append(execException.toString());
-		}
-		else	// No exception, just returns false.
-		{
-			for (int line = lastLine + 1; line <= source.length; line++)
-			{
+				explanation.append(indent);
+				explanation.append("--> ");
+				explanation.append(contexts.get(lineNo));
 				explanation.append("\n");
-				explanation.append(String.format("%2d: ", line));
-				explanation.append(source[line - 1].stripLeading());
+			}
+			
+			if (exLine == lineNo)
+			{
+				explanation.append(indent);
+				explanation.append("--> ");
+				explanation.append(execException.toString());
+				explanation.append("\n");
 			}
 
-			explanation.append("\n    => returns false");
+			indent = indent + "  ";		// Matches the PO getSource value
+			lineNo++;
+		}
+
+		if (execException == null)
+		{
+			// Last line has no starting "(", so fix indent
+			if (indent.length() > 2) indent = indent.substring(3);
+			explanation.append(indent);
+			explanation.append("--> returns false");
+			explanation.append("\n");
 		}
 
 		return explanation.toString();
@@ -1037,6 +1035,11 @@ public class QuickCheck
 				if (po.counterexample != null)
 				{
 					String cex = po.getExplanation();
+
+					if (cex == null)
+					{
+						cex = stringOfContext(po.counterexample);
+					}
 					
 					if (cex == null)
 					{
@@ -1047,17 +1050,6 @@ public class QuickCheck
 						infoln("Counterexample:\n" + cex);
 					}
 				}
-				
-				infoln("----");
-				int line = 0;
-
-				for (String text: po.toString().split("\n"))
-				{
-					infof("%2d: %s\n", line, text);
-					line++;
-				}
-
-				infoln("");
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
