@@ -242,6 +242,12 @@ public class QuickCheckThread extends CancellableThread
 			messages.add(new VDMWarning(9000, sb.toString(), po.location));
 		}
 
+		if (po.getExplanation() != null)
+		{
+			// Attempt to update source, after QC
+			json.put("source", splitPO(po.getExplanation()));
+		}
+
 		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
 		{
 			if (po.message != null)		// Add failed messages/qualifiers as a warning too
@@ -300,5 +306,18 @@ public class QuickCheckThread extends CancellableThread
 		}
 
 		return json;
+	}
+
+	private JSONArray splitPO(String value)
+	{
+		String[] parts = value.trim().split("\\n\\s+");
+		JSONArray array = new JSONArray();
+		
+		for (String part: parts)
+		{
+			array.add(part);
+		}
+		
+		return array;
 	}
 }

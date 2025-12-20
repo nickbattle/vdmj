@@ -733,11 +733,6 @@ public class QuickCheck
 						po.setCounterexample(path);
 						po.setExplanation(getExplanation(po, path, execException));
 					}
-
-					// if (execException != null)
-					// {
-					// 	po.setMessage("Causes " + execException.getMessage());
-					// }
 				}
 				
 				applyHeuristics(po);
@@ -760,6 +755,7 @@ public class QuickCheck
 		TreeMap<Integer, String> contexts = new TreeMap<Integer, String>();
 		String[] source = po.source.split("\n");
 		StringBuilder explanation = new StringBuilder();
+		int lastLine = 0;
 
 		// Note that PO sources are in file "console".
 
@@ -778,60 +774,65 @@ public class QuickCheck
 				}
 				else if (path.location.file.getName().equals("console"))
 				{
-					contexts.put(path.location.startLine, stringOfContext(path));
+					String ctxt = stringOfContext(path);
+
+					if (ctxt != null)	// Not an empty path
+					{
+						int line = path.location.startLine;
+						contexts.put(line, ctxt);
+						if (line > lastLine) lastLine = line;
+					}
 				}
 			}
 
 			path = path.outer;
 		}
 
-		// List each line of the PO, together with the context values
-		String sep = "";
-		int lastLine = 0;
+		// List each line of the PO, together with any context values or exceptions
+		int exLine = 0;
 
-		for (int line: contexts.keySet())
+		if (execException != null &&
+			execException.location.file.getName().equals("console") &&
+			execException.location.startLine <= source.length)
 		{
-			explanation.append(sep);
-			explanation.append(String.format("%2d: ", line));
-			explanation.append(source[line - 1].stripLeading());
-			explanation.append("\n    => ");
-			explanation.append(contexts.get(line));
-			sep = "\n";
-			lastLine = line;
+			exLine = execException.location.startLine;
 		}
 
-		// If the ContextException is within the PO source, list this line at the end
+		String indent = " ";		// Enough to line up with first char, eg. "f" of (forall...
+		int lineNo = 1;
 
-		if (execException != null)
+		for (String poLine: source)
 		{
+			explanation.append(poLine);
 			explanation.append("\n");
 
-			if (execException.location.file.getName().equals("console") &&
-				execException.location.startLine <= source.length)
+			if (contexts.containsKey(lineNo))
 			{
-				int exline = execException.location.startLine;
-
-				for (int line = lastLine + 1; line <= exline; line++)
-				{
-					explanation.append(String.format("%2d: ", line));
-					explanation.append(source[line - 1].stripLeading());
-					explanation.append("\n");
-				}
-			}
-
-			explanation.append("    => ");
-			explanation.append(execException.toString());
-		}
-		else	// No exception, just returns false.
-		{
-			for (int line = lastLine + 1; line <= source.length; line++)
-			{
+				explanation.append(indent);
+				explanation.append("--> ");
+				explanation.append(contexts.get(lineNo));
 				explanation.append("\n");
-				explanation.append(String.format("%2d: ", line));
-				explanation.append(source[line - 1].stripLeading());
+			}
+			
+			if (exLine == lineNo || execException != null && lineNo == lastLine)
+			{
+				explanation.append(indent);
+				explanation.append("--> ");
+				explanation.append(execException.toString());
+				explanation.append("\n");
 			}
 
-			explanation.append("\n    => returns false");
+			indent = indent + "  ";		// Matches the PO getSource value
+			lineNo++;
+		}
+
+		if (execException == null)
+		{
+			// Last line has no starting "(", so fix indent
+			if (indent.length() > 2) indent = indent.substring(3);
+			explanation.append(indent);
+			explanation.append("--> returns false");
+			explanation.append("\n");
 		}
 
 		return explanation.toString();
@@ -1023,7 +1024,7 @@ public class QuickCheck
 			infof(" in %ss", duration);
 		}
 		
-		infof("\n");
+		infoln("");
 		
 		if (!nominal)
 		{
@@ -1036,8 +1037,12 @@ public class QuickCheck
 			{
 				if (po.counterexample != null)
 				{
-					// String cex = stringOfContext(po.counterexample);
 					String cex = po.getExplanation();
+
+					if (cex == null)
+					{
+						cex = stringOfContext(po.counterexample);
+					}
 					
 					if (cex == null)
 					{
@@ -1045,11 +1050,9 @@ public class QuickCheck
 					}
 					else
 					{
-						infoln("Counterexample:\n" + cex);
+						infof("Counterexample:\n%s\n%s\n", po.toTitle(), cex);
 					}
 				}
-				
-				infof("----\n%s\n", po.toString());
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
@@ -1085,11 +1088,6 @@ public class QuickCheck
 			sep = ", ";
 		}
 		
-		// if (path.location.startLine != 1)
-		// {
-		// 	result.append(" @PO line #" + path.location.startLine);
-		// }
-
 		return result.toString();
 	}
 
@@ -1099,7 +1097,6 @@ public class QuickCheck
 		println("");
 		println("  -?|-help           - show command help");
 		println("  -q|-v|-n           - run with minimal, verbose, basic output");
-	//	println("  -e|-u              - show eval errors, or use undefined");
 		println("  -t <msecs>         - timeout in millisecs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");

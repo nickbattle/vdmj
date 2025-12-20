@@ -352,13 +352,22 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	{
 		StringBuilder sb = new StringBuilder();
 		
+		sb.append(toTitle());
+		sb.append("\n");
+		sb.append(source);
+		
+		return sb.toString();
+	}
+
+	public String toTitle()
+	{
+		StringBuilder sb = new StringBuilder();
+		
 		sb.append(name);
 		sb.append(": ");
 		sb.append(kind);
 		sb.append(" obligation ");
 		sb.append(location);
-		sb.append("\n");
-		sb.append(source);
 		
 		return sb.toString();
 	}
