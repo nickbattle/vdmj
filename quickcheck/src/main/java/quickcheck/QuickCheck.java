@@ -1050,7 +1050,7 @@ public class QuickCheck
 					}
 					else
 					{
-						infoln("Counterexample:\n" + cex);
+						infof("Counterexample:\n%s\n%s\n", po.toTitle(), cex);
 					}
 				}
 			}
