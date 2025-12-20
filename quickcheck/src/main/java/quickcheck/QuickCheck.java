@@ -814,7 +814,8 @@ public class QuickCheck
 				explanation.append("\n");
 			}
 			
-			if (exLine == lineNo || execException != null && lineNo == lastLine)
+			if ((exLine == lineNo) ||
+				(exLine == 0 && execException != null && lineNo == lastLine))
 			{
 				explanation.append(indent);
 				explanation.append("--> ");
