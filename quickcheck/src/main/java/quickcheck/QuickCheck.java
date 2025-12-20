@@ -755,6 +755,7 @@ public class QuickCheck
 		TreeMap<Integer, String> contexts = new TreeMap<Integer, String>();
 		String[] source = po.source.split("\n");
 		StringBuilder explanation = new StringBuilder();
+		int lastLine = 0;
 
 		// Note that PO sources are in file "console".
 
@@ -777,7 +778,9 @@ public class QuickCheck
 
 					if (ctxt != null)	// Not an empty path
 					{
-						contexts.put(path.location.startLine, ctxt);
+						int line = path.location.startLine;
+						contexts.put(line, ctxt);
+						if (line > lastLine) lastLine = line;
 					}
 				}
 			}
@@ -811,7 +814,7 @@ public class QuickCheck
 				explanation.append("\n");
 			}
 			
-			if (exLine == lineNo)
+			if (exLine == lineNo || execException != null && lineNo == lastLine)
 			{
 				explanation.append(indent);
 				explanation.append("--> ");
