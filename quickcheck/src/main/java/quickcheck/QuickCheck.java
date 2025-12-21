@@ -677,6 +677,7 @@ public class QuickCheck
 						po.setWitness(witness);
 						po.setQualifier("by witness");
 						po.setProvedBy("witness");
+						po.setExplanation(getExplanation(po, witness, null, result.value));
 					}
 				}
 				else if (sresults.hasAllValues && execCompleted)
@@ -731,7 +732,7 @@ public class QuickCheck
 					{
 						Context path = globals.getCounterexample();
 						po.setCounterexample(path);
-						po.setExplanation(getExplanation(po, path, execException));
+						po.setExplanation(getExplanation(po, path, execException, result.value));
 					}
 				}
 				
@@ -750,7 +751,8 @@ public class QuickCheck
 	 * Generate a list of context strings, for every layer of the path, in execution order.
 	 * Interleave these with the source of the PO and add any exceptions at the end.
 	 */
-	private String getExplanation(ProofObligation po, Context path, ContextException execException)
+	private String getExplanation(ProofObligation po,
+		Context path, ContextException execException, boolean returns)
 	{
 		TreeMap<Integer, String> contexts = new TreeMap<Integer, String>();
 		String[] source = po.source.split("\n");
@@ -779,7 +781,14 @@ public class QuickCheck
 					if (ctxt != null)	// Not an empty path
 					{
 						int line = path.location.startLine;
+
+						if (contexts.containsKey(line))		// eg. exists, all on one line
+						{
+							ctxt = ctxt + ", " + contexts.get(line);
+						}
+						
 						contexts.put(line, ctxt);
+
 						if (line > lastLine) lastLine = line;
 					}
 				}
@@ -798,7 +807,7 @@ public class QuickCheck
 			exLine = execException.location.startLine;
 		}
 
-		String indent = " ";		// Enough to line up with first char, eg. "f" of (forall...
+		String indent = source[0].startsWith("(") ? " " : "";
 		int lineNo = 1;
 
 		for (String poLine: source)
@@ -823,20 +832,35 @@ public class QuickCheck
 				explanation.append("\n");
 			}
 
-			indent = indent + "  ";		// Matches the PO getSource value
+			indent = indent + "  ";		// Matches the PO getSource indent
 			lineNo++;
 		}
 
 		if (execException == null)
 		{
-			// Last line has no starting "(", so fix indent
-			if (indent.length() > 2) indent = indent.substring(3);
+			indent = indentOf(source[source.length - 1]);
 			explanation.append(indent);
-			explanation.append("--> returns false");
+			explanation.append("--> returns ");
+			explanation.append(returns);
 			explanation.append("\n");
 		}
 
 		return explanation.toString();
+	}
+
+	/**
+	 * The whitespace prefix to a line.
+	 */
+	private String indentOf(String s)
+	{
+		StringBuilder sb = new StringBuilder();
+
+		while (s.charAt(sb.length()) == ' ')
+		{
+			sb.append(" ");
+		}
+
+		return sb.toString();
 	}
 
 	private void applyHeuristics(ProofObligation po)
@@ -1035,33 +1059,42 @@ public class QuickCheck
 				infoln(po.message);
 			}
 			
-			if (po.status == POStatus.FAILED)
+			if (po.status == POStatus.FAILED && po.counterexample != null)
 			{
-				if (po.counterexample != null)
-				{
-					String cex = po.getExplanation();
+				String cex = po.getExplanation();
 
-					if (cex == null)
-					{
-						cex = stringOfContext(po.counterexample);
-					}
-					
-					if (cex == null)
-					{
-						infoln("No counterexample");
-					}
-					else
-					{
-						infof("Counterexample:\n%s\n%s\n", po.toTitle(), cex);
-					}
+				if (cex == null)
+				{
+					cex = stringOfContext(po.counterexample);
+				}
+				
+				if (cex == null)
+				{
+					infoln("No counterexample");
+				}
+				else
+				{
+					infof("Counterexample:\n%s\n%s\n", po.toTitle(), cex);
 				}
 			}
 			
 			if (po.status == POStatus.PROVABLE && po.witness != null)
 			{
-				String witness = stringOfContext(po.witness);
-				infoln("Witness: " + witness);
-				infof("----\n%s\n", po.toString());
+				String wit = po.getExplanation();
+
+				if (wit == null)
+				{
+					wit = stringOfContext(po.witness);
+				}
+				
+				if (wit == null)
+				{
+					infoln("No witness");
+				}
+				else
+				{
+					infof("Witness:\n%s\n%s\n", po.toTitle(), wit);
+				}
 			}
 		}
 	}
