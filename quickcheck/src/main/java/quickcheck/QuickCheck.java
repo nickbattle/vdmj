@@ -1006,10 +1006,11 @@ public class QuickCheck
 	 * 
 	 * PO #1, MAYBE in 0.028s
 	 * PO #2, FAILED in 0.003s
-	 * Counterexample: i = 1, s = [1.25]
-	 * ----
+	 * Counterexample:
 	 * (forall i:nat, s:seq of real &amp; pre_f(i, s) =&gt;
+	 *  ==&gt; i = 1, s = [1.25]
 	 *   is_nat(s(i)))
+	 *   ==&gt; returns false
 	 */
 	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{
