@@ -784,7 +784,12 @@ public class QuickCheck
 
 						if (contexts.containsKey(line))		// eg. exists, all on one line
 						{
-							ctxt = ctxt + ", " + contexts.get(line);
+							String prev = contexts.get(line);
+
+							if (!ctxt.equals(prev))
+							{
+								ctxt = ctxt + ", " + prev;
+							}
 						}
 						
 						contexts.put(line, ctxt);
@@ -1108,6 +1113,7 @@ public class QuickCheck
 		
 		StringBuilder result = new StringBuilder();
 		String sep = "";
+		String tail = "";
 
 		for (TCNameToken name: path.keySet())
 		{
@@ -1121,7 +1127,14 @@ public class QuickCheck
 			result.append(" = ");
 			result.append(path.get(name));
 			sep = ", ";
+
+			if (!name.getLocation().file.getName().equals("console"))
+			{
+				tail = " " + name.getLocation().toString();	// If not local to PO
+			}
 		}
+
+		result.append(tail);
 		
 		return result.toString();
 	}
