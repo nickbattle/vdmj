@@ -769,8 +769,9 @@ public class QuickCheck
 				{
 					if (!path.isEmpty())
 					{
-						explanation.append("Types: ");
-						explanation.append(stringOfContext(path));
+						explanation.append("--> ");
+						String types = stringOfContext(path);
+						explanation.append(types.replaceAll("(\\w+ =)", "@$0"));
 						explanation.append("\n");
 					}
 				}
