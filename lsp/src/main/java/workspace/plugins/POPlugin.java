@@ -239,6 +239,12 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				source = po.getSource();
 			}
 
+			// Add the message, if we have one
+			if (po.message != null)
+			{
+				source = po.message + "\n----\n" + source;
+			}
+
 			JSONObject json = new JSONObject(
 					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
