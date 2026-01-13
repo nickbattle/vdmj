@@ -656,6 +656,7 @@ public class QuickCheck
 		if (execResult.isUndefined())
 		{
 			po.setStatus(POStatus.MAYBE);
+			applyHeuristics(po);
 		}
 		else if (execResult instanceof BooleanValue)
 		{
