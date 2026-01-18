@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.modules;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -33,6 +35,8 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class POModuleList extends POMappedList<TCModule, POModule>
 {
+	private final AtomicInteger progress = new AtomicInteger();
+
 	public POModuleList(TCModuleList from) throws Exception
 	{
 		super(from);
@@ -49,12 +53,34 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 		ProofObligationList obligations = new ProofObligationList();
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
 		POContextStack.reset();
+		progress.set(0);
 		
 		for (POModule m: this)
 		{
-			obligations.addAll(m.getProofObligations(menv));
+			obligations.addAll(m.getProofObligations(progress, menv));
 		}
 
 		return obligations;
+	}
+
+	/**
+	 * Count the number of top level definitions across all modules. This is
+	 * used to calculate the progress of the POG for large specifications.
+	 */
+	public int getDefCount()
+	{
+		int total = 0;
+
+		for (POModule m: this)
+		{
+			total = total + m.defs.size();
+		}
+
+		return total;
+	}
+
+	public int getProgreess()
+	{
+		return progress.get();
 	}
 }
