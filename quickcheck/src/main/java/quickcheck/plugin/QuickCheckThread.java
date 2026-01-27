@@ -50,8 +50,12 @@ import rpc.RPCResponse;
 import workspace.Diag;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
+import workspace.lenses.POLaunchDebugLens;
 import workspace.plugins.POPlugin;
 
+/**
+ * A thread supporting the background check of POs from VSCode.
+ */
 public class QuickCheckThread extends CancellableThread
 {
 	private final RPCRequest request;
@@ -223,7 +227,7 @@ public class QuickCheckThread extends CancellableThread
 			if (launch != null)
 			{
 				cexample.put("launch", launch);
-				pog.addCodeLens(po);
+				pog.addCodeLens(po.location.file, new POLaunchDebugLens(po));
 			}
 
 			if (po.counterexample.location.startLine != 1)

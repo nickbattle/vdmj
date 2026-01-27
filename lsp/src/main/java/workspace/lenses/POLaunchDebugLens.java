@@ -41,7 +41,7 @@ import json.JSONObject;
 /**
  * A class to generate launch lenses for PO counterexamples.
  */
-public class POLaunchDebugLens extends AbstractLaunchDebugLens
+public class POLaunchDebugLens extends AbstractLaunchDebugLens implements POCodeLens
 {
 	private final ProofObligation po;
 	
@@ -50,6 +50,7 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens
 		this.po = po;
 	}
 
+	@Override
 	public JSONArray getLaunchLens()
 	{
 		JSONArray results = new JSONArray();

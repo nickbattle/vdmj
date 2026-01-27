@@ -205,6 +205,10 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	/**
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
+	 * 
+	 * Note that ASTCodeLenses are factories which support one type of lens each. So here,
+	 * we return one ASTCodeLens for each *type* of AST lens. Compare this with PO, where
+	 * each POCodeLens supports one *instance* of a type of PO lens.
 	 */
 	protected List<ASTCodeLens> getASTCodeLenses()
 	{

@@ -141,7 +141,11 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	/**
-	 * Event handling above. Supporting methods below. 
+	 * Event handling above. Supporting methods below.
+	 * 
+	 * Note that TCCodeLenses are factories which support one type of lens each. So here,
+	 * we return one TCCodeLens for each *type* of TC lens. Compare this with PO, where
+	 * each POCodeLens supports one *instance* of a type of PO lens.
 	 */
 	protected List<TCCodeLens> getTCCodeLenses(boolean dirty)
 	{

@@ -55,7 +55,7 @@ import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.LSPEvent;
-import workspace.lenses.POLaunchDebugLens;
+import workspace.lenses.POCodeLens;
 
 abstract public class POPlugin extends AnalysisPlugin implements EventListener
 {
@@ -76,13 +76,13 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	private final Map<File, List<POLaunchDebugLens>> codeLenses;
+	private final Map<File, List<POCodeLens>> codeLenses;
 
 	protected POPlugin()
 	{
 		super();
 		
-		codeLenses = new HashMap<File, List<POLaunchDebugLens>>();
+		codeLenses = new HashMap<File, List<POCodeLens>>();
 	}
 	
 	@Override
@@ -284,17 +284,17 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		codeLenses.clear();
 	}
 	
-	public void addCodeLens(ProofObligation po)
+	public void addCodeLens(File file, POCodeLens lens)
 	{
-		List<POLaunchDebugLens> array = codeLenses.get(po.location.file);
+		List<POCodeLens> array = codeLenses.get(file);
 		
 		if (array == null)
 		{
-			array = new Vector<POLaunchDebugLens>();
-			codeLenses.put(po.location.file, array);
+			array = new Vector<POCodeLens>();
+			codeLenses.put(file, array);
 		}
 		
-		array.add(new POLaunchDebugLens(po));
+		array.add(lens);
 	}
 
 	private JSONArray getCodeLenses(File file)
@@ -303,7 +303,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		
 		if (codeLenses.containsKey(file))
 		{
-			for (POLaunchDebugLens lens: codeLenses.get(file))
+			for (POCodeLens lens: codeLenses.get(file))
 			{
 				results.addAll(lens.getLaunchLens());
 			}

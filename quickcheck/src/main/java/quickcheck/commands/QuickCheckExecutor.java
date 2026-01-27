@@ -51,8 +51,12 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
+import workspace.lenses.POLaunchDebugLens;
 import workspace.plugins.POPlugin;
 
+/**
+ * A command supporting the background check of POs from the Console.
+ */
 public class QuickCheckExecutor extends AsyncExecutor
 {
 	private final QuickCheck qc;
@@ -191,7 +195,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 
 		if (launch != null)
 		{
-			pog.addCodeLens(po);
+			pog.addCodeLens(po.location.file, new POLaunchDebugLens(po));
 		}
 	}
 
