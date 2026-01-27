@@ -24,10 +24,13 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POClassList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -65,6 +68,20 @@ public class POPluginPR extends POPlugin
 	{
 		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
 		return true;
+	}
+
+	@Override
+	protected void addPostCodeLenses(File file)
+	{
+		for (POClassDefinition clazz: poClassList)
+		{
+			if (!locationInScope(clazz.location, file))
+			{
+				continue;
+			}
+
+			createPostDependencyLenses(clazz.definitions);
+		}
 	}
 
 	@Override

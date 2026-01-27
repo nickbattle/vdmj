@@ -109,7 +109,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 		if (qc.initStrategies())
 		{
 			MessageHub.getInstance().clearPluginMessages(pog);
-			pog.clearLenses();
+			pog.clearLenses(POLaunchDebugLens.class);
 			List<VDMMessage> messages = new Vector<VDMMessage>();
 
 			for (ProofObligation po: chosen)

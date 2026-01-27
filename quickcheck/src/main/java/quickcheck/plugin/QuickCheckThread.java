@@ -88,7 +88,7 @@ public class QuickCheckThread extends CancellableThread
 			
 			LSPServer server = LSPServer.getInstance();
 			MessageHub.getInstance().clearPluginMessages(pog);
-			pog.clearLenses();
+			pog.clearLenses(POLaunchDebugLens.class);
 			
 			List<VDMMessage> messages = new Vector<VDMMessage>();
 			JSONArray list = new JSONArray();

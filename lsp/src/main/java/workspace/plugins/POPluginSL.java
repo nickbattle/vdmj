@@ -24,12 +24,15 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.util.Map.Entry;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -70,6 +73,22 @@ public class POPluginSL extends POPlugin
 	{
 		poModuleList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
 		return true;
+	}
+
+	@Override
+	protected void addPostCodeLenses(File file)
+	{
+		for (POModule module: poModuleList)
+		{
+			LexLocation mloc = module.defs.get(0).location;
+
+			if (!locationInScope(mloc, file))
+			{
+				continue;
+			}
+
+			createPostDependencyLenses(module.defs);
+		}
 	}
 
 	@Override

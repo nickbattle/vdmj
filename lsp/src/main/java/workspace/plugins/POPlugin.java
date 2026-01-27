@@ -26,14 +26,19 @@ package workspace.plugins;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -56,6 +61,7 @@ import workspace.events.CheckPrepareEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.POCodeLens;
+import workspace.lenses.POPostDependencyLens;
 
 abstract public class POPlugin extends AnalysisPlugin implements EventListener
 {
@@ -150,7 +156,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	protected void preCheck(CheckPrepareEvent event)
 	{
 		messagehub.clearPluginMessages(this);
-		clearLenses();
+		codeLenses.clear();
 	}
 
 	/**
@@ -188,6 +194,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
+
+			addPostCodeLenses(file);
 			
 			return getJSONObligations(request, file);
 		}
@@ -198,30 +206,94 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	public RPCMessageList getJSONObligations(RPCRequest request, File file)
+	abstract protected void addPostCodeLenses(File file);
+
+	protected ProofObligationList getPostDependencies(String postname)
+	{
+		ProofObligationList result = new ProofObligationList();
+
+		for (ProofObligation po: getProofObligations())
+		{
+			if (po.source.contains(postname))
+			{
+				result.add(po);
+			}
+		}
+
+		return result;
+	}
+
+	protected void createPostDependencyLenses(PODefinitionList definitions)
+	{
+		for (PODefinition def: definitions)
+		{
+			if (def instanceof POExplicitOperationDefinition)
+			{
+				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
+
+				if (exop.postdef != null)
+				{
+					String postname = exop.postdef.name.getName();	// "post_op"
+					ProofObligationList dependencies = getPostDependencies(postname);
+
+					if (!dependencies.isEmpty())
+					{
+						addCodeLens(exop.location.file, new POPostDependencyLens(exop.postdef.location, dependencies));
+					}
+				}
+			}
+			else if (def instanceof POImplicitOperationDefinition)
+			{
+				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
+
+				if (imop.postdef != null)
+				{
+					String postname = imop.postdef.name.getName();	// "post_op"
+					ProofObligationList dependencies = getPostDependencies(postname);
+
+					if (!dependencies.isEmpty())
+					{
+						addCodeLens(imop.location.file, new POPostDependencyLens(imop.postdef.location, dependencies));
+					}
+				}
+			}
+		}
+	}
+
+	protected boolean locationInScope(LexLocation location, File file)
+	{
+		if (file != null)
+		{
+			if (file.isFile())
+			{
+				if (!location.file.equals(file))
+				{
+					return false;
+				}
+			}
+			else if (file.isDirectory())
+			{
+				String path = file.getPath();
+				
+				if (!location.file.getPath().startsWith(path))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private RPCMessageList getJSONObligations(RPCRequest request, File file)
 	{
 		JSONArray poList = new JSONArray();
 		
 		for (ProofObligation po: getProofObligations())
 		{
-			if (file != null)
+			if (!locationInScope(po.location, file))
 			{
-				if (file.isFile())
-				{
-					if (!po.location.file.equals(file))
-					{
-						continue;
-					}
-				}
-				else if (file.isDirectory())
-				{
-					String path = file.getPath();
-					
-					if (!po.location.file.getPath().startsWith(path))
-					{
-						continue;
-					}
-				}
+				continue;
 			}
 			
 			JSONArray name = new JSONArray(po.location.module);
@@ -279,9 +351,23 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return response;
 	}
 
-	public void clearLenses()
+	public void clearLenses(Class<?> type)
 	{
-		codeLenses.clear();
+		for (File file: codeLenses.keySet())
+		{
+			List<POCodeLens> lenses = codeLenses.get(file);
+			Iterator<POCodeLens> iter = lenses.iterator();
+
+			while (iter.hasNext())
+			{
+				POCodeLens lens = iter.next();
+
+				if (type.isAssignableFrom(lens.getClass()))
+				{
+					iter.remove();
+				}
+			}
+		}
 	}
 	
 	public void addCodeLens(File file, POCodeLens lens)
