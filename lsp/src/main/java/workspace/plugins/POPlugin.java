@@ -43,6 +43,9 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCApplyFinder;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -208,13 +211,22 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	abstract protected void addPostCodeLenses(File file);
 
-	protected ProofObligationList getPostDependencies(String postname)
+	protected ProofObligationList getPostDependencies(TCNameToken applyname)
 	{
 		ProofObligationList result = new ProofObligationList();
 
 		for (ProofObligation po: getProofObligations())
 		{
-			if (po.source.contains(postname))
+			if (po.getCheckedExpression() != null)
+			{
+				TCExpressionList applies = po.getCheckedExpression().apply(new TCApplyFinder(), applyname);
+
+				if (!applies.isEmpty())
+				{
+					result.add(po);
+				}
+			}
+			else if (po.source.contains(applyname.getName()))	// Unchecked POs?
 			{
 				result.add(po);
 			}
@@ -233,8 +245,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 				if (exop.postdef != null)
 				{
-					String postname = exop.postdef.name.getName();	// "post_op"
-					ProofObligationList dependencies = getPostDependencies(postname);
+					ProofObligationList dependencies = getPostDependencies(exop.postdef.name);
 
 					if (!dependencies.isEmpty())
 					{
@@ -248,8 +259,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 				if (imop.postdef != null)
 				{
-					String postname = imop.postdef.name.getName();	// "post_op"
-					ProofObligationList dependencies = getPostDependencies(postname);
+					ProofObligationList dependencies = getPostDependencies(imop.postdef.name);
 
 					if (!dependencies.isEmpty())
 					{
