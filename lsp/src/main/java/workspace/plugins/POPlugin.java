@@ -37,8 +37,12 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -198,7 +202,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 
-			addPostCodeLenses(file);
+			addDependencyCodeLenses(file);
 			
 			return getJSONObligations(request, file);
 		}
@@ -209,9 +213,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	abstract protected void addPostCodeLenses(File file);
+	abstract protected void addDependencyCodeLenses(File file);
 
-	protected ProofObligationList getPostDependencies(TCNameToken applyname)
+	private ProofObligationList getDependentPOs(TCNameToken applyname)
 	{
 		ProofObligationList result = new ProofObligationList();
 
@@ -226,13 +230,56 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					result.add(po);
 				}
 			}
-			else if (po.source.contains(applyname.getName()))	// Unchecked POs?
+			else if (po.source.contains(applyname.getName() + "("))	// Unchecked POs?
 			{
 				result.add(po);
 			}
 		}
 
 		return result;
+	}
+
+	private ProofObligationList getDependentPOs(POStateDefinition sdef)
+	{
+		ProofObligationList result = new ProofObligationList();
+
+		for (ProofObligation po: getProofObligations())
+		{
+			if (po.source.contains("mk_" + sdef.name + "!("))	// mk_Sigma!(args)
+			{
+				result.add(po);
+			}
+		}
+
+		return result;
+	}
+
+	private void createOneLens(PODefinition def)
+	{
+		ProofObligationList dependencies = null;
+		LexLocation loc = null;
+
+		if (def instanceof POStateDefinition)
+		{
+			POStateDefinition sdef = (POStateDefinition)def;
+
+			if (sdef.invdef != null)
+			{
+				dependencies = getDependentPOs(sdef);
+				dependencies.addAll(getDependentPOs(sdef.invdef.name));
+				loc = sdef.invdef.location;
+			}
+		}
+		else if (def != null)
+		{
+			dependencies = getDependentPOs(def.name);
+			loc = def.location;
+		}
+
+		if (dependencies != null && !dependencies.isEmpty())
+		{
+			addCodeLens(loc.file, new POPostDependencyLens(loc, dependencies));
+		}
 	}
 
 	protected void createPostDependencyLenses(PODefinitionList definitions)
@@ -242,30 +289,36 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			if (def instanceof POExplicitOperationDefinition)
 			{
 				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
-
-				if (exop.postdef != null)
-				{
-					ProofObligationList dependencies = getPostDependencies(exop.postdef.name);
-
-					if (!dependencies.isEmpty())
-					{
-						addCodeLens(exop.location.file, new POPostDependencyLens(exop.postdef.location, dependencies));
-					}
-				}
+				createOneLens(exop.predef);
+				createOneLens(exop.postdef);
 			}
 			else if (def instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
-
-				if (imop.postdef != null)
-				{
-					ProofObligationList dependencies = getPostDependencies(imop.postdef.name);
-
-					if (!dependencies.isEmpty())
-					{
-						addCodeLens(imop.location.file, new POPostDependencyLens(imop.postdef.location, dependencies));
-					}
-				}
+				createOneLens(imop.predef);
+				createOneLens(imop.postdef);
+			}
+			else if (def instanceof POTypeDefinition)
+			{
+				POTypeDefinition tdef = (POTypeDefinition)def;
+				createOneLens(tdef.invdef);
+			}
+			else if (def instanceof POExplicitFunctionDefinition)
+			{
+				POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)def;
+				createOneLens(exfn.predef);
+				createOneLens(exfn.postdef);
+			}
+			else if (def instanceof POImplicitFunctionDefinition)
+			{
+				POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)def;
+				createOneLens(imfn.predef);
+				createOneLens(imfn.postdef);
+			}
+			else if (def instanceof POStateDefinition)
+			{
+				POStateDefinition sdef = (POStateDefinition)def;
+				createOneLens(sdef);
 			}
 		}
 	}

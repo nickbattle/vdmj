@@ -76,7 +76,7 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	protected void addPostCodeLenses(File file)
+	protected void addDependencyCodeLenses(File file)
 	{
 		for (POModule module: poModuleList)
 		{
