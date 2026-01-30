@@ -274,7 +274,7 @@ public class LSPPlugin extends AnalysisPlugin
 		loadAllProjectFiles();
 		
 		RPCMessageList responses = new RPCMessageList(request, new LSPInitializeResponse());
-		responses.addAll(eventhub.publish(new InitializeEvent(request)));
+		responses.addAll(eventhub.publish(new InitializeEvent(request)));	// adds dynamicRegistrations
 		
 		return responses;
 	}
