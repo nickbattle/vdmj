@@ -24,8 +24,6 @@
 
 package workspace.plugins;
 
-import java.io.File;
-
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
@@ -41,7 +39,6 @@ import workspace.events.CheckPrepareEvent;
 public class POPluginPR extends POPlugin
 {
 	private POClassList poClassList;
-	private ProofObligationList obligationList;
 
 	public POPluginPR()
 	{
@@ -53,7 +50,6 @@ public class POPluginPR extends POPlugin
 	{
 		super.preCheck(ev);
 		poClassList = null;
-		obligationList = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,15 +67,10 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	protected void addDependencyCodeLenses(File file)
+	protected void addDependencyCodeLenses()
 	{
 		for (POClassDefinition clazz: poClassList)
 		{
-			if (!locationInScope(clazz.location, file))
-			{
-				continue;
-			}
-
 			createPostDependencyLenses(clazz.definitions);
 		}
 	}
@@ -93,6 +84,8 @@ public class POPluginPR extends POPlugin
 			obligationList = poClassList.getProofObligations();
 			POAnnotation.close();
 			obligationList.renumber();
+
+			addDependencyCodeLenses();
 		}
 
 		return obligationList;

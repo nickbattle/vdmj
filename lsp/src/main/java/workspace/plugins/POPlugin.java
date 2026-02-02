@@ -90,6 +90,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	}
 
 	private final Map<File, List<POCodeLens>> codeLenses;
+	protected ProofObligationList obligationList;
 
 	protected POPlugin()
 	{
@@ -164,6 +165,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	{
 		messagehub.clearPluginMessages(this);
 		codeLenses.clear();
+		obligationList = null;
 	}
 
 	/**
@@ -202,8 +204,6 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 
-			addDependencyCodeLenses(file);
-			
 			return getJSONObligations(request, file);
 		}
 		catch (Exception e)
@@ -213,7 +213,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	abstract protected void addDependencyCodeLenses(File file);
+	abstract protected void addDependencyCodeLenses();
 
 	private ProofObligationList getDependentPOs(TCNameToken applyname)
 	{
