@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.Utils;
@@ -69,8 +70,10 @@ public class POGHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
+			JSONArray obligations = params.get("obligations");
+
 			POPlugin po = registry.getPlugin("PO");
-			return po.pogGenerate(request, file);
+			return po.pogGenerate(request, file, obligations);
 		}
 		catch (URISyntaxException e)
 		{

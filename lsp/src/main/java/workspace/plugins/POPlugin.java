@@ -195,7 +195,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return array;
 	}
 
-	public RPCMessageList pogGenerate(RPCRequest request, File file)
+	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONArray obligations)
 	{
 		try
 		{
@@ -204,7 +204,37 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 
-			return getJSONObligations(request, file);
+			ProofObligationList full = getProofObligations();
+			ProofObligationList chosen = new ProofObligationList();
+
+			if (obligations != null && !obligations.isEmpty())
+			{
+				// Ignore file limitation
+
+				for (int i=0; i < obligations.size(); i++)
+				{
+					long po = obligations.index(i);		// 1 to n
+
+					if (po <= full.size())
+					{
+						chosen.add(full.get((int) po - 1));
+					}
+				}
+			}
+			else
+			{
+				for (ProofObligation po: full)
+				{
+					if (!locationInScope(po.location, file))
+					{
+						continue;
+					}
+
+					chosen.add(po);
+				}
+			}
+
+			return getJSONObligations(request, chosen);
 		}
 		catch (Exception e)
 		{
@@ -348,17 +378,12 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return true;
 	}
 
-	private RPCMessageList getJSONObligations(RPCRequest request, File file)
+	private RPCMessageList getJSONObligations(RPCRequest request, ProofObligationList chosen)
 	{
 		JSONArray poList = new JSONArray();
 		
-		for (ProofObligation po: getProofObligations())
+		for (ProofObligation po: chosen)
 		{
-			if (!locationInScope(po.location, file))
-			{
-				continue;
-			}
-			
 			JSONArray name = new JSONArray(po.location.module);
 			
 			for (String part: po.name.split(";\\s+"))
