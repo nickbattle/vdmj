@@ -245,7 +245,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	abstract protected void addDependencyCodeLenses();
 
-	private ProofObligationList getDependentPOs(TCNameToken applyname)
+	public ProofObligationList getDependentPOs(TCNameToken applyname)
 	{
 		ProofObligationList result = new ProofObligationList();
 
