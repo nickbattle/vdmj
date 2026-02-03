@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POStatus;
+import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
@@ -270,13 +271,13 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return result;
 	}
 
-	private ProofObligationList getDependentPOs(POStateDefinition sdef)
+	private ProofObligationList getDependentPOs(PODefinition def, POType type)
 	{
 		ProofObligationList result = new ProofObligationList();
 
 		for (ProofObligation po: getProofObligations())
 		{
-			if (po.source.contains("mk_" + sdef.name + "!("))	// mk_Sigma!(args)
+			if (po.definition == def && po.kind == type)
 			{
 				result.add(po);
 			}
@@ -290,18 +291,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		ProofObligationList dependencies = null;
 		LexLocation loc = null;
 
-		if (def instanceof POStateDefinition)
-		{
-			POStateDefinition sdef = (POStateDefinition)def;
-
-			if (sdef.invdef != null)
-			{
-				dependencies = getDependentPOs(sdef);
-				dependencies.addAll(getDependentPOs(sdef.invdef.name));
-				loc = sdef.invdef.location;
-			}
-		}
-		else if (def != null)
+		if (def != null)
 		{
 			dependencies = getDependentPOs(def.name);
 			loc = def.location;
@@ -355,8 +345,20 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			else if (def instanceof POStateDefinition)
 			{
 				POStateDefinition sdef = (POStateDefinition)def;
-				createOneLens(sdef);
-				createOneLens(sdef.initdef);
+
+				if (sdef.invdef != null)
+				{
+					ProofObligationList dependencies = getDependentPOs(sdef.invdef, POType.STATE_INVARIANT);
+					dependencies.addAll(getDependentPOs(sdef.invdef.name));
+					addCodeLens(sdef.invdef.location.file, new POPostDependencyLens(sdef.invdef.location, dependencies));
+				}
+
+				if (sdef.initdef != null)
+				{
+					ProofObligationList dependencies = getDependentPOs(sdef.initdef, POType.STATE_INIT);
+					dependencies.addAll(getDependentPOs(sdef.initdef.name));
+					addCodeLens(sdef.initdef.location.file, new POPostDependencyLens(sdef.initdef.location, dependencies));
+				}
 			}
 		}
 	}

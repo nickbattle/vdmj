@@ -69,6 +69,7 @@ public class StateInvariantObligation extends ProofObligation
 		else	// must be because we have a module state invariant
 		{
 			POStateDefinition sdef = ass.stateDefinition;
+			this.definition = sdef.invdef;
 
 			sb.append("let ");
 			sb.append(sdef.invPattern);
