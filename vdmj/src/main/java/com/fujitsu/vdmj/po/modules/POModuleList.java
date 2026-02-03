@@ -73,7 +73,10 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 
 		for (POModule m: this)
 		{
-			total = total + m.defs.size();
+			if (m.defs != null)
+			{
+				total = total + m.defs.size();
+			}
 		}
 
 		return total;
