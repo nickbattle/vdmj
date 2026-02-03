@@ -322,34 +322,41 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
 				createOneLens(exop.predef);
 				createOneLens(exop.postdef);
+				createOneLens(exop.measureDef);
 			}
 			else if (def instanceof POImplicitOperationDefinition)
 			{
 				POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
 				createOneLens(imop.predef);
 				createOneLens(imop.postdef);
+				createOneLens(imop.measureDef);
 			}
 			else if (def instanceof POTypeDefinition)
 			{
 				POTypeDefinition tdef = (POTypeDefinition)def;
 				createOneLens(tdef.invdef);
+				createOneLens(tdef.eqdef);
+				createOneLens(tdef.orddef);
 			}
 			else if (def instanceof POExplicitFunctionDefinition)
 			{
 				POExplicitFunctionDefinition exfn = (POExplicitFunctionDefinition)def;
 				createOneLens(exfn.predef);
 				createOneLens(exfn.postdef);
+				createOneLens(exfn.measureDef);
 			}
 			else if (def instanceof POImplicitFunctionDefinition)
 			{
 				POImplicitFunctionDefinition imfn = (POImplicitFunctionDefinition)def;
 				createOneLens(imfn.predef);
 				createOneLens(imfn.postdef);
+				createOneLens(imfn.measureDef);
 			}
 			else if (def instanceof POStateDefinition)
 			{
 				POStateDefinition sdef = (POStateDefinition)def;
 				createOneLens(sdef);
+				createOneLens(sdef.initdef);
 			}
 		}
 	}
