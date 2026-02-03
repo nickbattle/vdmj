@@ -60,6 +60,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.PogCommand;
+import vdmj.commands.PogDepCommand;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.MessageHub;
@@ -496,6 +497,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			case "pog":
 				return new PogCommand(line);
 
+			case "pogdep":
+				return new PogDepCommand(line);
+
 			default:
 				return null;
 		}
@@ -506,7 +510,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	{
 		return new HelpList
 		(
-			PogCommand.HELP
+			PogCommand.HELP, PogDepCommand.HELP
 		);	
 	}
 }

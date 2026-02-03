@@ -22,19 +22,22 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins.commands;
+package vdmj.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.POPlugin;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
+import dap.DAPMessageList;
+import dap.DAPRequest;
+import workspace.PluginRegistry;
+import workspace.plugins.POPlugin;
+
 public class PogDepCommand extends AnalysisCommand
 {
-	private final static String CMD = "pogdep <[module`]name>";
+	private final static String CMD = "pogdep <[module`]name]>";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = CMD + " - list dependent POs";
 
@@ -49,13 +52,13 @@ public class PogDepCommand extends AnalysisCommand
 	}
 
 	@Override
-	public String run(String line)
+	public DAPMessageList run(DAPRequest request)
 	{
-		POPlugin po = registry.getPlugin("PO");
+		POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
 
 		if (argv.length != 2)
 		{
-			return USAGE;
+			return new DAPMessageList(request, false, USAGE, null);
 		}
 
 		String fname = argv[1];
@@ -67,7 +70,7 @@ public class PogDepCommand extends AnalysisCommand
 
 			if (parts.length != 2)
 			{
-				return USAGE;
+				return new DAPMessageList(request, false, USAGE, null);
 			}
 
 			applyName = new TCNameToken(LexLocation.ANY, parts[0], parts[1]);
@@ -80,19 +83,32 @@ public class PogDepCommand extends AnalysisCommand
 
 		if (!applyName.isReserved())
 		{
-			return "Expecting constraint name (inv/pre/post)";
+			return new DAPMessageList(request, false, "Expecting constraint name (inv/pre/post)", null);
 		}
 
 		ProofObligationList list = po.getDependentPOs(applyName);
 
 		if (list.isEmpty())
 		{
-			return "No dependent POs";
+			return new DAPMessageList(request, false, "No dependent POs", null);
 		}
 
-		printf("%s", "Obligations dependent on " + applyName.toString() + ":\n\n");
-		printf("%s", list.toString());
-		
-		return null;
+		// Use stdout, to match the QC command output format
+		Console.out.print("Obligations dependent on " + applyName.toString() + ":\n\n");
+		Console.out.print(list.toString());
+
+		return new DAPMessageList(request);
+	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean notWhenDirty()
+	{
+		return true;
 	}
 }
