@@ -27,6 +27,7 @@ package workspace.plugins;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POClassList;
@@ -101,5 +102,11 @@ public class POPluginPR extends POPlugin
 	public JSONObject getWitnessLaunch(ProofObligation po)
 	{
 		return null;	// Needs to create new object?
+	}
+
+	@Override
+	protected POProgress getPOProgress()
+	{
+		return poClassList;
 	}
 }

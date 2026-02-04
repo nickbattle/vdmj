@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.po.modules.POModuleList;
@@ -168,5 +169,11 @@ public class POPluginSL extends POPlugin
 				"params",		params,
 				"command",		"print " + launch
 			);
+	}
+
+	@Override
+	protected POProgress getPOProgress()
+	{
+		return poModuleList;
 	}
 }

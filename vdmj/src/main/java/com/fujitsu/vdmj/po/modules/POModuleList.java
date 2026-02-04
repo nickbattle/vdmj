@@ -27,13 +27,14 @@ package com.fujitsu.vdmj.po.modules;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.Utils;
 
-public class POModuleList extends POMappedList<TCModule, POModule>
+public class POModuleList extends POMappedList<TCModule, POModule> implements POProgress
 {
 	private final AtomicInteger progress = new AtomicInteger();
 
@@ -82,7 +83,7 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 		return total;
 	}
 
-	public int getProgreess()
+	public int getProgress()
 	{
 		return progress.get();
 	}

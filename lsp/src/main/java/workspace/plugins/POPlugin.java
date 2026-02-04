@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
@@ -74,6 +75,8 @@ import workspace.lenses.POPostDependencyLens;
 
 abstract public class POPlugin extends AnalysisPlugin implements EventListener
 {
+	private static final int MIN_PROGRESSABLE = 20;		// Min defs before POG shows progress
+
 	public static POPlugin factory(Dialect dialect)
 	{
 		switch (dialect)
@@ -179,12 +182,14 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
 	
 	abstract public ProofObligationList getProofObligations();
+
+	abstract protected POProgress getPOProgress();
 	
 	abstract public JSONObject getCexLaunch(ProofObligation po);
 
 	abstract public JSONObject getWitnessLaunch(ProofObligation po);
 	
-	protected JSONArray splitPO(String value)
+	private JSONArray splitPO(String value)
 	{
 		String[] parts = value.trim().split("\\n\\s+");
 		JSONArray array = new JSONArray();
@@ -197,6 +202,28 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return array;
 	}
 
+	private ProofObligationList generateWithProgress(RPCRequest request)
+	{
+		if (obligationList == null)				// Will generate all POs
+		{
+			POProgress progress = getPOProgress();
+
+			if (progress.getDefCount() > MIN_PROGRESSABLE)
+			{
+				POGProgressThread progressThread = new POGProgressThread(request, getPOProgress());
+				progressThread.start();
+				getProofObligations();
+				progressThread.interrupt();		// Just in case
+			}
+			else
+			{
+				getProofObligations();			// Too few for progress
+			}
+		}
+
+		return obligationList;
+	}
+
 	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONArray obligations)
 	{
 		try
@@ -206,7 +233,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 
-			ProofObligationList full = getProofObligations();
+			ProofObligationList full = generateWithProgress(request);
 			ProofObligationList chosen = new ProofObligationList();
 
 			if (obligations != null && !obligations.isEmpty())
@@ -227,12 +254,10 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			{
 				for (ProofObligation po: full)
 				{
-					if (!locationInScope(po.location, file))
+					if (locationInScope(po.location, file))
 					{
-						continue;
+						chosen.add(po);
 					}
-
-					chosen.add(po);
 				}
 			}
 
@@ -363,7 +388,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	protected boolean locationInScope(LexLocation location, File file)
+	private boolean locationInScope(LexLocation location, File file)
 	{
 		if (file != null)
 		{

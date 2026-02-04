@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -37,7 +38,7 @@ import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 /**
  * A class for holding a list of ClassDefinitions.
  */
-public class POClassList extends POMappedList<TCClassDefinition, POClassDefinition>
+public class POClassList extends POMappedList<TCClassDefinition, POClassDefinition> implements POProgress
 {
 	private static final long serialVersionUID = 1L;
 	private final AtomicInteger progress = new AtomicInteger();
@@ -100,7 +101,7 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 		return total;
 	}
 
-	public int getProgreess()
+	public int getProgress()
 	{
 		return progress.get();
 	}
