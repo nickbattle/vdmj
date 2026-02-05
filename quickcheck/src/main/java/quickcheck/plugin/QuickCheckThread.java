@@ -248,8 +248,16 @@ public class QuickCheckThread extends CancellableThread
 
 		if (po.getExplanation() != null)
 		{
+			String source = po.getExplanation();
+
+			// Add the message, if we have one
+			if (po.message != null)
+			{
+				source = po.message + "\n----\n" + source;
+			}
+
 			// Attempt to update source, after QC
-			json.put("source", splitPO(po.getExplanation()));
+			json.put("source", splitPO(source));
 		}
 
 		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)

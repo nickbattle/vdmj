@@ -106,7 +106,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.qualifier = null;
 		this.counterexample = null;
 		this.witness = null;
-		this.message = null;
+		// this.message = null;		// Not analysis, part of the PO
 		this.provedBy = null;
 	}
 
