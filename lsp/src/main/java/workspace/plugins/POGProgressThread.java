@@ -42,7 +42,7 @@ public class POGProgressThread extends CancellableThread
 
 	public POGProgressThread(RPCRequest request, POProgress progress)
 	{
-		super("POG");
+		super(request.get("id"));		// So cancel kills this thread
 
 		this.progress = progress;
 		JSONObject params = request.get("params");
@@ -62,7 +62,7 @@ public class POGProgressThread extends CancellableThread
 			{
 				int sofar = progress.getProgress();
 
-				while (sofar < total)
+				while (sofar < total && !cancelled)
 				{
 					long done = (100 * sofar)/total;
 					
@@ -74,15 +74,15 @@ public class POGProgressThread extends CancellableThread
 						{
 							value = new JSONObject(
 								"kind",			"begin",
-								"title",		"Executing QuickCheck",
-								"message",		"Processing QuickCheck",
+								"title",		"Executing POG",
+								"message",		"Processing POG",
 								"percentage",	done);
 						}
 						else
 						{
 							value = new JSONObject(
 								"kind",			"report",
-								"message",		"Processing QuickCheck",
+								"message",		"Processing POG",
 								"percentage",	done);
 						}
 						
