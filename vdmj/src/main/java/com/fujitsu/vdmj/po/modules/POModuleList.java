@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class POModuleList extends POMappedList<TCModule, POModule> implements POProgress
 {
 	private final AtomicInteger progress = new AtomicInteger();
+	private boolean cancelled = false;
 
 	public POModuleList(TCModuleList from) throws Exception
 	{
@@ -55,10 +56,16 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
 		POContextStack.reset();
 		progress.set(0);
+		cancelled = false;
 		
 		for (POModule m: this)
 		{
 			obligations.addAll(m.getProofObligations(progress, menv));
+
+			if (cancelled)
+			{
+				return new ProofObligationList();	// empty
+			}
 		}
 
 		return obligations;
@@ -86,5 +93,11 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 	public int getProgress()
 	{
 		return progress.get();
+	}
+
+	@Override
+	public void cancelProgress()
+	{
+		cancelled = true;
 	}
 }

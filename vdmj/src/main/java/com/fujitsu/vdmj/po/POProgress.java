@@ -35,4 +35,5 @@ public interface POProgress
 {
 	public int getDefCount();
 	public int getProgress();
+	public void cancelProgress();
 }

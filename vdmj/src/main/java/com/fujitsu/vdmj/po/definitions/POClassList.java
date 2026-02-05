@@ -44,6 +44,8 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	private final AtomicInteger progress = new AtomicInteger();
 	private final TCClassList tcclasses;
 
+	private boolean cancelled = false;
+
 	public POClassList()
 	{
 		super();
@@ -75,11 +77,17 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 		ProofObligationList obligations = new ProofObligationList();
 		POContextStack.reset();
 		progress.set(0);
+		cancelled = false;
 		
 		for (POClassDefinition c: this)
 		{
 			obligations.addAll(c.getProofObligations(progress,
 				new POContextStack(), new POGState(), new PublicClassEnvironment(tcclasses)));
+
+			if (cancelled)
+			{
+				return new ProofObligationList();	// empty
+			}
 		}
 
 		return obligations;
@@ -104,5 +112,11 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	public int getProgress()
 	{
 		return progress.get();
+	}
+
+	@Override
+	public void cancelProgress()
+	{
+		cancelled = true;
 	}
 }

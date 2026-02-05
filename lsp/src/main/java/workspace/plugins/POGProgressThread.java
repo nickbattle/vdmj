@@ -93,6 +93,13 @@ public class POGProgressThread extends CancellableThread
 					}
 
 					sleep(POLL_INTERVAL);
+
+					if (cancelled)	// while we slept
+					{
+						Diag.fine("POG progress cancelled.");
+						progress.cancelProgress();
+					}
+
 					sofar = progress.getProgress();
 				}
 			}
