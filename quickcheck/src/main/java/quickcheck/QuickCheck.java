@@ -1024,13 +1024,13 @@ public class QuickCheck
 	}
 	
 	/**
-	 * Produce output (subject to include/quiet flags) for a standard QuickCheck command line.
+	 * Produce output (subject to include/nominal/quiet flags) for a standard QuickCheck command line.
 	 * The format is as follows, with several fields being optional:
 	 * 
 	 * PO #&lt;number&gt;, &lt;status&gt; &lt;qualifier&gt; in &lt;time&gt;
 	 * &lt;message&gt;
 	 * &lt;counterexample&gt;|&lt;witness&gt;
-	 * ----
+	 * &lt;title&gt;
 	 * &lt;source&gt;
 	 * 
 	 * For example:
@@ -1038,10 +1038,11 @@ public class QuickCheck
 	 * PO #1, MAYBE in 0.028s
 	 * PO #2, FAILED in 0.003s
 	 * Counterexample:
-	 * (forall i:nat, s:seq of real &amp; pre_f(i, s) =&gt;
-	 *  ==&gt; i = 1, s = [1.25]
-	 *   is_nat(s(i)))
-	 *   ==&gt; returns false
+	 * f: sequence apply obligation in 'DEFAULT' (test.vdm) at line 3:16
+	 * (forall s:seq of nat, i:nat &amp;
+	 *  --&gt; i = 0, s = []
+	 *   i in set inds s)
+	 *   --&gt; returns false
 	 */
 	public void printQuickCheckResult(ProofObligation po, double duration, boolean nominal)
 	{
