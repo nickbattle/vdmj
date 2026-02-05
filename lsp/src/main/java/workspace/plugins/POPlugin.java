@@ -210,7 +210,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 			if (progress.getDefCount() > MIN_PROGRESSABLE)
 			{
-				POGProgressThread progressThread = new POGProgressThread(request, getPOProgress());
+				POGProgressThread progressThread = new POGProgressThread(request, progress);
 				progressThread.start();
 				getProofObligations();
 				progressThread.interrupt();		// Just in case
