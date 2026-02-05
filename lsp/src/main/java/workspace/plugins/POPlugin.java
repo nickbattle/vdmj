@@ -214,6 +214,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				progressThread.start();
 				getProofObligations();
 				progressThread.interrupt();		// Just in case
+
+				if (progressThread.wasCancelled())
+				{
+					return new ProofObligationList();	// obligationList still set
+				}
 			}
 			else
 			{

@@ -115,6 +115,11 @@ abstract public class CancellableThread extends Thread
 		Diag.info("Thread %s cancel sent", myId.toString());
 	}
 
+	public boolean wasCancelled()
+	{
+		return cancelled;
+	}
+
 	public static CancellableThread find(Object id)
 	{
 		return active.get(id);
