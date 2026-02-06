@@ -658,6 +658,7 @@ public class DefinitionReader extends SyntaxReader
 				def.setAccessSpecifier(access);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
+
 				list.add(def);
 
 				if (!newSection())
@@ -699,6 +700,7 @@ public class DefinitionReader extends SyntaxReader
 				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
+
 				list.add(def);
 
 				if (!newSection())
@@ -732,6 +734,7 @@ public class DefinitionReader extends SyntaxReader
 				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
+
 				list.add(def);
 
 				if (!ignore(Token.SEMICOLON) && Settings.strict)
@@ -765,6 +768,9 @@ public class DefinitionReader extends SyntaxReader
 				annotations.astBefore(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
 				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
+
 				list.add(def);
 
 				if (!newSection())
@@ -1152,6 +1158,7 @@ public class DefinitionReader extends SyntaxReader
 		annotations.astAfter(this, def);
 		def.setAnnotations(annotations);
 		def.setComments(comments);
+
 		return def;
 	}
 
