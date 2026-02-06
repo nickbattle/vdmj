@@ -329,7 +329,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 		if (dependencies != null && !dependencies.isEmpty())
 		{
-			addCodeLens(loc.file, new POPostDependencyLens(loc, dependencies));
+			addCodeLens(loc.file, new POPostDependencyLens(def, dependencies));
 		}
 	}
 
@@ -380,14 +380,14 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				{
 					ProofObligationList dependencies = getDependentPOs(sdef.invdef, POType.STATE_INVARIANT);
 					dependencies.addAll(getDependentPOs(sdef.invdef.name));
-					addCodeLens(sdef.invdef.location.file, new POPostDependencyLens(sdef.invdef.location, dependencies));
+					addCodeLens(sdef.invdef.location.file, new POPostDependencyLens(sdef.invdef, dependencies));
 				}
 
 				if (sdef.initdef != null)
 				{
 					ProofObligationList dependencies = getDependentPOs(sdef.initdef, POType.STATE_INIT);
 					dependencies.addAll(getDependentPOs(sdef.initdef.name));
-					addCodeLens(sdef.initdef.location.file, new POPostDependencyLens(sdef.initdef.location, dependencies));
+					addCodeLens(sdef.initdef.location.file, new POPostDependencyLens(sdef.initdef, dependencies));
 				}
 			}
 		}

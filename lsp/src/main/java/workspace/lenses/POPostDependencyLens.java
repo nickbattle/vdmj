@@ -24,7 +24,7 @@
 
 package workspace.lenses;
 
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -33,12 +33,12 @@ import json.JSONArray;
 public class POPostDependencyLens extends CodeLens implements POCodeLens
 {
 	private final ProofObligationList polist;
-	private final LexLocation postloc;
+	private final PODefinition def;
 
-	public POPostDependencyLens(LexLocation postloc, ProofObligationList polist)
+	public POPostDependencyLens(PODefinition def, ProofObligationList polist)
 	{
 		this.polist = polist;
-		this.postloc = postloc;
+		this.def = def;
 	}
 
 	@Override
@@ -50,12 +50,14 @@ public class POPostDependencyLens extends CodeLens implements POCodeLens
 		{
 			JSONArray args = new JSONArray();
 
+			args.add(def.name.getName());
+
 			for (ProofObligation po: polist)
 			{
 				args.add(po.number);
 			}
 
-			results.add(makeLens(postloc, "Dep POs", "vdm-vscode.showPODependencies", args));
+			results.add(makeLens(def.location, "Dep POs", "vdm-vscode.showPODependencies", args));
 		}
 		
 		return results;
