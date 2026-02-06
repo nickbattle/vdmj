@@ -36,9 +36,6 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class POModuleList extends POMappedList<TCModule, POModule> implements POProgress
 {
-	private final AtomicInteger progress = new AtomicInteger();
-	private boolean cancelled = false;
-
 	public POModuleList(TCModuleList from) throws Exception
 	{
 		super(from);
@@ -55,14 +52,13 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 		ProofObligationList obligations = new ProofObligationList();
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
 		POContextStack.reset();
-		progress.set(0);
-		cancelled = false;
+		resetProgress();
 		
 		for (POModule m: this)
 		{
-			obligations.addAll(m.getProofObligations(progress, menv));
+			obligations.addAll(m.getProofObligations(this, menv));
 
-			if (cancelled)
+			if (cancelRequested())
 			{
 				return new ProofObligationList();	// empty
 			}
@@ -75,7 +71,10 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 	 * Count the number of top level definitions across all modules. This is
 	 * used to calculate the progress of the POG for large specifications.
 	 */
-	public int getDefCount()
+	private final AtomicInteger progress = new AtomicInteger();
+	private boolean cancelled = false;
+
+	public int getTotal()
 	{
 		int total = 0;
 
@@ -99,5 +98,24 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 	public void cancelProgress()
 	{
 		cancelled = true;
+	}
+
+	@Override
+	public boolean cancelRequested()
+	{
+		return cancelled;
+	}
+
+	@Override
+	public void resetProgress()
+	{
+		progress.set(0);
+		cancelled = false;
+	}
+
+	@Override
+	public void makeProgress(int n)
+	{
+		progress.addAndGet(n);
 	}
 }

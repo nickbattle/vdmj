@@ -24,9 +24,8 @@
 
 package com.fujitsu.vdmj.po.modules;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -84,7 +83,7 @@ public class POModule extends PONode
 		return sb.toString();
 	}
 
-	public ProofObligationList getProofObligations(AtomicInteger progress, MultiModuleEnvironment menv)
+	public ProofObligationList getProofObligations(POProgress progress, MultiModuleEnvironment menv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
@@ -95,7 +94,12 @@ public class POModule extends PONode
 			POContextStack ctxt = new POContextStack();
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), menv));
-			progress.incrementAndGet();
+			progress.makeProgress(1);
+
+			if (progress.cancelRequested())
+			{
+				return new ProofObligationList();
+			}
 		}
 		
 		list.typeCheck(menv);

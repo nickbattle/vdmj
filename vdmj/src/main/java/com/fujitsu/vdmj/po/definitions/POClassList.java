@@ -41,10 +41,7 @@ import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 public class POClassList extends POMappedList<TCClassDefinition, POClassDefinition> implements POProgress
 {
 	private static final long serialVersionUID = 1L;
-	private final AtomicInteger progress = new AtomicInteger();
 	private final TCClassList tcclasses;
-
-	private boolean cancelled = false;
 
 	public POClassList()
 	{
@@ -76,15 +73,14 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		POContextStack.reset();
-		progress.set(0);
-		cancelled = false;
+		resetProgress();
 		
 		for (POClassDefinition c: this)
 		{
-			obligations.addAll(c.getProofObligations(progress,
+			obligations.addAll(c.getProofObligations(this,
 				new POContextStack(), new POGState(), new PublicClassEnvironment(tcclasses)));
 
-			if (cancelled)
+			if (cancelRequested())
 			{
 				return new ProofObligationList();	// empty
 			}
@@ -97,7 +93,10 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	 * Count the number of top level definitions across all classes. This is
 	 * used to calculate the progress of the POG for large specifications.
 	 */
-	public int getDefCount()
+	private final AtomicInteger progress = new AtomicInteger();
+	private boolean cancelled = false;
+
+	public int getTotal()
 	{
 		int total = 0;
 
@@ -118,5 +117,24 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	public void cancelProgress()
 	{
 		cancelled = true;
+	}
+
+	@Override
+	public boolean cancelRequested()
+	{
+		return cancelled;
+	}
+
+	@Override
+	public void resetProgress()
+	{
+		progress.set(0);
+		cancelled = false;
+	}
+
+	@Override
+	public void makeProgress(int n)
+	{
+		progress.addAndGet(n);
 	}
 }

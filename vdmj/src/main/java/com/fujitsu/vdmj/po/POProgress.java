@@ -26,14 +26,37 @@ package com.fujitsu.vdmj.po;
 
 /**
  * An interface to assist with asynchronous progress reporting for POG. This is implemented
- * by POModuleList and POClassList, and reports the total number of definitions and the number
- * that have been processed by POG. We don't know the number of POs generated until the
- * getProofObligations finishes, so this is a rough approximation based on the definition
- * count.
+ * by POModuleList and POClassList.
  */
 public interface POProgress
 {
-	public int getDefCount();
+	/**
+	 * Start a new progress run.
+	 */
+	public void resetProgress();
+
+	/**
+	 * The maximum value that the progress can have. The minimum is assumed to be zero.
+	 */
+	public int getTotal();
+
+	/**
+	 * Get the current value of the progress. This is 0 <= x <= getTotal().
+	 */
 	public int getProgress();
+
+	/**
+	 * Advance the progress towards the total by "n".
+	 */
+	public void makeProgress(int n);
+
+	/**
+	 * Indicate that the task being progressed should terminate.
+	 */
 	public void cancelProgress();
+
+	/**
+	 * Test whether a cancel request has been received.
+	 */
+	public boolean cancelRequested();
 }

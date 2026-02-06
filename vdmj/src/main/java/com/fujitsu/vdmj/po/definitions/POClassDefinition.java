@@ -24,10 +24,9 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
@@ -209,7 +208,7 @@ public class POClassDefinition extends PODefinition
 		return false;
 	}
 
-	public ProofObligationList getProofObligations(AtomicInteger progress, POContextStack ctxt, POGState pogState, Environment publicEnv)
+	public ProofObligationList getProofObligations(POProgress progress, POContextStack ctxt, POGState pogState, Environment publicEnv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
@@ -221,8 +220,13 @@ public class POClassDefinition extends PODefinition
 		{
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
-			progress.incrementAndGet();
+			progress.makeProgress(1);
 			ctxt.clear();
+
+			if (progress.cancelRequested())
+			{
+				return new ProofObligationList();
+			}
 		}
 		
 		list.typeCheck(tcdef.name, local);

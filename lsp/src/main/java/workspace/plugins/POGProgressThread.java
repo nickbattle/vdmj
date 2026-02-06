@@ -56,7 +56,7 @@ public class POGProgressThread extends CancellableThread
 		{
 			LSPServer server = LSPServer.getInstance();
 			long percentDone = -1;
-			int total = progress.getDefCount();
+			int total = progress.getTotal();
 
 			if (workDoneToken != null)
 			{
