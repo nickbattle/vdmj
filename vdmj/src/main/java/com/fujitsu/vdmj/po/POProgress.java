@@ -41,7 +41,7 @@ public interface POProgress
 	public int getTotal();
 
 	/**
-	 * Get the current value of the progress. This is 0 <= x <= getTotal().
+	 * Get the current value of the progress. This is 0 &lt;= x &lt;= getTotal().
 	 */
 	public int getProgress();
 
