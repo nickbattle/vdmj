@@ -72,7 +72,8 @@ public class ASTPluginSL extends ASTPlugin
 	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
-		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
+		LSPPlugin lsp = LSPPlugin.getInstance();
+		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();
 		LexLocation.resetLocations();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
@@ -80,6 +81,7 @@ public class ASTPluginSL extends ASTPlugin
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Dialect.VDM_SL, entry.getKey());
 			ModuleReader mr = new ModuleReader(ltr);
 			astModuleList.addAll(mr.readModules());
+			lsp.setFileEnding(entry.getKey(), ltr);
 			
 			if (mr.getErrorCount() > 0)
 			{

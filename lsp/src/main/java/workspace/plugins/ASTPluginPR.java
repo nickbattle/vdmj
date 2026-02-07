@@ -77,8 +77,9 @@ public class ASTPluginPR extends ASTPlugin
 	{
 		dirty = false;
 		dirtyClassList = null;
+		LSPPlugin lsp = LSPPlugin.getInstance();
 		
-		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();
 		LexLocation.resetLocations();
 		
 		if (Settings.dialect == Dialect.VDM_RT)
@@ -101,6 +102,7 @@ public class ASTPluginPR extends ASTPlugin
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey());
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
+			lsp.setFileEnding(entry.getKey(), ltr);
 			
 			if (mr.getErrorCount() > 0)
 			{

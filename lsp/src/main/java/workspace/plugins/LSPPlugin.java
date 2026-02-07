@@ -58,7 +58,9 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -139,6 +141,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private JSONObject clientCapabilities;
 	private File rootUri = null;
 	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
+	private Map<File, LexLocation> fileEndings = new LinkedHashMap<File, LexLocation>();
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean checkInProgress = false;
 
@@ -252,6 +255,24 @@ public class LSPPlugin extends AnalysisPlugin
 	public Map<File, StringBuilder> getProjectFiles()
 	{
 		return projectFiles;
+	}
+
+	public Map<File, LexLocation> getFileEndings()
+	{
+		return fileEndings;
+	}
+
+	public void setFileEnding(File file, LexTokenReader ltr)
+	{
+		try
+		{
+			// Last should be the EOF token at the end of the file parse
+			fileEndings.put(file, ltr.getLast().location);
+		}
+		catch (LexException e)
+		{
+			Diag.error(e);
+		}
 	}
 	
 	/**
@@ -429,6 +450,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
+		fileEndings.clear();
 		externalFilesWarned.clear();	// Re-warn after reloads
 		messagehub.clear();
 		
@@ -1665,8 +1687,16 @@ public class LSPPlugin extends AnalysisPlugin
 		
 		if (!results.isEmpty())
 		{
-			 StringBuilder buffer = projectFiles.get(file);
-			 Utils.fixRanges(results, Utils.afterLine(Utils.getEndPosition(buffer)));
+			JSONObject eof = Utils.lexLocationToPosition(fileEndings.get(file));
+
+			if (eof != null)
+			{
+				Utils.fixRanges(results, eof);
+			}
+			else
+			{
+				Diag.error("Missing fileEnding for %s", file);
+			}
 		}
 		
 		return new RPCMessageList(request, results);

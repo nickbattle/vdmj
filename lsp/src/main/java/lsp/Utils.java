@@ -59,9 +59,8 @@ public class Utils
 	public static JSONObject lexLocationToPosition(LexLocation location)
 	{
 		return new JSONObject(
-			"start", new JSONObject(
 				"line", zero(location.startLine - 1),
-				"character", zero(location.startPos - 1)));
+				"character", zero(location.startPos - 1));
 	}
 
 	public static JSONObject lexLocationToRange(LexLocation location)
