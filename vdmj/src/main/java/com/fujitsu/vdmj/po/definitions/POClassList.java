@@ -114,13 +114,13 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	}
 
 	@Override
-	public void cancelProgress()
+	public synchronized void cancelProgress()
 	{
 		cancelled = true;
 	}
 
 	@Override
-	public boolean cancelRequested()
+	public synchronized boolean cancelRequested()
 	{
 		return cancelled;
 	}

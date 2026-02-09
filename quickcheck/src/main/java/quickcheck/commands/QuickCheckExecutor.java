@@ -145,7 +145,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 					}
 				}
 				
-				if (cancelled)
+				if (wasCancelled())
 				{
 					break;
 				}
@@ -156,7 +156,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 				infoln("(Use 'qc .*' to check all POs)");
 			}
 
-			if (!cancelled)
+			if (!wasCancelled())
 			{
 				RPCMessageList responses = new RPCMessageList();
 				MessageHub.getInstance().addPluginMessages(pog, messages);
@@ -171,7 +171,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 			}
 		}
 		
-		answer = qc.hasErrors() ? "Failed" : cancelled ? "Cancelled" : "OK";
+		answer = qc.hasErrors() ? "Failed" : wasCancelled() ? "Cancelled" : "OK";
 	}
 
 	private void addCodeLenses(POPlugin pog, ProofObligation po)

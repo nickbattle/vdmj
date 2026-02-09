@@ -33,9 +33,10 @@ abstract public class CancellableThread extends Thread
 {
 	private static final Map<Object, CancellableThread> active = new HashMap<Object, CancellableThread>();
 	protected final Object myId;
-	protected boolean cancelled = false;
 	protected static String running = null;
-
+	
+	private boolean cancelled = false;
+	
 	public CancellableThread(Object myId)
 	{
 		this.myId = myId;
@@ -48,7 +49,7 @@ abstract public class CancellableThread extends Thread
 	{
 		try
 		{
-			if (!cancelled)
+			if (!wasCancelled())
 			{
 				Diag.info("Starting %s", getName());
 				body();
@@ -109,13 +110,13 @@ abstract public class CancellableThread extends Thread
 		}
 	}
 	
-	public void setCancelled()
+	public synchronized void setCancelled()
 	{
 		cancelled = true;
 		Diag.info("Thread %s cancel sent", myId.toString());
 	}
 
-	public boolean wasCancelled()
+	public synchronized boolean wasCancelled()
 	{
 		return cancelled;
 	}

@@ -157,7 +157,7 @@ public class QuickCheckThread extends CancellableThread
 					}
 				}
 				
-				if (cancelled)
+				if (wasCancelled())
 				{
 					list.clear();
 					break;
@@ -166,7 +166,7 @@ public class QuickCheckThread extends CancellableThread
 
 			responses.add(RPCResponse.result(request, list));
 
-			if (!cancelled)
+			if (!wasCancelled())
 			{
 				MessageHub.getInstance().addPluginMessages(pog, messages);
 				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());

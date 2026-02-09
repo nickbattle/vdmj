@@ -548,7 +548,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 						send(server, RPCRequest.notification("$/progress", params));
 					}
 
-					if (cancelled)
+					if (wasCancelled())
 					{
 						Diag.info("%s cancelled", getName());
 						break;
@@ -557,7 +557,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				
 				if (progressToken == null)
 				{
-					if (cancelled)
+					if (wasCancelled())
 					{
 						Diag.info("Sending cancelled results");
 						send(server, RPCResponse.error(request, RPCErrors.RequestCancelled, "Trace cancelled", responses));
@@ -570,7 +570,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				}
 				else
 				{
-					if (cancelled)
+					if (wasCancelled())
 					{
 						Diag.info("Sending cancelled null result");
 						send(server, RPCResponse.error(request, RPCErrors.RequestCancelled, "Trace cancelled", null));

@@ -62,7 +62,7 @@ public class POGProgressThread extends CancellableThread
 			{
 				int sofar = progress.getProgress();
 
-				while (sofar < total && !cancelled)
+				while (sofar < total && !wasCancelled())
 				{
 					long done = (100 * sofar)/total;
 					
@@ -94,14 +94,17 @@ public class POGProgressThread extends CancellableThread
 
 					sleep(POLL_INTERVAL);
 
-					if (cancelled)	// while we slept
+					if (wasCancelled())	// while we slept
 					{
 						Diag.fine("POG progress cancelled.");
 						progress.cancelProgress();
+						break;
 					}
 
 					sofar = progress.getProgress();
 				}
+
+				Diag.fine("POG progress completed.");
 			}
 		}
 		catch (IOException e)
@@ -110,7 +113,7 @@ public class POGProgressThread extends CancellableThread
 		}
 		catch (InterruptedException e)
 		{
-			Diag.fine("POG progress completed.");
+			Diag.fine("POG progress interrupted.");
 		}
 		finally
 		{

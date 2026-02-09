@@ -95,13 +95,13 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 	}
 
 	@Override
-	public void cancelProgress()
+	public synchronized void cancelProgress()
 	{
 		cancelled = true;
 	}
 
 	@Override
-	public boolean cancelRequested()
+	public synchronized boolean cancelRequested()
 	{
 		return cancelled;
 	}
