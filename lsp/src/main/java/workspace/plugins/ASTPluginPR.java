@@ -49,6 +49,8 @@ import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 
 import json.JSONArray;
+import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import workspace.Diag;
 import workspace.events.CheckPrepareEvent;
@@ -77,8 +79,9 @@ public class ASTPluginPR extends ASTPlugin
 	{
 		dirty = false;
 		dirtyClassList = null;
+		dirtyEndings.clear();
+
 		LSPPlugin lsp = LSPPlugin.getInstance();
-		
 		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();
 		LexLocation.resetLocations();
 		
@@ -176,6 +179,7 @@ public class ASTPluginPR extends ASTPlugin
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ClassReader cr = new ClassReader(ltr);
 		dirtyClassList = cr.readClasses();
+		setDirtyEnding(file, ltr);
 		
 		if (cr.getErrorCount() > 0)
 		{
@@ -189,13 +193,13 @@ public class ASTPluginPR extends ASTPlugin
 	}
 
 	@Override
-	public JSONArray documentSymbols(File file)
+	public JSONArray documentSymbols(File file, JSONObject eof)
 	{
 		JSONArray results = new JSONArray();
 
-		if (!astClassList.isEmpty())	// May be syntax errors
+		if (dirtyClassList != null)	// May be syntax errors
 		{
-			for (ASTClassDefinition clazz: astClassList)
+			for (ASTClassDefinition clazz: dirtyClassList)
 			{
 				if (clazz.name.location.file.equals(file))
 				{
@@ -207,6 +211,12 @@ public class ASTPluginPR extends ASTPlugin
 							clazz.name.location,
 							documentSymbols(clazz.definitions)));
 				}
+			}
+
+			if (dirtyEndings.containsKey(file))
+			{
+				JSONObject dof = Utils.lexLocationToPosition(dirtyEndings.get(file));
+				eof.putAll(dof);
 			}
 		}
 		

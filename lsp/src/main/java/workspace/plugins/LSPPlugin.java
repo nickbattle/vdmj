@@ -1678,17 +1678,16 @@ public class LSPPlugin extends AnalysisPlugin
 
 		TCPlugin tc = registry.getPlugin("TC");
 		JSONArray results = tc.documentSymbols(file);
+		JSONObject eof = Utils.lexLocationToPosition(fileEndings.get(file));
 
 		if (results.isEmpty())
 		{
 			ASTPlugin ast = registry.getPlugin("AST");
-			results = ast.documentSymbols(file);
+			results = ast.documentSymbols(file, eof);	// Updates eof!
 		}
 		
 		if (!results.isEmpty())
 		{
-			JSONObject eof = Utils.lexLocationToPosition(fileEndings.get(file));
-
 			if (eof != null)
 			{
 				Utils.fixRanges(results, eof);

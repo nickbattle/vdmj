@@ -46,6 +46,8 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 
 import json.JSONArray;
+import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
@@ -72,6 +74,9 @@ public class ASTPluginSL extends ASTPlugin
 	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
+		dirtyModuleList = null;
+		dirtyEndings.clear();
+
 		LSPPlugin lsp = LSPPlugin.getInstance();
 		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();
 		LexLocation.resetLocations();
@@ -122,15 +127,16 @@ public class ASTPluginSL extends ASTPlugin
 	@Override
 	protected void parseFile(File file)
 	{
-		dirty = true;	// Until saved.
-		dirtyModuleList = null;
+		dirty = true;	// Until saved (see checkLoadedFiles).
 
-		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
+		LSPPlugin lsp = LSPPlugin.getInstance();
+		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ModuleReader mr = new ModuleReader(ltr);
 		dirtyModuleList = mr.readModules();
+		setDirtyEnding(file, ltr);
 		
 		if (mr.getErrorCount() > 0)
 		{
@@ -144,13 +150,13 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	public JSONArray documentSymbols(File file)
+	public JSONArray documentSymbols(File file, JSONObject eof)
 	{
 		JSONArray results = new JSONArray();
 		
-		if (!astModuleList.isEmpty())	// May be syntax errors
+		if (dirtyModuleList != null)
 		{
-			for (ASTModule module: astModuleList)
+			for (ASTModule module: dirtyModuleList)
 			{
 				if (module.files.contains(file))
 				{
@@ -162,6 +168,12 @@ public class ASTPluginSL extends ASTPlugin
 							module.name.location,
 							documentSymbols(module.defs)));
 				}
+			}
+
+			if (dirtyEndings.containsKey(file))
+			{
+				JSONObject dof = Utils.lexLocationToPosition(dirtyEndings.get(file));
+				eof.putAll(dof);
 			}
 		}
 		
