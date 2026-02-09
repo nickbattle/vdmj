@@ -117,5 +117,22 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 	public void makeProgress(int n)
 	{
 		progress.addAndGet(n);
+
+		/**
+		 * TODO Remove this when we're happy with POG progress
+		 */
+		int delay = Integer.getInteger("lsp.pog.delay", 0);
+
+		if (delay > 0)
+		{
+			try
+			{
+				Thread.sleep(delay);
+			}
+			catch (InterruptedException e)
+			{
+				// ?
+			}
+		}
 	}
 }
