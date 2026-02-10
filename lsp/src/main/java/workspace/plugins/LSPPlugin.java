@@ -97,6 +97,7 @@ import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
+import lsp.textdocument.InlayHintHandler;
 import lsp.textdocument.ReferencesHandler;
 import lsp.textdocument.TypeHierarchyHandler;
 import lsp.textdocument.WatchKind;
@@ -122,6 +123,7 @@ import workspace.events.CloseFileEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
+import workspace.events.InlayHintEvent;
 import workspace.events.LSPEvent;
 import workspace.events.OpenFileEvent;
 import workspace.events.SaveFileEvent;
@@ -226,6 +228,7 @@ public class LSPPlugin extends AnalysisPlugin
 		lspDispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
 		lspDispatcher.register(new CompletionHandler(), "textDocument/completion");
 		lspDispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
+		lspDispatcher.register(new InlayHintHandler(), "textDocument/inlayHint", "inlayHint/resolve");
 		lspDispatcher.register(new ReferencesHandler(), "textDocument/references");
 		lspDispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
 
@@ -1723,7 +1726,32 @@ public class LSPPlugin extends AnalysisPlugin
 
 	public RPCMessageList lspCodeLensResolve(RPCRequest request, JSONObject data)
 	{
-		return new RPCMessageList(request);
+		return new RPCMessageList(request);		// Not used
+	}
+
+	public RPCMessageList lspInlayHint(RPCRequest request, File file, JSONObject range)
+	{
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+		
+		RPCMessageList responses = eventhub.publish(new InlayHintEvent(request, file, range));
+		
+		// We have to combine all the plugin inlay responses into one.
+		JSONArray lenses = new JSONArray();
+		
+		for (JSONObject lens: responses)
+		{
+			lenses.addAll(lens.get("result"));
+		}
+		
+		return new RPCMessageList(request, lenses);
+	}
+
+	public RPCMessageList lspInlayHintResolve(RPCRequest request)
+	{
+		return new RPCMessageList(request);		// Not used
 	}
 	
 	private TCDefinition findDefinition(File file, long zline, long zcol)
