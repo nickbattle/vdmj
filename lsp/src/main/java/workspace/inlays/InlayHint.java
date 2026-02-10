@@ -1,0 +1,46 @@
+/*******************************************************************************
+ *
+ *	Copyright (c) 2026 Nick Battle.
+ *
+ *	Author: Nick Battle
+ *
+ *	This file is part of VDMJ.
+ *
+ *	VDMJ is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	VDMJ is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with VDMJ.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ *	SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ ******************************************************************************/
+
+package workspace.inlays;
+
+import com.fujitsu.vdmj.lex.LexLocation;
+import json.JSONObject;
+import lsp.Utils;
+
+/**
+ * The base class for all inlay hints.
+ */
+abstract public class InlayHint
+{
+	/**
+	 * These helper methods generate the inlay hint response body.
+	 */
+	protected JSONObject makeInlay(LexLocation location, String label, String markup)
+	{
+		return new JSONObject(
+			"position", Utils.lexLocationToPosition(location),
+			"label", label,
+			"tooltip", new JSONObject("kind", "markdown", "value", markup));
+	}
+}
