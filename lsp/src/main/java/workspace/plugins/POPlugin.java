@@ -55,6 +55,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.CancellableThread;
 import lsp.Utils;
 import lsp.lspx.POGHandler;
 import rpc.RPCErrors;
@@ -182,8 +183,10 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
 	
 	abstract public ProofObligationList getProofObligations();
+	
+	abstract public ProofObligationList getProofObligations(POProgress progress);
 
-	abstract protected POProgress getPOProgress();
+	abstract protected int getTotal();
 	
 	abstract public JSONObject getCexLaunch(ProofObligation po);
 
@@ -202,33 +205,6 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return array;
 	}
 
-	private ProofObligationList generateWithProgress(RPCRequest request)
-	{
-		if (obligationList == null)				// Will generate all POs
-		{
-			POProgress progress = getPOProgress();
-
-			if (progress.getTotal() > MIN_PROGRESSABLE)
-			{
-				POGProgressThread progressThread = new POGProgressThread(request, progress);
-				progressThread.start();
-				getProofObligations();
-				progressThread.interrupt();		// Just in case
-
-				if (progressThread.wasCancelled())
-				{
-					return new ProofObligationList();	// obligationList still set
-				}
-			}
-			else
-			{
-				getProofObligations();			// Too few for progress
-			}
-		}
-
-		return obligationList;
-	}
-
 	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONArray obligations)
 	{
 		try
@@ -238,41 +214,66 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 
-			ProofObligationList full = generateWithProgress(request);
-			ProofObligationList chosen = new ProofObligationList();
-
-			if (obligations != null && !obligations.isEmpty())
+			if (CancellableThread.currentlyRunning() != null)
 			{
-				// Ignore file limitation
-
-				for (int i=0; i < obligations.size(); i++)
-				{
-					long po = obligations.index(i);		// 1 to n
-
-					if (po <= full.size())
-					{
-						chosen.add(full.get((int) po - 1));
-					}
-				}
+				Diag.error("Running " + CancellableThread.currentlyRunning());
+				return new RPCMessageList(request, RPCErrors.InternalError, "Still running " + CancellableThread.currentlyRunning());
 			}
-			else
+
+			if (obligationList == null)	// New POs will be generated
 			{
-				for (ProofObligation po: full)
+				int total = getTotal();
+				JSONObject params = request.get("params");
+				String workDoneToken = params.get("workDoneToken");
+
+				if (total > MIN_PROGRESSABLE && workDoneToken != null)
 				{
-					if (locationInScope(po.location, file))
-					{
-						chosen.add(po);
-					}
+					POGProgressThread progressThread = new POGProgressThread(request, file, obligations);
+					progressThread.start();
+					return null;
 				}
 			}
 
-			return getJSONObligations(request, chosen);
+			return getPOGResponse(request, file, obligations);
 		}
 		catch (Exception e)
 		{
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+	}
+
+	public RPCMessageList getPOGResponse(RPCRequest request, File file, JSONArray obligations)
+	{
+		ProofObligationList full = getProofObligations();
+		ProofObligationList chosen = new ProofObligationList();
+
+		if (obligations != null && !obligations.isEmpty())
+		{
+			// Ignore file limitation
+
+			for (int i=0; i < obligations.size(); i++)
+			{
+				long po = obligations.index(i);		// 1 to n
+
+				if (po <= full.size())
+				{
+					chosen.add(full.get((int) po - 1));
+				}
+			}
+		}
+		else
+		{
+			for (ProofObligation po: full)
+			{
+				if (locationInScope(po.location, file))		// Null matched everything
+				{
+					chosen.add(po);
+				}
+			}
+		}
+
+		return getJSONObligations(request, chosen);
 	}
 
 	abstract protected void addDependencyCodeLenses();
@@ -333,7 +334,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	protected void createPostDependencyLenses(PODefinitionList definitions)
+	protected void createPOGDependencyLenses(PODefinitionList definitions)
 	{
 		for (PODefinition def: definitions)
 		{

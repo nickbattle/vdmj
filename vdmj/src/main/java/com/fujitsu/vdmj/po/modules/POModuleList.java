@@ -24,8 +24,7 @@
 
 package com.fujitsu.vdmj.po.modules;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -34,7 +33,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.Utils;
 
-public class POModuleList extends POMappedList<TCModule, POModule> implements POProgress
+public class POModuleList extends POMappedList<TCModule, POModule>
 {
 	public POModuleList(TCModuleList from) throws Exception
 	{
@@ -49,16 +48,21 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 
 	public ProofObligationList getProofObligations()
 	{
+		return getProofObligations(new NullProgress());
+	}
+
+	public ProofObligationList getProofObligations(POProgress progress)
+	{
 		ProofObligationList obligations = new ProofObligationList();
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
 		POContextStack.reset();
-		resetProgress();
+		progress.resetProgress();
 		
 		for (POModule m: this)
 		{
-			obligations.addAll(m.getProofObligations(this, menv));
+			obligations.addAll(m.getProofObligations(progress, menv));
 
-			if (cancelRequested())
+			if (progress.cancelRequested())
 			{
 				return new ProofObligationList();	// empty
 			}
@@ -71,9 +75,6 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 	 * Count the number of top level definitions across all modules. This is
 	 * used to calculate the progress of the POG for large specifications.
 	 */
-	private final AtomicInteger progress = new AtomicInteger();
-	private boolean cancelled = false;
-
 	public int getTotal()
 	{
 		int total = 0;
@@ -87,52 +88,5 @@ public class POModuleList extends POMappedList<TCModule, POModule> implements PO
 		}
 
 		return total;
-	}
-
-	public int getProgress()
-	{
-		return progress.get();
-	}
-
-	@Override
-	public synchronized void cancelProgress()
-	{
-		cancelled = true;
-	}
-
-	@Override
-	public synchronized boolean cancelRequested()
-	{
-		return cancelled;
-	}
-
-	@Override
-	public void resetProgress()
-	{
-		progress.set(0);
-		cancelled = false;
-	}
-
-	@Override
-	public void makeProgress(int n)
-	{
-		progress.addAndGet(n);
-
-		/**
-		 * TODO Remove this when we're happy with POG progress
-		 */
-		int delay = Integer.getInteger("lsp.pog.delay", 0);
-
-		if (delay > 0)
-		{
-			try
-			{
-				Thread.sleep(delay);
-			}
-			catch (InterruptedException e)
-			{
-				// ?
-			}
-		}
 	}
 }

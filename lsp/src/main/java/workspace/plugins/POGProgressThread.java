@@ -24,100 +24,166 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.po.POProgress;
-
+import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.LSPServer;
 import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.PluginRegistry;
 
-public class POGProgressThread extends CancellableThread
+public class POGProgressThread extends CancellableThread implements POProgress
 {
-	private static final long POLL_INTERVAL = 200;	// fifth sec?
-	private final POProgress progress;
-	private final Object workDoneToken;
+	private final RPCRequest request;
+	private final File file;
+	private final JSONArray obligations;
+	private final LSPServer server = LSPServer.getInstance();
 
-	public POGProgressThread(RPCRequest request, POProgress progress)
+	public POGProgressThread(RPCRequest request, File file, JSONArray obligations)
 	{
 		super(request.get("id"));		// So cancel kills this thread
-
-		this.progress = progress;
-		JSONObject params = request.get("params");
-		this.workDoneToken = params.get("workDoneToken");
+		this.request = request;
+		this.file = file;
+		this.obligations = obligations;
 	}
 
 	@Override
 	protected void body()
 	{
+		JSONObject params = request.get("params");
+		workDoneToken = params.get("workDoneToken");
+		
+		POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
+		total = po.getTotal();
+		po.getProofObligations(this);
+
+		for (JSONObject message: po.getPOGResponse(request, file, obligations))
+		{
+			try
+			{
+				server.writeMessage(message);
+			}
+			catch (IOException e)
+			{
+				Diag.error(e);
+			}
+		}
+
+		if (wasCancelled())
+		{
+			Diag.warning("POG was cancelled, clearing PO list");
+			po.obligationList = null;	// Force recalculation
+		}
+
+		running = null;
+	}
+
+	/**
+	 * These methods and fields are updated by the PO*List getProofObligation methods.
+	 */
+	private int total;
+	private String workDoneToken;
+	private long percentDone = -1;
+	private int progress = 0;
+
+	@Override
+	public void resetProgress()
+	{
+		progress = 0;
+		percentDone = -1;	// Causes "begin" response
+	}
+
+	@Override
+	public int getTotal()
+	{
+		return total;
+	}
+
+	@Override
+	public int getProgress()
+	{
+		return progress;
+	}
+
+	@Override
+	public void makeProgress(int n)
+	{
+		progress += n;
+
+		if (progress <= total && !wasCancelled())
+		{
+			sendProgress();
+
+			/**
+			 * TODO Remove this when we're happy with POG progress
+			 */
+			int delay = Integer.getInteger("lsp.pog.delay", 0);
+
+			if (delay > 0)
+			{
+				try
+				{
+					Thread.sleep(delay);
+				}
+				catch (InterruptedException e)
+				{
+					// ?
+				}
+			}
+		}
+	}
+
+	@Override
+	public void cancelProgress()
+	{
+		setCancelled();
+	}
+
+	@Override
+	public boolean cancelRequested()
+	{
+		return wasCancelled();
+	}
+
+	private void sendProgress()
+	{
 		try
 		{
-			LSPServer server = LSPServer.getInstance();
-			long percentDone = -1;
-			int total = progress.getTotal();
-
-			if (workDoneToken != null)
+			long done = (100 * progress)/total;
+			
+			if (done != percentDone)	// Only send if changed %age
 			{
-				int sofar = progress.getProgress();
-
-				while (sofar < total && !wasCancelled())
+				JSONObject value = null;
+				
+				if (percentDone < 0)	// First time
 				{
-					long done = (100 * sofar)/total;
-					
-					if (done != percentDone)	// Only if changed %age
-					{
-						JSONObject value = null;
-						
-						if (percentDone < 0)	// First time
-						{
-							value = new JSONObject(
-								"kind",			"begin",
-								"title",		"Executing POG",
-								"message",		"Processing POG",
-								"percentage",	done);
-						}
-						else
-						{
-							value = new JSONObject(
-								"kind",			"report",
-								"message",		"Processing POG",
-								"percentage",	done);
-						}
-						
-						JSONObject params = new JSONObject("token", workDoneToken, "value", value);
-						Diag.fine("Sending POG work done = %d%%", done);
-						server.writeMessage(RPCRequest.notification("$/progress", params));
-						percentDone = done;
-					}
-
-					sleep(POLL_INTERVAL);
-
-					if (wasCancelled())	// while we slept
-					{
-						Diag.fine("POG progress cancelled.");
-						progress.cancelProgress();
-						break;
-					}
-
-					sofar = progress.getProgress();
+					value = new JSONObject(
+						"kind",			"begin",
+						"title",		"Executing POG",
+						"message",		"Processing POG",
+						"percentage",	done);
 				}
-
-				Diag.fine("POG progress completed.");
+				else
+				{
+					value = new JSONObject(
+						"kind",			"report",
+						"message",		"Processing POG",
+						"percentage",	done);
+				}
+				
+				JSONObject params = new JSONObject("token", workDoneToken, "value", value);
+				Diag.fine("Sending POG work done = %d%%", done);
+				server.writeMessage(RPCRequest.notification("$/progress", params));
+				percentDone = done;
 			}
 		}
 		catch (IOException e)
 		{
 			Diag.error(e);
-		}
-		catch (InterruptedException e)
-		{
-			Diag.fine("POG progress interrupted.");
-		}
-		finally
-		{
-			running = null;
 		}
 	}
 }

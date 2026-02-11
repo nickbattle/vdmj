@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -72,21 +73,30 @@ public class POPluginPR extends POPlugin
 	{
 		for (POClassDefinition clazz: poClassList)
 		{
-			createPostDependencyLenses(clazz.definitions);
+			createPOGDependencyLenses(clazz.definitions);
 		}
 	}
 
 	@Override
 	public ProofObligationList getProofObligations()
 	{
+		return getProofObligations(new NullProgress());
+	}
+
+	@Override
+	public ProofObligationList getProofObligations(POProgress progress)
+	{
 		if (obligationList == null)
 		{
 			POAnnotation.init();
-			obligationList = poClassList.getProofObligations();
+			obligationList = poClassList.getProofObligations(progress);
 			POAnnotation.close();
-			obligationList.renumber();
 
-			addDependencyCodeLenses();
+			if (!progress.cancelRequested())
+			{
+				obligationList.renumber();
+				addDependencyCodeLenses();
+			}
 		}
 
 		return obligationList;
@@ -105,8 +115,8 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	protected POProgress getPOProgress()
+	protected int getTotal()
 	{
-		return poClassList;
+		return poClassList.getTotal();
 	}
 }

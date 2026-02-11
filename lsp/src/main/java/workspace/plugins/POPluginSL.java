@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -77,21 +78,30 @@ public class POPluginSL extends POPlugin
 	{
 		for (POModule module: poModuleList)
 		{
-			createPostDependencyLenses(module.defs);
+			createPOGDependencyLenses(module.defs);
 		}
 	}
 
 	@Override
 	public ProofObligationList getProofObligations()
 	{
+		return getProofObligations(new NullProgress());
+	}
+
+	@Override
+	public ProofObligationList getProofObligations(POProgress progress)
+	{
 		if (obligationList == null)
 		{
 			POAnnotation.init();
-			obligationList = poModuleList.getProofObligations();
+			obligationList = poModuleList.getProofObligations(progress);
 			POAnnotation.close();
-			obligationList.renumber();
-			
-			addDependencyCodeLenses();
+
+			if (!progress.cancelRequested())
+			{
+				obligationList.renumber();
+				addDependencyCodeLenses();
+			}
 		}
 		
 		return obligationList;
@@ -172,8 +182,8 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	protected POProgress getPOProgress()
+	protected int getTotal()
 	{
-		return poModuleList;
+		return poModuleList.getTotal();
 	}
 }
