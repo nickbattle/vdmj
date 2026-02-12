@@ -228,7 +228,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 				if (total > MIN_PROGRESSABLE && workDoneToken != null)
 				{
-					POGProgressThread progressThread = new POGProgressThread(request, file, obligations);
+					POGThread progressThread = new POGThread(request, file, obligations);
 					progressThread.start();
 					return null;
 				}

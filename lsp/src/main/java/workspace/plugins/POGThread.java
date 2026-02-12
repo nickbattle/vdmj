@@ -37,14 +37,14 @@ import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.PluginRegistry;
 
-public class POGProgressThread extends CancellableThread implements Progress
+public class POGThread extends CancellableThread implements Progress
 {
 	private final RPCRequest request;
 	private final File file;
 	private final JSONArray obligations;
 	private final LSPServer server = LSPServer.getInstance();
 
-	public POGProgressThread(RPCRequest request, File file, JSONArray obligations)
+	public POGThread(RPCRequest request, File file, JSONArray obligations)
 	{
 		super(request.get("id"));		// So cancel kills this thread
 		this.request = request;
