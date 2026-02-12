@@ -26,14 +26,14 @@ package workspace.plugins;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POClassList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 
 import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
@@ -84,7 +84,7 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POProgress progress)
+	public ProofObligationList getProofObligations(Progress progress)
 	{
 		if (obligationList == null)
 		{

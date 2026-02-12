@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
@@ -52,6 +51,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCApplyFinder;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.util.Progress;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -184,7 +184,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public ProofObligationList getProofObligations();
 	
-	abstract public ProofObligationList getProofObligations(POProgress progress);
+	abstract public ProofObligationList getProofObligations(Progress progress);
 
 	abstract protected int getTotal();
 	

@@ -24,15 +24,15 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.POMappedList;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 
 /**
  * A class for holding a list of ClassDefinitions.
@@ -73,7 +73,7 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 		return getProofObligations(new NullProgress());
 	}
 
-	public ProofObligationList getProofObligations(POProgress progress)
+	public ProofObligationList getProofObligations(Progress progress)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		POContextStack.reset();

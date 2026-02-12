@@ -22,13 +22,13 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po;
+package com.fujitsu.vdmj.util;
 
 /**
  * An interface to assist with asynchronous progress reporting for POG. This is implemented
  * by POModuleList and POClassList.
  */
-public interface POProgress
+public interface Progress
 {
 	/**
 	 * Start a new progress run.

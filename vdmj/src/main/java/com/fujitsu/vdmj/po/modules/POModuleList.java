@@ -24,13 +24,13 @@
 
 package com.fujitsu.vdmj.po.modules;
 
-import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.POMappedList;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POModuleList extends POMappedList<TCModule, POModule>
@@ -51,7 +51,7 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 		return getProofObligations(new NullProgress());
 	}
 
-	public ProofObligationList getProofObligations(POProgress progress)
+	public ProofObligationList getProofObligations(Progress progress)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);

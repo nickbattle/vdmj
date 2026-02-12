@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
@@ -45,6 +44,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
+import com.fujitsu.vdmj.util.Progress;
 
 /**
  * A class to represent a VDM++ class definition.
@@ -208,7 +208,7 @@ public class POClassDefinition extends PODefinition
 		return false;
 	}
 
-	public ProofObligationList getProofObligations(POProgress progress, POContextStack ctxt, POGState pogState, Environment publicEnv)
+	public ProofObligationList getProofObligations(Progress progress, POContextStack ctxt, POGState pogState, Environment publicEnv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();

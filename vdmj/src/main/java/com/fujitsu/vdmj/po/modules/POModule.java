@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.po.modules;
 
 import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -35,6 +34,7 @@ import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.util.Progress;
 
 /**
  * A class holding all the details for one module.
@@ -83,7 +83,7 @@ public class POModule extends PONode
 		return sb.toString();
 	}
 
-	public ProofObligationList getProofObligations(POProgress progress, MultiModuleEnvironment menv)
+	public ProofObligationList getProofObligations(Progress progress, MultiModuleEnvironment menv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();

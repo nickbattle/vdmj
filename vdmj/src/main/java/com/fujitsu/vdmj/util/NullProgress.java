@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po;
+package com.fujitsu.vdmj.util;
 
-public class NullProgress implements POProgress
+public class NullProgress implements Progress
 {
 
 	@Override

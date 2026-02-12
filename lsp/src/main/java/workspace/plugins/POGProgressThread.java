@@ -27,7 +27,8 @@ package workspace.plugins;
 import java.io.File;
 import java.io.IOException;
 
-import com.fujitsu.vdmj.po.POProgress;
+import com.fujitsu.vdmj.util.Progress;
+
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
@@ -36,7 +37,7 @@ import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.PluginRegistry;
 
-public class POGProgressThread extends CancellableThread implements POProgress
+public class POGProgressThread extends CancellableThread implements Progress
 {
 	private final RPCRequest request;
 	private final File file;

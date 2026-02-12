@@ -28,9 +28,7 @@ import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.po.NullProgress;
 import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.POProgress;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.po.modules.POModuleList;
@@ -38,6 +36,8 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 import com.fujitsu.vdmj.values.Value;
 
 import json.JSONObject;
@@ -89,7 +89,7 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POProgress progress)
+	public ProofObligationList getProofObligations(Progress progress)
 	{
 		if (obligationList == null)
 		{
