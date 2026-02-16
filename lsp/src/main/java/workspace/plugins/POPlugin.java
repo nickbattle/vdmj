@@ -459,7 +459,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					"source",	splitPO(source),
 					"status",	po.status.toString(),
 					"message", 	po.message,
-					"hover",	hovers);
+					"hovers",	hovers);
 			
 			poList.add(json);
 		}
