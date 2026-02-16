@@ -191,6 +191,7 @@ public class QuickCheckThread extends CancellableThread
 	private JSONObject getQCResponse(ProofObligation po, List<VDMMessage> messages, long duration)
 	{
 		JSONObject json = new JSONObject(
+				"type",	"PO",
 				"id",		Long.valueOf(po.number),
 				"status",	po.status.toString(),
 				"duration",	duration);
@@ -301,21 +302,28 @@ public class QuickCheckThread extends CancellableThread
 
 			json.put("witness", witness);
 		}
+
+		JSONArray hovers = new JSONArray("id", "name", "status", "duration");
 		
 		if (po.provedBy != null)
 		{
 			json.put("provedBy", po.provedBy);
+			hovers.add("provedBy");
 		}
 		
 		if (po.message != null)
 		{
 			json.put("message", po.message);
+			hovers.add("message");
 		}
 		
 		if (po.qualifier != null)
 		{
 			json.put("qualifier", po.qualifier);
+			hovers.add("qualifier");
 		}
+
+		json.put("hovers", hovers);
 
 		return json;
 	}

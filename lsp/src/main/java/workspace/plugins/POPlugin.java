@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -234,7 +233,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				}
 			}
 
-			return getPOGResponse(request, file, obligations);
+			RPCMessageList response = getPOGResponse(request, file, obligations);
+			response.addAll(MessageHub.getInstance().getDiagnosticResponses());
+			return response;
 		}
 		catch (Exception e)
 		{
@@ -440,22 +441,37 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				source = po.getSource();
 			}
 
+			JSONArray hovers = new JSONArray("id", "name", "status");
+
 			// Add the message, if we have one
 			if (po.message != null)
 			{
 				source = po.message + "\n----\n" + source;
+				hovers.add("message");
 			}
 
 			JSONObject json = new JSONObject(
+				"type",		"PO",
 					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
 					"source",	splitPO(source),
-					"status",	po.status.toString());
+					"status",	po.status.toString(),
+					"message", 	po.message,
+					"hover",	hovers);
 			
 			poList.add(json);
 		}
+
+		poList.addAll(getJSONReductions());
+
+		return new RPCMessageList(request, poList);
+	}
+
+	private JSONArray getJSONReductions()
+	{
+		JSONArray rlist = new JSONArray();
 
 		// Add dummy POs for any operations with missing POs.
 		Map<PODefinition,Long> reduced = POContextStack.getReducedDefinitions();
@@ -464,20 +480,15 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		{
 			long paths = reduced.get(def);
 
-			poList.add(new JSONObject(
-					"id",		0,		// Appears at the start of the list
-					"kind", 	"Missing POs",
+			rlist.add(new JSONObject(
+					"type",		"missing",
 					"name",		new JSONArray(def.name.getModule(), def.name.getName()),
 					"location",	Utils.lexLocationToLocation(def.location),
-					"source",	new JSONArray(
-						"Operation is too complex (" + paths + " paths). Some POs missing."),
-					"status",	POStatus.FAILED.toString()));
+					"message",	"Operation '" + def.name.getName() + "' too complex. Missing POs",
+					"paths",	paths));
 		}
 
-		RPCMessageList response = new RPCMessageList(request, poList);
-		response.addAll(MessageHub.getInstance().getDiagnosticResponses());
-		
-		return response;
+		return rlist;
 	}
 
 	public void clearLenses(Class<?> type)
