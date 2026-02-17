@@ -303,7 +303,7 @@ public class QuickCheckThread extends CancellableThread
 			json.put("witness", witness);
 		}
 
-		JSONArray hovers = new JSONArray("id", "name", "status", "duration");
+		JSONArray hovers = new JSONArray("name", "status", "duration");
 		
 		if (po.provedBy != null)
 		{

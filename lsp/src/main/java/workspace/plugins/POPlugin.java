@@ -441,7 +441,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				source = po.getSource();
 			}
 
-			JSONArray hovers = new JSONArray("id", "name", "status");
+			JSONArray hovers = new JSONArray("name", "status");
 
 			// Add the message, if we have one
 			if (po.message != null)
