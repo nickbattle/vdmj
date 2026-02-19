@@ -70,9 +70,20 @@ public class POLaunchDebugLens extends AbstractLaunchDebugLens implements POCode
 	{
 		JSONObject launchArgs = new JSONObject();
 		POLaunchFactory factory = new POLaunchFactory(po);
-		
-		ApplyCall apply = factory.getCexApply();
-		Context sctxt = factory.getCexState();
+
+		ApplyCall apply = null;
+		Context sctxt = null;
+
+		if (po.isExistential())
+		{
+			apply = factory.getWitnessApply();
+			sctxt = factory.getWitnessState();
+		}
+		else
+		{
+			apply = factory.getCexApply();
+			sctxt = factory.getCexState();
+		}
 		
 		launchArgs.put("name", "PO #" + po.number);
 		launchArgs.put("defaultName", defaultName);

@@ -292,6 +292,7 @@ public class QuickCheckThread extends CancellableThread
 			if (launch != null)
 			{
 				witness.put("launch", launch);
+				pog.addCodeLens(po.location.file, new POLaunchDebugLens(po));
 			}
 
 			if (po.witness.location.startLine != 1)

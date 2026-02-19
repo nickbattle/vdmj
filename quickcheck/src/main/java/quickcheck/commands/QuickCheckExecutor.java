@@ -176,7 +176,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 
 	private void addCodeLenses(POPlugin pog, ProofObligation po)
 	{
-		JSONObject launch = pog.getCexLaunch(po);
+		JSONObject launch = po.isExistential() ? pog.getWitnessLaunch(po) : pog.getCexLaunch(po);
 
 		if (po instanceof RecursiveObligation)
 		{
