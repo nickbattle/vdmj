@@ -70,7 +70,10 @@ import workspace.MessageHub;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CodeLensEvent;
+import workspace.events.InlayHintEvent;
 import workspace.events.LSPEvent;
+import workspace.inlays.POInlayHint;
+import workspace.inlays.POMissingPOInlayHint;
 import workspace.lenses.POCodeLens;
 import workspace.lenses.POPostDependencyLens;
 
@@ -96,6 +99,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	}
 
 	private final Map<File, List<POCodeLens>> codeLenses;
+	private final Map<File, List<POInlayHint>> inlayHints;
 	protected ProofObligationList obligationList;
 
 	protected POPlugin()
@@ -103,6 +107,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		super();
 		
 		codeLenses = new HashMap<File, List<POCodeLens>>();
+		inlayHints = new HashMap<File, List<POInlayHint>>();
 	}
 	
 	@Override
@@ -125,6 +130,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 		eventhub.register(CodeLensEvent.class, this);
+		eventhub.register(InlayHintEvent.class, this);
 	}
 	
 	@Override
@@ -159,6 +165,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		{
 			CodeLensEvent le = (CodeLensEvent)event;
 			return new RPCMessageList(le.request, getCodeLenses(le.file));
+		}
+		else if (event instanceof InlayHintEvent)
+		{
+			InlayHintEvent ihe = (InlayHintEvent)event;
+			return new RPCMessageList(ihe.request, getInlayHints(ihe.file, ihe.range));
 		}
 		else
 		{
@@ -474,24 +485,43 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	{
 		JSONArray rlist = new JSONArray();
 
-		// Add dummy POs for any operations with missing POs.
+		// Add dummy POs/InlayHints for any operations with missing POs.
 		Map<PODefinition,Long> reduced = POContextStack.getReducedDefinitions();
+		inlayHints.clear();
 		
 		for (PODefinition def: reduced.keySet())
 		{
 			long paths = reduced.get(def);
 			long missing = paths - Properties.pog_max_alt_paths;
 
-			rlist.add(new JSONObject(
+			JSONObject reduction = new JSONObject(
 					"type",		"missing",
 					"name",		new JSONArray(def.name.getModule(), def.name.getName()),
 					"location",	Utils.lexLocationToLocation(def.location),
 					"message",	"Definition '" + def.name.getName() + "' too complex: " +
 								missing + " of " + paths + " POs missing",
-					"paths",	paths));
+					"paths",	paths);
+
+			rlist.add(reduction);
+			addInlayHint(def.location.file,
+				new POMissingPOInlayHint(def.location, "POG!", getMissingPOMarkup(paths, missing)));
 		}
 
 		return rlist;
+	}
+
+	private String getMissingPOMarkup(long paths, long missing)
+	{
+		return
+			"### This definition is too complex for POG\n" +
+			"There are " +
+			paths +
+			" possible execution paths through this definition, " +
+			"which exceeds the configured limit in the Java property vdmj.pog.max_alt_paths (" +
+			Properties.pog_max_alt_paths +
+			")\n\n" +
+			"The proof obligation generation (POG) has therefore omitted " + missing +
+			" POs. Try to simplify the definition.";
 	}
 
 	public void clearLenses(Class<?> type)
@@ -535,6 +565,34 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			for (POCodeLens lens: codeLenses.get(file))
 			{
 				results.addAll(lens.getLaunchLens());
+			}
+		}
+		
+		return results;
+	}
+	
+	public void addInlayHint(File file, POInlayHint lens)
+	{
+		List<POInlayHint> array = inlayHints.get(file);
+		
+		if (array == null)
+		{
+			array = new Vector<POInlayHint>();
+			inlayHints.put(file, array);
+		}
+		
+		array.add(lens);
+	}
+
+	private JSONArray getInlayHints(File file, JSONObject range)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (inlayHints.containsKey(file))
+		{
+			for (POInlayHint hint: inlayHints.get(file))
+			{
+				results.add(hint.getInlayHint());
 			}
 		}
 		

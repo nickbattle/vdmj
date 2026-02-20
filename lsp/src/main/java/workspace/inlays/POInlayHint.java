@@ -21,28 +21,11 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
-
 package workspace.inlays;
 
-import com.fujitsu.vdmj.lex.LexLocation;
 import json.JSONObject;
-import lsp.Utils;
 
-/**
- * The base class for all inlay hints.
- */
-abstract public class InlayHint
+public interface POInlayHint
 {
-	/**
-	 * These helper methods generate the inlay hint response body.
-	 */
-	protected JSONObject makeInlay(LexLocation location, String label, String markup)
-	{
-		return new JSONObject(
-			"position", Utils.lexLocationToPosition(location),
-			"label", label,
-			"kind", 2L,	// 1 = Type, 2 = Parameter
-			"tooltip", new JSONObject("kind", "markdown", "value", markup),
-			"paddingRight", true);
-	}
+	public JSONObject getInlayHint();
 }
