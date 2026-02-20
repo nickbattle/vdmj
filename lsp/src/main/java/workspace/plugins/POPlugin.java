@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.Mappable;
@@ -475,16 +476,18 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 		// Add dummy POs for any operations with missing POs.
 		Map<PODefinition,Long> reduced = POContextStack.getReducedDefinitions();
-
+		
 		for (PODefinition def: reduced.keySet())
 		{
 			long paths = reduced.get(def);
+			long missing = paths - Properties.pog_max_alt_paths;
 
 			rlist.add(new JSONObject(
 					"type",		"missing",
 					"name",		new JSONArray(def.name.getModule(), def.name.getName()),
 					"location",	Utils.lexLocationToLocation(def.location),
-					"message",	"Operation '" + def.name.getName() + "' too complex. Missing POs",
+					"message",	"Definition '" + def.name.getName() + "' too complex: " +
+								missing + " of " + paths + " POs missing",
 					"paths",	paths));
 		}
 
