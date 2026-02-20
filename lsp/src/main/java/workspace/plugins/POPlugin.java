@@ -499,12 +499,12 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					"name",		new JSONArray(def.name.getModule(), def.name.getName()),
 					"location",	Utils.lexLocationToLocation(def.location),
 					"message",	"Definition '" + def.name.getName() + "' too complex: " +
-								missing + " of " + paths + " POs missing",
+								missing + " of " + paths + " paths missing",
 					"paths",	paths);
 
 			rlist.add(reduction);
 			addInlayHint(def.location.file,
-				new POMissingPOInlayHint(def.location, "POG!", getMissingPOMarkup(paths, missing)));
+				new POMissingPOInlayHint(def.location, "\u26A0\uFE0F", getMissingPOMarkup(paths, missing)));
 		}
 
 		return rlist;
@@ -521,7 +521,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			Properties.pog_max_alt_paths +
 			")\n\n" +
 			"The proof obligation generation (POG) has therefore omitted " + missing +
-			" POs. Try to simplify the definition.";
+			" POs. Try to simplify the definition, or increase the property value.";
 	}
 
 	public void clearLenses(Class<?> type)
