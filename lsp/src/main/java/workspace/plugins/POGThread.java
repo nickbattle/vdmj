@@ -33,8 +33,10 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.LSPServer;
+import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.MessageHub;
 import workspace.PluginRegistry;
 
 public class POGThread extends CancellableThread implements Progress
@@ -58,11 +60,14 @@ public class POGThread extends CancellableThread implements Progress
 		JSONObject params = request.get("params");
 		workDoneToken = params.get("workDoneToken");
 		
-		POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
-		total = po.getTotal();
-		po.getProofObligations(this);
+		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
+		total = pog.getTotal();
+		pog.getProofObligations(this);
 
-		for (JSONObject message: po.getPOGResponse(request, file, obligations))
+		RPCMessageList responses = pog.getPOGResponse(request, file, obligations);
+		responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
+
+		for (JSONObject message: responses)
 		{
 			try
 			{
@@ -77,7 +82,7 @@ public class POGThread extends CancellableThread implements Progress
 		if (wasCancelled())
 		{
 			Diag.warning("POG was cancelled, clearing PO list");
-			po.obligationList = null;	// Force recalculation
+			pog.obligationList = null;	// Force recalculation
 		}
 
 		running = null;
