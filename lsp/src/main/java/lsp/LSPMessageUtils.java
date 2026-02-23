@@ -146,7 +146,7 @@ public class LSPMessageUtils
 	{
 		return new JSONObject(
 				"name",				cdef.name.getName(),
-				"kind",				SymbolKind.Class,
+				"kind",				SymbolKind.Class.getValue(),
 				"uri",				cdef.location.file.toURI().toString(),
 				"range",			Utils.lexLocationToRange(cdef.location),
 				"selectionRange",	Utils.lexLocationToRange(cdef.location));
