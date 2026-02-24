@@ -1496,7 +1496,7 @@ public class LSPPlugin extends AnalysisPlugin
 		else if (def instanceof TCClassDefinition)
 		{
 			TCClassDefinition cdef = (TCClassDefinition)def;
-			return new RPCMessageList(request, messages.typeHierarchyItem(cdef));
+			return new RPCMessageList(request, new JSONArray(messages.typeHierarchyItem(cdef)));
 		}
 		else
 		{
