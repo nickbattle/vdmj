@@ -45,6 +45,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
+import workspace.Diag;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.lenses.TCCodeLens;
@@ -204,6 +205,7 @@ public class TCPluginPR extends TCPlugin
 		{
 			if (codeLenses.get(file) != null && !ast.isDirty())
 			{
+				Diag.info("Using cached TC code lenses for " + file);
 				return codeLenses.get(file);
 			}
 			
