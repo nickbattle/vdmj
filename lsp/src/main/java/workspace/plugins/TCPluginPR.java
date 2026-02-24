@@ -200,8 +200,13 @@ public class TCPluginPR extends TCPlugin
 		JSONArray results = new JSONArray();
 		ASTPlugin ast = registry.getPlugin("AST");
 		
-		if (!tcClassList.isEmpty())	// May be syntax errors
+		if (!tcClassList.isEmpty())
 		{
+			if (codeLenses.get(file) != null && !ast.isDirty())
+			{
+				return codeLenses.get(file);
+			}
+			
 			List<TCCodeLens> lenses = getTCCodeLenses(ast.isDirty());
 			
 			for (TCClassDefinition clazz: tcClassList)
@@ -220,6 +225,8 @@ public class TCPluginPR extends TCPlugin
 					}
 				}
 			}
+
+			codeLenses.put(file, results);
 		}
 		
 		return results;

@@ -27,8 +27,10 @@ package workspace.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -84,9 +86,13 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
+	protected final Map<File, JSONArray> codeLenses;		// cache for efficiency
+
 	protected TCPlugin()
 	{
 		super();
+
+		codeLenses = new HashMap<File, JSONArray>();
 	}
 	
 	@Override
@@ -138,6 +144,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	protected void preCheck(CheckPrepareEvent ev)
 	{
 		messagehub.clearPluginMessages(this);
+		codeLenses.clear();
 	}
 	
 	/**

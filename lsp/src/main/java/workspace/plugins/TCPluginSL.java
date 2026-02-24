@@ -217,11 +217,16 @@ public class TCPluginSL extends TCPlugin
 	@Override
 	public JSONArray getCodeLenses(File file)
 	{
-		JSONArray results = new JSONArray();
 		ASTPlugin ast = registry.getPlugin("AST");
+		JSONArray results = new JSONArray();
 		
 		if (!tcModuleList.isEmpty())
 		{
+			if (codeLenses.get(file) != null && !ast.isDirty())
+			{
+				return codeLenses.get(file);
+			}
+			
 			List<TCCodeLens> lenses = getTCCodeLenses(ast.isDirty());
 			
 			for (TCModule module: tcModuleList)
@@ -237,6 +242,8 @@ public class TCPluginSL extends TCPlugin
 					}
 				}
 			}
+
+			codeLenses.put(file, results);
 		}
 		
 		return results;
