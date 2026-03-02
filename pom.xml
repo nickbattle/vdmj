@@ -14,6 +14,7 @@
     <properties>
         <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<minimumJava>11</minimumJava>
 
         <revision>4.7.0-SNAPSHOT</revision>
         <changelist></changelist>
@@ -66,7 +67,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
                     <configuration>
-                        <release>11</release>
+                        <release>${minimumJava}</release>
                     </configuration>
                 </plugin>
 
@@ -107,7 +108,7 @@
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <quiet>true</quiet>
                         <doclint>none</doclint>
-                        <source>11</source>
+                        <source>${minimumJava}</source>
                     </configuration>
                 </plugin>
 

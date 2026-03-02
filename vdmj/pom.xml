@@ -60,6 +60,7 @@
 									<Main-Class>com.fujitsu.vdmj.plugins.VDMJ</Main-Class>
 									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
 									<Class-Path>.</Class-Path>
+									<Minimum-Java-Version>${minimumJava}</Minimum-Java-Version>
 								</manifestEntries>
 							</archive>
 						</configuration>
