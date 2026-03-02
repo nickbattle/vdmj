@@ -176,6 +176,7 @@ public class ASTPluginPR extends ASTPlugin
 		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
+		LexLocation.clearFile(file);
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ClassReader cr = new ClassReader(ltr);
 		dirtyClassList = cr.readClasses();

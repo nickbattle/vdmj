@@ -133,6 +133,7 @@ public class ASTPluginSL extends ASTPlugin
 		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
+		LexLocation.clearFile(file);
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ModuleReader mr = new ModuleReader(ltr);
 		dirtyModuleList = mr.readModules();

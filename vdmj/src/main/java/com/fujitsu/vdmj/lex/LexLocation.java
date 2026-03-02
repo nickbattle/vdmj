@@ -289,6 +289,25 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 		}
 	}
 
+	public static void clearFile(File file)
+	{
+		// Called from LSP's editor when files are changed on the fly.
+
+		ListIterator<LexLocation> it =
+			allLocations.listIterator(allLocations.size());
+
+		while (it.hasNext())
+		{
+			LexLocation l = it.next();
+
+			if (l.file.equals(file))
+			{
+				it.remove();
+				uniqueLocations.remove(l);
+			}
+		}
+	}
+
 	public static void addSpan(LexNameToken name, LexToken upto)
 	{
 		LexLocation span = new LexLocation(
