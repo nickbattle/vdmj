@@ -64,8 +64,12 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 
 	/** The filename of the token. */
 	public final File file;
+
 	/** The module/class name of the token. */
 	public final String module;
+
+	/** The location of the end of the "range" for this location */
+	public LexLocation range;
 	
 	/**
 	 * The line and character positions of a LexLocation are 1-relative. That is,
@@ -254,6 +258,21 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 			loc.hits = 0;
 		}
 	}
+
+	/**
+	 * Set the range value for a location (the location of the end of the range)
+	 */
+	public void setRange(LexToken range)
+	{
+		if (range != null)
+		{
+			this.range = range.location;
+		}
+	}
+
+	/**
+	 * Various methods to clear/set location values.
+	 */
 
 	public static void resetLocations()
 	{
