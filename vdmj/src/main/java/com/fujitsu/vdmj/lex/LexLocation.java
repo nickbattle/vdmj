@@ -111,6 +111,8 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 			allLocations.add(this);
 			uniqueLocations.put(this, this);
 		}
+
+		this.range = this;	// Overwritten by setRange
 	}
 
 	/**
@@ -262,11 +264,11 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 	/**
 	 * Set the range value for a location (the location of the end of the range)
 	 */
-	public void setRange(LexToken range)
+	public void setRange(LexToken lastToken)
 	{
-		if (range != null)
+		if (lastToken != null)
 		{
-			this.range = range.location;
+			this.range = lastToken.location;
 		}
 	}
 

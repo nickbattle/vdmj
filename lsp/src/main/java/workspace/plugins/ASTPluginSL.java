@@ -165,7 +165,7 @@ public class ASTPluginSL extends ASTPlugin
 							module.name.name,
 							"",
 							SymbolKind.Module,
-							module.name.location,
+							module.name.location.range,
 							module.name.location,
 							documentSymbols(module.defs)));
 				}

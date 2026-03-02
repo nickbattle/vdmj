@@ -219,7 +219,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.name.getName(),
 						"",
 						SymbolKind.Struct,
-						top.name.getLocation(),
+						top.name.getLocation().range,
 						top.name.getLocation());
 
 				iter.next();	// Ignore state record
@@ -232,7 +232,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						vdef.pattern.toString(),
 						"",
 						SymbolKind.Struct,
-						vdef.location,
+						vdef.location.range,
 						vdef.location);
 			}
 			else if (top instanceof TCPerSyncDefinition ||
@@ -242,7 +242,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.toString(),
 						"",
 						SymbolKind.Enum,
-						top.location,
+						top.location.range,
 						top.location);
 				
 				iter.next();	// Ignore def
@@ -268,7 +268,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 							field.tag,
 							field.type.toString(),
 							SymbolKind.Field,
-							field.tagname.getLocation(),
+							field.tagname.getLocation().range,
 							field.tagname.getLocation()));
 					}
 				}
@@ -277,7 +277,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 					top.name.getName(),
 					detail,
 					SymbolKind.kindOf(top),
-					top.name.getLocation(),
+					top.name.getLocation().range,
 					top.name.getLocation());
 				
 				iter.next();
@@ -316,7 +316,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			def.name.getName(),
 			def.getType().toString(),
 			SymbolKind.kindOf(def),
-			def.name.getLocation(),
+			def.name.getLocation().range,
 			def.name.getLocation());
 	}
 }
