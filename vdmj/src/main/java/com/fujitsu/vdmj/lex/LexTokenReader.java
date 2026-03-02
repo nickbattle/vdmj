@@ -1210,7 +1210,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 	/**
 	 * Get the previous token (before last).
-	 * @param The previous token or null.
+	 * @return The previous token or null.
 	 */
 	public LexToken getPrev()
 	{
