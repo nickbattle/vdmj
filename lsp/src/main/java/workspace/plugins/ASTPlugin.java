@@ -369,7 +369,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 			name,
 			detail,
 			kind,
-			def.location.range,
+			def.location,
 			def.location,
 			children);
 	}

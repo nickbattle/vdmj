@@ -208,7 +208,7 @@ public class ASTPluginPR extends ASTPlugin
 							clazz.name.getName(),
 							"",
 							SymbolKind.Class,
-							clazz.name.location.range,
+							clazz.name.location,
 							clazz.name.location,
 							documentSymbols(clazz.definitions)));
 				}

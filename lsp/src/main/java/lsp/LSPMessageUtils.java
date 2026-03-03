@@ -119,7 +119,7 @@ public class LSPMessageUtils
 			"name",				name,
 			"detail",			detail,
 			"kind",				kind.getValue(),
-			"range",			Utils.lexLocationToRange(range),
+			"range",			Utils.lexLocationToLongRange(range),
 			"selectionRange",	Utils.lexLocationToRange(selection));
 	}
 	
@@ -136,7 +136,7 @@ public class LSPMessageUtils
 				"name",				name,
 				"detail",			detail,
 				"kind",				kind.getValue(),
-				"range",			Utils.lexLocationToRange(range),
+				"range",			Utils.lexLocationToLongRange(range),
 				"selectionRange",	Utils.lexLocationToRange(selection),
 				"children",			children);
 		}

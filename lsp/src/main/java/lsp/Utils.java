@@ -89,6 +89,20 @@ public class Utils
 		}
 	}
 
+	public static JSONObject lexLocationToLongRange(LexLocation location)
+	{
+		if (location.range == location)
+		{
+			return lexLocationToRange(location);
+		}
+		else
+		{
+			return new JSONObject(
+				"start", lexLocationToPosition(location),
+				"end",   lexLocationToPosition(location.range));
+		}
+	}
+
 	public static JSONObject lexLocationsToRange(LexLocation from, LexLocation to)
 	{
 		return new JSONObject(
@@ -284,33 +298,37 @@ public class Utils
 		for (int s = 0; s < symbols.size(); s++)
 		{
 			JSONObject symbol = symbols.index(s);
-			JSONObject start = symbol.getPath("selectionRange.start");
+			JSONObject range = symbol.get("range");
+			JSONObject selection = symbol.get("selectionRange");
+			JSONObject nextstart = endPosition;
 
-			JSONObject nextstart = null;
-			
-			for (int n = s + 1; n <= symbols.size(); n++)
+			if (range.equals(selection))
 			{
-				if (n == symbols.size())
+				JSONObject start = symbol.getPath("selectionRange.start");
+				
+				for (int n = s + 1; n <= symbols.size(); n++)
 				{
-					nextstart = endPosition;
-				}
-				else
-				{
-					JSONObject next = symbols.index(n);
-					nextstart = next.getPath("selectionRange.start");
+					if (n == symbols.size())
+					{
+						nextstart = endPosition;
+					}
+					else
+					{
+						JSONObject next = symbols.index(n);
+						nextstart = next.getPath("selectionRange.start");
+					}
+					
+					if (!nextstart.get("line").equals(start.get("line")))
+					{
+						break;	// Guaranteed exit for endPosition
+					}
 				}
 				
-				if (!nextstart.get("line").equals(start.get("line")))
-				{
-					break;	// Guaranteed exit for endPosition
-				}
+				range.put("start", startLine(start));
+				range.put("end", beforeNext(nextstart));
+				
+				verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
 			}
-			
-			JSONObject range = symbol.get("range");
-			range.put("start", startLine(start));
-			range.put("end", beforeNext(nextstart));
-			
-			verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
 			
 			JSONArray children = symbol.get("children");
 			

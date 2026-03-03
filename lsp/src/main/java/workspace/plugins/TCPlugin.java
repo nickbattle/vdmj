@@ -219,7 +219,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.name.getName(),
 						"",
 						SymbolKind.Struct,
-						top.name.getLocation().range,
+						top.name.getLocation(),
 						top.name.getLocation());
 
 				iter.next();	// Ignore state record
@@ -232,8 +232,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						vdef.pattern.toString(),
 						"",
 						SymbolKind.Struct,
-						vdef.location.range,
-						vdef.location);
+						vdef.name.getLocation(),
+						vdef.name.getLocation());
 			}
 			else if (top instanceof TCPerSyncDefinition ||
 					 top instanceof TCMutexSyncDefinition)
@@ -242,8 +242,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.toString(),
 						"",
 						SymbolKind.Enum,
-						top.location.range,
-						top.location);
+						top.name.getLocation(),
+						top.name.getLocation());
 				
 				iter.next();	// Ignore def
 			}
@@ -268,7 +268,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 							field.tag,
 							field.type.toString(),
 							SymbolKind.Field,
-							field.tagname.getLocation().range,
+							field.tagname.getLocation(),
 							field.tagname.getLocation()));
 					}
 				}
@@ -277,7 +277,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 					top.name.getName(),
 					detail,
 					SymbolKind.kindOf(top),
-					top.name.getLocation().range,
+					top.name.getLocation(),
 					top.name.getLocation());
 				
 				iter.next();
@@ -311,12 +311,11 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	}
 
 	private JSONObject documentSymbolsDef(TCDefinition def)
-	{
-		return messages.documentSymbol(
+	{		return messages.documentSymbol(
 			def.name.getName(),
 			def.getType().toString(),
 			SymbolKind.kindOf(def),
-			def.name.getLocation().range,
+			def.name.getLocation(),
 			def.name.getLocation());
 	}
 }
