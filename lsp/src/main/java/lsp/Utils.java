@@ -46,6 +46,8 @@ import workspace.Diag;
 
 public class Utils
 {
+	private static final int ENDLINE = 999999999;
+
 	private static int zero(int value)
 	{
 		return value < 0 ? 0 : value;
@@ -97,9 +99,16 @@ public class Utils
 		}
 		else
 		{
+			// Long range covers whole lines
+
 			return new JSONObject(
-				"start", lexLocationToPosition(location),
-				"end",   lexLocationToPosition(location.range));
+				"start", new JSONObject(
+					"line", zero(location.startLine - 1),
+					"character", 0L),
+				
+				"end",   new JSONObject(
+					"line", zero(location.range.startLine - 1),
+					"character", ENDLINE));
 		}
 	}
 
@@ -301,33 +310,32 @@ public class Utils
 			JSONObject range = symbol.get("range");
 			JSONObject selection = symbol.get("selectionRange");
 			JSONObject nextstart = endPosition;
-
-			if (range.equals(selection))
+			JSONObject start = symbol.getPath("selectionRange.start");
+			
+			for (int n = s + 1; n <= symbols.size(); n++)
 			{
-				JSONObject start = symbol.getPath("selectionRange.start");
-				
-				for (int n = s + 1; n <= symbols.size(); n++)
+				if (n == symbols.size())
 				{
-					if (n == symbols.size())
-					{
-						nextstart = endPosition;
-					}
-					else
-					{
-						JSONObject next = symbols.index(n);
-						nextstart = next.getPath("selectionRange.start");
-					}
-					
-					if (!nextstart.get("line").equals(start.get("line")))
-					{
-						break;	// Guaranteed exit for endPosition
-					}
+					nextstart = endPosition;
+				}
+				else
+				{
+					JSONObject next = symbols.index(n);
+					nextstart = next.getPath("selectionRange.start");
 				}
 				
+				if (!nextstart.get("line").equals(start.get("line")))
+				{
+					break;	// Guaranteed exit for endPosition
+				}
+			}
+				
+			if (range.equals(selection))
+			{
 				range.put("start", startLine(start));
 				range.put("end", beforeNext(nextstart));
 				
-				verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
+				verifyRange(symbol.get("name"), range, symbol.get("selectionRange"));
 			}
 			
 			JSONArray children = symbol.get("children");
@@ -368,7 +376,7 @@ public class Utils
 	private static JSONObject beforeNext(JSONObject next)
 	{
 		long line = next.get("line");
-		return new JSONObject("line", line - 1, "character", 999999999);
+		return new JSONObject("line", line - 1, "character", ENDLINE);
 	}
 	
 	public static JSONObject getEndPosition(StringBuilder buffer)

@@ -610,6 +610,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 					LexLocation here = new LexLocation(file, currentModule, tokline, tokpos + 2, tokline, lasteol);
 					comments.add(here, sb.toString().substring(1), false);
+					last = prev;	// to re-enter
 					return nextToken();
 				}
 				else if (ch == '>')
@@ -952,6 +953,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 					comments.add(here, sb.toString(), true);
 					rdCh();
+					last = prev;	// to re-enter
 					return nextToken();
 				}
 				else

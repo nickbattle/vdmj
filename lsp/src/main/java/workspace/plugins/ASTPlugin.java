@@ -328,7 +328,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 						field.tag,
 						field.type.toString(),
 						SymbolKind.Field,
-						field.tagname.location.range,
+						field.tagname.location,
 						field.tagname.location));
 			}
 		}
@@ -352,7 +352,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 							field.tag,
 							field.type.toString(),
 							SymbolKind.Field,
-							field.tagname.location.range,
+							field.tagname.location,
 							field.tagname.location));
 				}
 			}

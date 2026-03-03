@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCThreadDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -219,8 +220,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.name.getName(),
 						"",
 						SymbolKind.Struct,
-						top.name.getLocation(),
-						top.name.getLocation());
+						top.location,
+						top.location);
 
 				iter.next();	// Ignore state record
 			}
@@ -232,8 +233,17 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						vdef.pattern.toString(),
 						"",
 						SymbolKind.Struct,
-						vdef.name.getLocation(),
-						vdef.name.getLocation());
+						vdef.pattern.location,
+						vdef.pattern.location);
+			}
+			else if (top instanceof TCThreadDefinition)
+			{
+				return messages.documentSymbol(
+					"thread",
+					"()",
+					SymbolKind.kindOf(top),
+					top.location,
+					top.location);
 			}
 			else if (top instanceof TCPerSyncDefinition ||
 					 top instanceof TCMutexSyncDefinition)
@@ -242,8 +252,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.toString(),
 						"",
 						SymbolKind.Enum,
-						top.name.getLocation(),
-						top.name.getLocation());
+						top.location,
+						top.location);
 				
 				iter.next();	// Ignore def
 			}
@@ -311,7 +321,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	}
 
 	private JSONObject documentSymbolsDef(TCDefinition def)
-	{		return messages.documentSymbol(
+	{
+		return messages.documentSymbol(
 			def.name.getName(),
 			def.getType().toString(),
 			SymbolKind.kindOf(def),

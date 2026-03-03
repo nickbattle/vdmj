@@ -517,8 +517,11 @@ public class DefinitionReader extends SyntaxReader
     		}
 		}
 
-		return new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression,
+		ASTTypeDefinition def = new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression,
 			eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
+
+		def.name.location.setRange(lastToken());
+		return def;
 	}
 
 	private ASTDefinitionList readTypes() throws LexException, ParserException
@@ -851,6 +854,8 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		LexLocation.addSpan(idToName(funcName), lastToken());
+		def.name.location.setRange(lastToken());
+
 		return def;
 	}
 
@@ -1102,8 +1107,12 @@ public class DefinitionReader extends SyntaxReader
     	}
 
  		checkFor(Token.EQUALS, 2096, "Expecting <pattern>[:<type>]=<exp>");
-		return new ASTValueDefinition(
+		ASTValueDefinition def = new ASTValueDefinition(
 			scope, p, type, getExpressionReader().readExpression());
+
+		p.location.setRange(lastToken());
+
+		return def;
 	}
 
 	private ASTDefinition readStateDefinition() throws ParserException, LexException
@@ -1158,6 +1167,7 @@ public class DefinitionReader extends SyntaxReader
 		annotations.astAfter(this, def);
 		def.setAnnotations(annotations);
 		def.setComments(comments);
+		def.location.setRange(prevToken());
 
 		return def;
 	}
@@ -1187,6 +1197,8 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		LexLocation.addSpan(idToName(opName), lastToken());
+		def.name.location.setRange(prevToken());
+
 		return def;
 	}
 
@@ -1564,6 +1576,7 @@ public class DefinitionReader extends SyntaxReader
 	private ASTDefinition readThreadDefinition() throws LexException, ParserException
 	{
 		LexToken token = lastToken();
+		ASTDefinition def = null;
 
 		if (token.is(Token.PERIODIC))
 		{
@@ -1580,7 +1593,7 @@ public class DefinitionReader extends SyntaxReader
 			LexNameToken name = readNameToken("Expecting (name) after periodic(...)");
 			checkFor(Token.KET, 2115, "Expecting (name) after periodic(...)");
 
-			return new ASTThreadDefinition(new ASTPeriodicStatement(name, args));
+			def = new ASTThreadDefinition(new ASTPeriodicStatement(name, args));
 		}
 		else if (token.is(Token.SPORADIC))
 		{
@@ -1597,13 +1610,16 @@ public class DefinitionReader extends SyntaxReader
 			LexNameToken name = readNameToken("Expecting (name) after sporadic(...)");
 			checkFor(Token.KET, 2315, "Expecting (name) after sporadic(...)");
 
-			return new ASTThreadDefinition(new ASTSporadicStatement(name, args));
+			def = new ASTThreadDefinition(new ASTSporadicStatement(name, args));
 		}
 		else
 		{
 			ASTStatement stmt = getStatementReader().readStatement();
-			return new ASTThreadDefinition(stmt);
+			def = new ASTThreadDefinition(stmt);
 		}
+
+		def.location.setRange(lastToken());
+		return def;
 	}
 
 	private ASTDefinition readPermissionPredicateDefinition()

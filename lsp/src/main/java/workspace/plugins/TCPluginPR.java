@@ -141,7 +141,7 @@ public class TCPluginPR extends TCPlugin
 			clazz.name.getName(),
 			"",
 			SymbolKind.Class,
-			clazz.name.getLocation().range,
+			clazz.name.getLocation(),
 			clazz.name.getLocation(),
 			symbols);
 	}
