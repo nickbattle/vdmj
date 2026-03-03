@@ -123,23 +123,6 @@ public class POGThread extends CancellableThread implements Progress
 		if (progress <= total && !wasCancelled())
 		{
 			sendProgress();
-
-			/**
-			 * TODO Remove this when we're happy with POG progress
-			 */
-			int delay = Integer.getInteger("lsp.pog.delay", 0);
-
-			if (delay > 0)
-			{
-				try
-				{
-					Thread.sleep(delay);
-				}
-				catch (InterruptedException e)
-				{
-					// ?
-				}
-			}
 		}
 	}
 
