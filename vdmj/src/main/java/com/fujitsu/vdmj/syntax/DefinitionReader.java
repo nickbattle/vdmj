@@ -420,6 +420,7 @@ public class DefinitionReader extends SyntaxReader
 			case EQUALS:
 				nextToken();
 				ASTNamedType nt = new ASTNamedType(idToName(id), tr.readType());
+				nt.location.setRange(prevToken());
 
 				if (nt.type instanceof ASTUnresolvedType &&
 					((ASTUnresolvedType)nt.type).typename.equals(nt.typename))
@@ -467,6 +468,7 @@ public class DefinitionReader extends SyntaxReader
         			invPattern = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after pattern in invariant");
         			invExpression = getExpressionReader().readExpression();
+					invPattern.location.setRange(prevToken());
         			break;
         			
     			case EQ:
@@ -491,6 +493,7 @@ public class DefinitionReader extends SyntaxReader
         			eqPattern2 = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in eq clause");
         			eqExpression = getExpressionReader().readExpression();
+					eqPattern1.location.setRange(prevToken());
     				break;
     				
     			case ORD:
@@ -510,6 +513,7 @@ public class DefinitionReader extends SyntaxReader
         			ordPattern2 = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in ord clause");
         			ordExpression = getExpressionReader().readExpression();
+					ordPattern1.location.setRange(prevToken());
     				break;
 
     			default:
@@ -1136,6 +1140,7 @@ public class DefinitionReader extends SyntaxReader
 			invPattern = getPatternReader().readPattern();
 			checkFor(Token.EQUALSEQUALS, 2098, "Expecting '==' after pattern in invariant");
 			invExpression = getExpressionReader().readExpression();
+			invPattern.location.setRange(prevToken());
 		}
 
 		if (lastToken().is(Token.INIT))
@@ -1144,6 +1149,7 @@ public class DefinitionReader extends SyntaxReader
 			initPattern = getPatternReader().readPattern();
 			checkFor(Token.EQUALSEQUALS, 2099, "Expecting '==' after pattern in initializer");
 			initExpression = getExpressionReader().readExpression();
+			initPattern.location.setRange(prevToken());
 		}
 
 		// Be forgiving about the inv/init order

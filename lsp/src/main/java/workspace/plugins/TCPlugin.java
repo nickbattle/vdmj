@@ -224,6 +224,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.location);
 
 				iter.next();	// Ignore state record
+				iter.next();	// Ignore "old" state record
+				// iter fields follow
 			}
 			else if (top instanceof TCValueDefinition && alldefs.size() > 1)
 			{
