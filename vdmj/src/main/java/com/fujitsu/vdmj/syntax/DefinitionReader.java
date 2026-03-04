@@ -1560,8 +1560,9 @@ public class DefinitionReader extends SyntaxReader
 			ASTExpression exp = getExpressionReader().readExpression();
 			String str = getCurrentModule();
 			LexNameToken className = new LexNameToken(str, str, token.location);
-			return new ASTClassInvariantDefinition(
-				className.getInvName(token.location), exp);
+			ASTClassInvariantDefinition ivd = new ASTClassInvariantDefinition(className.getInvName(token.location), exp);
+			ivd.name.location.setRange(lastToken());
+			return ivd;
 		}
 		else
 		{
@@ -1574,6 +1575,7 @@ public class DefinitionReader extends SyntaxReader
 			ivd.setAccessSpecifier(access);
 			ivd.setAnnotations(annotations);
 			ivd.setComments(comments);
+			ivd.name.location.setRange(prevToken());
 
 			return ivd;
 		}
@@ -1640,7 +1642,9 @@ public class DefinitionReader extends SyntaxReader
 				LexNameToken name = readNameToken("Expecting name after 'per'");
 				checkFor(Token.IMPLIES, 2116, "Expecting <name> => <exp>");
 				ASTExpression exp = getExpressionReader().readPerExpression();
-				return new ASTPerSyncDefinition(token.location, name, exp);
+				ASTPerSyncDefinition def = new ASTPerSyncDefinition(token.location, name, exp);
+				def.location.setRange(prevToken());
+				return def;
 
 			case MUTEX:
 				nextToken();
@@ -1668,7 +1672,9 @@ public class DefinitionReader extends SyntaxReader
 						break;
 				}
 
-				return new ASTMutexSyncDefinition(token.location, opnames);
+				ASTMutexSyncDefinition mux = new ASTMutexSyncDefinition(token.location, opnames);
+				mux.location.setRange(prevToken());
+				return mux;
 
 			default:
 				throwMessage(2028, "Expecting 'per' or 'mutex'");
