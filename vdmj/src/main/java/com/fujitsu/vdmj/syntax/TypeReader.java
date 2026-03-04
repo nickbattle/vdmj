@@ -199,7 +199,9 @@ public class TypeReader extends SyntaxReader
 
 		while (lastToken().isNot(Token.END) &&
 			   lastToken().isNot(Token.SEMICOLON) &&
-			   lastToken().isNot(Token.INV))
+			   lastToken().isNot(Token.INV) &&
+			   lastToken().isNot(Token.EQ) &&
+			   lastToken().isNot(Token.ORD))
 		{
 			reader.push();
 			LexToken tag = lastToken();
