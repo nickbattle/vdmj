@@ -193,6 +193,9 @@ public class TypeReader extends SyntaxReader
 		return type;
 	}
 
+	/**
+	 * Used to read lists of <name>:<type> field lists, for records and state.
+	 */
 	public ASTFieldList readFieldList() throws ParserException, LexException
 	{
 		ASTFieldList list = new ASTFieldList();
@@ -201,7 +204,8 @@ public class TypeReader extends SyntaxReader
 			   lastToken().isNot(Token.SEMICOLON) &&
 			   lastToken().isNot(Token.INV) &&
 			   lastToken().isNot(Token.EQ) &&
-			   lastToken().isNot(Token.ORD))
+			   lastToken().isNot(Token.ORD) &&
+			   lastToken().isNot(Token.INIT))
 		{
 			reader.push();
 			LexToken tag = lastToken();
@@ -224,6 +228,7 @@ public class TypeReader extends SyntaxReader
 				
 				LexNameToken tagname = idToName(tagid);
 				list.add(new ASTField(tagname, tagid.name, readType(), false));
+				tagname.location.setRange(prevToken());
 				reader.unpush();
 			}
 			else if (separator.is(Token.EQABST))
@@ -243,6 +248,7 @@ public class TypeReader extends SyntaxReader
 
 				LexNameToken tagname = idToName(tagid);
 				list.add(new ASTField(tagname, tagid.name, readType(), true));
+				tagname.location.setRange(prevToken());
 				reader.unpush();
 			}
 			else	// Anonymous field or end of fields
@@ -252,9 +258,9 @@ public class TypeReader extends SyntaxReader
 					reader.retry();
 					String anon = Integer.toString(list.size() + 1);
 					ASTType ftype = readType();
-					LexNameToken tagname = new LexNameToken(
-						getCurrentModule(), anon, ftype.location);
+					LexNameToken tagname = new LexNameToken(getCurrentModule(), anon, ftype.location);
 					list.add(new ASTField(tagname, anon, ftype, false));
+					tagname.location.setRange(prevToken());
 					reader.unpush();
 				}
 				catch (Exception e)
