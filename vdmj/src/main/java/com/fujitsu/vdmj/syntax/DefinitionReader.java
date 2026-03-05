@@ -1689,6 +1689,7 @@ public class DefinitionReader extends SyntaxReader
 		List<String> names = readTraceIdentifierList();
 		checkFor(Token.COLON, 2264, "Expecting ':' after trace name(s)");
 		ASTTraceDefinitionTermList traces = readTraceDefinitionList();
+		start.setRange(lastToken());
 
 		return new ASTNamedTraceDefinition(start, names, traces);
 	}
