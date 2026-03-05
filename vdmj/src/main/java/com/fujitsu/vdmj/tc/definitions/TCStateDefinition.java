@@ -265,7 +265,21 @@ public class TCStateDefinition extends TCDefinition
 	@Override
 	public TCDefinitionList getDefinitions()
 	{
-		return statedefs;
+		TCDefinitionList result = new TCDefinitionList();
+
+		result.addAll(statedefs);
+
+		if (invdef != null)
+		{
+			result.add(invdef);
+		}
+
+		if (initdef != null)
+		{
+			result.add(initdef);
+		}
+
+		return result;
 	}
 
 	private TCExplicitFunctionDefinition getInvDefinition()
