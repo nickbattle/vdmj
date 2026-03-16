@@ -125,9 +125,9 @@ public class ASTPluginSL extends ASTPlugin
 	}
 
 	@Override
-	protected void parseFile(File file)
+	protected void parseFile(File file, boolean changed)
 	{
-		dirty = true;	// Until saved (see checkLoadedFiles).
+		dirty = changed;	// Until saved (see checkLoadedFiles).
 
 		LSPPlugin lsp = LSPPlugin.getInstance();
 		Map<File, StringBuilder> projectFiles = lsp.getProjectFiles();

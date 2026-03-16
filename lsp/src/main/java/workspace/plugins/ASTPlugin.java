@@ -189,7 +189,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public ASTExpression parseExpression(String line, String module) throws Exception;
 	
-	abstract protected void parseFile(File file);
+	abstract protected void parseFile(File file, boolean changed);
 
 	protected void setDirtyEnding(File file, LexTokenReader ltr)
 	{
@@ -207,7 +207,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
 	{
 		messagehub.clearPluginMessages(this);
-		parseFile(event.file);
+		parseFile(event.file, event.changed);
 		return messagehub.getDiagnosticResponses(event.file);	// Includes TC errs etc
 	}
 	

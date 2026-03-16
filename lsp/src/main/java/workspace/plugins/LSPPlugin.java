@@ -146,6 +146,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private Map<File, LexLocation> fileEndings = new LinkedHashMap<File, LexLocation>();
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean checkInProgress = false;
+	private long lastSaved = 0;
 
 	private List<File> vdmignore = new Vector<File>();
 	private List<File> ordering = new Vector<File>();
@@ -159,6 +160,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private static final String VDMIGNORE = ".vscode/vdmignore";
 	private static final String EXTERNALS = ".vscode/externals";
 	public static final String PROPERTIES = ".vscode/vdmj.properties";
+	private static final long OUTLINE_UPDATE = 500;
 
 	private LSPPlugin()
 	{
@@ -1063,6 +1065,7 @@ public class LSPPlugin extends AnalysisPlugin
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
+			boolean changed = true;
 			
 			if (range != null)
 			{
@@ -1075,6 +1078,16 @@ public class LSPPlugin extends AnalysisPlugin
 				}
 				
 				DiagUtils.dumpEdit(range, buffer);
+
+				// Try to identify the automatic changes that come from attempts to force
+				// an outline update. These should not mark the buffer as dirty.
+
+				if (lastSaved > 0 &&
+					System.currentTimeMillis() - lastSaved < OUTLINE_UPDATE &&
+					(text.equals(" ") || text.equals("")))
+				{
+					changed = false;		// This is an automatic change to fix outlines
+				}
 			}
 			else
 			{
@@ -1083,7 +1096,7 @@ public class LSPPlugin extends AnalysisPlugin
 				buffer.append(text);
 			}
 			
-			return eventhub.publish(new ChangeFileEvent(request, file));
+			return eventhub.publish(new ChangeFileEvent(request, file, changed));
 		}
 	}
 
@@ -1159,6 +1172,12 @@ public class LSPPlugin extends AnalysisPlugin
 			ignoreChangesList.remove(file);
 			return DO_NOTHING;
 		}
+
+		/**
+		 * This is used in lspDidChange to decide whether the change is an automatic change
+		 * used to provoke an outline update.
+		 */
+		lastSaved = System.currentTimeMillis();
 		
 		switch (type)
 		{
