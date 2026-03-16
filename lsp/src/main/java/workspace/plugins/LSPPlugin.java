@@ -146,7 +146,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private Map<File, LexLocation> fileEndings = new LinkedHashMap<File, LexLocation>();
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean checkInProgress = false;
-	private long lastSaved = 0;
+	private long lastChecked = 0;
 
 	private List<File> vdmignore = new Vector<File>();
 	private List<File> ordering = new Vector<File>();
@@ -893,6 +893,7 @@ public class LSPPlugin extends AnalysisPlugin
 		finally
 		{
 			checkInProgress = false;
+			lastChecked = System.currentTimeMillis();
 		}
 	}
 	
@@ -1082,8 +1083,8 @@ public class LSPPlugin extends AnalysisPlugin
 				// Try to identify the automatic changes that come from attempts to force
 				// an outline update. These should not mark the buffer as dirty.
 
-				if (lastSaved > 0 &&
-					System.currentTimeMillis() - lastSaved < OUTLINE_UPDATE &&
+				if (lastChecked > 0 &&
+					System.currentTimeMillis() - lastChecked < OUTLINE_UPDATE &&
 					(text.equals(" ") || text.equals("")))
 				{
 					changed = false;		// This is an automatic change to fix outlines
@@ -1173,12 +1174,6 @@ public class LSPPlugin extends AnalysisPlugin
 			return DO_NOTHING;
 		}
 
-		/**
-		 * This is used in lspDidChange to decide whether the change is an automatic change
-		 * used to provoke an outline update.
-		 */
-		lastSaved = System.currentTimeMillis();
-		
 		switch (type)
 		{
 			case CREATE:
