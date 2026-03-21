@@ -54,10 +54,12 @@ public class HeapMonitor extends Thread
 			while (true)
 			{
 				long total = runtime.totalMemory();
+				long free = runtime.freeMemory();
+				long used = total - free;
 
-				if (total > highTide)
+				if (used > highTide)
 				{
-					highTide = total;
+					highTide = used;
 				}
 
 				sleep(1000);
