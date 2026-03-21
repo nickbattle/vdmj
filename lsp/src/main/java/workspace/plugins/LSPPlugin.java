@@ -111,6 +111,7 @@ import workspace.DiagUtils;
 import workspace.EventHub;
 import workspace.EventListener;
 import workspace.GlobFinder;
+import workspace.HeapMonitor;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
 import workspace.events.ChangeFileEvent;
@@ -206,6 +207,11 @@ public class LSPPlugin extends AnalysisPlugin
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
 			registry.registerPlugin(TRPlugin.factory(Settings.dialect));
+
+			/**
+			 * Start the HeapMonitor
+			 */
+			HeapMonitor.getInstance().start();
 			
 			Diag.info("Created LSPPlugin");
 		}
@@ -894,6 +900,7 @@ public class LSPPlugin extends AnalysisPlugin
 		{
 			checkInProgress = false;
 			lastChecked = System.currentTimeMillis();
+			HeapMonitor.getInstance().check();
 		}
 	}
 	
@@ -1783,7 +1790,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private static final long ERROR_MSG = 1L;
 	private static final long WARNING_MSG = 2L;
 	
-	private void sendMessage(Long type, String message)
+	public void sendMessage(Long type, String message)
 	{
 		try
 		{
@@ -1802,6 +1809,7 @@ public class LSPPlugin extends AnalysisPlugin
 		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
 		removeExtractedFiles();
+		HeapMonitor.getInstance().interrupt();
 		reset();	// Clear registry, eventhub and messagehub
 		
 		return new RPCMessageList(request);
