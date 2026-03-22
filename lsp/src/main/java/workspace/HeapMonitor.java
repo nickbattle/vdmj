@@ -46,6 +46,15 @@ public class HeapMonitor extends Thread
 		return INSTANCE;
 	}
 
+	public static void reset()
+	{
+		if (INSTANCE != null)
+		{
+			INSTANCE.interrupt();
+			INSTANCE = null;
+		}
+	}
+
 	@Override
 	public void run()
 	{
