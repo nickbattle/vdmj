@@ -254,6 +254,7 @@ public class LSPPlugin extends AnalysisPlugin
 		PluginRegistry.reset();
 		EventHub.reset();
 		MessageHub.reset();
+		HeapMonitor.getInstance().interrupt();
 		
 		INSTANCE = null;
 	}
