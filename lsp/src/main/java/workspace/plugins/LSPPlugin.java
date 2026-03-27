@@ -58,7 +58,9 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -95,6 +97,7 @@ import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
+import lsp.textdocument.InlayHintHandler;
 import lsp.textdocument.ReferencesHandler;
 import lsp.textdocument.TypeHierarchyHandler;
 import lsp.textdocument.WatchKind;
@@ -108,6 +111,7 @@ import workspace.DiagUtils;
 import workspace.EventHub;
 import workspace.EventListener;
 import workspace.GlobFinder;
+import workspace.HeapMonitor;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
 import workspace.events.ChangeFileEvent;
@@ -120,6 +124,7 @@ import workspace.events.CloseFileEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
+import workspace.events.InlayHintEvent;
 import workspace.events.LSPEvent;
 import workspace.events.OpenFileEvent;
 import workspace.events.SaveFileEvent;
@@ -139,8 +144,10 @@ public class LSPPlugin extends AnalysisPlugin
 	private JSONObject clientCapabilities;
 	private File rootUri = null;
 	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
+	private Map<File, LexLocation> fileEndings = new LinkedHashMap<File, LexLocation>();
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean checkInProgress = false;
+	private long lastChecked = 0;
 
 	private List<File> vdmignore = new Vector<File>();
 	private List<File> ordering = new Vector<File>();
@@ -154,6 +161,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private static final String VDMIGNORE = ".vscode/vdmignore";
 	private static final String EXTERNALS = ".vscode/externals";
 	public static final String PROPERTIES = ".vscode/vdmj.properties";
+	private static final long OUTLINE_UPDATE = 500;
 
 	private LSPPlugin()
 	{
@@ -199,6 +207,11 @@ public class LSPPlugin extends AnalysisPlugin
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
 			registry.registerPlugin(TRPlugin.factory(Settings.dialect));
+
+			/**
+			 * Start the HeapMonitor
+			 */
+			HeapMonitor.getInstance().start();
 			
 			Diag.info("Created LSPPlugin");
 		}
@@ -223,6 +236,7 @@ public class LSPPlugin extends AnalysisPlugin
 		lspDispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
 		lspDispatcher.register(new CompletionHandler(), "textDocument/completion");
 		lspDispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
+		lspDispatcher.register(new InlayHintHandler(), "textDocument/inlayHint", "inlayHint/resolve");
 		lspDispatcher.register(new ReferencesHandler(), "textDocument/references");
 		lspDispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
 
@@ -240,6 +254,7 @@ public class LSPPlugin extends AnalysisPlugin
 		PluginRegistry.reset();
 		EventHub.reset();
 		MessageHub.reset();
+		HeapMonitor.reset();
 		
 		INSTANCE = null;
 	}
@@ -252,6 +267,24 @@ public class LSPPlugin extends AnalysisPlugin
 	public Map<File, StringBuilder> getProjectFiles()
 	{
 		return projectFiles;
+	}
+
+	public Map<File, LexLocation> getFileEndings()
+	{
+		return fileEndings;
+	}
+
+	public void setFileEnding(File file, LexTokenReader ltr)
+	{
+		try
+		{
+			// Last should be the EOF token at the end of the file parse
+			fileEndings.put(file, ltr.getLast().location);
+		}
+		catch (LexException e)
+		{
+			Diag.error(e);
+		}
 	}
 	
 	/**
@@ -274,7 +307,7 @@ public class LSPPlugin extends AnalysisPlugin
 		loadAllProjectFiles();
 		
 		RPCMessageList responses = new RPCMessageList(request, new LSPInitializeResponse());
-		responses.addAll(eventhub.publish(new InitializeEvent(request)));
+		responses.addAll(eventhub.publish(new InitializeEvent(request)));	// adds dynamicRegistrations
 		
 		return responses;
 	}
@@ -429,6 +462,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
+		fileEndings.clear();
 		externalFilesWarned.clear();	// Re-warn after reloads
 		messagehub.clear();
 		
@@ -866,6 +900,8 @@ public class LSPPlugin extends AnalysisPlugin
 		finally
 		{
 			checkInProgress = false;
+			lastChecked = System.currentTimeMillis();
+			HeapMonitor.getInstance().check();
 		}
 	}
 	
@@ -1038,6 +1074,7 @@ public class LSPPlugin extends AnalysisPlugin
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
+			boolean changed = true;
 			
 			if (range != null)
 			{
@@ -1050,6 +1087,16 @@ public class LSPPlugin extends AnalysisPlugin
 				}
 				
 				DiagUtils.dumpEdit(range, buffer);
+
+				// Try to identify the automatic changes that come from attempts to force
+				// an outline update. These should not mark the buffer as dirty.
+
+				if (lastChecked > 0 &&
+					System.currentTimeMillis() - lastChecked < OUTLINE_UPDATE &&
+					(text.equals(" ") || text.equals("")))
+				{
+					changed = false;		// This is an automatic change to fix outlines
+				}
 			}
 			else
 			{
@@ -1058,7 +1105,7 @@ public class LSPPlugin extends AnalysisPlugin
 				buffer.append(text);
 			}
 			
-			return eventhub.publish(new ChangeFileEvent(request, file));
+			return eventhub.publish(new ChangeFileEvent(request, file, changed));
 		}
 	}
 
@@ -1134,7 +1181,7 @@ public class LSPPlugin extends AnalysisPlugin
 			ignoreChangesList.remove(file);
 			return DO_NOTHING;
 		}
-		
+
 		switch (type)
 		{
 			case CREATE:
@@ -1471,7 +1518,7 @@ public class LSPPlugin extends AnalysisPlugin
 		else if (def instanceof TCClassDefinition)
 		{
 			TCClassDefinition cdef = (TCClassDefinition)def;
-			return new RPCMessageList(request, messages.typeHierarchyItem(cdef));
+			return new RPCMessageList(request, new JSONArray(messages.typeHierarchyItem(cdef)));
 		}
 		else
 		{
@@ -1656,17 +1703,24 @@ public class LSPPlugin extends AnalysisPlugin
 
 		TCPlugin tc = registry.getPlugin("TC");
 		JSONArray results = tc.documentSymbols(file);
+		JSONObject eof = Utils.lexLocationToPosition(fileEndings.get(file));
 
 		if (results.isEmpty())
 		{
 			ASTPlugin ast = registry.getPlugin("AST");
-			results = ast.documentSymbols(file);
+			results = ast.documentSymbols(file, eof);	// Updates eof!
 		}
 		
 		if (!results.isEmpty())
 		{
-			 StringBuilder buffer = projectFiles.get(file);
-			 Utils.fixRanges(results, Utils.afterLine(Utils.getEndPosition(buffer)));
+			if (eof != null)
+			{
+				Utils.fixRanges(results, eof);
+			}
+			else
+			{
+				Diag.error("Missing fileEnding for %s", file);
+			}
 		}
 		
 		return new RPCMessageList(request, results);
@@ -1694,7 +1748,32 @@ public class LSPPlugin extends AnalysisPlugin
 
 	public RPCMessageList lspCodeLensResolve(RPCRequest request, JSONObject data)
 	{
-		return new RPCMessageList(request);
+		return new RPCMessageList(request);		// Not used
+	}
+
+	public RPCMessageList lspInlayHint(RPCRequest request, File file, JSONObject range)
+	{
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+		
+		RPCMessageList responses = eventhub.publish(new InlayHintEvent(request, file, range));
+		
+		// We have to combine all the plugin inlay responses into one.
+		JSONArray lenses = new JSONArray();
+		
+		for (JSONObject lens: responses)
+		{
+			lenses.addAll(lens.get("result"));
+		}
+		
+		return new RPCMessageList(request, lenses);
+	}
+
+	public RPCMessageList lspInlayHintResolve(RPCRequest request)
+	{
+		return new RPCMessageList(request);		// Not used
 	}
 	
 	private TCDefinition findDefinition(File file, long zline, long zcol)
@@ -1712,7 +1791,7 @@ public class LSPPlugin extends AnalysisPlugin
 	private static final long ERROR_MSG = 1L;
 	private static final long WARNING_MSG = 2L;
 	
-	private void sendMessage(Long type, String message)
+	public void sendMessage(Long type, String message)
 	{
 		try
 		{
@@ -1731,6 +1810,7 @@ public class LSPPlugin extends AnalysisPlugin
 		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
 		removeExtractedFiles();
+		HeapMonitor.getInstance().interrupt();
 		reset();	// Clear registry, eventhub and messagehub
 		
 		return new RPCMessageList(request);

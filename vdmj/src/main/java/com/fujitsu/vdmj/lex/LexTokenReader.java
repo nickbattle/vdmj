@@ -72,6 +72,8 @@ public class LexTokenReader extends BacktrackInputReader
 	private char ch;
 	/** The last token returned. */
 	private LexToken last = null;
+	/** The last but one token returned. */
+	private LexToken prev = null;
 	/** True if ch is a quoted double quote, ie. \" */
 	private boolean quotedQuote = false;
 
@@ -92,6 +94,7 @@ public class LexTokenReader extends BacktrackInputReader
 
     	public final char c;
     	public final LexToken l;
+    	public final LexToken p;
     	public LexCommentList co = new LexCommentList();
 
     	/**
@@ -107,6 +110,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 			c = ch;
 			l = last;
+			p = prev;
 			co.addAll(comments);
 		}
 
@@ -123,6 +127,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 			ch = c;
 			last = l;
+			prev = p;
 			comments.clear();
 			comments.addAll(co);
 		}
@@ -228,6 +233,7 @@ public class LexTokenReader extends BacktrackInputReader
 		this.charsread = 0;
 		this.tokensread = 0;
 		this.last = null;
+		this.prev = null;
 		this.comments.clear();
 	}
 	
@@ -262,6 +268,7 @@ public class LexTokenReader extends BacktrackInputReader
 		charsread = 0;
 		tokensread = 0;
 		last = null;
+		prev = null;
 		comments.clear();
 	}
 
@@ -581,6 +588,7 @@ public class LexTokenReader extends BacktrackInputReader
 		int tokline = linecount;
 		int tokpos = charpos;
 		Token type = null;
+		prev = last;
 		last = null;
 		boolean rdch = true;
 
@@ -603,6 +611,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 					LexLocation here = new LexLocation(file, currentModule, tokline, tokpos + 2, tokline, lasteol);
 					comments.add(here, sb.toString().substring(1), false);
+					last = prev;	// to re-enter
 					return nextToken();
 				}
 				else if (ch == '>')
@@ -945,6 +954,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 					comments.add(here, sb.toString(), true);
 					rdCh();
+					last = prev;	// to re-enter
 					return nextToken();
 				}
 				else
@@ -1199,6 +1209,15 @@ public class LexTokenReader extends BacktrackInputReader
 		}
 
 		return last;
+	}
+
+	/**
+	 * Get the previous token (before last).
+	 * @return The previous token or null.
+	 */
+	public LexToken getPrev()
+	{
+		return prev;
 	}
 
 	/**

@@ -83,6 +83,8 @@ public class JSONWriter
 		{
 			switch (c)
 			{
+				case 0:		sb.append("\\u0000"); break;
+
     		    case '\r':	sb.append("\\r"); break;
     		    case '\n':	sb.append("\\n"); break;
     		    case '\t':	sb.append("\\t"); break;

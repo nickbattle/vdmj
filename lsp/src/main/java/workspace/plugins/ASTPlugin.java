@@ -26,7 +26,9 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
@@ -45,6 +47,9 @@ import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.ast.types.ASTNamedType;
 import com.fujitsu.vdmj.ast.types.ASTRecordType;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 
 import json.JSONArray;
@@ -67,6 +72,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
 	protected boolean dirty;
+	protected Map<File, LexLocation> dirtyEndings = new LinkedHashMap<File, LexLocation>();
 	
 	public static ASTPlugin factory(Dialect dialect)
 	{
@@ -183,12 +189,25 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public ASTExpression parseExpression(String line, String module) throws Exception;
 	
-	abstract protected void parseFile(File file);
+	abstract protected void parseFile(File file, boolean changed);
+
+	protected void setDirtyEnding(File file, LexTokenReader ltr)
+	{
+		try
+		{
+			// Last should be the EOF token at the end of the file parse
+			dirtyEndings.put(file, ltr.getLast().location);
+		}
+		catch (LexException e)
+		{
+			Diag.error(e);
+		}
+	}
 
 	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
 	{
 		messagehub.clearPluginMessages(this);
-		parseFile(event.file);
+		parseFile(event.file, event.changed);
 		return messagehub.getDiagnosticResponses(event.file);	// Includes TC errs etc
 	}
 	
@@ -205,6 +224,10 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	/**
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
+	 * 
+	 * Note that ASTCodeLenses are factories which support one type of lens each. So here,
+	 * we return one ASTCodeLens for each *type* of AST lens. Compare this with PO, where
+	 * each POCodeLens supports one *instance* of a type of PO lens.
 	 */
 	protected List<ASTCodeLens> getASTCodeLenses()
 	{
@@ -227,7 +250,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return dirty;
 	}
 	
-	abstract public JSONArray documentSymbols(File file);
+	abstract public JSONArray documentSymbols(File file, JSONObject eof);
 
 	abstract public FilenameFilter getFilenameFilter();
 

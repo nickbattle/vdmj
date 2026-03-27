@@ -11,7 +11,7 @@ The tool is designed to be easily extended or modified via user-defined analysis
 ### Features
 
 * Parses, type checks, executes and debugs VDM specifications
-* Generates proof obligations
+* Generates proof obligations and checks for counterexamples
 * Generates detailed code coverage for tests in LaTeX or MS doc
 * Performs combinatorial tests
 * Supports all three VDM dialects: VDM-SL, VDM++ and VDM-RT

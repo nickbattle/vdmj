@@ -31,6 +31,8 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 
 /**
  * A class for holding a list of ClassDefinitions.
@@ -38,7 +40,6 @@ import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 public class POClassList extends POMappedList<TCClassDefinition, POClassDefinition>
 {
 	private static final long serialVersionUID = 1L;
-	
 	private final TCClassList tcclasses;
 
 	public POClassList()
@@ -69,15 +70,43 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 
 	public ProofObligationList getProofObligations()
 	{
+		return getProofObligations(new NullProgress());
+	}
+
+	public ProofObligationList getProofObligations(Progress progress)
+	{
 		ProofObligationList obligations = new ProofObligationList();
 		POContextStack.reset();
+		progress.resetProgress();
 		
 		for (POClassDefinition c: this)
 		{
-			obligations.addAll(c.getProofObligations(
+			obligations.addAll(c.getProofObligations(progress,
 				new POContextStack(), new POGState(), new PublicClassEnvironment(tcclasses)));
+
+			if (progress.cancelRequested())
+			{
+				return new ProofObligationList();	// empty
+			}
 		}
 
 		return obligations;
+	}
+
+	/**
+	 * Count the number of top level definitions across all classes. This is
+	 * used to calculate the progress of the POG for large specifications.
+	 */
+
+	public int getTotal()
+	{
+		int total = 0;
+
+		for (POClassDefinition clazz: this)
+		{
+			total = total + clazz.definitions.size();
+		}
+
+		return total;
 	}
 }

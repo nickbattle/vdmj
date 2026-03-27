@@ -28,9 +28,12 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.POClassList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 
 import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
@@ -38,7 +41,6 @@ import workspace.events.CheckPrepareEvent;
 public class POPluginPR extends POPlugin
 {
 	private POClassList poClassList;
-	private ProofObligationList obligationList;
 
 	public POPluginPR()
 	{
@@ -50,7 +52,6 @@ public class POPluginPR extends POPlugin
 	{
 		super.preCheck(ev);
 		poClassList = null;
-		obligationList = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,14 +69,34 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
+	protected void addDependencyCodeLenses()
+	{
+		for (POClassDefinition clazz: poClassList)
+		{
+			createPOGDependencyLenses(clazz.definitions);
+		}
+	}
+
+	@Override
 	public ProofObligationList getProofObligations()
+	{
+		return getProofObligations(new NullProgress());
+	}
+
+	@Override
+	public ProofObligationList getProofObligations(Progress progress)
 	{
 		if (obligationList == null)
 		{
 			POAnnotation.init();
-			obligationList = poClassList.getProofObligations();
+			obligationList = poClassList.getProofObligations(progress);
 			POAnnotation.close();
-			obligationList.renumber();
+
+			if (!progress.cancelRequested())
+			{
+				obligationList.renumber();
+				addDependencyCodeLenses();
+			}
 		}
 
 		return obligationList;
@@ -91,5 +112,11 @@ public class POPluginPR extends POPlugin
 	public JSONObject getWitnessLaunch(ProofObligation po)
 	{
 		return null;	// Needs to create new object?
+	}
+
+	@Override
+	protected int getTotal()
+	{
+		return poClassList.getTotal();
 	}
 }

@@ -124,6 +124,16 @@ public abstract class SyntaxReader
 	}
 
 	/**
+	 * Return the last but one token read by the lexical analyser
+	 *
+	 * @return The last but one token.
+	 */
+	protected LexToken prevToken()
+	{
+		return reader.getPrev();
+	}
+
+	/**
 	 * Return the last token read, and also advance by one token. This
 	 * is equivalent to calling {@link #lastToken} followed by
 	 * {@link #nextToken}, but returning the result of lastToken.

@@ -22,13 +22,11 @@
  *
  ******************************************************************************/
 
-package lsp.lspx;
+package lsp.textdocument;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 
-import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.Utils;
@@ -37,11 +35,10 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.plugins.LSPPlugin;
-import workspace.plugins.POPlugin;
 
-public class POGHandler extends LSPHandler
+public class InlayHintHandler extends LSPHandler
 {
-	public POGHandler()
+	public InlayHintHandler()
 	{
 		super();
 	}
@@ -49,38 +46,49 @@ public class POGHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		if (!LSPPlugin.getInstance().hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			return new RPCMessageList(request, RPCErrors.MethodNotFound, "PO plugin is not enabled by client");
-		}
-
 		switch (request.getMethod())
 		{
-			case "slsp/POG/generate":
-				return generate(request);
-
+			case "textDocument/inlayHint":
+				return inlayHint(request);
+			
+			case "inlayHint/resolve":
+				return inlayHintResolve(request);
+				
 			default:
-				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected slsp/POG method");
+				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected codeLens method");
 		}
 	}
-
-	private RPCMessageList generate(RPCRequest request)
+	
+	private RPCMessageList inlayHint(RPCRequest request)
 	{
 		try
 		{
 			JSONObject params = request.get("params");
-			File file = Utils.uriToFile(params.get("uri"));
-			JSONArray obligations = params.get("obligations");
-
-			POPlugin po = registry.getPlugin("PO");
-			return po.pogGenerate(request, file, obligations);
+			JSONObject textDocument = params.get("textDocument");
+			File file = Utils.uriToFile(textDocument.get("uri"));
+			JSONObject range = params.get("range");
+			
+			return LSPPlugin.getInstance().lspInlayHint(request, file, range);
 		}
 		catch (URISyntaxException e)
 		{
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
-		catch (IOException e)
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+	
+	private RPCMessageList inlayHintResolve(RPCRequest request)
+	{
+		try
+		{
+			return LSPPlugin.getInstance().lspInlayHintResolve(request);
+		}
+		catch (Exception e)
 		{
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());

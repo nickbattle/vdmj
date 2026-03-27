@@ -420,6 +420,7 @@ public class DefinitionReader extends SyntaxReader
 			case EQUALS:
 				nextToken();
 				ASTNamedType nt = new ASTNamedType(idToName(id), tr.readType());
+				nt.location.setRange(prevToken());
 
 				if (nt.type instanceof ASTUnresolvedType &&
 					((ASTUnresolvedType)nt.type).typename.equals(nt.typename))
@@ -467,6 +468,7 @@ public class DefinitionReader extends SyntaxReader
         			invPattern = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after pattern in invariant");
         			invExpression = getExpressionReader().readExpression();
+					invPattern.location.setRange(prevToken());
         			break;
         			
     			case EQ:
@@ -491,6 +493,7 @@ public class DefinitionReader extends SyntaxReader
         			eqPattern2 = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in eq clause");
         			eqExpression = getExpressionReader().readExpression();
+					eqPattern1.location.setRange(prevToken());
     				break;
     				
     			case ORD:
@@ -510,6 +513,7 @@ public class DefinitionReader extends SyntaxReader
         			ordPattern2 = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in ord clause");
         			ordExpression = getExpressionReader().readExpression();
+					ordPattern1.location.setRange(prevToken());
     				break;
 
     			default:
@@ -517,8 +521,11 @@ public class DefinitionReader extends SyntaxReader
     		}
 		}
 
-		return new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression,
+		ASTTypeDefinition def = new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression,
 			eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
+
+		def.name.location.setRange(lastToken());
+		return def;
 	}
 
 	private ASTDefinitionList readTypes() throws LexException, ParserException
@@ -658,6 +665,7 @@ public class DefinitionReader extends SyntaxReader
 				def.setAccessSpecifier(access);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
+
 				list.add(def);
 
 				if (!newSection())
@@ -699,6 +707,7 @@ public class DefinitionReader extends SyntaxReader
 				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
+
 				list.add(def);
 
 				if (!newSection())
@@ -732,6 +741,7 @@ public class DefinitionReader extends SyntaxReader
 				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
+
 				list.add(def);
 
 				if (!ignore(Token.SEMICOLON) && Settings.strict)
@@ -765,6 +775,9 @@ public class DefinitionReader extends SyntaxReader
 				annotations.astBefore(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
 				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
+
 				list.add(def);
 
 				if (!newSection())
@@ -845,6 +858,8 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		LexLocation.addSpan(idToName(funcName), lastToken());
+		def.name.location.setRange(lastToken());
+
 		return def;
 	}
 
@@ -1096,8 +1111,12 @@ public class DefinitionReader extends SyntaxReader
     	}
 
  		checkFor(Token.EQUALS, 2096, "Expecting <pattern>[:<type>]=<exp>");
-		return new ASTValueDefinition(
+		ASTValueDefinition def = new ASTValueDefinition(
 			scope, p, type, getExpressionReader().readExpression());
+
+		p.location.setRange(lastToken());
+
+		return def;
 	}
 
 	private ASTDefinition readStateDefinition() throws ParserException, LexException
@@ -1121,6 +1140,7 @@ public class DefinitionReader extends SyntaxReader
 			invPattern = getPatternReader().readPattern();
 			checkFor(Token.EQUALSEQUALS, 2098, "Expecting '==' after pattern in invariant");
 			invExpression = getExpressionReader().readExpression();
+			invPattern.location.setRange(prevToken());
 		}
 
 		if (lastToken().is(Token.INIT))
@@ -1129,6 +1149,7 @@ public class DefinitionReader extends SyntaxReader
 			initPattern = getPatternReader().readPattern();
 			checkFor(Token.EQUALSEQUALS, 2099, "Expecting '==' after pattern in initializer");
 			initExpression = getExpressionReader().readExpression();
+			initPattern.location.setRange(prevToken());
 		}
 
 		// Be forgiving about the inv/init order
@@ -1152,6 +1173,8 @@ public class DefinitionReader extends SyntaxReader
 		annotations.astAfter(this, def);
 		def.setAnnotations(annotations);
 		def.setComments(comments);
+		def.location.setRange(prevToken());
+
 		return def;
 	}
 
@@ -1180,6 +1203,8 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		LexLocation.addSpan(idToName(opName), lastToken());
+		def.name.location.setRange(prevToken());
+
 		return def;
 	}
 
@@ -1535,8 +1560,9 @@ public class DefinitionReader extends SyntaxReader
 			ASTExpression exp = getExpressionReader().readExpression();
 			String str = getCurrentModule();
 			LexNameToken className = new LexNameToken(str, str, token.location);
-			return new ASTClassInvariantDefinition(
-				className.getInvName(token.location), exp);
+			ASTClassInvariantDefinition ivd = new ASTClassInvariantDefinition(className.getInvName(token.location), exp);
+			ivd.name.location.setRange(lastToken());
+			return ivd;
 		}
 		else
 		{
@@ -1549,6 +1575,7 @@ public class DefinitionReader extends SyntaxReader
 			ivd.setAccessSpecifier(access);
 			ivd.setAnnotations(annotations);
 			ivd.setComments(comments);
+			ivd.name.location.setRange(prevToken());
 
 			return ivd;
 		}
@@ -1557,6 +1584,7 @@ public class DefinitionReader extends SyntaxReader
 	private ASTDefinition readThreadDefinition() throws LexException, ParserException
 	{
 		LexToken token = lastToken();
+		ASTDefinition def = null;
 
 		if (token.is(Token.PERIODIC))
 		{
@@ -1573,7 +1601,7 @@ public class DefinitionReader extends SyntaxReader
 			LexNameToken name = readNameToken("Expecting (name) after periodic(...)");
 			checkFor(Token.KET, 2115, "Expecting (name) after periodic(...)");
 
-			return new ASTThreadDefinition(new ASTPeriodicStatement(name, args));
+			def = new ASTThreadDefinition(new ASTPeriodicStatement(name, args));
 		}
 		else if (token.is(Token.SPORADIC))
 		{
@@ -1590,13 +1618,16 @@ public class DefinitionReader extends SyntaxReader
 			LexNameToken name = readNameToken("Expecting (name) after sporadic(...)");
 			checkFor(Token.KET, 2315, "Expecting (name) after sporadic(...)");
 
-			return new ASTThreadDefinition(new ASTSporadicStatement(name, args));
+			def = new ASTThreadDefinition(new ASTSporadicStatement(name, args));
 		}
 		else
 		{
 			ASTStatement stmt = getStatementReader().readStatement();
-			return new ASTThreadDefinition(stmt);
+			def = new ASTThreadDefinition(stmt);
 		}
+
+		def.location.setRange(lastToken());
+		return def;
 	}
 
 	private ASTDefinition readPermissionPredicateDefinition()
@@ -1611,7 +1642,9 @@ public class DefinitionReader extends SyntaxReader
 				LexNameToken name = readNameToken("Expecting name after 'per'");
 				checkFor(Token.IMPLIES, 2116, "Expecting <name> => <exp>");
 				ASTExpression exp = getExpressionReader().readPerExpression();
-				return new ASTPerSyncDefinition(token.location, name, exp);
+				ASTPerSyncDefinition def = new ASTPerSyncDefinition(token.location, name, exp);
+				def.location.setRange(prevToken());
+				return def;
 
 			case MUTEX:
 				nextToken();
@@ -1639,7 +1672,9 @@ public class DefinitionReader extends SyntaxReader
 						break;
 				}
 
-				return new ASTMutexSyncDefinition(token.location, opnames);
+				ASTMutexSyncDefinition mux = new ASTMutexSyncDefinition(token.location, opnames);
+				mux.location.setRange(prevToken());
+				return mux;
 
 			default:
 				throwMessage(2028, "Expecting 'per' or 'mutex'");
@@ -1654,6 +1689,7 @@ public class DefinitionReader extends SyntaxReader
 		List<String> names = readTraceIdentifierList();
 		checkFor(Token.COLON, 2264, "Expecting ':' after trace name(s)");
 		ASTTraceDefinitionTermList traces = readTraceDefinitionList();
+		start.setRange(lastToken());
 
 		return new ASTNamedTraceDefinition(start, names, traces);
 	}

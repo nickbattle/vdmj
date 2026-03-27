@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,19 +22,27 @@
  *
  ******************************************************************************/
 
-package workspace.events;
+package workspace.inlays;
 
-import java.io.File;
+import com.fujitsu.vdmj.lex.LexLocation;
+import json.JSONObject;
+import lsp.Utils;
 
-import rpc.RPCRequest;
-
-public class ChangeFileEvent extends AbstractFileEvent
+/**
+ * The base class for all inlay hints.
+ */
+abstract public class InlayHint
 {
-	public final boolean changed;
-
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
+	/**
+	 * These helper methods generate the inlay hint response body.
+	 */
+	protected JSONObject makeInlay(LexLocation location, String label, String markup)
 	{
-		super(request, file);
-		this.changed = changed;
+		return new JSONObject(
+			"position", Utils.lexLocationToPosition(location),
+			"label", label,
+			"kind", 2L,	// 1 = Type, 2 = Parameter
+			"tooltip", new JSONObject("kind", "markdown", "value", markup),
+			"paddingRight", true);
 	}
 }

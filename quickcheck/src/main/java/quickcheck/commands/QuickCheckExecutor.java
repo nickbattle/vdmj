@@ -51,8 +51,12 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
+import workspace.lenses.POLaunchDebugLens;
 import workspace.plugins.POPlugin;
 
+/**
+ * A command supporting the background check of POs from the Console.
+ */
 public class QuickCheckExecutor extends AsyncExecutor
 {
 	private final QuickCheck qc;
@@ -105,7 +109,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 		if (qc.initStrategies())
 		{
 			MessageHub.getInstance().clearPluginMessages(pog);
-			pog.clearLenses();
+			pog.clearLenses(POLaunchDebugLens.class);
 			List<VDMMessage> messages = new Vector<VDMMessage>();
 
 			for (ProofObligation po: chosen)
@@ -141,7 +145,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 					}
 				}
 				
-				if (cancelled)
+				if (wasCancelled())
 				{
 					break;
 				}
@@ -152,7 +156,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 				infoln("(Use 'qc .*' to check all POs)");
 			}
 
-			if (!cancelled)
+			if (!wasCancelled())
 			{
 				RPCMessageList responses = new RPCMessageList();
 				MessageHub.getInstance().addPluginMessages(pog, messages);
@@ -167,12 +171,12 @@ public class QuickCheckExecutor extends AsyncExecutor
 			}
 		}
 		
-		answer = qc.hasErrors() ? "Failed" : cancelled ? "Cancelled" : "OK";
+		answer = qc.hasErrors() ? "Failed" : wasCancelled() ? "Cancelled" : "OK";
 	}
 
 	private void addCodeLenses(POPlugin pog, ProofObligation po)
 	{
-		JSONObject launch = pog.getCexLaunch(po);
+		JSONObject launch = po.isExistential() ? pog.getWitnessLaunch(po) : pog.getCexLaunch(po);
 
 		if (po instanceof RecursiveObligation)
 		{
@@ -191,7 +195,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 
 		if (launch != null)
 		{
-			pog.addCodeLens(po);
+			pog.addCodeLens(po.location.file, new POLaunchDebugLens(po));
 		}
 	}
 

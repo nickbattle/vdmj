@@ -26,15 +26,16 @@ package workspace.events;
 
 import java.io.File;
 
+import json.JSONObject;
 import rpc.RPCRequest;
 
-public class ChangeFileEvent extends AbstractFileEvent
+public class InlayHintEvent extends AbstractFileEvent
 {
-	public final boolean changed;
+	public final JSONObject range;
 
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
+	public InlayHintEvent(RPCRequest request, File file, JSONObject range)
 	{
 		super(request, file);
-		this.changed = changed;
+		this.range = range;
 	}
 }

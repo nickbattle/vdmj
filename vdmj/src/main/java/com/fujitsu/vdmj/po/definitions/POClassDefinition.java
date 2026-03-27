@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
+import com.fujitsu.vdmj.util.Progress;
 
 /**
  * A class to represent a VDM++ class definition.
@@ -207,8 +208,7 @@ public class POClassDefinition extends PODefinition
 		return false;
 	}
 
-	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment publicEnv)
+	public ProofObligationList getProofObligations(Progress progress, POContextStack ctxt, POGState pogState, Environment publicEnv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
@@ -220,7 +220,13 @@ public class POClassDefinition extends PODefinition
 		{
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
+			progress.makeProgress(1);
 			ctxt.clear();
+
+			if (progress.cancelRequested())
+			{
+				return new ProofObligationList();
+			}
 		}
 		
 		list.typeCheck(tcdef.name, local);

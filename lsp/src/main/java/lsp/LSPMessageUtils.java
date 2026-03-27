@@ -119,7 +119,7 @@ public class LSPMessageUtils
 			"name",				name,
 			"detail",			detail,
 			"kind",				kind.getValue(),
-			"range",			Utils.lexLocationToRange(range),
+			"range",			Utils.lexLocationToLongRange(range),
 			"selectionRange",	Utils.lexLocationToRange(selection));
 	}
 	
@@ -136,7 +136,7 @@ public class LSPMessageUtils
 				"name",				name,
 				"detail",			detail,
 				"kind",				kind.getValue(),
-				"range",			Utils.lexLocationToRange(range),
+				"range",			Utils.lexLocationToLongRange(range),
 				"selectionRange",	Utils.lexLocationToRange(selection),
 				"children",			children);
 		}
@@ -146,7 +146,7 @@ public class LSPMessageUtils
 	{
 		return new JSONObject(
 				"name",				cdef.name.getName(),
-				"kind",				SymbolKind.Class,
+				"kind",				SymbolKind.Class.getValue(),
 				"uri",				cdef.location.file.toURI().toString(),
 				"range",			Utils.lexLocationToRange(cdef.location),
 				"selectionRange",	Utils.lexLocationToRange(cdef.location));

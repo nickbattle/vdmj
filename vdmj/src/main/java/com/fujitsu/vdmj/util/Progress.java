@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,19 +22,41 @@
  *
  ******************************************************************************/
 
-package workspace.events;
+package com.fujitsu.vdmj.util;
 
-import java.io.File;
-
-import rpc.RPCRequest;
-
-public class ChangeFileEvent extends AbstractFileEvent
+/**
+ * An interface to assist with asynchronous progress reporting for POG. This is implemented
+ * by POModuleList and POClassList.
+ */
+public interface Progress
 {
-	public final boolean changed;
+	/**
+	 * Start a new progress run.
+	 */
+	public void resetProgress();
 
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
-	{
-		super(request, file);
-		this.changed = changed;
-	}
+	/**
+	 * The maximum value that the progress can have. The minimum is assumed to be zero.
+	 */
+	public int getTotal();
+
+	/**
+	 * Get the current value of the progress. This is 0 &lt;= x &lt;= getTotal().
+	 */
+	public int getProgress();
+
+	/**
+	 * Advance the progress towards the total by "n".
+	 */
+	public void makeProgress(int n);
+
+	/**
+	 * Indicate that the task being progressed should terminate.
+	 */
+	public void cancelProgress();
+
+	/**
+	 * Test whether a cancel request has been received.
+	 */
+	public boolean cancelRequested();
 }

@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 import json.JSONObject;
+import workspace.HeapMonitor;
 
 public class ExpressionExecutor extends AsyncExecutor
 {
@@ -96,6 +97,7 @@ public class ExpressionExecutor extends AsyncExecutor
 	@Override
 	protected void clean()
 	{
+		HeapMonitor.getInstance().check();
 		running = null;
 	}
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,19 +22,44 @@
  *
  ******************************************************************************/
 
-package workspace.events;
+package com.fujitsu.vdmj.util;
 
-import java.io.File;
-
-import rpc.RPCRequest;
-
-public class ChangeFileEvent extends AbstractFileEvent
+public class NullProgress implements Progress
 {
-	public final boolean changed;
 
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
+	@Override
+	public void resetProgress()
 	{
-		super(request, file);
-		this.changed = changed;
+		return;
+	}
+
+	@Override
+	public int getTotal()
+	{
+		return 0;
+	}
+
+	@Override
+	public int getProgress()
+	{
+		return 0;
+	}
+
+	@Override
+	public void makeProgress(int n)
+	{
+		return;
+	}
+
+	@Override
+	public void cancelProgress()
+	{
+		return;
+	}
+
+	@Override
+	public boolean cancelRequested()
+	{
+		return false;
 	}
 }

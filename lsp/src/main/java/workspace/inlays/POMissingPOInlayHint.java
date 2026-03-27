@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,19 +22,28 @@
  *
  ******************************************************************************/
 
-package workspace.events;
+ package workspace.inlays;
 
-import java.io.File;
+import com.fujitsu.vdmj.lex.LexLocation;
 
-import rpc.RPCRequest;
+import json.JSONObject;
 
-public class ChangeFileEvent extends AbstractFileEvent
+public class POMissingPOInlayHint extends InlayHint implements POInlayHint
 {
-	public final boolean changed;
-
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
+	private final LexLocation location;
+	private final String label;
+	private final String markup;
+	
+	public POMissingPOInlayHint(LexLocation location, String label, String markup)
 	{
-		super(request, file);
-		this.changed = changed;
+		this.location = location;
+		this.label = label;
+		this.markup = markup;
+	}
+
+	@Override
+	public JSONObject getInlayHint()
+	{
+		return makeInlay(location, label, markup);
 	}
 }

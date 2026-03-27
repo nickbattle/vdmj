@@ -323,6 +323,8 @@ public class PatternReader extends SyntaxReader
 		}
 
 		if (rdtok) nextToken();
+		pattern.location.setRange(lastToken());
+
 		return pattern;
 	}
 

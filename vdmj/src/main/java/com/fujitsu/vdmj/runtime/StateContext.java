@@ -155,7 +155,7 @@ public class StateContext extends RootContext
 	{
 		if (stateCtxt != null)
 		{
-			return super.toString() + "\tState visible\n";
+			return super.toString() + "\t" + stateCtxt.toStringLine() + "\n";
 		}
 		else
 		{
@@ -184,7 +184,7 @@ public class StateContext extends RootContext
 
     			if (stateCtxt != null)
     			{
-    				out.println("\tState visible");
+    				out.println("\t" + stateCtxt.toStringLine());
     			}
 			}
 

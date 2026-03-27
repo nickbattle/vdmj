@@ -30,11 +30,14 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 import com.fujitsu.vdmj.values.Value;
 
 import json.JSONObject;
@@ -43,7 +46,6 @@ import workspace.events.CheckPrepareEvent;
 public class POPluginSL extends POPlugin
 {
 	private POModuleList poModuleList;
-	private ProofObligationList obligationList;
 
 	public POPluginSL()
 	{
@@ -55,7 +57,6 @@ public class POPluginSL extends POPlugin
 	{
 		super.preCheck(ev);
 		poModuleList = null;
-		obligationList = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -73,14 +74,34 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
+	protected void addDependencyCodeLenses()
+	{
+		for (POModule module: poModuleList)
+		{
+			createPOGDependencyLenses(module.defs);
+		}
+	}
+
+	@Override
 	public ProofObligationList getProofObligations()
+	{
+		return getProofObligations(new NullProgress());
+	}
+
+	@Override
+	public ProofObligationList getProofObligations(Progress progress)
 	{
 		if (obligationList == null)
 		{
 			POAnnotation.init();
-			obligationList = poModuleList.getProofObligations();
+			obligationList = poModuleList.getProofObligations(progress);
 			POAnnotation.close();
-			obligationList.renumber();
+
+			if (!progress.cancelRequested())
+			{
+				obligationList.renumber();
+				addDependencyCodeLenses();
+			}
 		}
 		
 		return obligationList;
@@ -158,5 +179,11 @@ public class POPluginSL extends POPlugin
 				"params",		params,
 				"command",		"print " + launch
 			);
+	}
+
+	@Override
+	protected int getTotal()
+	{
+		return poModuleList.getTotal();
 	}
 }

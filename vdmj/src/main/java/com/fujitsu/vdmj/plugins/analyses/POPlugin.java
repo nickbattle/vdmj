@@ -43,12 +43,17 @@ import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.plugins.commands.PogCommand;
+import com.fujitsu.vdmj.plugins.commands.PogDepCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCApplyFinder;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * PO analysis plugin
@@ -175,6 +180,30 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	abstract public <T extends Collection<?>> T getPO();
 
+	public ProofObligationList getDependentPOs(TCNameToken applyname)
+	{
+		ProofObligationList result = new ProofObligationList();
+
+		for (ProofObligation po: getProofObligations())
+		{
+			if (po.getCheckedExpression() != null)
+			{
+				TCExpressionList applies = po.getCheckedExpression().apply(new TCApplyFinder(), applyname);
+
+				if (!applies.isEmpty())
+				{
+					result.add(po);
+				}
+			}
+			else if (po.source.contains(applyname.getName() + "("))	// Unchecked POs?
+			{
+				result.add(po);
+			}
+		}
+
+		return result;
+	}
+
 	@Override
 	public AnalysisCommand getCommand(String line)
 	{
@@ -185,6 +214,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			case "pog":	
 				return new PogCommand(line);
 
+			case "pogdep":
+				return new PogDepCommand(line);
+
 			default:
 				return null;
 		}
@@ -193,6 +225,6 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(PogCommand.HELP);
+		return new HelpList(PogCommand.HELP, PogDepCommand.HELP);
 	}
 }

@@ -27,8 +27,10 @@ package workspace.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -42,6 +44,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCThreadDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -84,9 +87,13 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
+	protected final Map<File, JSONArray> codeLenses;		// cache for efficiency
+
 	protected TCPlugin()
 	{
 		super();
+
+		codeLenses = new HashMap<File, JSONArray>();
 	}
 	
 	@Override
@@ -138,10 +145,15 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	protected void preCheck(CheckPrepareEvent ev)
 	{
 		messagehub.clearPluginMessages(this);
+		codeLenses.clear();
 	}
 	
 	/**
-	 * Event handling above. Supporting methods below. 
+	 * Event handling above. Supporting methods below.
+	 * 
+	 * Note that TCCodeLenses are factories which support one type of lens each. So here,
+	 * we return one TCCodeLens for each *type* of TC lens. Compare this with PO, where
+	 * each POCodeLens supports one *instance* of a type of PO lens.
 	 */
 	protected List<TCCodeLens> getTCCodeLenses(boolean dirty)
 	{
@@ -208,10 +220,12 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						top.name.getName(),
 						"",
 						SymbolKind.Struct,
-						top.name.getLocation(),
-						top.name.getLocation());
+						top.location,
+						top.location);
 
 				iter.next();	// Ignore state record
+				iter.next();	// Ignore "old" state record
+				// iter fields follow
 			}
 			else if (top instanceof TCValueDefinition && alldefs.size() > 1)
 			{
@@ -221,8 +235,17 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						vdef.pattern.toString(),
 						"",
 						SymbolKind.Struct,
-						vdef.location,
-						vdef.location);
+						vdef.pattern.location,
+						vdef.pattern.location);
+			}
+			else if (top instanceof TCThreadDefinition)
+			{
+				return messages.documentSymbol(
+					"thread",
+					"()",
+					SymbolKind.kindOf(top),
+					top.location,
+					top.location);
 			}
 			else if (top instanceof TCPerSyncDefinition ||
 					 top instanceof TCMutexSyncDefinition)

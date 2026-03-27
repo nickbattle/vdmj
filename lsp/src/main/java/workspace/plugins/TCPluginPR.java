@@ -45,6 +45,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
+import workspace.Diag;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.lenses.TCCodeLens;
@@ -140,7 +141,7 @@ public class TCPluginPR extends TCPlugin
 			clazz.name.getName(),
 			"",
 			SymbolKind.Class,
-			LexLocation.getSpan(clazz.name.getLex()),
+			clazz.name.getLocation(),
 			clazz.name.getLocation(),
 			symbols);
 	}
@@ -200,8 +201,14 @@ public class TCPluginPR extends TCPlugin
 		JSONArray results = new JSONArray();
 		ASTPlugin ast = registry.getPlugin("AST");
 		
-		if (!tcClassList.isEmpty())	// May be syntax errors
+		if (!tcClassList.isEmpty())
 		{
+			if (codeLenses.get(file) != null && !ast.isDirty())
+			{
+				Diag.info("Using cached TC code lenses for " + file);
+				return codeLenses.get(file);
+			}
+			
 			List<TCCodeLens> lenses = getTCCodeLenses(ast.isDirty());
 			
 			for (TCClassDefinition clazz: tcClassList)
@@ -220,6 +227,8 @@ public class TCPluginPR extends TCPlugin
 					}
 				}
 			}
+
+			codeLenses.put(file, results);
 		}
 		
 		return results;

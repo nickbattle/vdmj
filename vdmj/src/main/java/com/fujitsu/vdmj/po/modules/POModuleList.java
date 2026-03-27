@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
+import com.fujitsu.vdmj.util.NullProgress;
+import com.fujitsu.vdmj.util.Progress;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POModuleList extends POMappedList<TCModule, POModule>
@@ -46,15 +48,45 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 
 	public ProofObligationList getProofObligations()
 	{
+		return getProofObligations(new NullProgress());
+	}
+
+	public ProofObligationList getProofObligations(Progress progress)
+	{
 		ProofObligationList obligations = new ProofObligationList();
 		MultiModuleEnvironment menv = new MultiModuleEnvironment(this);
 		POContextStack.reset();
+		progress.resetProgress();
 		
 		for (POModule m: this)
 		{
-			obligations.addAll(m.getProofObligations(menv));
+			obligations.addAll(m.getProofObligations(progress, menv));
+
+			if (progress.cancelRequested())
+			{
+				return new ProofObligationList();	// empty
+			}
 		}
 
 		return obligations;
+	}
+
+	/**
+	 * Count the number of top level definitions across all modules. This is
+	 * used to calculate the progress of the POG for large specifications.
+	 */
+	public int getTotal()
+	{
+		int total = 0;
+
+		for (POModule m: this)
+		{
+			if (m.defs != null)
+			{
+				total = total + m.defs.size();
+			}
+		}
+
+		return total;
 	}
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,20 +21,11 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+package workspace.lenses;
 
-package workspace.events;
+import json.JSONArray;
 
-import java.io.File;
-
-import rpc.RPCRequest;
-
-public class ChangeFileEvent extends AbstractFileEvent
+public interface POCodeLens
 {
-	public final boolean changed;
-
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
-	{
-		super(request, file);
-		this.changed = changed;
-	}
+	public JSONArray getLaunchLens();
 }

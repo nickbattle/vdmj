@@ -50,8 +50,12 @@ import rpc.RPCResponse;
 import workspace.Diag;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
+import workspace.lenses.POLaunchDebugLens;
 import workspace.plugins.POPlugin;
 
+/**
+ * A thread supporting the background check of POs from VSCode.
+ */
 public class QuickCheckThread extends CancellableThread
 {
 	private final RPCRequest request;
@@ -84,7 +88,7 @@ public class QuickCheckThread extends CancellableThread
 			
 			LSPServer server = LSPServer.getInstance();
 			MessageHub.getInstance().clearPluginMessages(pog);
-			pog.clearLenses();
+			pog.clearLenses(POLaunchDebugLens.class);
 			
 			List<VDMMessage> messages = new Vector<VDMMessage>();
 			JSONArray list = new JSONArray();
@@ -153,7 +157,7 @@ public class QuickCheckThread extends CancellableThread
 					}
 				}
 				
-				if (cancelled)
+				if (wasCancelled())
 				{
 					list.clear();
 					break;
@@ -162,7 +166,7 @@ public class QuickCheckThread extends CancellableThread
 
 			responses.add(RPCResponse.result(request, list));
 
-			if (!cancelled)
+			if (!wasCancelled())
 			{
 				MessageHub.getInstance().addPluginMessages(pog, messages);
 				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
@@ -187,6 +191,7 @@ public class QuickCheckThread extends CancellableThread
 	private JSONObject getQCResponse(ProofObligation po, List<VDMMessage> messages, long duration)
 	{
 		JSONObject json = new JSONObject(
+				"type",	"PO",
 				"id",		Long.valueOf(po.number),
 				"status",	po.status.toString(),
 				"duration",	duration);
@@ -223,7 +228,7 @@ public class QuickCheckThread extends CancellableThread
 			if (launch != null)
 			{
 				cexample.put("launch", launch);
-				pog.addCodeLens(po);
+				pog.addCodeLens(po.location.file, new POLaunchDebugLens(po));
 			}
 
 			if (po.counterexample.location.startLine != 1)
@@ -244,8 +249,16 @@ public class QuickCheckThread extends CancellableThread
 
 		if (po.getExplanation() != null)
 		{
+			String source = po.getExplanation();
+
+			// Add the message, if we have one
+			if (po.message != null)
+			{
+				source = po.message + "\n----\n" + source;
+			}
+
 			// Attempt to update source, after QC
-			json.put("source", splitPO(po.getExplanation()));
+			json.put("source", splitPO(source));
 		}
 
 		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
@@ -279,6 +292,7 @@ public class QuickCheckThread extends CancellableThread
 			if (launch != null)
 			{
 				witness.put("launch", launch);
+				pog.addCodeLens(po.location.file, new POLaunchDebugLens(po));
 			}
 
 			if (po.witness.location.startLine != 1)
@@ -289,21 +303,28 @@ public class QuickCheckThread extends CancellableThread
 
 			json.put("witness", witness);
 		}
+
+		JSONArray hovers = new JSONArray("name", "status", "duration");
 		
 		if (po.provedBy != null)
 		{
 			json.put("provedBy", po.provedBy);
+			hovers.add("provedBy");
 		}
 		
 		if (po.message != null)
 		{
 			json.put("message", po.message);
+			hovers.add("message");
 		}
 		
 		if (po.qualifier != null)
 		{
 			json.put("qualifier", po.qualifier);
+			hovers.add("qualifier");
 		}
+
+		json.put("hovers", hovers);
 
 		return json;
 	}

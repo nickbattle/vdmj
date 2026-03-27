@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.util.Progress;
 
 /**
  * A class holding all the details for one module.
@@ -82,17 +83,23 @@ public class POModule extends PONode
 		return sb.toString();
 	}
 
-	public ProofObligationList getProofObligations(MultiModuleEnvironment menv)
+	public ProofObligationList getProofObligations(Progress progress, MultiModuleEnvironment menv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
-		
+
 		for (PODefinition def: defs)
 		{
 			def.moduleDefinition = this;
 			POContextStack ctxt = new POContextStack();
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), menv));
+			progress.makeProgress(1);
+
+			if (progress.cancelRequested())
+			{
+				return new ProofObligationList();
+			}
 		}
 		
 		list.typeCheck(menv);
