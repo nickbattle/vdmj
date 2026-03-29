@@ -282,7 +282,7 @@ public class MessageHub
 					}
 				}
 				
-				JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", messages);
+				JSONObject params = new JSONObject("uri", file.toPath().toUri().toString(), "diagnostics", messages);
 				responses.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
 			}
 			else

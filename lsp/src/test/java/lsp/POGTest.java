@@ -62,7 +62,7 @@ public class POGTest extends LSPTest
 		POGHandler handler = new POGHandler();
 		File file = new File(testdir, "pogtest.vdmsl");
 		RPCRequest request = RPCRequest.create(123L, "slsp/POG/generate",
-				new JSONObject("uri", file.toURI().toString()));
+				new JSONObject("uri", file.toPath().toUri().toString()));
 		
 		RPCMessageList response = handler.request(request);
 		assertEquals(2, response.size());

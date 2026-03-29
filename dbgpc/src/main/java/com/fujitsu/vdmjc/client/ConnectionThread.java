@@ -628,7 +628,7 @@ public class ConnectionThread extends Thread
 
 	public void xcmd_overture_coverage(File file) throws IOException
 	{
-		xcmd_overture_cmd("coverage", file.toURI().toString());
+		xcmd_overture_cmd("coverage", file.toPath().toUri().toString());
 	}
 
 	public void xcmd_overture_latex(File dir, File file) throws IOException

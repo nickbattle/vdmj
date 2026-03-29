@@ -105,7 +105,7 @@ public class LSPMessageUtils
 				}
 			}
 			
-			JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", messages);
+			JSONObject params = new JSONObject("uri", file.toPath().toUri().toString(), "diagnostics", messages);
 			responses.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
 		}
 		
@@ -147,7 +147,7 @@ public class LSPMessageUtils
 		return new JSONObject(
 				"name",				cdef.name.getName(),
 				"kind",				SymbolKind.Class.getValue(),
-				"uri",				cdef.location.file.toURI().toString(),
+				"uri",				cdef.location.file.toPath().toUri().toString(),
 				"range",			Utils.lexLocationToRange(cdef.location),
 				"selectionRange",	Utils.lexLocationToRange(cdef.location));
 	}

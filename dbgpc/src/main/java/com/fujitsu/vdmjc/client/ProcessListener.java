@@ -96,7 +96,7 @@ public class ProcessListener extends Thread
 
 			for (File file: files)
 			{
-				pargs.add(file.toURI().toString());
+				pargs.add(file.toPath().toUri().toString());
 			}
 
     		ProcessBuilder pb = new ProcessBuilder(pargs);

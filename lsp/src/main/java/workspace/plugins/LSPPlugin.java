@@ -1387,7 +1387,7 @@ public class LSPPlugin extends AnalysisPlugin
 					}
 					
 					// Send publishDiagnostics for any deleted files, to clear messages
-					JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
+					JSONObject params = new JSONObject("uri", file.toPath().toUri().toString(), "diagnostics", new JSONArray());
 					results.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
 
 					// Remove file from open list
@@ -1489,7 +1489,7 @@ public class LSPPlugin extends AnalysisPlugin
 							{
 								results.add(
 									new JSONObject(
-										"uri", pfile.toURI().toString(),
+										"uri", pfile.toPath().toUri().toString(),
 										"range", range));
 							}
 						}
@@ -1500,7 +1500,7 @@ public class LSPPlugin extends AnalysisPlugin
 			if (incdec)
 			{
 				results.add(new JSONObject(
-						"uri", def.location.file.toURI().toString(),
+						"uri", def.location.file.toPath().toUri().toString(),
 						"range", defRange));
 			}
 			
