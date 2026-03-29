@@ -1377,8 +1377,6 @@ public class LSPPlugin extends AnalysisPlugin
 				results.add(RPCRequest.create("workspace/codeLens/refresh", null));
 			}
 			
-			// Send publishDiagnostics for any deleted files, to clear messages
-			
 			if (deleted != null)
 			{
 				for (File file: deleted)
@@ -1388,8 +1386,12 @@ public class LSPPlugin extends AnalysisPlugin
 						file = getExtractedName(file);	// Messages reported against extract
 					}
 					
+					// Send publishDiagnostics for any deleted files, to clear messages
 					JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
 					results.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
+
+					// Remove file from open list
+					openFiles.remove(file);
 				}
 			}
 		}
@@ -1703,7 +1705,7 @@ public class LSPPlugin extends AnalysisPlugin
 
 	public RPCMessageList lspDocumentSymbols(RPCRequest request, File file)
 	{
-		if (onDotPath(file) || ignoredFile(file))
+		if (onDotPath(file) || ignoredFile(file) || !projectFiles.containsKey(file))
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}

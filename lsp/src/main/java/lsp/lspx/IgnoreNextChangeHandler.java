@@ -28,10 +28,6 @@ import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.plugins.LSPPlugin;
 
-import java.io.File;
-import java.net.URISyntaxException;
-
-import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import rpc.RPCErrors;
