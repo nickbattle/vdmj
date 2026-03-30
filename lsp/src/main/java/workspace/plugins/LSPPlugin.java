@@ -1100,13 +1100,12 @@ public class LSPPlugin extends AnalysisPlugin
 				
 				if (start >= 0 && end >= 0)
 				{
-					String original = buffer.toString();
+					String original = buffer.substring(start, end);
 					buffer.replace(start, end, text);
-					boolean changed = !buffer.toString().equals(original);
-					Diag.fine("Buffer %s", changed ? "changed" : "did not change");
-
-					if (!changed)
+					
+					if (original.equals(text))
 					{
+						Diag.fine("Buffer did not change");
 						return new RPCMessageList();
 					}
 				}
