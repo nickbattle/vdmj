@@ -285,16 +285,12 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.7.0</version>
+                        <version>0.10.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>ossrh</publishingServerId>
-                            <centralBaseUrl>https://central.sonatype.com</centralBaseUrl>
-                            <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots/</centralSnapshotsUrl>
-                            <!-- Change this to auto publish if false you must log into https://central.sonatype.com/publishing and
-                            manually find it and publish it for the job to complete -->
                             <autoPublish>false</autoPublish>
-                            <waitUntil>published</waitUntil>
+                            <waitUntil>validated</waitUntil>
                         </configuration>
                     </plugin>
                     <plugin>
