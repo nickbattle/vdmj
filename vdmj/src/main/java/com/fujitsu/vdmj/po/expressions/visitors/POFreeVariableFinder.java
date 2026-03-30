@@ -31,10 +31,12 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.expressions.POCasesExpression;
+import com.fujitsu.vdmj.po.expressions.POElseIfExpression;
 import com.fujitsu.vdmj.po.expressions.POExists1Expression;
 import com.fujitsu.vdmj.po.expressions.POExistsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POForAllExpression;
+import com.fujitsu.vdmj.po.expressions.POIfExpression;
 import com.fujitsu.vdmj.po.expressions.POIotaExpression;
 import com.fujitsu.vdmj.po.expressions.POLambdaExpression;
 import com.fujitsu.vdmj.po.expressions.POLetBeStExpression;
@@ -116,6 +118,37 @@ public class POFreeVariableFinder extends POLeafExpressionVisitor<POVariableExpr
 		TCNameSet locals = node.bind.getVariableNames();
 		return node.predicate.apply(this, new Locals(locals, arg));
 	}
+
+	@Override
+	public List<POVariableExpression> caseIfExpression(POIfExpression node, Locals arg)
+	{
+		// First collect everything that is reasoned about in the if/else checks
+		List<POVariableExpression> ifvars = node.ifExp.apply(this, arg);
+
+		if (node.elseList != null)
+		{
+			for (POElseIfExpression elif: node.elseList)
+			{
+				ifvars.addAll(elif.elseIfExp.apply(this, arg));		// cumulative
+			}
+		}
+
+		// Then hide these variables by making them local
+		Locals locals = hide(ifvars, arg);
+
+		List<POVariableExpression> results = node.thenExp.apply(this, locals);
+
+		if (node.elseList != null)
+		{
+			for (POElseIfExpression elif: node.elseList)
+			{
+				results.addAll(elif.thenExp.apply(this, locals));
+			}
+		}
+
+		results.addAll(node.elseExp.apply(this, locals));
+		return results;
+	}
 	
 	@Override
 	public List<POVariableExpression> caseLetDefExpression(POLetDefExpression node, Locals arg)
@@ -140,7 +173,10 @@ public class POFreeVariableFinder extends POLeafExpressionVisitor<POVariableExpr
 	@Override
 	public List<POVariableExpression> caseCasesExpression(POCasesExpression node, Locals arg)
 	{
-		List<POVariableExpression> results = node.exp.apply(this, arg);
+		List<POVariableExpression> caseex = node.exp.apply(this, arg);
+		List<POVariableExpression> results = newCollection();
+
+		arg = hide(caseex, arg);
 		
 		for (POCaseAlternative each: node.cases)
 		{
@@ -155,7 +191,7 @@ public class POFreeVariableFinder extends POLeafExpressionVisitor<POVariableExpr
 		
 		return results;
 	}
-	
+
 	@Override
 	public List<POVariableExpression> caseLambdaExpression(POLambdaExpression node, Locals arg)
 	{
@@ -215,5 +251,19 @@ public class POFreeVariableFinder extends POLeafExpressionVisitor<POVariableExpr
 	public List<POVariableExpression> caseExpression(POExpression node, Locals arg)
 	{
 		return newCollection();
+	}
+	
+	// The passed variables are "reasoned about" by testing expressions (if/then, cases)
+	// So we add them to locals to avoid returning them.
+	private Locals hide(List<POVariableExpression> results, Locals arg)
+	{
+		TCNameList names = new TCNameList();
+
+		for (POVariableExpression exp: results)
+		{
+			names.add(exp.name);
+		}
+
+		return new Locals(names, arg);
 	}
 }
