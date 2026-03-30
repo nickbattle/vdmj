@@ -30,11 +30,8 @@ import rpc.RPCRequest;
 
 public class ChangeFileEvent extends AbstractFileEvent
 {
-	public final boolean changed;
-
-	public ChangeFileEvent(RPCRequest request, File file, boolean changed)
+	public ChangeFileEvent(RPCRequest request, File file)
 	{
 		super(request, file);
-		this.changed = changed;
 	}
 }

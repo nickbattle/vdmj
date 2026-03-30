@@ -1092,7 +1092,6 @@ public class LSPPlugin extends AnalysisPlugin
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
-			boolean changed = true;
 			
 			if (range != null)
 			{
@@ -1101,10 +1100,15 @@ public class LSPPlugin extends AnalysisPlugin
 				
 				if (start >= 0 && end >= 0)
 				{
-					int original = buffer.toString().hashCode();
+					String original = buffer.toString();
 					buffer.replace(start, end, text);
-					changed = buffer.toString().hashCode() != original;
-					Diag.fine("Buffer changed = %s", changed);
+					boolean changed = !buffer.toString().equals(original);
+					Diag.fine("Buffer %s", changed ? "changed" : "did not change");
+
+					if (!changed)
+					{
+						return new RPCMessageList();
+					}
 				}
 				
 				DiagUtils.dumpEdit(range, buffer);
@@ -1116,7 +1120,7 @@ public class LSPPlugin extends AnalysisPlugin
 				buffer.append(text);
 			}
 			
-			return eventhub.publish(new ChangeFileEvent(request, file, changed));
+			return eventhub.publish(new ChangeFileEvent(request, file));
 		}
 	}
 
