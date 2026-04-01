@@ -677,7 +677,7 @@ public class DAPPlugin extends AnalysisPlugin
 				else
 				{
 					Diag.error("Function breakpoint %s is not function or operation", name);
-					results.add(new JSONObject("verified", false, "message", " is not a function or operation"));
+					results.add(new JSONObject("verified", false, "message", name + " is not a function or operation"));
 				}
 			}
 			else
