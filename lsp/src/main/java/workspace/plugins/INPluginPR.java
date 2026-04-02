@@ -112,16 +112,24 @@ public class INPluginPR extends INPlugin
 	public INDefinitionList findDefinition(String name)
 	{
 		INDefinitionList results = new INDefinitionList();
+		String name2 = name.replaceAll(" ", "").replaceAll("\\(", "").replaceAll("\\)", "");
 		
 		for (INClassDefinition clazz: inClassList)
 		{
 			for (INDefinition def: clazz.definitions)
 			{
-				if (def.name != null &&
-					(def.name.toString().equals(name) ||
-					 def.name.getExplicit(true).toString().equals(name)))
+				if (def.name != null)
 				{
-					results.add(def);
+					// eg. "func(nat, seq of (nat))"" -> "funcnat,seqofnat" for comparison
+					String defstr = def.name.toString().
+						replaceAll(" ", "").replaceAll("\\(", "").replaceAll("\\)", "");
+					String defname = def.name.getExplicit(true).toString().
+						replaceAll(" ", "").replaceAll("\\(", "").replaceAll("\\)", "");
+
+					if (defstr.equals(name2) || defname.equals(name2))
+					{
+						results.add(def);
+					}
 				}
 			}
 		}

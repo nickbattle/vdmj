@@ -118,11 +118,13 @@ public class INPluginSL extends INPlugin
 		{
 			for (INDefinition def: module.defs)
 			{
-				if (def.name != null &&
-					(def.name.toString().equals(name) ||
-					 def.name.getExplicit(true).toString().equals(name)))
+				if (def.name != null)
 				{
-					results.add(def);
+					if (def.name.toString().equals(name) ||
+						def.name.getExplicit(true).toString().equals(name))
+					{
+						results.add(def);
+					}
 				}
 			}
 		}
