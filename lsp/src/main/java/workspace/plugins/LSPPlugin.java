@@ -87,7 +87,6 @@ import lsp.SetTraceNotificationHandler;
 import lsp.ShutdownHandler;
 import lsp.UnknownHandler;
 import lsp.Utils;
-import lsp.lspx.IgnoreNextChangeHandler;
 import lsp.textdocument.CodeLensHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.CompletionItemKind;
@@ -156,7 +155,6 @@ public class LSPPlugin extends AnalysisPlugin
 	private Set<File> externalFilesWarned = new HashSet<File>();
 	private List<File> externals = new Vector<File>();
 	private List<File> ignoreChangesList = new Vector<File>();
-	private JSONObject ignoreNextChange = null;
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
@@ -227,7 +225,6 @@ public class LSPPlugin extends AnalysisPlugin
 		lspDispatcher.register(new ExitHandler(), "exit");
 		lspDispatcher.register(new CancelHandler(), "$/cancelRequest");
 		lspDispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
-		lspDispatcher.register(new IgnoreNextChangeHandler(), "$/ignoreNextChange");
 
 		lspDispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
 		lspDispatcher.register(new DidCloseHandler(), "textDocument/didClose");
@@ -1042,17 +1039,6 @@ public class LSPPlugin extends AnalysisPlugin
 		return null;
 	}
 
-	/**
-	 * This is a non-standard notification. We use it to allow a subsequent didChange
-	 * request to be ignored. This is so that it can be used to provoke a refresh of
-	 * the outline view after a save, without causing the AST buffer to become dirty.
-	 */
-	public void lspIgnoreNextChange(JSONObject range)
-	{
-		Diag.fine("Ignoring next didChange");
-		ignoreNextChange = range;
-	}
-
 	public RPCMessageList lspDidChange(RPCRequest request, File file, JSONObject range, String text) throws Exception
 	{
 		if (onDotPath(file))
@@ -1077,13 +1063,6 @@ public class LSPPlugin extends AnalysisPlugin
 		}
 		else
 		{
-			if (ignoreNextChange != null && ignoreNextChange.equals(range))
-			{
-				Diag.fine("Ignoring didChange after notification");
-				ignoreNextChange = null;
-				return new RPCMessageList();
-			}
-
 			if (externalFiles.containsKey(file) && !externalFilesWarned.contains(file))
 			{
 				sendMessage(WARNING_MSG, "WARNING: Changing extracted VDM source: " + file);
