@@ -35,8 +35,6 @@ import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-
 import vdmj.commands.ClassesCommand;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.LogCommand;
@@ -111,20 +109,19 @@ public class INPluginPR extends INPlugin
 	}
 
 	@Override
-	public INDefinitionList findDefinition(TCNameToken name)
+	public INDefinitionList findDefinition(String name)
 	{
 		INDefinitionList results = new INDefinitionList();
 		
-		for (INClassDefinition module: inClassList)
+		for (INClassDefinition clazz: inClassList)
 		{
-			if (module.name.getName().equals(name.getModule()))
+			for (INDefinition def: clazz.definitions)
 			{
-				for (INDefinition def: module.definitions)
+				if (def.name != null &&
+					(def.name.toString().equals(name) ||
+					 def.name.getExplicit(true).toString().equals(name)))
 				{
-					if (def.name != null && def.name.equals(name))
-					{
-						results.add(def);
-					}
+					results.add(def);
 				}
 			}
 		}

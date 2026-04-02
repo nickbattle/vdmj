@@ -37,9 +37,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
@@ -52,17 +49,12 @@ import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-
 import dap.DAPInitializeResponse;
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -591,25 +583,8 @@ public class DAPPlugin extends AnalysisPlugin
 
 			if (!noDebug)	// debugging allowed!
 			{
-				LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
-				LexToken token = ltr.nextToken();
-				ltr.close();
-
 				INPlugin in = registry.getPlugin("IN");
-				INDefinitionList list = null;
-
-				if (token.is(Token.IDENTIFIER))
-				{
-					LexIdentifierToken id = (LexIdentifierToken)token;
-					TCNameToken tok = new TCNameToken(id.location, interpreter.getDefaultName(), id.name);
-					name = tok.toExplicitString(LexLocation.ANY);	// for errors
-					list = in.findDefinition(tok);
-				}
-				else if (token.is(Token.NAME))
-				{
-					list = in.findDefinition(new TCNameToken((LexNameToken)token));
-				}
-				
+				INDefinitionList list = in.findDefinition(name);	// Must match def.name.toString()
 				INNode node = null;
 				
 				if (!list.isEmpty())
@@ -674,7 +649,7 @@ public class DAPPlugin extends AnalysisPlugin
 				else if (list.isEmpty())
 				{
 					Diag.error("Function breakpoint name %s not found", name);
-					results.add(new JSONObject("verified", false, "message", name + " is not visible or not found"));
+					results.add(new JSONObject("verified", false, "message", name + " is not found"));
 				}
 				else
 				{

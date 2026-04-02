@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.values.Value;
 
@@ -197,5 +196,5 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public <T extends Mappable> Interpreter getInterpreter() throws Exception;
 
-	abstract public INDefinitionList findDefinition(TCNameToken lnt);
+	abstract public INDefinitionList findDefinition(String name);
 }
