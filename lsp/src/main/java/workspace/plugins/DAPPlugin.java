@@ -52,6 +52,7 @@ import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -601,6 +602,7 @@ public class DAPPlugin extends AnalysisPlugin
 				{
 					LexIdentifierToken id = (LexIdentifierToken)token;
 					TCNameToken tok = new TCNameToken(id.location, interpreter.getDefaultName(), id.name);
+					name = tok.toExplicitString(LexLocation.ANY);	// for errors
 					list = in.findDefinition(tok);
 				}
 				else if (token.is(Token.NAME))
