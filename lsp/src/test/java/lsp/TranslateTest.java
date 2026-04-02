@@ -73,7 +73,7 @@ public class TranslateTest extends LSPTest
 
 		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
-					"uri", file.toURI().toString(),
+					"uri", file.toPath().toUri().toString(),
 					"languageId", "latex",
 					"saveUri",	testdir.toURI().toString()));
 		
@@ -86,9 +86,9 @@ public class TranslateTest extends LSPTest
 
 		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
-					"uri", file.toURI().toString(),
+					"uri", file.toPath().toUri().toString(),
 					"languageId", "latex",
-					"saveUri",	file.toURI().toString()));
+					"saveUri",	file.toPath().toUri().toString()));
 		
 		response = handler.request(request);
 		assertEquals(1, response.size());
@@ -99,7 +99,7 @@ public class TranslateTest extends LSPTest
 
 		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
-					"uri", file.toURI().toString(),
+					"uri", file.toPath().toUri().toString(),
 					"languageId", "latex",
 					"saveUri",	new File("???!!!").toURI().toString()));
 		
@@ -114,7 +114,7 @@ public class TranslateTest extends LSPTest
 
 		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
-					"uri", file.toURI().toString(),
+					"uri", file.toPath().toUri().toString(),
 					"languageId", "Chinese",
 					"saveUri",	empty.toUri().toString()));
 		
@@ -164,7 +164,7 @@ public class TranslateTest extends LSPTest
 		File file = new File(testdir, "pogtest.vdmsl");
 		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
-					"uri", file.toURI().toString(),
+					"uri", file.toPath().toUri().toString(),
 					"languageId", "latex",
 					"saveUri",	empty.toURI().toString()));
 

@@ -127,7 +127,7 @@ public class Utils
 	public static JSONObject lexLocationToLocation(LexLocation location)
 	{
 		return new JSONObject(
-			"uri",   location.file.toURI().toString(),
+			"uri",   location.file.toPath().toUri().toString(),
 			"range", lexLocationToRange(location));
 	}
 	

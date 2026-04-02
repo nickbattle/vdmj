@@ -157,6 +157,18 @@ public class DefinitionReader extends SyntaxReader
 	{
 		return sectionList.contains(tok.type);
 	}
+
+	private LexToken rangeEnd() throws LexException
+	{
+		if (lastToken().is(Token.SEMICOLON))
+		{
+			return lastToken();
+		}
+		else
+		{
+			return prevToken();
+		}
+	}
 	
 	private boolean accessSpecifier() throws LexException
 	{
@@ -420,7 +432,7 @@ public class DefinitionReader extends SyntaxReader
 			case EQUALS:
 				nextToken();
 				ASTNamedType nt = new ASTNamedType(idToName(id), tr.readType());
-				nt.location.setRange(prevToken());
+				nt.location.setRange(rangeEnd());
 
 				if (nt.type instanceof ASTUnresolvedType &&
 					((ASTUnresolvedType)nt.type).typename.equals(nt.typename))
@@ -468,7 +480,7 @@ public class DefinitionReader extends SyntaxReader
         			invPattern = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after pattern in invariant");
         			invExpression = getExpressionReader().readExpression();
-					invPattern.location.setRange(prevToken());
+					invPattern.location.setRange(rangeEnd());
         			break;
         			
     			case EQ:
@@ -493,7 +505,7 @@ public class DefinitionReader extends SyntaxReader
         			eqPattern2 = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in eq clause");
         			eqExpression = getExpressionReader().readExpression();
-					eqPattern1.location.setRange(prevToken());
+					eqPattern1.location.setRange(rangeEnd());
     				break;
     				
     			case ORD:
@@ -513,7 +525,7 @@ public class DefinitionReader extends SyntaxReader
         			ordPattern2 = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in ord clause");
         			ordExpression = getExpressionReader().readExpression();
-					ordPattern1.location.setRange(prevToken());
+					ordPattern1.location.setRange(rangeEnd());
     				break;
 
     			default:
@@ -524,7 +536,7 @@ public class DefinitionReader extends SyntaxReader
 		ASTTypeDefinition def = new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression,
 			eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 
-		def.name.location.setRange(lastToken());
+		def.name.location.setRange(rangeEnd());
 		return def;
 	}
 
@@ -858,7 +870,7 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		LexLocation.addSpan(idToName(funcName), lastToken());
-		def.name.location.setRange(lastToken());
+		def.name.location.setRange(rangeEnd());
 
 		return def;
 	}
@@ -1114,7 +1126,7 @@ public class DefinitionReader extends SyntaxReader
 		ASTValueDefinition def = new ASTValueDefinition(
 			scope, p, type, getExpressionReader().readExpression());
 
-		p.location.setRange(lastToken());
+		p.location.setRange(rangeEnd());
 
 		return def;
 	}
@@ -1140,7 +1152,7 @@ public class DefinitionReader extends SyntaxReader
 			invPattern = getPatternReader().readPattern();
 			checkFor(Token.EQUALSEQUALS, 2098, "Expecting '==' after pattern in invariant");
 			invExpression = getExpressionReader().readExpression();
-			invPattern.location.setRange(prevToken());
+			invPattern.location.setRange(rangeEnd());
 		}
 
 		if (lastToken().is(Token.INIT))
@@ -1149,7 +1161,7 @@ public class DefinitionReader extends SyntaxReader
 			initPattern = getPatternReader().readPattern();
 			checkFor(Token.EQUALSEQUALS, 2099, "Expecting '==' after pattern in initializer");
 			initExpression = getExpressionReader().readExpression();
-			initPattern.location.setRange(prevToken());
+			initPattern.location.setRange(rangeEnd());
 		}
 
 		// Be forgiving about the inv/init order
@@ -1173,7 +1185,7 @@ public class DefinitionReader extends SyntaxReader
 		annotations.astAfter(this, def);
 		def.setAnnotations(annotations);
 		def.setComments(comments);
-		def.location.setRange(prevToken());
+		def.location.setRange(rangeEnd());
 
 		return def;
 	}
@@ -1203,7 +1215,7 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		LexLocation.addSpan(idToName(opName), lastToken());
-		def.name.location.setRange(prevToken());
+		def.name.location.setRange(rangeEnd());
 
 		return def;
 	}
@@ -1561,7 +1573,7 @@ public class DefinitionReader extends SyntaxReader
 			String str = getCurrentModule();
 			LexNameToken className = new LexNameToken(str, str, token.location);
 			ASTClassInvariantDefinition ivd = new ASTClassInvariantDefinition(className.getInvName(token.location), exp);
-			ivd.name.location.setRange(lastToken());
+			ivd.name.location.setRange(rangeEnd());
 			return ivd;
 		}
 		else
@@ -1575,7 +1587,7 @@ public class DefinitionReader extends SyntaxReader
 			ivd.setAccessSpecifier(access);
 			ivd.setAnnotations(annotations);
 			ivd.setComments(comments);
-			ivd.name.location.setRange(prevToken());
+			ivd.name.location.setRange(rangeEnd());
 
 			return ivd;
 		}
@@ -1626,7 +1638,7 @@ public class DefinitionReader extends SyntaxReader
 			def = new ASTThreadDefinition(stmt);
 		}
 
-		def.location.setRange(lastToken());
+		def.location.setRange(rangeEnd());
 		return def;
 	}
 
@@ -1643,7 +1655,7 @@ public class DefinitionReader extends SyntaxReader
 				checkFor(Token.IMPLIES, 2116, "Expecting <name> => <exp>");
 				ASTExpression exp = getExpressionReader().readPerExpression();
 				ASTPerSyncDefinition def = new ASTPerSyncDefinition(token.location, name, exp);
-				def.location.setRange(prevToken());
+				def.location.setRange(rangeEnd());
 				return def;
 
 			case MUTEX:
@@ -1673,7 +1685,7 @@ public class DefinitionReader extends SyntaxReader
 				}
 
 				ASTMutexSyncDefinition mux = new ASTMutexSyncDefinition(token.location, opnames);
-				mux.location.setRange(prevToken());
+				mux.location.setRange(rangeEnd());
 				return mux;
 
 			default:
@@ -1689,7 +1701,7 @@ public class DefinitionReader extends SyntaxReader
 		List<String> names = readTraceIdentifierList();
 		checkFor(Token.COLON, 2264, "Expecting ':' after trace name(s)");
 		ASTTraceDefinitionTermList traces = readTraceDefinitionList();
-		start.setRange(lastToken());
+		start.setRange(rangeEnd());
 
 		return new ASTNamedTraceDefinition(start, names, traces);
 	}

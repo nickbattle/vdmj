@@ -147,7 +147,6 @@ public class LSPPlugin extends AnalysisPlugin
 	private Map<File, LexLocation> fileEndings = new LinkedHashMap<File, LexLocation>();
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean checkInProgress = false;
-	private long lastChecked = 0;
 
 	private List<File> vdmignore = new Vector<File>();
 	private List<File> ordering = new Vector<File>();
@@ -161,7 +160,6 @@ public class LSPPlugin extends AnalysisPlugin
 	private static final String VDMIGNORE = ".vscode/vdmignore";
 	private static final String EXTERNALS = ".vscode/externals";
 	public static final String PROPERTIES = ".vscode/vdmj.properties";
-	private static final long OUTLINE_UPDATE = 500;
 
 	private LSPPlugin()
 	{
@@ -900,7 +898,6 @@ public class LSPPlugin extends AnalysisPlugin
 		finally
 		{
 			checkInProgress = false;
-			lastChecked = System.currentTimeMillis();
 			HeapMonitor.getInstance().check();
 		}
 	}
@@ -1074,7 +1071,6 @@ public class LSPPlugin extends AnalysisPlugin
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
-			boolean changed = true;
 			
 			if (range != null)
 			{
@@ -1083,20 +1079,17 @@ public class LSPPlugin extends AnalysisPlugin
 				
 				if (start >= 0 && end >= 0)
 				{
+					String original = buffer.substring(start, end);
 					buffer.replace(start, end, text);
+					
+					if (original.equals(text))
+					{
+						Diag.fine("Buffer did not change");
+						return new RPCMessageList();
+					}
 				}
 				
 				DiagUtils.dumpEdit(range, buffer);
-
-				// Try to identify the automatic changes that come from attempts to force
-				// an outline update. These should not mark the buffer as dirty.
-
-				if (lastChecked > 0 &&
-					System.currentTimeMillis() - lastChecked < OUTLINE_UPDATE &&
-					(text.equals(" ") || text.equals("")))
-				{
-					changed = false;		// This is an automatic change to fix outlines
-				}
 			}
 			else
 			{
@@ -1105,7 +1098,7 @@ public class LSPPlugin extends AnalysisPlugin
 				buffer.append(text);
 			}
 			
-			return eventhub.publish(new ChangeFileEvent(request, file, changed));
+			return eventhub.publish(new ChangeFileEvent(request, file));
 		}
 	}
 
@@ -1370,8 +1363,6 @@ public class LSPPlugin extends AnalysisPlugin
 				results.add(RPCRequest.create("workspace/codeLens/refresh", null));
 			}
 			
-			// Send publishDiagnostics for any deleted files, to clear messages
-			
 			if (deleted != null)
 			{
 				for (File file: deleted)
@@ -1381,8 +1372,12 @@ public class LSPPlugin extends AnalysisPlugin
 						file = getExtractedName(file);	// Messages reported against extract
 					}
 					
-					JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
+					// Send publishDiagnostics for any deleted files, to clear messages
+					JSONObject params = new JSONObject("uri", file.toPath().toUri().toString(), "diagnostics", new JSONArray());
 					results.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
+
+					// Remove file from open list
+					openFiles.remove(file);
 				}
 			}
 		}
@@ -1480,7 +1475,7 @@ public class LSPPlugin extends AnalysisPlugin
 							{
 								results.add(
 									new JSONObject(
-										"uri", pfile.toURI().toString(),
+										"uri", pfile.toPath().toUri().toString(),
 										"range", range));
 							}
 						}
@@ -1491,7 +1486,7 @@ public class LSPPlugin extends AnalysisPlugin
 			if (incdec)
 			{
 				results.add(new JSONObject(
-						"uri", def.location.file.toURI().toString(),
+						"uri", def.location.file.toPath().toUri().toString(),
 						"range", defRange));
 			}
 			
@@ -1696,7 +1691,7 @@ public class LSPPlugin extends AnalysisPlugin
 
 	public RPCMessageList lspDocumentSymbols(RPCRequest request, File file)
 	{
-		if (onDotPath(file) || ignoredFile(file))
+		if (onDotPath(file) || ignoredFile(file) || !projectFiles.containsKey(file))
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}

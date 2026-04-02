@@ -103,7 +103,23 @@ public class MessageHub
 			Diag.info("MessageHub already contains file %s", file);
 		}
 	}
-	
+
+	/**
+	 * Used when a file is deleted.
+	 */
+	public synchronized void removeFile(File file)
+	{
+		if (messageMap.containsKey(file))
+		{
+			messageMap.remove(file);
+			Diag.info("MessageHub rmoved file %s", file);
+		}
+		else
+		{
+			Diag.info("MessageHub does not contain file %s", file);
+		}
+	}
+
 	/**
 	 * Add a list of messages for files (assumed to be already added).
 	 */
@@ -266,7 +282,7 @@ public class MessageHub
 					}
 				}
 				
-				JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", messages);
+				JSONObject params = new JSONObject("uri", file.toPath().toUri().toString(), "diagnostics", messages);
 				responses.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
 			}
 			else
