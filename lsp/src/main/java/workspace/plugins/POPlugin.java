@@ -368,7 +368,14 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			else if (def instanceof POTypeDefinition)
 			{
 				POTypeDefinition tdef = (POTypeDefinition)def;
-				createOneLens(tdef.invdef);
+
+				if (tdef.invdef != null)
+				{
+					ProofObligationList dependencies = getDependentPOs(tdef, POType.INV_SATISFIABILITY);
+					dependencies.addAll(getDependentPOs(tdef.invdef.name));
+					addCodeLens(tdef.invdef.location.file, new POPostDependencyLens(tdef.invdef, dependencies));
+				}
+
 				createOneLens(tdef.eqdef);
 				createOneLens(tdef.orddef);
 			}
