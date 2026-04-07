@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 import vdmj.commands.AnalysisCommand;
@@ -111,17 +110,18 @@ public class INPluginSL extends INPlugin
 	}
 
 	@Override
-	public INDefinitionList findDefinition(TCNameToken name)
+	public INDefinitionList findDefinition(String name)
 	{
 		INDefinitionList results = new INDefinitionList();
 		
 		for (INModule module: inModuleList)
 		{
-			if (module.name.getName().equals(name.getModule()))
+			for (INDefinition def: module.defs)
 			{
-				for (INDefinition def: module.defs)
+				if (def.name != null)
 				{
-					if (def.name != null && def.name.equals(name))
+					if (def.name.toString().equals(name) ||
+						def.name.getExplicit(true).toString().equals(name))
 					{
 						results.add(def);
 					}
