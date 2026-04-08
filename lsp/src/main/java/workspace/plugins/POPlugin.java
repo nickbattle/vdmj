@@ -279,7 +279,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		{
 			for (ProofObligation po: full)
 			{
-				if (locationInScope(po.location, file))		// Null matched everything
+				if (locationInScope(po.location, file))		// Null file matches everything
 				{
 					chosen.add(po);
 				}
@@ -418,7 +418,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	{
 		if (file != null)
 		{
-			if (file.isFile())
+			if (location.file.getName().equals("console"))	// Some eq/ord POs
+			{
+				return true;
+			}
+			else if (file.isFile())
 			{
 				if (!location.file.equals(file))
 				{
