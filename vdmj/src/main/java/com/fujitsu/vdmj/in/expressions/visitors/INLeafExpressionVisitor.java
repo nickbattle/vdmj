@@ -124,10 +124,13 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	{
  		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
  		
- 		for (INExpression a: node.annotation.args)
- 		{
- 			all.addAll(a.apply(this, arg));
- 		}
+ 		if (node.annotation.args != null)
+		{
+			for (INExpression a: node.annotation.args)
+			{
+				all.addAll(a.apply(this, arg));
+			}
+		}
  		
  		all.addAll(node.expression.apply(this, arg));
  		return all;

@@ -110,10 +110,13 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 	{
  		C all = newCollection();
  		
- 		for (ASTExpression a: node.annotation.args)
- 		{
- 			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
- 		}
+		if (node.annotation.args != null)
+		{
+			for (ASTExpression a: node.annotation.args)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(a, arg));
+			}
+		}
  		
  		all.addAll(node.statement.apply(this, arg));
  		return all;

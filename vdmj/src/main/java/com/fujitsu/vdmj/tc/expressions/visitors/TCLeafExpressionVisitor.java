@@ -117,10 +117,13 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	{
  		C all = newCollection();
  		
- 		for (TCExpression a: node.annotation.args)
- 		{
- 			all.addAll(a.apply(this, arg));
- 		}
+		if (node.annotation.args != null)
+		{
+			for (TCExpression a: node.annotation.args)
+			{
+				all.addAll(a.apply(this, arg));
+			}
+		}
  		
  		all.addAll(node.expression.apply(this, arg));
  		return all;

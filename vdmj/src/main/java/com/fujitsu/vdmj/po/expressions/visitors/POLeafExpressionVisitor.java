@@ -117,11 +117,14 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	{
  		C all = newCollection();
  		
- 		for (POExpression exp: node.annotation.args)
- 		{
- 			all.addAll(exp.apply(this, arg));
- 		}
- 		
+ 		if (node.annotation.args != null)
+		{
+			for (POExpression exp: node.annotation.args)
+			{
+				all.addAll(exp.apply(this, arg));
+			}
+		}
+		 		
  		all.addAll(node.expression.apply(this, arg));
  		return all;
  	}
