@@ -859,13 +859,16 @@ public class TypeComparator
     		{
 				if (sup instanceof TCNamedType)
 				{
-					// both have an invariant and we're not ignoring them, so check for equality
-					return sub.equals(sup) && !sub.isMaximal() ? Result.Yes : Result.No;
+					// both have an invariant and we're not ignoring them, so check for name equality
+					return sub.equals(sup) ? Result.Yes : Result.No;
 				}
 				else
 				{
-					// sub has an invariant and we're not ignoring it, so No.
-					return Result.No;
+					// sub has an invariant and we're not ignoring it, so Yes if the basic type
+					// is always a subtype, else No.
+
+					TCNamedType nt = (TCNamedType)sub;
+					return searchSubType(nt.type, sup, invignore);
 				}
 			}
 			else if (sup instanceof TCOptionalType)
