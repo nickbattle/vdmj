@@ -35,7 +35,17 @@ public abstract class TCNumericType extends TCBasicType
 		super(location);
 	}
 
-	public abstract int getWeight();
+	public abstract int getWeight();	// nat1=0, nat=1, int=2, rat=3, real=4
+
+	public boolean isSigned()			// Can be negative
+	{
+		return getWeight() > 1;
+	}
+
+	public boolean isWhole()			// Cannot be a fraction
+	{
+		return getWeight() < 3;
+	}
 
 	@Override
 	public boolean isNumeric(LexLocation from)

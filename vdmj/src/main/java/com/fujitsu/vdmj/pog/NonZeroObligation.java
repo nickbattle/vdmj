@@ -29,11 +29,11 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class NonZeroObligation extends ProofObligation
 {
-	private NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
+	private NonZeroObligation(LexLocation location, POExpression exp, POContextStack ctxt)
 	{
 		super(location, POType.NON_ZERO, ctxt);
-		source = ctxt.getSource(right + " <> 0");
-		setObligationVars(ctxt, right);
+		source = ctxt.getSource(exp + " <> 0");
+		setObligationVars(ctxt, exp);
 		setReasonsAbout(ctxt.getReasonsAbout());
 	}
 	
@@ -41,13 +41,13 @@ public class NonZeroObligation extends ProofObligation
 	 * Create an obligation for each of the alternative stacks contained in the ctxt.
 	 * This happens with operation POs that push POAltContexts onto the stack.
 	 */
-	public static ProofObligationList getAllPOs(LexLocation location, POExpression right, POContextStack ctxt)
+	public static ProofObligationList getAllPOs(LexLocation location, POExpression exp, POContextStack ctxt)
 	{
 		ProofObligationList results = new ProofObligationList();
 		
 		for (POContextStack choice: ctxt.getAlternatives())
 		{
-			results.add(new NonZeroObligation(location, right, choice));
+			results.add(new NonZeroObligation(location, exp, choice));
 		}
 		
 		return results;

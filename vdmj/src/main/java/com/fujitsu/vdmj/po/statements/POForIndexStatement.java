@@ -34,12 +34,15 @@ import com.fujitsu.vdmj.po.definitions.POAssignmentDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POAndExpression;
 import com.fujitsu.vdmj.po.expressions.PODivideExpression;
+import com.fujitsu.vdmj.po.expressions.POElseIfExpressionList;
 import com.fujitsu.vdmj.po.expressions.POEqualsExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POFloorExpression;
 import com.fujitsu.vdmj.po.expressions.POGreaterExpression;
+import com.fujitsu.vdmj.po.expressions.POIfExpression;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POLessEqualExpression;
+import com.fujitsu.vdmj.po.expressions.POLessExpression;
 import com.fujitsu.vdmj.po.expressions.POPlusExpression;
 import com.fujitsu.vdmj.po.expressions.PORemExpression;
 import com.fujitsu.vdmj.po.expressions.POSubtractExpression;
@@ -47,6 +50,7 @@ import com.fujitsu.vdmj.po.expressions.POTimesExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
+import com.fujitsu.vdmj.pog.NonZeroObligation;
 import com.fujitsu.vdmj.pog.POAltContext;
 import com.fujitsu.vdmj.pog.POAmbiguousContext;
 import com.fujitsu.vdmj.pog.POCommentContext;
@@ -60,6 +64,7 @@ import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -76,6 +81,8 @@ public class POForIndexStatement extends POStatement
 	public final POStatement statement;
 	public final PODefinition vardef;
 	public final POLoopAnnotations invariants;
+
+	private boolean byCanBeNegative = false;	// Can by be negative?
 
 	public POForIndexStatement(LexLocation location,
 		TCNameToken var, POExpression from, POExpression to, POExpression by, POStatement body,
@@ -115,6 +122,11 @@ public class POForIndexStatement extends POStatement
 		{
 			eby = extractOpCalls(by, obligations, pogState, ctxt, env);
 			obligations.addAll(eby.getProofObligations(ctxt, pogState, env));
+			
+			TCNumericType btype = eby.getExptype().getNumeric();
+			byCanBeNegative = btype.isSigned();
+
+			obligations.addAll(NonZeroObligation.getAllPOs(by.location, eby, ctxt));
 		}
 
 		boolean varAmbiguous = pogState.isAmbiguous();
@@ -149,7 +161,7 @@ public class POForIndexStatement extends POStatement
 		 * from here on, since the loop only has effects/POs if it is entered. At the end, we cover
 		 * the isEmpty() case in another altpath.
 		 */
-		ctxt.push(new POImpliesContext(isNotEmpty()));
+		ctxt.push(new POImpliesContext(isNotEmpty(efrom, eto, eby)));
 
 		/**
 		 * The initial case verifies that the invariant is true for the first loop.
@@ -197,7 +209,7 @@ public class POForIndexStatement extends POStatement
 		 */
 		updates.remove(var);
 
-		ctxt.push(new POImpliesContext(isNotEmpty()));		// from <= to =>
+		ctxt.push(new POImpliesContext(isNotEmpty(efrom, eto, eby)));	// from <= to =>
 		ctxt.push(new POForAllContext(updates, env));		// forall <changed variables>
 		def = new POAssignmentDefinition(var, vardef.getType(), varAfter(efrom, eto, eby), vardef.getType());
 		ctxt.push(new POLetDefContext(def));				// eg. let x = <to + by> in
@@ -209,7 +221,7 @@ public class POForIndexStatement extends POStatement
 		 * another alternative path with this condition and nothing else. The invariant
 		 * holds, because of the check before the loop.
 		 */
-		ctxt.push(new POImpliesContext(isEmpty()));			// from > to =>
+		ctxt.push(new POImpliesContext(isEmpty(efrom, eto, eby)));	// from > to =>
 		ctxt.push(new POCommentContext("Did not enter loop", location));
 		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
@@ -221,31 +233,77 @@ public class POForIndexStatement extends POStatement
 	}
 
 	/**
-	 * Produce "from > to"
+	 * Produce "from > to" or "to > from" depending on "by > 0"
 	 */
-	private POExpression isEmpty()
+	private POExpression isEmpty(POExpression efrom, POExpression eto, POExpression eby)
 	{
 		TCRealType real = new TCRealType(location);
 
-		return new POGreaterExpression(
-			from,
-			new LexKeywordToken(Token.GT, location),
-			to,
-			real, real);
+		if (byCanBeNegative)
+		{
+			return new POIfExpression(location,
+				new POGreaterExpression(
+					eby,
+					new LexKeywordToken(Token.GT, location),
+					new POIntegerLiteralExpression(LexIntegerToken.ZERO),
+					real, real),
+				new POGreaterExpression(
+					efrom,
+					new LexKeywordToken(Token.GT, location),
+					eto,
+					real, real),
+				new POElseIfExpressionList(),
+				new POGreaterExpression(
+					eto,
+					new LexKeywordToken(Token.GT, location),
+					efrom,
+					real, real));
+		}
+		else
+		{
+			return new POGreaterExpression(
+				from,
+				new LexKeywordToken(Token.GT, location),
+				to,
+				real, real);
+		}
 	}
 
 	/**
-	 * Produce "from <= to"
+	 * Produce "from <= to" or "to <= from", depending on "by > 0"
 	 */
-	private POExpression isNotEmpty()
+	private POExpression isNotEmpty(POExpression efrom, POExpression eto, POExpression eby)
 	{
 		TCRealType real = new TCRealType(location);
 
-		return new POLessEqualExpression(
-			from,
-			new LexKeywordToken(Token.LE, location),
-			to,
-			real, real);
+		if (byCanBeNegative)
+		{
+			return new POIfExpression(location,
+				new POGreaterExpression(
+					eby,
+					new LexKeywordToken(Token.GT, location),
+					new POIntegerLiteralExpression(LexIntegerToken.ZERO),
+					real, real),
+				new POLessEqualExpression(
+					efrom,
+					new LexKeywordToken(Token.LE, location),
+					eto,
+					real, real),
+				new POElseIfExpressionList(),
+				new POLessEqualExpression(
+					eto,
+					new LexKeywordToken(Token.LE, location),
+					efrom,
+					real, real));
+		}
+		else
+		{
+			return new POLessEqualExpression(
+				efrom,
+				new LexKeywordToken(Token.LE, location),
+				eto,
+				real, real);
+		}
 	}
 
 	/**
@@ -253,6 +311,7 @@ public class POForIndexStatement extends POStatement
 	 * 
 	 * If by defaults to 1, this is just "to + 1"
 	 * Otherwise the value is <from> + (floor((<to> - <from>)/<by>) + 1) x <by>
+	 * This holds, even if the loop is decreasing (by < 0)
 	 */
 	private POExpression varAfter(POExpression efrom, POExpression eto, POExpression eby)
 	{
@@ -291,16 +350,37 @@ public class POForIndexStatement extends POStatement
 	}
 
 	/**
-	 * Produce test of a valid index, between from and to using "by".
+	 * Produce test of a valid index, between from and to using "by". From A to B by C:
 	 */
 	private POExpression varIsValid(POExpression efrom, POExpression eto, POExpression eby)
 	{
 		TCRealType real = new TCRealType(location);
 		POExpression vexp = new POVariableExpression(var, vardef);
-		
-		POExpression ge = new POLessEqualExpression(vexp, new LexKeywordToken(Token.GE, location), efrom, real, real);		// x >= A
-		POExpression le = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), eto, real, real);		// x <= B
-		POExpression range = new POAndExpression(ge, new LexKeywordToken(Token.AND, location), le, real, real);				// x >= A and x <= B
+		POExpression range = null;
+	
+		POExpression ge = new POLessEqualExpression(vexp, new LexKeywordToken(Token.GE, location), efrom, real, real);	// x >= A
+		POExpression le = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), eto, real, real);	// x <= B
+
+		if (byCanBeNegative)
+		{
+			POExpression ge2 = new POLessEqualExpression(vexp, new LexKeywordToken(Token.GE, location), eto, real, real);	// x >= B
+			POExpression le2 = new POLessEqualExpression(vexp, new LexKeywordToken(Token.LE, location), efrom, real, real);	// x <= A
+
+			range = new POIfExpression(location,
+				new POGreaterExpression(
+					eby,
+					new LexKeywordToken(Token.GT, location),
+					new POIntegerLiteralExpression(LexIntegerToken.ZERO),
+					real, real),
+				new POAndExpression(ge, new LexKeywordToken(Token.AND, location), le, real, real),		// x >= A and x <= B
+				new POElseIfExpressionList(),
+				new POAndExpression(ge2, new LexKeywordToken(Token.AND, location), le2, real, real));	// x >= B and x <= A
+		}
+		else
+		{
+			range = new POAndExpression(ge, new LexKeywordToken(Token.AND, location), le, real, real);	// x >= A and x <= B
+		}
+
 		
 		if (eby != null)
 		{
@@ -309,28 +389,28 @@ public class POForIndexStatement extends POStatement
 			POExpression zero = new POIntegerLiteralExpression(LexIntegerToken.ZERO);
 			POExpression equals = new POEqualsExpression(rem, new LexKeywordToken(Token.EQUALS, location), zero, real, real);	// (x-A) rem C == 0
 
-			return new POAndExpression(equals, new LexKeywordToken(Token.AND, location), range, real, real);	// x >= A and x <= B and (x-A) rem C == 0
+			return new POAndExpression(equals, new LexKeywordToken(Token.AND, location), range, real, real);	// <range> and (x-A) rem C == 0
 		}
 		else
 		{
-			return range;
+			return range;	// x >= A and x <= B
 		}
 	}
 
 	/**
-	 * Produce "<var> + <by>"
+	 * Produce "<var> + <by>". This might be "x + -1"
 	 */
 	private POExpression varPlusBy(POExpression eby)
 	{
+		TCRealType real = new TCRealType(location);
 		POExpression vexp = new POVariableExpression(var, vardef);
-		TCType bytype = (eby == null) ? new TCIntegerType(location) : eby.getExptype();
 		POExpression _by = (eby == null) ? new POIntegerLiteralExpression(LexIntegerToken.ONE) : eby;
 
 		return new POPlusExpression(
 			vexp,
 			new LexKeywordToken(Token.PLUS, location),
 			_by,
-			from.getExptype(), bytype);
+			real, real);
 	}
 
 	@Override
