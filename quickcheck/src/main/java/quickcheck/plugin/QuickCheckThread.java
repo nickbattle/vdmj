@@ -257,11 +257,11 @@ public class QuickCheckThread extends CancellableThread
 				source = po.message + "\n----\n" + source;
 			}
 
-			// Attempt to update source, after QC
+			// Ppdate GUI source, after QC
 			json.put("source", splitPO(source));
 		}
 
-		if (po.status == POStatus.FAILED || po.status == POStatus.MAYBE)
+		if (po.status == POStatus.FAILED) // || po.status == POStatus.MAYBE)
 		{
 			if (po.message != null)		// Add failed messages/qualifiers as a warning too
 			{
