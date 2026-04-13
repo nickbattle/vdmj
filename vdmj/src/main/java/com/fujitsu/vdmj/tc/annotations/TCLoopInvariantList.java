@@ -119,11 +119,16 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 	}
 
 	/**
-	 * A Ghost variable is required for some loop types. 
+	 * A Ghost variable is required for some loop types, assuming there are
+	 * invariants declared.
 	 */
 	public Environment getGhostEnvironment(TCStatement stmt, Environment env)
 	{
-		if (stmt instanceof TCWhileStatement)
+		if (isEmpty())		// No annotations!
+		{
+			return env;
+		}
+		else if (stmt instanceof TCWhileStatement)
 		{
 			return env;		// No ghost variable
 		}
