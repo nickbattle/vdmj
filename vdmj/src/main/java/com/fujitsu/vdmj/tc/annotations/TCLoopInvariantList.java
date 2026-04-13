@@ -119,16 +119,14 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 	}
 
 	/**
-	 * A Ghost variable is required for some loop types, assuming there are
-	 * invariants declared.
+	 * A Ghost variable is required for some loop types. Note that we create
+	 * a ghost definition even without annotations, because there will be
+	 * a default @LoopInvariant(true) created, which will use the ghost at
+	 * runtime.
 	 */
 	public Environment getGhostEnvironment(TCStatement stmt, Environment env)
 	{
-		if (isEmpty())		// No annotations!
-		{
-			return env;
-		}
-		else if (stmt instanceof TCWhileStatement)
+		if (stmt instanceof TCWhileStatement)
 		{
 			return env;		// No ghost variable
 		}
