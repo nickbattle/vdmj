@@ -131,29 +131,30 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	{
 		if (arg.touches(node.name.getLocation()))
 		{
-			return node.name;
+			return node;	// The import itself
 		}
 		else if (node.renamed != null && arg.touches(node.renamed.getLocation()))
 		{
 			return node.renamed;
 		}
-		else if (node instanceof TCImportedValue)
-		{
-			TCImportedValue imp = (TCImportedValue)node;
-			Set<TCNode> set = imp.unresolved.matchUnresolved(arg);
-			
-			if (set.isEmpty())
-			{
-				return null;
-			}
-			else
-			{
-				return set.iterator().next();
-			}
-		}
 		else
 		{
 			return null;
+		}
+	}
+
+	@Override
+	public TCNode caseImportedValue(TCImportedValue node, LexLocation arg)
+	{
+		Set<TCNode> set = node.unresolved.matchUnresolved(arg);
+		
+		if (set.isEmpty())
+		{
+			return caseImport(node, arg);
+		}
+		else
+		{
+			return set.iterator().next();
 		}
 	}
 }

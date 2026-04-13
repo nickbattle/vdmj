@@ -279,7 +279,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		{
 			for (ProofObligation po: full)
 			{
-				if (locationInScope(po.location, file))		// Null matched everything
+				if (locationInScope(po.location, file))		// Null file matches everything
 				{
 					chosen.add(po);
 				}
@@ -368,7 +368,14 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			else if (def instanceof POTypeDefinition)
 			{
 				POTypeDefinition tdef = (POTypeDefinition)def;
-				createOneLens(tdef.invdef);
+
+				if (tdef.invdef != null)
+				{
+					ProofObligationList dependencies = getDependentPOs(tdef, POType.INV_SATISFIABILITY);
+					dependencies.addAll(getDependentPOs(tdef.invdef.name));
+					addCodeLens(tdef.invdef.location.file, new POPostDependencyLens(tdef.invdef, dependencies));
+				}
+
 				createOneLens(tdef.eqdef);
 				createOneLens(tdef.orddef);
 			}
@@ -411,7 +418,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	{
 		if (file != null)
 		{
-			if (file.isFile())
+			if (location.file.getName().equals("console"))	// Some eq/ord POs
+			{
+				return true;
+			}
+			else if (file.isFile())
 			{
 				if (!location.file.equals(file))
 				{

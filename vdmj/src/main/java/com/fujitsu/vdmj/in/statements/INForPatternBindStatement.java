@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
+import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -90,6 +91,12 @@ public class INForPatternBindStatement extends INStatement
 				}
 
 				values = backwards;
+			}
+
+			if (invariants.getGhostDef() != null && ctxt instanceof RootContext)
+			{
+				// We create a new context for the ghost, to avoid polluting the "Arguments" context
+				ctxt = new Context(location, "ghost", ctxt);
 			}
 
 			invariants.before(ctxt);

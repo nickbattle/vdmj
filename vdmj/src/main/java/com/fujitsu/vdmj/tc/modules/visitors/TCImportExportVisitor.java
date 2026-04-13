@@ -79,12 +79,12 @@ public abstract class TCImportExportVisitor<R, S>
 
  	public R caseImportedFunction(TCImportedFunction node, S arg)
 	{
-		return caseImport(node, arg);
+		return caseImportedValue(node, arg);
 	}
 
  	public R caseImportedOperation(TCImportedOperation node, S arg)
 	{
-		return caseImport(node, arg);
+		return caseImportedValue(node, arg);
 	}
 
  	public R caseImportedType(TCImportedType node, S arg)

@@ -30,7 +30,7 @@ public class TotalOrderObligation extends ProofObligation
 {
 	public TotalOrderObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.TOTAL_ORDER, ctxt);
+		super(def.orddef.location, POType.TOTAL_ORDER, ctxt);
 		String po = "(forall x:%T, y:%T & x <= y or y <= x)";
 		po = po.replaceAll("%T", def.name.getName());
 		source = ctxt.getSource(po);

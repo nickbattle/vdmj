@@ -270,18 +270,22 @@ public class ModuleReader extends SyntaxReader
 		{
 			case TYPES:
 				nextToken();
+				if (newType()) return readExportsOfOneType();
 				return readExportedTypes();
 
 			case VALUES:
 				nextToken();
+				if (newType()) return readExportsOfOneType();
 				return readExportedValues();
 
 			case FUNCTIONS:
 				nextToken();
+				if (newType()) return readExportsOfOneType();
 				return readExportedFunctions();
 
 			case OPERATIONS:
 				nextToken();
+				if (newType()) return readExportsOfOneType();
 				return readExportedOperations();
 				
 			default:
@@ -497,18 +501,22 @@ public class ModuleReader extends SyntaxReader
 		{
 			case TYPES:
 				nextToken();
+				if (newType()) return readImportsOfOneType(from);
 				return readImportedTypes(from);
 
 			case VALUES:
 				nextToken();
+				if (newType()) return readImportsOfOneType(from);
 				return readImportedValues(from);
 
 			case FUNCTIONS:
 				nextToken();
+				if (newType()) return readImportsOfOneType(from);
 				return readImportedFunctions(from);
 
 			case OPERATIONS:
 				nextToken();
+				if (newType()) return readImportsOfOneType(from);
 				return readImportedOperations(from);
 				
 			default:
