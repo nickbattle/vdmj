@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -38,6 +39,11 @@ public class INLoopAnnotations implements Mappable
 	{
 		this.invariants = invariants;
 		this.measure = measure;
+	}
+
+	public INAssignmentDefinition getGhostDef()
+	{
+		return invariants.getGhostDef();
 	}
 
 	// These methods are called by the various loop INStatements. Note that
