@@ -142,7 +142,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 			nvl.addAll(names);
 		}
 		
-		if (measureDef != null && measureDef.name.isMeasureName())
+		if (measureDef != null)
 		{
 			NameValuePairList names = measureDef.getNamedValues(ctxt);
 			measurefunc = names.getNamedValue(measureDef.name);
