@@ -16,7 +16,7 @@ then
     usage
 fi
 
-VERSION="4.7.0-SNAPSHOT"
+VERSION="4.7.0"
 VDMJ="vdmj"
 
 SELF=$(which "$0")
