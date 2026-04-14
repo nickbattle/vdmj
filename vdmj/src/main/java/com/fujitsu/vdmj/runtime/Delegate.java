@@ -296,7 +296,7 @@ public class Delegate implements Serializable
 
 		for (TCNameToken arg: anames)
 		{
-			avals[a++] = ctxt.get(arg);
+			avals[a++] = ctxt.get(arg).deref();
 		}
 		
 		if (paramTypes.length > 0)	// Only check if provided
