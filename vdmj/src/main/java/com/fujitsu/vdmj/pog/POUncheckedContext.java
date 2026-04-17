@@ -43,6 +43,13 @@ public class POUncheckedContext extends POContext
 	@Override
 	public String getSource()
 	{
-		return "-- Unchecked " + comment + " at " + location.startLine + ":" + location.startPos;
+		if (Character.isUpperCase(comment.charAt(0)))
+		{
+			return "-- Unchecked: " + comment + " at " + location.startLine + ":" + location.startPos;
+		}
+		else
+		{
+			return "-- Unchecked " + comment + " at " + location.startLine + ":" + location.startPos;
+		}
 	}
 }

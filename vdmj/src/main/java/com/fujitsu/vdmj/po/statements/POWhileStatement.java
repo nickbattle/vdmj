@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.LoopMeasureObligation;
@@ -43,6 +44,7 @@ import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
+import com.fujitsu.vdmj.pog.POUncheckedContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -90,10 +92,17 @@ public class POWhileStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
 		pogState.setAmbiguous(false);
-		ProofObligationList obligations = new ProofObligationList();
 
-		POExpression extr = extractOpCalls(exp, obligations, pogState, ctxt, env);
-		obligations.addAll(exp.getProofObligations(ctxt, pogState, env));
+		POExpressionOperationExtractor visitor = new POExpressionOperationExtractor();
+		exp.apply(visitor);
+		
+		if (!visitor.getSubstitutions().keySet().isEmpty())		// condition has op calls
+		{
+			// Mark as Unchecked for following POs in this path.
+			ctxt.add(new POUncheckedContext("While condition is not pure", location));
+		}
+		
+		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
 
 		POLoopInvariantList annotations = invariants.getList();
 		POLoopMeasureAnnotation measure = invariants.getMeasure();
@@ -110,7 +119,7 @@ public class POWhileStatement extends POStatement
 			int popto = ctxt.size();
 
 			ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
-			ctxt.push(new POImpliesContext(invariant, extr));		// while invariant && C => ...
+			ctxt.push(new POImpliesContext(invariant, this.exp));		// while invariant && C => ...
 			ctxt.push(new POLetDefContext(measure.getDefinition()));	// let loop_measure_n = <exp> in ...
 
 			statement.getProofObligations(ctxt, pogState, env);			// build context, ignore POs
@@ -141,7 +150,7 @@ public class POWhileStatement extends POStatement
 		/**
 		 * Then we verify that if we can start the loop, we will meet the invariant.
 		 */
-		ctxt.push(new POImpliesContext(extr));					// while C => ...
+		ctxt.push(new POImpliesContext(this.exp));					// while C => ...
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
 			setMessage("check invariant before first while body"));
 		// No ctxt.pop here, because we always check that the loop is entered.
@@ -151,7 +160,7 @@ public class POWhileStatement extends POStatement
 		 * the end of the loop.
 		 */
 		ctxt.push(new POForAllContext(updates, env));				// forall <changed variables>
-		ctxt.push(new POImpliesContext(invariant, extr));		// invariant && while C => ...
+		ctxt.push(new POImpliesContext(invariant, this.exp));		// invariant && while C => ...
 		obligations.addAll(statement.getProofObligations(ctxt, pogState, env));
 		obligations.addAll(LoopInvariantObligation.getAllPOs(statement.location, ctxt, invariant).
 			setMessage("check invariant preserved by while body"));
@@ -171,8 +180,8 @@ public class POWhileStatement extends POStatement
 		 * The context stack beyond the loop just contains the loop invariant and failed loop condition,
 		 * unless there are return paths from the above.
 		 */
-		POExpression negated = new PONotExpression(location, extr);
-		ctxt.push(new POImpliesContext(extr));				// while C => (loop entered)
+		POExpression negated = new PONotExpression(location, this.exp);
+		ctxt.push(new POImpliesContext(this.exp));				// while C => (loop entered)
 		ctxt.push(new POForAllContext(updates, env));			// forall <changed variables>
 		ctxt.push(new POImpliesContext(invariant, negated));	// invariant && not C => ...
 		ctxt.popInto(popto, altCtxt.add());
