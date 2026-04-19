@@ -837,6 +837,20 @@ public class DAPPlugin extends AnalysisPlugin
 	 */
 	public DAPMessageList dapDisconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
+		stdout("\nSession disconnected.\n");
+		SchedulableThread.terminateAll();
+		clearInterpreter();
+		restoreSettings();
+		eventhub.publish(new DAPDisconnectEvent(request));
+
+		DAPMessageList result = new DAPMessageList(request);
+		return result;
+	}
+
+	public DAPMessageList dapTerminate(DAPRequest request, Boolean restart)
+	{
+		DAPMessageList result = new DAPMessageList(request);
+
 		try
 		{
 			RTLogger.dump(true);
@@ -863,21 +877,6 @@ public class DAPPlugin extends AnalysisPlugin
 			Diag.error("Problem saving/validating RT logs");
 			Diag.error(e);
 		}
-		
-		stdout("\nSession disconnected.\n");
-		SchedulableThread.terminateAll();
-		clearInterpreter();
-		restoreSettings();
-		eventhub.publish(new DAPDisconnectEvent(request));
-
-		DAPMessageList result = new DAPMessageList(request);
-		return result;
-	}
-
-	public DAPMessageList dapTerminate(DAPRequest request, Boolean restart)
-	{
-		DAPMessageList result = new DAPMessageList(request);
-		RTLogger.dump(true);
 
 		if (restart && !specHasErrors())
 		{
