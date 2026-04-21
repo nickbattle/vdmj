@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -78,6 +79,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final boolean recursive;
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
+
+	public TCExplicitFunctionDefinition mappedFrom = null;
 
 	public int bodyObligationCount = 0;		// Set by getObligations
 

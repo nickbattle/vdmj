@@ -33,8 +33,10 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.Utils;
@@ -89,5 +91,11 @@ public class TCPluginSL extends TCPlugin
 	public <T extends Collection<?>> T getTC()
 	{
 		return (T)tcModuleList;
+	}
+
+	@Override
+	public Environment getGlobalEnvironment()
+	{
+		return new MultiModuleEnvironment(tcModuleList);
 	}
 }

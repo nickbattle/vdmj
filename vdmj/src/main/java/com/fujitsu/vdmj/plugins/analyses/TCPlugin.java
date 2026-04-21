@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * TC analysis plugin
@@ -99,4 +100,6 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	abstract protected List<VDMMessage> typeCheck();
 
 	abstract public <T extends Collection<?>> T getTC();
+
+	abstract public Environment getGlobalEnvironment();
 }

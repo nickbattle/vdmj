@@ -33,6 +33,7 @@
         <module>cmd-plugins</module>
         <module>vdmjunit</module>
         <module>quickcheck</module>
+        <module>smtlib</module>
         <module>packaging</module>
         <module>examples</module>
     </modules>

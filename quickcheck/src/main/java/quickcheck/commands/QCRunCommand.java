@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
+import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
@@ -185,8 +186,9 @@ public class QCRunCommand extends AnalysisCommand
 							
 							if (Settings.dialect == Dialect.VDM_SL)
 							{
-								POPlugin tc = registry.getPlugin("PO");
-								menv = new MultiModuleEnvironment(tc.getPO());
+								POPlugin pog = registry.getPlugin("PO");
+								POModuleList modules = pog.getPO();
+								menv = new MultiModuleEnvironment(modules);
 							}
 							
 							PrintCommand cmd = new PrintCommand(pline, menv);

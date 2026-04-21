@@ -37,6 +37,8 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.DependencyOrder;
@@ -106,6 +108,12 @@ public class TCPluginPR extends TCPlugin
 	public <T extends Mappable> T getTC()
 	{
 		return (T)tcClassList;
+	}
+
+	@Override
+	public Environment getGlobalEnvironment()
+	{
+		return new PublicClassEnvironment(tcClassList);
 	}
 	
 	@Override

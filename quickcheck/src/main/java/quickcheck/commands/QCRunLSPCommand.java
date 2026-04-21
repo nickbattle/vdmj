@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
+import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
@@ -177,7 +178,7 @@ public class QCRunLSPCommand extends AnalysisCommand
 					// This allows maximal types to parse, for invariant POs, and allows POs to
 					// reference types outside their module in VDM-SL.
 					Environment env = (Settings.dialect == Dialect.VDM_SL) ?
-						new MultiModuleEnvironment(po.getPO()) : null;
+						new MultiModuleEnvironment((POModuleList)po.getPO()) : null;
 					
 					ExpressionExecutor executor = new ExpressionExecutor("print", request, launch, true, env);
 					executor.start();

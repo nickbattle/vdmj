@@ -226,6 +226,22 @@ public class TCNameToken extends TCToken implements Comparable<TCNameToken>
 	{
 		return new TCNameToken(l, l.module, "RESULT", false, false);
 	}
+
+	public TCNameToken getBaseName(LexLocation l)	// eg. pre_func becomes func.
+	{
+		if (isReserved())
+		{
+			int underscore = getName().indexOf("_");
+
+			if (underscore > 0)
+			{
+				String base = getName().substring(underscore + 1);
+				return new TCNameToken(l, getModule(), base, false, false);
+			}
+		}
+		
+		return this;	// No reserved prefix
+	}
 	
 	public boolean isReserved()
 	{

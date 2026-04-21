@@ -177,6 +177,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	abstract protected JSONArray getCodeLenses(File file);
 
 	abstract public <T extends Mappable> T getTC();
+
+	abstract public Environment getGlobalEnvironment();
 	
 	abstract public <T extends Mappable> void checkLoadedFiles(T ast, CheckTypeEvent event) throws Exception;
 
