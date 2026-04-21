@@ -24,8 +24,14 @@
 
 package smtlib.ast;
 
+import java.util.List;
+import java.util.Vector;
+
 public class Expression extends SExp
 {
+	// Cumulative constraints from subexpressions
+	private List<Expression> constraints = new Vector<Expression>();
+
 	public Expression()
 	{
 		super();
@@ -39,11 +45,13 @@ public class Expression extends SExp
 	public Expression(String operator, Source arg)
 	{
 		super(new Text(operator), arg);
+		addConstraints(arg);
 	}
 
 	public Expression(Source... args)
 	{
 		super(args);
+		addConstraints(args);
 	}
 
 	public Expression(String operator, String arg)
@@ -54,6 +62,7 @@ public class Expression extends SExp
 	public Expression(String operator, Source left, Source right)
 	{
 		super(new Text(operator), left, right);
+		addConstraints(left, right);
 	}
 
 	public Expression(String operator, String left, String right)
@@ -64,5 +73,18 @@ public class Expression extends SExp
 	public Expression(String operator, Source one, Source two, Source three)
 	{
 		super(new Text(operator), one, two, three);
+		addConstraints(one, two, three);
+	}
+
+	public void addConstraints(Source... sources)
+	{
+		for (Source source: sources)
+		{
+			if (source instanceof Expression)
+			{
+				Expression exp = (Expression)source;
+				constraints.addAll(exp.constraints);
+			}
+		}
 	}
 }

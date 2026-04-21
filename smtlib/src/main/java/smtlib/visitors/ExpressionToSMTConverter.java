@@ -171,7 +171,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	public Expression caseForAllExpression(TCForAllExpression node, Environment env)
 	{
 		Bracketed binds = new Bracketed();
-		Expression body = node.predicate.apply(new ExpressionToSMTConverter(), env);
+		Expression body = node.predicate.apply(this, env);
 		Expression qualifiers = null;
 		
 		for (TCMultipleBind bind: node.bindList)
@@ -476,7 +476,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	public Expression caseLetDefExpression(TCLetDefExpression node, Environment env)
 	{
 		Bracketed binds = new Bracketed();
-		Expression body = node.expression.apply(new ExpressionToSMTConverter(), env);
+		Expression body = node.expression.apply(this, env);
 		Expression qualifiers = null;
 		
 		for (TCDefinition def: node.localDefs)
