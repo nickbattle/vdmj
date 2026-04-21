@@ -52,4 +52,10 @@ public class Attribute implements Source
 			return ":" + name + " " + value.toString();
 		}
 	}
+
+	@Override
+	public String toFormat(int indent)
+	{
+		return toSource();
+	}
 }

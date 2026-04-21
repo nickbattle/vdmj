@@ -127,7 +127,7 @@ public class SMTCommand extends AnalysisCommand
 
 				if (source)
 				{
-					Console.out.print(script.toSource());
+					Console.out.print(script.toFormat(0));
 					Console.out.println("----");
 				}
 

@@ -37,4 +37,10 @@ public class Text implements Source
 	{
 		return text;
 	}
+
+	@Override
+	public String toFormat(int indent)
+	{
+		return " ".repeat(indent) + text;
+	}
 }

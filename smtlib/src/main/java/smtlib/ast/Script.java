@@ -62,4 +62,18 @@ public class Script extends Vector<Command> implements Source
 
 		return sb.toString();
 	}
+
+	@Override
+	public String toFormat(int indent)
+	{
+		StringBuilder sb = new StringBuilder();
+
+		for (Command cmd: this)
+		{
+			sb.append(cmd.toFormat(0));
+			sb.append("\n");
+		}
+
+		return sb.toString();
+	}
 }

@@ -102,6 +102,7 @@ public class SMTLIB
 	{
 		TCExpression tcexp = po.getCheckedExpression();
 		Script script = new Script();
+		script.add(new Comment("Definitions for PO #" + po.number, true));
 
 		if (tcexp instanceof TCForAllExpression)
 		{
@@ -119,7 +120,6 @@ public class SMTLIB
 			script.addAll(tcexp.apply(new SMTExpressionAnalysis(), locals));
 			removeDuplicates(script);
 
-			script.add(new Comment("Definitions for PO #" + po.number, true));
 			script.add(new AssertCommand(
 				new Expression("not",
 				body.apply(new ExpressionToSMTConverter(), locals))));
@@ -141,7 +141,6 @@ public class SMTLIB
 			script.addAll(tcexp.apply(new SMTExpressionAnalysis(), locals));
 			removeDuplicates(script);
 
-			script.add(new Comment("Definitions for PO #" + po.number, true));
 			script.add(new AssertCommand(
 				body.apply(new ExpressionToSMTConverter(), locals)));
 		}

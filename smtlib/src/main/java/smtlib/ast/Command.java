@@ -29,5 +29,6 @@ public abstract class Command extends Bracketed
 	public Command(Source... sources)
 	{
 		super(sources);
+		oneLine = true;		// Simple formatting
 	}
 }

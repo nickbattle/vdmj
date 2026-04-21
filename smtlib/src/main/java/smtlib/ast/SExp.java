@@ -28,6 +28,8 @@ import java.util.Vector;
 
 public abstract class SExp extends Vector<Source> implements Source
 {
+	protected boolean oneLine = false;
+
 	public SExp(Source... sources)
 	{
 		for (Source src: sources)
@@ -56,6 +58,35 @@ public abstract class SExp extends Vector<Source> implements Source
 				sep = " ";
 			}
 
+			sb.append(")");
+			return sb.toString();
+		}
+	}
+
+	@Override
+	public String toFormat(int indent)
+	{
+		if (oneLine)
+		{
+			return " ".repeat(indent) + toSource();
+		}
+		else if (size() == 1)
+		{
+			return get(0).toFormat(indent);
+		}
+		else
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append(" ".repeat(indent));
+			sb.append("(\n");
+
+			for (Source arg: this)
+			{
+				sb.append(arg.toFormat(indent + 2));
+				sb.append("\n");
+			}
+
+			sb.append(" ".repeat(indent));
 			sb.append(")");
 			return sb.toString();
 		}

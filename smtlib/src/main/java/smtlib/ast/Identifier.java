@@ -62,4 +62,10 @@ public class Identifier extends Vector<String> implements Source
 			return sb.toString();
 		}
 	}
+
+	@Override
+	public String toFormat(int indent)
+	{
+		return toSource();
+	}
 }

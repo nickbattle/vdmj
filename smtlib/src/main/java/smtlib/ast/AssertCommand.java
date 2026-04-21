@@ -29,5 +29,6 @@ public class AssertCommand extends Command
 	public AssertCommand(Source ass)
 	{
 		super(new Text("assert"), ass);
+		oneLine = false;
 	}
 }

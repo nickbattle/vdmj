@@ -45,4 +45,10 @@ public class Comment extends Command
 	{
 		return (blank ? "\n" : "") + "; " + comment;
 	}
+
+	@Override
+	public String toFormat(int indent)
+	{
+		return toSource();
+	}
 }

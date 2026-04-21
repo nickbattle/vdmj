@@ -27,4 +27,5 @@ package smtlib.ast;
 public interface Source
 {
 	public abstract String toSource();
+	public abstract String toFormat(int indent);
 }
