@@ -24,6 +24,7 @@
 
 package smtlib.ast;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -76,6 +77,9 @@ public class Expression extends SExp
 		addConstraints(one, two, three);
 	}
 
+	/**
+	 * Add constraints from subexpressions.
+	 */
 	public void addConstraints(Source... sources)
 	{
 		for (Source source: sources)
@@ -85,6 +89,32 @@ public class Expression extends SExp
 				Expression exp = (Expression)source;
 				constraints.addAll(exp.constraints);
 			}
+		}
+	}
+
+	/**
+	 * Produce a new Expression: <constraints> => <expression>.
+	 * Remove the constraints used.
+	 */
+	public Expression constrain()
+	{
+		if (constraints.isEmpty())
+		{
+			return this;
+		}
+		else
+		{
+			Iterator<Source> iter = this.iterator();
+			Source andlist = iter.next();
+
+			while (iter.hasNext())
+			{
+				andlist = new Expression("and", iter.next(), andlist);
+			}
+
+			Expression result = new Implies(andlist, this);
+			result.constraints.clear();
+			return result;
 		}
 	}
 }

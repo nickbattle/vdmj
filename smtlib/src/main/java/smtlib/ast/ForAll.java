@@ -24,15 +24,27 @@
 
 package smtlib.ast;
 
-public class DeclareConst extends Command
+public class ForAll extends Expression
 {
-	public DeclareConst(String symbol, Source type)
+	public ForAll(Bracketed binds, Expression predictate)
 	{
-		super(new Text("declare-const"), new Text(symbol), type);
+		super(new Text("forall"), binds, predictate);
 	}
 
-	public DeclareConst(Source symbol, Source type)
+	@Override
+	public String toFormat(int indent)
 	{
-		super(new Text("declare-const"), symbol, type);
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(" ".repeat(indent));
+		sb.append("(forall ");
+		sb.append(get(1).toSource());
+		sb.append("\n");
+		sb.append(get(2).toFormat(indent + 2));
+		sb.append("\n");
+		sb.append(" ".repeat(indent));
+		sb.append(")");
+
+		return sb.toString();
 	}
 }

@@ -56,6 +56,8 @@ import smtlib.ast.DeclareConst;
 import smtlib.ast.DeclareFun;
 import smtlib.ast.DefineFun;
 import smtlib.ast.Expression;
+import smtlib.ast.ForAll;
+import smtlib.ast.Implies;
 import smtlib.ast.Script;
 import smtlib.ast.Sort;
 import smtlib.ast.Text;
@@ -179,16 +181,16 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 					if (qualifiers == null)
 					{
 						// (assert (forall ((<params>)) (= (g <params>) (<body>)))
-						all.add(new AssertCommand(new Expression(
-							new Text("forall"), params,
+						all.add(new AssertCommand(new ForAll(
+								params,
 								new Expression("=", call, body))));
 					}
 					else
 					{
 						// (assert (forall ((<params>)) (=> (<qualifiers>) (= (g <params>) (<body>)))))
-						all.add(new AssertCommand(new Expression(
-							new Text("forall"), params,
-								new Expression("=>",
+						all.add(new AssertCommand(new ForAll(
+								params,
+								new Implies(
 									qualifiers,
 									new Expression("=", call, body)))));
 					}
@@ -214,7 +216,7 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 				Expression key = node.args.get(0).apply(new ExpressionToSMTConverter(), env);
 
 				all.add(new AssertCommand(
-					new Expression("=>",
+					new Implies(
 						new Expression(new Text("set.member"), key, new Text("dom_" + mapname)),
 						domsort.qualifier)));
 			}
@@ -246,7 +248,7 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 		all.add(new DeclareFun("vdm.inds", new Bracketed(seqof.sort), setof));
 		// forall ((s (Seq Int)) (i Int)) (= (set.member i (inds s)) (and (>= i 0) (< i (seq.len s)))))
 		all.add(new AssertCommand(
-			new Expression("forall",
+			new ForAll(
 				new Bracketed(
 					new Expression(new Text("s"), seqof.sort),
 					new Expression("i", "Int")),
@@ -276,7 +278,7 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 		//   (= (set.member x (elems s))
 		//      (exists ((i Int)) (and (>= i 0) (< i (seq.len s)) (= (seq.nth s i) x)))))
 		all.add(new AssertCommand(
-			new Expression("forall",
+			new ForAll(
 				new Bracketed(
 					new Expression(new Text("s"), seqof.sort),
 					new Expression(new Text("x"), seqof.sort.get(1))),

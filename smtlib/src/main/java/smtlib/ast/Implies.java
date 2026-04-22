@@ -24,15 +24,10 @@
 
 package smtlib.ast;
 
-public class DeclareConst extends Command
+public class Implies extends Expression
 {
-	public DeclareConst(String symbol, Source type)
+	public Implies(Source left, Source right)
 	{
-		super(new Text("declare-const"), new Text(symbol), type);
-	}
-
-	public DeclareConst(Source symbol, Source type)
-	{
-		super(new Text("declare-const"), symbol, type);
+		super(new Text("=>"), left, right);
 	}
 }

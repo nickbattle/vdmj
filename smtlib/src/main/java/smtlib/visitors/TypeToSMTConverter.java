@@ -40,6 +40,8 @@ import com.fujitsu.vdmj.typechecker.Environment;
 
 import smtlib.ast.Bracketed;
 import smtlib.ast.Expression;
+import smtlib.ast.ForAll;
+import smtlib.ast.Implies;
 import smtlib.ast.Sort;
 import smtlib.ast.Text;
 
@@ -107,9 +109,9 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 		return new QualifiedSort(
 			new Sort(new Text("Seq"), esort.sort),
 			// (forall ((i Int)) (=> (and (>= i 0) (< i (seq.len s))) (>= (seq.nth s i) 0))))
-			new Expression(new Text("forall"),
+			new ForAll(
 				new Bracketed(new Expression(new Text("i"), esort.sort)),
-				new Expression("=>",
+				new Implies(
 					new Expression("and",
 						new Expression(">=", "i", "0"),
 						new Expression(new Text("<"),
@@ -144,14 +146,22 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 	{
 		QualifiedSort esort = node.setof.apply(new TypeToSMTConverter("e"), env);
 
-		return new QualifiedSort(
-			new Sort(new Text("Set"), esort.sort),
-			// (forall ((x Int)) (=> (set.member x S) <qualifier>)));
-			new Expression(new Text("forall"),
-				new Bracketed(new Expression(new Text("e"), esort.sort)),
-				new Expression("=>",
-					new Expression(new Text("set.member"), new Text("e"), varname),
-					esort.qualifier)));
+		if (esort.qualifier == null)
+		{
+			return new QualifiedSort(
+				new Sort(new Text("Set"), esort.sort), null);
+		}
+		else
+		{
+			return new QualifiedSort(
+				new Sort(new Text("Set"), esort.sort),
+				// (forall ((x Int)) (=> (set.member x S) <qualifier>)));
+				new ForAll(
+					new Bracketed(new Expression(new Text("e"), esort.sort)),
+					new Implies(
+						new Expression(new Text("set.member"), new Text("e"), varname),
+						esort.qualifier)));
+		}
 	}
 
 	@Override
@@ -160,14 +170,24 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 		QualifiedSort keysort = node.from.apply(new TypeToSMTConverter("key"), env);
 		QualifiedSort valsort = node.to.apply(new TypeToSMTConverter("value"), env);
 
+		Expression rhs = new Expression(new Text(">="),
+			new Expression("select", "m", "key"),
+			new Text("0"));
+
+		if (keysort.qualifier != null)
+		{
+			rhs = new Expression("and", keysort.qualifier, rhs);
+		}
+
 		return new QualifiedSort(
 			new Sort(new Text("Array"), keysort.sort, valsort.sort),
-			new Expression(new Text("forall"),
+			// forall ((key Sort)) (=> (set.member key dom_map) (<rhs>))
+			new ForAll(
 				new Bracketed(new Expression(new Text("key"), keysort.sort)),
-					new Expression("=>",
-						new Expression(new Text("set.member"), new Text("key"), new Text("dom_" + varname.toSource())),
-						new Expression("and",
-							keysort.qualifier,
-							new Expression(new Text(">="), new Expression("select", "m", "key"), new Text("0"))))));
+					new Implies(
+						new Expression(new Text("set.member"),
+							new Text("key"),
+							new Text("dom_" + varname.toSource())),
+						rhs)));
 	}
 }

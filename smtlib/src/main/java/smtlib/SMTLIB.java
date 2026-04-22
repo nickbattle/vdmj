@@ -36,40 +36,32 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
-import com.fujitsu.vdmj.tc.patterns.TCPattern;
-import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.values.SeqValue;
 
 import smtlib.ast.AssertCommand;
+import smtlib.ast.Bracketed;
 import smtlib.ast.CheckSat;
 import smtlib.ast.Command;
 import smtlib.ast.Comment;
 import smtlib.ast.DeclareConst;
 import smtlib.ast.Expression;
 import smtlib.ast.GetModel;
+import smtlib.ast.Implies;
 import smtlib.ast.PopCommand;
 import smtlib.ast.PushCommand;
 import smtlib.ast.Script;
-import smtlib.ast.Sort;
-import smtlib.ast.Text;
+import smtlib.ast.Source;
 import smtlib.parser.Bracket;
 import smtlib.parser.SMTLIBReader;
 import smtlib.visitors.ExpressionToSMTConverter;
-import smtlib.visitors.QualifiedSort;
 import smtlib.visitors.SMTExpressionAnalysis;
-import smtlib.visitors.TypeToSMTConverter;
 
 public class SMTLIB
 {
@@ -89,6 +81,7 @@ public class SMTLIB
 		Script script = new Script("Proof Obligation #" + po.number);
 		script.add(new Comment("Using solver " + solver));
 		script.add(new PushCommand());
+		script.add(new Comment("Definitions for PO #" + po.number, true));
 		script.addAll(topLevelDefinitions(po));
 		script.add(new Comment("Check result", true));
 		script.add(new CheckSat());
@@ -102,47 +95,70 @@ public class SMTLIB
 	{
 		TCExpression tcexp = po.getCheckedExpression();
 		Script script = new Script();
-		script.add(new Comment("Definitions for PO #" + po.number, true));
 
 		if (tcexp instanceof TCForAllExpression)
 		{
 			TCForAllExpression node = (TCForAllExpression)tcexp;
 			FlatEnvironment locals = new FlatEnvironment(new TCDefinitionList(), env);
 
-			for (TCMultipleBind bind: node.bindList)
+			Expression forall = node.apply(new ExpressionToSMTConverter(), locals);
+			Bracketed binds = (Bracketed)forall.get(1);
+
+			// Add define-consts for the forall bindings
+			for (Source bind: binds)
 			{
-				addVariables(script, bind, locals);
+				Expression pair = (Expression)bind;
+				script.add(new DeclareConst(pair.get(0), pair.get(1)));
 			}
 
-			TCExpression body = node.predicate;
-
-			// Extract any define-funcs we need for the obligation
+			// Extract any define-funcs we need for the obligation, which may use
+			// the declare-consts above.
 			script.addAll(tcexp.apply(new SMTExpressionAnalysis(), locals));
 			removeDuplicates(script);
 
-			script.add(new AssertCommand(
-				new Expression("not",
-				body.apply(new ExpressionToSMTConverter(), locals))));
+			// Add top level assertion if there are any qualifiers
+			Expression body = (Expression)forall.get(2);
 
+			if (body instanceof Implies)
+			{
+				script.add(new AssertCommand(body.get(1)));
+				body = (Expression)body.get(2);
+			}
+
+			script.add(new Comment("Obligation satisfiable?", true));
+			script.add(new AssertCommand(new Expression("not", body)));
 		}
 		else if (tcexp instanceof TCExistsExpression)
 		{
 			TCExistsExpression node = (TCExistsExpression)tcexp;
 			FlatEnvironment locals = new FlatEnvironment(new TCDefinitionList(), env);
 
-			for (TCMultipleBind bind: node.bindList)
+			Expression exists = node.apply(new ExpressionToSMTConverter(), locals);
+			Bracketed binds = (Bracketed)exists.get(1);
+
+			// Add define-consts for the exists bindings
+			for (Source bind: binds)
 			{
-				addVariables(script, bind, locals);
+				Expression pair = (Expression)bind;
+				script.add(new DeclareConst(pair.get(0), pair.get(1)));
 			}
 
-			TCExpression body = node.predicate;
-
-			// Extract any define-funcs we need for the obligation
+			// Extract any define-funcs we need for the obligation, which may
+			// use the declare-consts above.
 			script.addAll(tcexp.apply(new SMTExpressionAnalysis(), locals));
 			removeDuplicates(script);
 
-			script.add(new AssertCommand(
-				body.apply(new ExpressionToSMTConverter(), locals)));
+			// Add top level assertion if there are any qualifiers
+			Expression body = (Expression)exists.get(2);
+
+			if (body.get(0) instanceof Implies)
+			{
+				script.add(new AssertCommand(body.get(1)));
+				body = (Implies)body.get(2);
+			}
+
+			script.add(new Comment("Obligation satisfiable?", true));
+			script.add(new AssertCommand(body));
 		}
 		else
 		{
@@ -174,44 +190,6 @@ public class SMTLIB
 					done.add(name);
 				}
 			}
-		}
-	}
-
-	private void addVariables(Script script, TCMultipleBind bind, FlatEnvironment env)
-	{
-		if (bind instanceof TCMultipleTypeBind)
-		{
-			TCMultipleTypeBind tbind = (TCMultipleTypeBind)bind;
-
-			for (TCPattern pattern: bind.plist)
-			{
-				for (TCDefinition def: pattern.getDefinitions(tbind.type, NameScope.LOCAL))
-				{
-					TCLocalDefinition local = (TCLocalDefinition)def;
-					QualifiedSort qsort = local.type.apply(new TypeToSMTConverter(local.name.getName()), env);
-					script.add(new DeclareConst(local.name.getName(), qsort.sort));
-
-					if (local.type.isMap(local.location))	// Add dom_m
-					{
-						TCMapType map = local.type.getMap();
-						QualifiedSort domsort = map.from.apply(new TypeToSMTConverter(local.name.getName()), env);
-
-						script.add(new DeclareConst("dom_" + local.name.getName(),
-											new Sort(new Text("Set"), domsort.sort)));
-					}
-
-					if (qsort.qualifier != null)
-					{
-						script.add(new AssertCommand(qsort.qualifier));
-					}
-
-					env.add(local);
-				}
-			}
-		}
-		else
-		{
-			throw new UnsupportedOperationException("Cannot convert: " + bind);
 		}
 	}
 

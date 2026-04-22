@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.tc.expressions.TCDivideExpression;
 import com.fujitsu.vdmj.tc.expressions.TCElementsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCElseIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
+import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFloorExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
@@ -99,6 +100,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 import smtlib.ast.Bracketed;
 import smtlib.ast.Expression;
+import smtlib.ast.ForAll;
+import smtlib.ast.Implies;
 import smtlib.ast.Source;
 import smtlib.ast.Text;
 
@@ -148,7 +151,6 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 		{
 			TCVariableExpression var = (TCVariableExpression)node.root;
 			Expression index = node.args.get(0).apply(this, env);
-
 
 			// (seq.nth s (- i 1)
 			return new Expression(new Text("seq.nth"),
@@ -209,10 +211,58 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 		if (qualifiers != null)
 		{
-			body = new Expression("=>", qualifiers, body);
+			body = new Implies(qualifiers, body);
 		}
 
-		return new Expression(new Text("forall"), binds, body);
+		return new ForAll(binds, body);
+	}
+
+	@Override
+	public Expression caseExistsExpression(TCExistsExpression node, Environment env)
+	{
+		Bracketed binds = new Bracketed();
+		Expression body = node.predicate.apply(this, env);
+		Expression qualifiers = null;
+		
+		for (TCMultipleBind bind: node.bindList)
+		{
+			if (bind instanceof TCMultipleTypeBind)
+			{
+				TCMultipleTypeBind mtbind = (TCMultipleTypeBind)bind;
+
+				for (TCPattern pattern: mtbind.plist)
+				{
+					for (TCDefinition def: pattern.getDefinitions(mtbind.type, NameScope.LOCAL))
+					{
+						QualifiedSort qsort = def.getType().apply(new TypeToSMTConverter(def.name.getName()), env);
+						binds.add(new Expression(def.name.getName(), qsort.sort));
+
+						if (qsort.qualifier != null)
+						{
+							if (qualifiers == null)
+							{
+								qualifiers = qsort.qualifier;
+							}
+							else
+							{
+								qualifiers = new Expression("and", qsort.qualifier, qualifiers);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Cannot convert: " + bind);
+			}
+		}
+
+		if (qualifiers != null)
+		{
+			body = new Implies(qualifiers, body);
+		}
+
+		return new Expression(new Text("exists"), binds, body);
 	}
 
 	@Override
@@ -509,7 +559,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 		if (qualifiers != null)
 		{
-			body = new Expression("=>", qualifiers, body);
+			body = new Implies(qualifiers, body);
 		}
 
 		return new Expression(new Text("let"), binds, body);
@@ -648,7 +698,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseImpliesExpression(TCImpliesExpression node, Environment env)
 	{
-		return new Expression("=>",
+		return new Implies(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}

@@ -24,6 +24,7 @@
 
 package smtlib.ast;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 public abstract class SExp extends Vector<Source> implements Source
@@ -78,11 +79,14 @@ public abstract class SExp extends Vector<Source> implements Source
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append(" ".repeat(indent));
-			sb.append("(\n");
+			sb.append("(");
+			Iterator<Source> iter = iterator();
+			sb.append(iter.next().toSource());
+			sb.append("\n");
 
-			for (Source arg: this)
+			while (iter.hasNext())
 			{
-				sb.append(arg.toFormat(indent + 2));
+				sb.append(iter.next().toFormat(indent + 2));
 				sb.append("\n");
 			}
 
