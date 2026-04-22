@@ -35,6 +35,7 @@ public class Or extends Expression
 		for (Source clause: clauses)
 		{
 			add(clause);	// Can't construct with varargs and fixed value
+			addConstraints(clause);
 		}
 	}
 
@@ -45,6 +46,8 @@ public class Or extends Expression
 		for (Source clause: clauses)
 		{
 			add(clause);	// Can't construct with varargs and fixed value
+			addConstraints(clause);
 		}
+
 	}
 }

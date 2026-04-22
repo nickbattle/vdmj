@@ -79,7 +79,7 @@ public class Expression extends SExp
 	/**
 	 * Add constraints from subexpressions.
 	 */
-	public void addConstraints(Source... sources)
+	protected void addConstraints(Source... sources)
 	{
 		for (Source source: sources)
 		{
