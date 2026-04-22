@@ -24,7 +24,9 @@
 
 package smtlib.visitors;
 
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
@@ -98,10 +100,20 @@ import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
+import smtlib.ast.And;
 import smtlib.ast.Bracketed;
+import smtlib.ast.EQ;
+import smtlib.ast.Exists;
 import smtlib.ast.Expression;
 import smtlib.ast.ForAll;
+import smtlib.ast.GE;
+import smtlib.ast.GT;
 import smtlib.ast.Implies;
+import smtlib.ast.LE;
+import smtlib.ast.LT;
+import smtlib.ast.Let;
+import smtlib.ast.Not;
+import smtlib.ast.Or;
 import smtlib.ast.Source;
 import smtlib.ast.Text;
 
@@ -125,7 +137,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 				{
 					TCExplicitFunctionDefinition func = (TCExplicitFunctionDefinition)basedef;
 
-					return new Expression("let",
+					return new Let(
 						new Bracketed(new Expression("RESULT", func.body.apply(this, env))),
 						def.body.apply(this, env)
 					);
@@ -174,7 +186,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	{
 		Bracketed binds = new Bracketed();
 		Expression body = node.predicate.apply(this, env);
-		Expression qualifiers = null;
+		List<Expression> qualifiers = new Vector<Expression>();
 		
 		for (TCMultipleBind bind: node.bindList)
 		{
@@ -191,14 +203,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 						if (qsort.qualifier != null)
 						{
-							if (qualifiers == null)
-							{
-								qualifiers = qsort.qualifier;
-							}
-							else
-							{
-								qualifiers = new Expression("and", qsort.qualifier, qualifiers);
-							}
+							qualifiers.add(qsort.qualifier);
 						}
 					}
 				}
@@ -209,9 +214,9 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 			}
 		}
 
-		if (qualifiers != null)
+		if (!qualifiers.isEmpty())
 		{
-			body = new Implies(qualifiers, body);
+			body = new Implies(new And(qualifiers), body);
 		}
 
 		return new ForAll(binds, body);
@@ -222,7 +227,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	{
 		Bracketed binds = new Bracketed();
 		Expression body = node.predicate.apply(this, env);
-		Expression qualifiers = null;
+		List<Expression> qualifiers = new Vector<Expression>();
 		
 		for (TCMultipleBind bind: node.bindList)
 		{
@@ -239,14 +244,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 						if (qsort.qualifier != null)
 						{
-							if (qualifiers == null)
-							{
-								qualifiers = qsort.qualifier;
-							}
-							else
-							{
-								qualifiers = new Expression("and", qsort.qualifier, qualifiers);
-							}
+							qualifiers.add(qsort.qualifier);
 						}
 					}
 				}
@@ -259,10 +257,10 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 		if (qualifiers != null)
 		{
-			body = new Implies(qualifiers, body);
+			body = new Implies(new And(qualifiers), body);
 		}
 
-		return new Expression(new Text("exists"), binds, body);
+		return new Exists(binds, body);
 	}
 
 	@Override
@@ -318,7 +316,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseNotInSetExpression(TCNotInSetExpression node, Environment env)
 	{
-		return new Expression(new Text("not"),
+		return new Not(
 			new Expression("set.member",
 				node.left.apply(this, env),
 				node.right.apply(this, env)));
@@ -363,12 +361,12 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseProperSubsetExpression(TCProperSubsetExpression node, Environment env)
 	{
-		return new Expression("and",
+		return new And(
 			new Expression("set.subset",
 				node.left.apply(this, env),
 				node.right.apply(this, env)),
-			new Expression("not",
-				new Expression("=",
+			new Not(
+				new EQ(
 					node.left.apply(this, env),
 					node.right.apply(this, env))));
 	}
@@ -527,7 +525,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	{
 		Bracketed binds = new Bracketed();
 		Expression body = node.expression.apply(this, env);
-		Expression qualifiers = null;
+		List<Expression> qualifiers = new Vector<Expression>();
 		
 		for (TCDefinition def: node.localDefs)
 		{
@@ -541,13 +539,9 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 					QualifiedSort qsort = ldef.getType().apply(new TypeToSMTConverter(ldef.name.getName()), env);
 					binds.add(new Expression(ldef.name.getName(), vdef.exp.apply(this, env)));
 
-					if (qualifiers == null)
+					if (qsort.qualifier != null)
 					{
-						qualifiers = qsort.qualifier;
-					}
-					else
-					{
-						qualifiers = new Expression("and", qsort.qualifier, qualifiers);
+						qualifiers.add(qsort.qualifier);
 					}
 				}
 			}
@@ -559,10 +553,10 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 		if (qualifiers != null)
 		{
-			body = new Implies(qualifiers, body);
+			body = new Implies(new And(qualifiers), body);
 		}
 
-		return new Expression(new Text("let"), binds, body);
+		return new Let(binds, body);
 	}
 
 	@Override
@@ -576,7 +570,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseEqualsExpression(TCEqualsExpression node, Environment env)
 	{
-		return new Expression("=",
+		return new EQ(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -584,8 +578,8 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseNotEqualExpression(TCNotEqualExpression node, Environment env)
 	{
-		return new Expression("not",
-			new Expression("=",
+		return new Not(
+			new EQ(
 				node.left.apply(this, env),
 				node.right.apply(this, env)));
 	}
@@ -593,7 +587,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseGreaterExpression(TCGreaterExpression node, Environment env)
 	{
-		return new Expression(">",
+		return new GT(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -601,7 +595,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseGreaterEqualExpression(TCGreaterEqualExpression node, Environment env)
 	{
-		return new Expression(">=",
+		return new GE(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -609,7 +603,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseLessExpression(TCLessExpression node, Environment env)
 	{
-		return new Expression("<",
+		return new LT(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -617,7 +611,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseLessEqualExpression(TCLessEqualExpression node, Environment env)
 	{
-		return new Expression("<=",
+		return new LE(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -671,7 +665,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 			TCCaseAlternative calt = iter.previous();
 
 			tail = new Expression("ite",
-				new Expression("=", test, patternToExpression(calt.pattern)),
+				new EQ(test, patternToExpression(calt.pattern)),
 				calt.result.apply(this, env),
 				tail);
 		}
@@ -682,7 +676,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseAndExpression(TCAndExpression node, Environment env)
 	{
-		return new Expression("and",
+		return new And(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -690,7 +684,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseOrExpression(TCOrExpression node, Environment env)
 	{
-		return new Expression("or",
+		return new Or(
 			node.left.apply(this, env),
 			node.right.apply(this, env));
 	}
@@ -706,7 +700,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 	@Override
 	public Expression caseNotExpression(TCNotExpression node, Environment env)
 	{
-		return new Expression("not", node.exp.apply(this, env));
+		return new Not(node.exp.apply(this, env));
 	}
 
 	@Override
@@ -747,13 +741,13 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 				if (isFloat)
 				{
-					return new Expression("and",
-						new Expression("=", new Expression("to_int", test), test),
-						new Expression(">=", test, new Text("0")));
+					return new And(
+						new EQ(new Expression("to_int", test), test),
+						new GE(test, new Text("0")));
 				}
 				else
 				{
-					return new Expression(">=", test, new Text("0"));
+					return new GE(test, new Text("0"));
 				}
 			}
 			else if (node.basictype instanceof TCNaturalOneType)
@@ -762,13 +756,13 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 				if (isFloat)
 				{
-					return new Expression("and",
-						new Expression("=", new Expression("to_int", test), test),
-						new Expression(">", test, new Text("0")));
+					return new And(
+						new EQ(new Expression("to_int", test), test),
+						new GT(test, new Text("0")));
 				}
 				else
 				{
-					return new Expression(">", test, new Text("0"));
+					return new GT(test, new Text("0"));
 				}
 			}
 			else if (node.basictype instanceof TCRealType)

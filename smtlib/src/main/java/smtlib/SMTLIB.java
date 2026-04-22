@@ -54,6 +54,7 @@ import smtlib.ast.DeclareConst;
 import smtlib.ast.Expression;
 import smtlib.ast.GetModel;
 import smtlib.ast.Implies;
+import smtlib.ast.Not;
 import smtlib.ast.PopCommand;
 import smtlib.ast.PushCommand;
 import smtlib.ast.Script;
@@ -126,7 +127,7 @@ public class SMTLIB
 			}
 
 			script.add(new Comment("Obligation satisfiable?", true));
-			script.add(new AssertCommand(new Expression("not", body)));
+			script.add(new AssertCommand(new Not(body)));
 		}
 		else if (tcexp instanceof TCExistsExpression)
 		{
@@ -151,10 +152,10 @@ public class SMTLIB
 			// Add top level assertion if there are any qualifiers
 			Expression body = (Expression)exists.get(2);
 
-			if (body.get(0) instanceof Implies)
+			if (body instanceof Implies)
 			{
 				script.add(new AssertCommand(body.get(1)));
-				body = (Implies)body.get(2);
+				body = (Expression)body.get(2);
 			}
 
 			script.add(new Comment("Obligation satisfiable?", true));

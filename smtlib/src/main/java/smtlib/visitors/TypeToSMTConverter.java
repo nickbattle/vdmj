@@ -38,10 +38,15 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
+import smtlib.ast.And;
 import smtlib.ast.Bracketed;
 import smtlib.ast.Expression;
 import smtlib.ast.ForAll;
+import smtlib.ast.GE;
+import smtlib.ast.GT;
 import smtlib.ast.Implies;
+import smtlib.ast.LT;
+import smtlib.ast.Let;
 import smtlib.ast.Sort;
 import smtlib.ast.Text;
 
@@ -63,13 +68,13 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 	@Override
 	public QualifiedSort caseNaturalType(TCNaturalType node, Environment env)
 	{
-		return new QualifiedSort(new Sort("Int"), new Expression(">=", varname, new Text("0")));
+		return new QualifiedSort(new Sort("Int"), new GE(varname, new Text("0")));
 	}
 
 	@Override
 	public QualifiedSort caseNaturalOneType(TCNaturalOneType node, Environment env)
 	{
-		return new QualifiedSort(new Sort("Int"), new Expression(">", varname, new Text("0")));
+		return new QualifiedSort(new Sort("Int"), new GT(varname, new Text("0")));
 	}
 
 	@Override
@@ -112,12 +117,12 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 			new ForAll(
 				new Bracketed(new Expression(new Text("i"), esort.sort)),
 				new Implies(
-					new Expression("and",
-						new Expression(">=", "i", "0"),
-						new Expression(new Text("<"),
+					new And(
+						new GE("i", "0"),
+						new LT(
 							new Text("i"),
 							new Expression(new Text("seq.len"), varname))),
-					new Expression("let",
+					new Let(
 						new Bracketed(
 							new Expression(new Text("e"),
 							new Expression(new Text("seq.nth"), varname, new Text("i")))),
@@ -135,10 +140,11 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 		}
 
 		return new QualifiedSort(qsort.sort,
-			new Expression("and",
-				new Expression(new Text(">"),
+			new And(
+				new GT(
 					new Expression(new Text("seq.len"), varname),
-					new Text("0")), qsort.qualifier));
+					new Text("0")),
+				qsort.qualifier));
 	}
 
 	@Override
@@ -170,13 +176,13 @@ public class TypeToSMTConverter extends TCTypeVisitor<QualifiedSort, Environment
 		QualifiedSort keysort = node.from.apply(new TypeToSMTConverter("key"), env);
 		QualifiedSort valsort = node.to.apply(new TypeToSMTConverter("value"), env);
 
-		Expression rhs = new Expression(new Text(">="),
+		Expression rhs = new GE(
 			new Expression("select", "m", "key"),
 			new Text("0"));
 
 		if (keysort.qualifier != null)
 		{
-			rhs = new Expression("and", keysort.qualifier, rhs);
+			rhs = new And(keysort.qualifier, rhs);
 		}
 
 		return new QualifiedSort(

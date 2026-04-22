@@ -24,6 +24,9 @@
 
 package smtlib.visitors;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
@@ -48,6 +51,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
+import smtlib.ast.And;
 import smtlib.ast.AssertCommand;
 import smtlib.ast.Bracketed;
 import smtlib.ast.Command;
@@ -55,9 +59,13 @@ import smtlib.ast.Comment;
 import smtlib.ast.DeclareConst;
 import smtlib.ast.DeclareFun;
 import smtlib.ast.DefineFun;
+import smtlib.ast.EQ;
+import smtlib.ast.Exists;
 import smtlib.ast.Expression;
 import smtlib.ast.ForAll;
+import smtlib.ast.GE;
 import smtlib.ast.Implies;
+import smtlib.ast.LT;
 import smtlib.ast.Script;
 import smtlib.ast.Sort;
 import smtlib.ast.Text;
@@ -134,7 +142,7 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 				TCPatternList patterns = def.paramPatternList.get(0);
 				Bracketed params = new Bracketed();		// eg. (x Int)
 				Bracketed psorts = new Bracketed();		// eg. (Int)
-				Expression qualifiers = null;
+				List<Expression> qualifiers = new Vector<Expression>();
 				Expression call = new Expression(def.name.getName());	// eg. (g a b c)
 
 				for (int i=0; i < patterns.size(); i++)
@@ -152,14 +160,7 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 
 						if (qsort.qualifier != null)
 						{
-							if (qualifiers == null)
-							{
-								qualifiers = qsort.qualifier;
-							}
-							else
-							{
-								qualifiers = new Expression("and", qsort.qualifier, qualifiers);
-							}
+							qualifiers.add(qsort.qualifier);
 						}
 					}
 					else
@@ -178,12 +179,12 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 
 				if (!psorts.isEmpty())
 				{
-					if (qualifiers == null)
+					if (qualifiers.isEmpty())
 					{
 						// (assert (forall ((<params>)) (= (g <params>) (<body>)))
 						all.add(new AssertCommand(new ForAll(
 								params,
-								new Expression("=", call, body))));
+								new EQ(call, body))));
 					}
 					else
 					{
@@ -191,15 +192,15 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 						all.add(new AssertCommand(new ForAll(
 								params,
 								new Implies(
-									qualifiers,
-									new Expression("=", call, body)))));
+									new And(qualifiers),
+									new EQ(call, body)))));
 					}
 				}
 				else	// Function is a constant, like g() == 123;
 				{
 					// (assert (= g (<body>)))
 					all.add(new AssertCommand(new Expression(
-						new Expression("=", call, body))));
+						new EQ(call, body))));
 				}
 			}
 		}
@@ -252,13 +253,13 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 				new Bracketed(
 					new Expression(new Text("s"), seqof.sort),
 					new Expression("i", "Int")),
-				new Expression("=",
+				new EQ(
 					new Expression(new Text("set.member"),
 						new Text("i"),
 						new Expression("vdm.inds", "s")),
-					new Expression(new Text("and"),
-						new Expression(">=", "i", "0"),
-						new Expression(new Text("<"),
+					new And(
+						new GE("i", "0"),
+						new LT(
 							new Text("i"),
 							new Expression("seq.len", "s")))
 				))));
@@ -282,18 +283,18 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 				new Bracketed(
 					new Expression(new Text("s"), seqof.sort),
 					new Expression(new Text("x"), seqof.sort.get(1))),
-				new Expression("=",
+				new EQ(
 					new Expression(new Text("set.member"),
 						new Text("x"),
 						new Expression("vdm.elems", "s")),
-					new Expression(new Text("exists"),
+					new Exists(
 						new Bracketed(new Expression("i", "Int")),
-						new Expression("and",
-							new Expression(">=", "i", "0"),
-							new Expression(new Text("<"),
+						new And(
+							new GE("i", "0"),
+							new LT(
 								new Text("i"),
 								new Expression("seq.len", "s")),
-							new Expression(new Text("="),
+							new EQ(
 								new Expression("seq.nth", "s", "i"),
 								new Text("x")
 							)))))));
@@ -326,7 +327,7 @@ public class SMTExpressionAnalysis extends TCLeafExpressionVisitor<Command, Scri
 				script.add(new DeclareConst(keyname, domsort.sort));
 				script.add(new DeclareConst("$v", rngsort.sort));
 				// (assert (= v (select m k)))
-				script.add(new AssertCommand(new Expression("=", new Text("$v"),
+				script.add(new AssertCommand(new EQ(new Text("$v"),
 					new Expression("select", mapname, keyname))));
 			}
 			else
