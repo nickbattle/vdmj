@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 public class POSaveStateContext extends POContext
 {
 	private static int count = 0;
-	private static POSaveStateContext last = null;
+	private static POSaveStateContext current = null;
 
 	private static final String OLDNAME = "$oldState";
 	private static final String NEWNAME = "$newState";
@@ -46,6 +46,9 @@ public class POSaveStateContext extends POContext
 	private final POClassDefinition clazz;
 	private final int number;
 	private final boolean oldAndNew;
+
+	public String moduleName = null;
+	public String moduleVar = null;
 
 	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
@@ -83,22 +86,33 @@ public class POSaveStateContext extends POContext
 			this.clazz = null;
 		}
 
-		last = this;
+		// If this is a remote module call, note the name of the module
+		// and variable name that will hold the module state after the
+		// postcondition call.
+
+		if (state != null && oldAndNew && !state.location.sameModule(from))
+		{
+			moduleName = state.location.module;
+			moduleVar = newName();
+		}
+
+		current = this;
 	}
 
 	public static void reset()
 	{
 		count = 0;
+		current = null;
 	}
 
 	public static String getOldName()
 	{
-		return last == null ? null : last.oldName();
+		return current == null ? null : current.oldName();
 	}
 
 	public static String getNewName()
 	{
-		return last == null ? null : last.newName();
+		return current == null ? null : current.newName();
 	}
 
 	private String oldName()
@@ -124,18 +138,31 @@ public class POSaveStateContext extends POContext
 				sb.append(oldName());
 				sb.append(" = ");
 				sb.append(state.toPattern(false, from));
-				sb.append(" in");
+				sb.append(" in ");
 			}
 			else
 			{
-				sb.append("forall ");
-				sb.append(oldName());
-				sb.append(":");
-				sb.append(state.name.toExplicitString(from));
+				String previous = null;		// TODO the previous name of the state;
+
+				// if (previous != null)
+				// {
+				// 	sb.append("let ");
+				// 	sb.append(oldName());
+				// 	sb.append(" = ");
+				// 	sb.append(previous);
+				// 	sb.append(" in forall ");
+				// }
+				// else
+				{
+					sb.append("forall ");
+					sb.append(oldName());
+					sb.append(":");
+					sb.append(state.name.toExplicitString(from));
+				}
 
 				if (oldAndNew)
 				{
-					sb.append(", ");
+					if (previous == null) sb.append(", ");
 					sb.append(newName());
 					sb.append(":");
 					sb.append(state.name.toExplicitString(from));

@@ -613,6 +613,7 @@ public class POContextStack extends Stack<POContext>
 	public String getSource(String poSource)
 	{
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before stack
+		POSaveStateContext.reset();				// Reset the module state names
 
 		StringBuilder result = new StringBuilder();
 		String spacing = "  ";
@@ -662,28 +663,6 @@ public class POContextStack extends Stack<POContext>
 			}
 		}
 		
-		return null;
-	}
-	
-	public PODefinition getStateDefinition()
-	{
-		for (POContext ctxt: this)
-		{
-			if (ctxt instanceof POOperationDefinitionContext)
-			{
-				POOperationDefinitionContext opdef = (POOperationDefinitionContext)ctxt;
-				
-				if (opdef.stateDefinition != null)
-				{
-					return opdef.stateDefinition;
-				}
-				else
-				{
-					return opdef.classDefinition;
-				}
-			}
-		}
-
 		return null;
 	}
 	
