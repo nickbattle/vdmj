@@ -307,11 +307,12 @@ public class TCRecursiveCycles
 		{
 			if (def.annotations != null)
 			{
+				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
 				TCOperationMeasureAnnotation measure = def.annotations.getInstance(TCOperationMeasureAnnotation.class);
 
 				if (measure != null)
 				{
-					mname.append(def.name.toString());
+					mname.append(exop.measureDef.name.toString());
 					return measure.args.get(0).getType();
 				}
 			}	
@@ -321,10 +322,11 @@ public class TCRecursiveCycles
 			if (def.annotations != null)
 			{
 				TCOperationMeasureAnnotation measure = def.annotations.getInstance(TCOperationMeasureAnnotation.class);
+				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
 
 				if (measure != null)
 				{
-					mname.append(def.name.toString());
+					mname.append(imop.measureDef.name.toString());
 					return measure.args.get(0).getType();
 				}
 			}	
