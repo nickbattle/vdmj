@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Map;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -49,6 +51,7 @@ public class POSaveStateContext extends POContext
 
 	public String moduleName = null;
 	public String moduleVar = null;
+	private String previousState = null;
 
 	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
@@ -90,7 +93,7 @@ public class POSaveStateContext extends POContext
 		// and variable name that will hold the module state after the
 		// postcondition call.
 
-		if (state != null && oldAndNew && !state.location.sameModule(from))
+		if (state != null && !state.location.sameModule(from))
 		{
 			moduleName = state.location.module;
 			moduleVar = newName();
@@ -126,6 +129,16 @@ public class POSaveStateContext extends POContext
 	}
 
 	@Override
+	public void updateStateMap(Map<String, String> stateMap)
+	{
+		if (moduleName != null)
+		{
+			previousState = stateMap.get(moduleName);	// Previous state for this module
+			stateMap.put(moduleName, moduleVar);		// New state after post_op
+		}
+	}
+
+	@Override
 	public String getSource()
 	{
 		StringBuilder sb = new StringBuilder();
@@ -142,33 +155,40 @@ public class POSaveStateContext extends POContext
 			}
 			else
 			{
-				String previous = null;		// TODO the previous name of the state;
+				boolean forall = false;
 
-				// if (previous != null)
-				// {
-				// 	sb.append("let ");
-				// 	sb.append(oldName());
-				// 	sb.append(" = ");
-				// 	sb.append(previous);
-				// 	sb.append(" in forall ");
-				// }
-				// else
+				if (previousState != null)	// re-use an existing state value
+				{
+					sb.append("let ");
+					sb.append(oldName());
+					sb.append(" = ");
+					sb.append(previousState);
+					sb.append(" in ");
+					
+					if (oldAndNew)
+					{
+						sb.append("forall ");
+						forall = true;
+					}
+				}
+				else
 				{
 					sb.append("forall ");
 					sb.append(oldName());
 					sb.append(":");
 					sb.append(state.name.toExplicitString(from));
+					forall = true;
 				}
 
 				if (oldAndNew)
 				{
-					if (previous == null) sb.append(", ");
+					if (previousState == null) sb.append(", ");
 					sb.append(newName());
 					sb.append(":");
 					sb.append(state.name.toExplicitString(from));
 				}
 
-				sb.append(" &");
+				if (forall) sb.append(" &");	// Could just be a "let"
 			}
 		}
 		else if (clazz != null)

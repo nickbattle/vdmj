@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -90,6 +91,7 @@ public class POModule extends PONode
 
 		for (PODefinition def: defs)
 		{
+			POSaveStateContext.reset();				// Reset the module state names
 			def.moduleDefinition = this;
 			POContextStack ctxt = new POContextStack();
 			ctxt.push(new PONameContext(def.getVariableNames()));

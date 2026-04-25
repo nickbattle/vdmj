@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.POSaveStateContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -218,6 +219,7 @@ public class POClassDefinition extends PODefinition
 
 		for (PODefinition def: definitions)
 		{
+			POSaveStateContext.reset();	// Reset the class state names
 			ctxt.push(new PONameContext(def.getVariableNames()));
 			list.addAll(def.getProofObligations(ctxt, new POGState(), local));
 			progress.makeProgress(1);

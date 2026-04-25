@@ -613,15 +613,16 @@ public class POContextStack extends Stack<POContext>
 	public String getSource(String poSource)
 	{
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before stack
-		POSaveStateContext.reset();				// Reset the module state names
 
 		StringBuilder result = new StringBuilder();
 		String spacing = "  ";
 		String indent = "";
 		StringBuilder tail = new StringBuilder();
+		Map<String, String> stateMap = new HashMap<String, String>();
 
 		for (POContext ctxt: this)
 		{
+			ctxt.updateStateMap(stateMap);
 			String po = ctxt.getSource();
 			String comment = ctxt.getComment();
 

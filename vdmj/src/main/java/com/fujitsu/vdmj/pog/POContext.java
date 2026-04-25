@@ -193,4 +193,13 @@ abstract public class POContext
 	{
 		return false;
 	}
+
+	/**
+	 * Update state information as we process the context stack. Used in getSource
+	 * and primarily implemented by POSaveStateContext.
+	 */
+	public void updateStateMap(Map<String, String> stateMap)
+	{
+		return;
+	}
 }
