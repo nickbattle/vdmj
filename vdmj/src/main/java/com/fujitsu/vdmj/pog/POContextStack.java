@@ -403,11 +403,11 @@ public class POContextStack extends Stack<POContext>
 				// Only save old state if we need it
 				if (imp.predef != null)
 				{
-					push(new POSaveStateContext(imp.predef, from, imp.postdef != null));
+					push(new POSaveStateContext(imp, from, imp.postdef != null));
 				}
 				else if (imp.postdef != null)
 				{
-					push(new POSaveStateContext(imp.postdef, from, true));
+					push(new POSaveStateContext(imp, from, true));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, imp.predef, imp.postdef, args, resultVar), env));
@@ -453,11 +453,11 @@ public class POContextStack extends Stack<POContext>
 				// Only save old state if we need it
 				if (exop.predef != null)
 				{
-					push(new POSaveStateContext(exop.predef, from, exop.postdef != null));
+					push(new POSaveStateContext(exop, from, exop.postdef != null));
 				}
 				else if (exop.postdef != null)
 				{
-					push(new POSaveStateContext(exop.postdef, from, true));
+					push(new POSaveStateContext(exop, from, true));
 				}
 
 				push(new POForAllContext(names, getPostQualifier(from, exop.predef, exop.postdef, args, resultVar), env));
