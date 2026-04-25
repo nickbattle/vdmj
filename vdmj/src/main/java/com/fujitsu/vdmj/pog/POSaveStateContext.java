@@ -24,10 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -36,8 +33,6 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POSaveStateContext extends POContext
 {
@@ -55,18 +50,13 @@ public class POSaveStateContext extends POContext
 
 	public String moduleName = null;
 	public String moduleVar = null;
-	private String called = null;
 	private String previousState = null;
-	private Set<String> invalidated = null;
 
 	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
 		this.number = count++;
 		this.from = from;
 		this.oldAndNew = oldAndNew;
-		this.called = def.name.toExplicitString(LexLocation.ANY);
-
-		TCNameSet transitiveUpdates = null;
 
 		if (def instanceof POExplicitFunctionDefinition)
 		{
@@ -85,14 +75,12 @@ public class POSaveStateContext extends POContext
 			POExplicitOperationDefinition exop = (POExplicitOperationDefinition)def;
 			this.state = exop.stateDefinition;
 			this.clazz = exop.classDefinition;
-			transitiveUpdates = exop.transitiveUpdates;
 		}
 		else if (def instanceof POImplicitOperationDefinition)
 		{
 			POImplicitOperationDefinition imop = (POImplicitOperationDefinition)def;
 			this.state = imop.stateDefinition;
 			this.clazz = imop.classDefinition;
-			transitiveUpdates = imop.transitiveUpdates;
 		}
 		else
 		{
@@ -108,24 +96,6 @@ public class POSaveStateContext extends POContext
 		{
 			moduleName = state.location.module;
 			moduleVar = newName();
-			invalidated = new HashSet<String>();
-
-			// This call invalidates the saved state of modules that are updated
-			// transitively via this call. Our own state is excluded, as this will
-			// be defined by the post_op.
-
-			if (transitiveUpdates != null)
-			{
-				for (TCNameToken name: transitiveUpdates)
-				{
-					String m = name.getModule();
-
-					if (!m.equals(moduleName))		// Don't invalidate ourselves!
-					{
-						invalidated.add(m);
-					}
-				}
-			}
 		}
 
 		current = this;
@@ -139,12 +109,12 @@ public class POSaveStateContext extends POContext
 
 	public static String getOldName()
 	{
-		return current == null ? null : current.oldName();
+		return current == null ? OLDNAME : current.oldName();
 	}
 
 	public static String getNewName()
 	{
-		return current == null ? null : current.newName();
+		return current == null ? NEWNAME : current.newName();
 	}
 
 	private String oldName()
@@ -164,11 +134,6 @@ public class POSaveStateContext extends POContext
 		{
 			previousState = stateMap.get(moduleName);	// Previous state for this module
 			stateMap.put(moduleName, moduleVar);		// New state after post_op
-
-			for (String invalid: invalidated)
-			{
-				stateMap.remove(invalid);	// This call invalidates saved state
-			}
 		}
 	}
 
@@ -224,13 +189,6 @@ public class POSaveStateContext extends POContext
 
 				if (forall) sb.append(" &");	// Could just be a "let"
 
-				if (invalidated != null && !invalidated.isEmpty())
-				{
-					sb.append("  -- Call to ");
-					sb.append(called);
-					sb.append(" invalidates ");
-					sb.append(invalidated.toString());
-				}
 			}
 		}
 		else if (clazz != null)

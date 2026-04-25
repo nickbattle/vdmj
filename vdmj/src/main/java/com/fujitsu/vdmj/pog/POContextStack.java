@@ -25,10 +25,12 @@
 package com.fujitsu.vdmj.pog;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -418,6 +420,8 @@ public class POContextStack extends Stack<POContext>
 					POExpression result = new POVariableExpression(resultVar, null);
 					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), result));
 				}
+
+				invalidateState(from, imp.name, imp.transitiveUpdates);
 			}
 			else if (called instanceof POExplicitOperationDefinition)
 			{
@@ -468,9 +472,39 @@ public class POContextStack extends Stack<POContext>
 					POExpression result = new POVariableExpression(resultVar, null);
 					push(new POReturnContext(pogState.getResultPattern(), pogState.getResultType(), result));
 				}
+
+				invalidateState(from, exop.name, exop.transitiveUpdates);
 			}
 
 			return true;
+		}
+	}
+
+	/**
+	 * If this op call makes transitive updates to modules other than the callers, we
+	 * drop a POInvalidateStateContext, which is processed during the getSource.
+	 */
+	private void invalidateState(LexLocation from, TCNameToken to, TCNameSet transitiveUpdates)
+	{
+		String local = from.module;
+		String remote = to.getLocation().module;
+		Set<String> invalid = new HashSet<String>();
+
+		if (transitiveUpdates != null)
+		{
+			for (TCNameToken name: transitiveUpdates)
+			{
+				if (!name.getModule().equals(local) &&
+					!name.getModule().equals(remote))
+				{
+					invalid.add(name.getModule());	// Affects some other module
+				}
+			}
+
+			if (!invalid.isEmpty())
+			{
+				push(new POInvalidateStateContext(to, invalid));
+			}
 		}
 	}
 
