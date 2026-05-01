@@ -275,7 +275,7 @@ public class Delegate implements Serializable
 			}
 			
 			VDMFunction annotation = m.getAnnotation(VDMFunction.class);
-			paramTypes = annotation.params();
+			if (annotation != null) paramTypes = annotation.params();
 		}
 		else if (section == Token.OPERATIONS)
 		{
@@ -286,7 +286,7 @@ public class Delegate implements Serializable
 			}
 			
 			VDMOperation annotation = m.getAnnotation(VDMOperation.class);
-			paramTypes = annotation.params();
+			if (annotation != null) paramTypes = annotation.params();
 		}
 
 		TCNameList anames = delegateArgs.get(ctxt.title);
@@ -299,7 +299,7 @@ public class Delegate implements Serializable
 			avals[a++] = ctxt.get(arg).deref();
 		}
 		
-		if (paramTypes.length > 0)	// Only check if provided
+		if (paramTypes != null && paramTypes.length > 0)	// Only check if provided
 		{
 			if (anames.size() == paramTypes.length)
 			{
