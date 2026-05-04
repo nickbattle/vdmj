@@ -122,9 +122,9 @@ public class TotalFunctionObligation extends ProofObligation
 		for (String tbdef: defined)
 		{
 			sb.append(sep);
-			sb.append("defined_(");
+			sb.append("(");
 			sb.append(tbdef);
-			sb.append(")");
+			sb.append(" <> undefined)");
 			sep = " => ";
 		}
 		
