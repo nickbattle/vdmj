@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
@@ -81,6 +82,21 @@ public class POCallStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
+		// If we're calling a function as though it was an operation, we create a return
+		// statement and process that instead. This is a lot easier than coping with
+		// functions which really ought to be operations.
+
+		if (opdef instanceof POExplicitFunctionDefinition ||
+			opdef instanceof POImplicitFunctionDefinition)
+		{
+			POReturnStatement returnStmt = new POReturnStatement(location,
+				new POApplyExpression(
+					new POVariableExpression(name, opdef), args, opdef.getType(), getParamTypes(), recursiveCycles, opdef, false));
+
+			returnStmt.setStmttype(getStmttype());
+			return returnStmt.getProofObligations(ctxt, pogState, env);
+		}
+
 		ProofObligationList obligations = new ProofObligationList();
 		TCTypeList paramTypes = getParamTypes();
 		int i = 0;
