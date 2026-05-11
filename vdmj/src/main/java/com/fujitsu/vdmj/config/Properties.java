@@ -67,6 +67,9 @@ public class Properties
 	
 	/** The maximum TC errors reported before "Too many errors". */
 	public static int tc_max_errors = 100;
+	
+	/** The maximum TC warnings reported before "Too many warnings". */
+	public static int tc_max_warnings = 100;
 
 
 	/** The maximum number of paths in an operation before POG starts limiting them */
@@ -206,6 +209,7 @@ public class Properties
 		tc_skip_recursive_check = get(vdmj, "vdmj.tc.skip_recursive_check", false);
 		tc_skip_cyclic_check = get(vdmj, "vdmj.tc.skip_cyclic_check", false);
 		tc_max_errors = get(vdmj, "vdmj.tc.max_errors", 100);
+		tc_max_warnings = get(vdmj, "vdmj.tc.max_warnings", 100);
 
 		pog_max_alt_paths = get(vdmj, "vdmj.pog.max_alt_paths", 200);
 		
