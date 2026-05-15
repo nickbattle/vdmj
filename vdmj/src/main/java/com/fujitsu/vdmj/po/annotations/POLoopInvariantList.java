@@ -72,7 +72,7 @@ public class POLoopInvariantList extends POMappedList<TCLoopInvariantAnnotation,
 				}
 				else
 				{
-					exp = new POAndExpression(loopInv.expression, AND, exp, BOOL, BOOL);
+					exp = new POAndExpression(exp, AND, loopInv.expression, BOOL, BOOL);
 				}
 			}
 		}

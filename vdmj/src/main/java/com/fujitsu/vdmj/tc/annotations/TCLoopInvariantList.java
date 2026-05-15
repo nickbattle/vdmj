@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -56,6 +57,11 @@ public class TCLoopInvariantList extends Vector<TCLoopInvariantAnnotation> imple
 	{
 		List<TCLoopInvariantAnnotation> invariants =
 			stmt.getAnnotations().getInstances(TCLoopInvariantAnnotation.class);
+
+		// The invariants are from a cascade of TCAnnotatedStatements, and in reverse order.
+		// But we want them in "top to bottom" order, which is most intuitive. This affects
+		// the order of the combined "and" of the clauses.
+		Collections.reverse(invariants);
 
 		super.addAll(invariants);
 		this.stmt = stmt;
