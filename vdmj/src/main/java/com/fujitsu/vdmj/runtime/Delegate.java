@@ -351,6 +351,12 @@ public class Delegate implements Serializable
 			{
 				throw (ContextException) e.getTargetException();
 			}
+			else if (e.getTargetException() instanceof ValueException)
+			{
+				// Replace the native ctxt with the VDM one
+				ValueException ex = (ValueException) e.getTargetException();
+				throw new ContextException(new ValueException(ex.number, ex.getMessage(), ctxt), ctxt.location);
+			}
 			else
 			{
 				throw new InternalException(59,
