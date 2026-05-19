@@ -24,6 +24,7 @@
 
 package json;
 
+import java.util.List;
 import java.util.Vector;
 
 public class JSONArray extends Vector<Object>
@@ -31,6 +32,14 @@ public class JSONArray extends Vector<Object>
 	private static final long serialVersionUID = 1L;
 
 	public JSONArray(Object... args)
+	{
+		for (Object arg: args)
+		{
+			add(arg);
+		}
+	}
+
+	public JSONArray(List<?> args)
 	{
 		for (Object arg: args)
 		{

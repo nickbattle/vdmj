@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.pog.RecursiveObligation;
 import dap.AsyncExecutor;
 import dap.DAPRequest;
 import dap.DAPResponse;
+import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPServer;
 import quickcheck.QuickCheck;
@@ -162,6 +163,19 @@ public class QuickCheckExecutor extends AsyncExecutor
 				MessageHub.getInstance().addPluginMessages(pog, messages);
 				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
 				responses.add(RPCRequest.create("workspace/codeLens/refresh", null));
+
+				// Add a notification of the QC PO's processed by this call. This must be
+				// after the diagnostic responses
+				JSONArray numbers = new JSONArray();
+
+				for (ProofObligation po: chosen)
+				{
+					numbers.add(po.number);
+				}
+
+				JSONObject params = new JSONObject("obligations", numbers);
+				responses.add(RPCRequest.create("slsp/POG/qc", params));
+
 				LSPServer lspserver = LSPServer.getInstance();
 				
 				for (JSONObject message: responses)
