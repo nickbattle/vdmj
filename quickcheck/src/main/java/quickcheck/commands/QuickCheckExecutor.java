@@ -174,7 +174,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 				}
 
 				JSONObject params = new JSONObject("obligations", numbers);
-				responses.add(RPCRequest.create("slsp/POG/qc", params));
+				responses.add(RPCRequest.notification("slsp/POG/qc", params));
 
 				LSPServer lspserver = LSPServer.getInstance();
 				
