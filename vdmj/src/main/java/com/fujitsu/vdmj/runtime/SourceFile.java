@@ -204,18 +204,11 @@ public class SourceFile
 			out.println("\\begin{vdm_al}");
 		}
 
-		boolean endDocFound = false;
 		boolean inVdmAlModelTag = false;
 
 		for (int lnum = 1; lnum <= lines.size(); lnum++)
 		{
 			String line = lines.get(lnum - 1);
-
-			if (line.contains("\\end{document}"))
-			{
-				endDocFound = true;
-				break;
-			}
 
 			if (line.contains("\\begin{vdm_al}"))
 			{
@@ -284,7 +277,7 @@ public class SourceFile
 			out.println("\\end{longtable}");
 		}
 
-		if (headers || !endDocFound)
+		if (headers)
 		{
 			out.println("\\end{document}");
 		}

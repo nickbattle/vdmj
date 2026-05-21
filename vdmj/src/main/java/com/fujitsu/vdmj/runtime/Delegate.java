@@ -275,7 +275,7 @@ public class Delegate implements Serializable
 			}
 			
 			VDMFunction annotation = m.getAnnotation(VDMFunction.class);
-			paramTypes = annotation.params();
+			if (annotation != null) paramTypes = annotation.params();
 		}
 		else if (section == Token.OPERATIONS)
 		{
@@ -286,7 +286,7 @@ public class Delegate implements Serializable
 			}
 			
 			VDMOperation annotation = m.getAnnotation(VDMOperation.class);
-			paramTypes = annotation.params();
+			if (annotation != null) paramTypes = annotation.params();
 		}
 
 		TCNameList anames = delegateArgs.get(ctxt.title);
@@ -299,7 +299,7 @@ public class Delegate implements Serializable
 			avals[a++] = ctxt.get(arg).deref();
 		}
 		
-		if (paramTypes.length > 0)	// Only check if provided
+		if (paramTypes != null && paramTypes.length > 0)	// Only check if provided
 		{
 			if (anames.size() == paramTypes.length)
 			{
@@ -351,7 +351,19 @@ public class Delegate implements Serializable
 			{
 				throw (ContextException) e.getTargetException();
 			}
-			else
+			else if (e.getTargetException() instanceof ValueException)
+			{
+				// Replace the native ctxt with the VDM one
+				ValueException ex = (ValueException) e.getTargetException();
+				throw new ContextException(new ValueException(ex.number, ex.getMessage(), ctxt), ctxt.location);
+			}
+			else if (e.getTargetException().getClass() == Exception.class)
+			{
+				// VDMJ methods tend to throw raw Exception objects, so assume it's us
+				Exception ex = (Exception)e.getTargetException();
+				throw new ContextException(78, "Exception: " + ex.getMessage(), ctxt.location, ctxt);
+			}
+			else // Something ugly, like a NPE which should never happen.
 			{
 				throw new InternalException(59,
 					"Failed in native method: " + e.getTargetException().toString());

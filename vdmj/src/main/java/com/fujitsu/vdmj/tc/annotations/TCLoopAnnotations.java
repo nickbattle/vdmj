@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.statements.TCForIndexStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -66,14 +65,15 @@ public class TCLoopAnnotations implements Mappable
 
 	/**
 	 * Some checks have to be performed across all of the @LoopInvariants declared. So these methods are
-	 * called from the typeCheck of each loop statement type.
+	 * called from the typeCheck of each loop statement type. The first version is used by while and
+	 * for-index loops, which do not check loop vars.
 	 */
 	public void typeCheck(Environment env, TCStatement stmt)
 	{
 		typeCheck(env, stmt, new TCNameList());
 	}
 
-	public void typeCheck(Environment env, TCStatement stmt, TCNameList loopVars)
+	public void typeCheck(Environment env, TCStatement stmt, TCNameList checkVars)
 	{
 		if (!invariants.isEmpty())
 		{
@@ -114,16 +114,16 @@ public class TCLoopAnnotations implements Mappable
 				stmt.report(6007, "@LoopInvariants have different ghosts: " + ghosts);
 			}
 
-			if (!loopVars.isEmpty())	// So we must have at least one inv without these
+			if (!checkVars.isEmpty())	// So we must have at least one inv without these
 			{
-				boolean oneOkay = (stmt instanceof TCForIndexStatement);
+				boolean oneOkay = false;
 
 				for (TCLoopInvariantAnnotation loopInv: invariants)
 				{
 					boolean hasLoopVars = false;
 					TCNameSet invVars = loopInv.args.get(0).getFreeVariableNames();
 
-					for (TCNameToken loopVar: loopVars)
+					for (TCNameToken loopVar: checkVars)
 					{
 						if (invVars.contains(loopVar))
 						{
@@ -134,7 +134,7 @@ public class TCLoopAnnotations implements Mappable
 					
 					if (!hasLoopVars)
 					{
-						oneOkay = true;
+						oneOkay = true;		// Found one without loop vars
 					}
 					else
 					{
@@ -144,7 +144,7 @@ public class TCLoopAnnotations implements Mappable
 
 				if (!oneOkay)
 				{
-					stmt.report(6007, "At least one @LoopInvariant must be independent of " + loopVars);
+					stmt.report(6007, "At least one @LoopInvariant must be independent of " + checkVars);
 				}
 			}
 		}

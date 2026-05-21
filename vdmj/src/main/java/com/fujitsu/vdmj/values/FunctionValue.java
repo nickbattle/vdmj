@@ -802,10 +802,19 @@ public class FunctionValue extends Value
 	{
 		// Remove first set of parameters, and set the free variables instead.
 		// And adjust the return type to be the result type (a function).
+		// Pass this on to any precondition too, since curried measures can have
+		// curried preconditions.
+
+		FunctionValue newpre = precondition;
+
+		if (precondition != null)
+		{
+			newpre = precondition.curry(newFreeVariables);
+		}
 
 		return new FunctionValue(location, name, (TCFunctionType)type.result, typeValues,
 			paramPatternList.subList(1, paramPatternList.size()),
-			body, precondition, postcondition, measure, newFreeVariables, null, classdef);
+			body, newpre, postcondition, measure, newFreeVariables, null, classdef);
 	}
 
 	@Override

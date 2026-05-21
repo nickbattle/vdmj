@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
+import com.fujitsu.vdmj.tc.types.TCRationalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -58,6 +59,14 @@ public class TCTimesExpression extends TCNumericBinaryExpression
 			return setType(ln);
 		}
 		else if (rn instanceof TCRealType)
+		{
+			return setType(rn);
+		}
+		else if (ln instanceof TCRationalType)
+		{
+			return setType(ln);
+		}
+		else if (rn instanceof TCRationalType)
 		{
 			return setType(rn);
 		}

@@ -62,7 +62,8 @@ abstract public class TypeChecker
 	private static List<VDMWarning> warnings = new Vector<VDMWarning>();
 	private static VDMMessage lastMessage = null;
 	private static boolean suspended = false;
-	private static int MAX = Properties.tc_max_errors;
+	private static int MAXE = Properties.tc_max_errors;
+	private static int MAXW = Properties.tc_max_warnings;
 	
 	public TypeChecker()
 	{
@@ -454,15 +455,14 @@ abstract public class TypeChecker
 
 		if (!errors.contains(error))
 		{
-			if (errors.size() < MAX)
+			if (errors.size() < MAXE)
 			{
 				errors.add(error);
 				lastMessage = error;
 	
-	    		if (errors.size() == MAX)
+	    		if (errors.size() == MAXE)
 	    		{
 	    			errors.add(new VDMError(10, "Too many type checking errors", location));
-	    			// throw new InternalException(10, "Too many type checking errors");
 	    		}
 			}
 		}
@@ -482,15 +482,14 @@ abstract public class TypeChecker
 
 		if (!warnings.contains(warning))
 		{
-			if (warnings.size() < MAX)
+			if (warnings.size() < MAXW)
 			{
 				warnings.add(warning);
 				lastMessage = warning;
 
-				if (warnings.size() == MAX)
+				if (warnings.size() == MAXW)
 	    		{
 	    			warnings.add(new VDMWarning(10, "Too many type checking warnings", location));
-	    			// throw new InternalException(10, "Too many type checking errors");
 	    		}
 			}
 		}
