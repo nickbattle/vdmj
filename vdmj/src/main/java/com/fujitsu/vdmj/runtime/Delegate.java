@@ -357,7 +357,13 @@ public class Delegate implements Serializable
 				ValueException ex = (ValueException) e.getTargetException();
 				throw new ContextException(new ValueException(ex.number, ex.getMessage(), ctxt), ctxt.location);
 			}
-			else
+			else if (e.getTargetException().getClass() == Exception.class)
+			{
+				// VDMJ methods tend to throw raw Exception objects, so assume it's us
+				Exception ex = (Exception)e.getTargetException();
+				throw new ContextException(78, "Exception: " + ex.getMessage(), ctxt.location, ctxt);
+			}
+			else // Something ugly, like a NPE which should never happen.
 			{
 				throw new InternalException(59,
 					"Failed in native method: " + e.getTargetException().toString());
