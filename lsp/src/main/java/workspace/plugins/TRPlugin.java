@@ -197,9 +197,15 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 		boolean modelOnly = false;
 		boolean markCoverage = false;
 		boolean insertCoverageTables = false;
+		boolean headers = false;
 
 		if (options != null)
 		{
+			if (options.containsKey("headers"))
+			{
+				headers = options.get("headers");
+			}
+			
 			if (options.containsKey("modelOnly"))
 			{
 				modelOnly = options.get("modelOnly");
@@ -223,7 +229,7 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 		File outfile = new File(subfolder, texname);
 		
 		PrintWriter out = new PrintWriter(outfile);
-		source.printLatexCoverage(out, true, modelOnly, markCoverage, insertCoverageTables);
+		source.printLatexCoverage(out, headers, modelOnly, markCoverage, insertCoverageTables);
 		out.close();
 
 		return outfile;

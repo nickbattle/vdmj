@@ -164,6 +164,23 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	/**
+	 * Get a named module environment, without changing the default module.
+	 */
+	@Override
+	public Environment getNamedEnvironment(String mname) throws Exception
+	{
+		for (TCModule m: checkedModules)
+		{
+			if (m.name.getName().equals(mname))
+			{
+				return new ModuleEnvironment(m);
+			}
+		}
+
+		throw new Exception("Module " + mname + " not loaded");
+	}
+
+	/**
 	 * @return The current default module name.
 	 */
 	@Override

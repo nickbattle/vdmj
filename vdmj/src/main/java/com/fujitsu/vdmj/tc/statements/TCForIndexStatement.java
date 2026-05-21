@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.tc.annotations.TCLoopAnnotations;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -103,7 +102,7 @@ public class TCForIndexStatement extends TCStatement
 		rt = new TCUnionType(location, rt, new TCVoidType(location));
 
 		invariants = TCLoopAnnotations.getLoopAnnotations(this);
-		invariants.typeCheck(local, this, new TCNameList(var));
+		invariants.typeCheck(local, this);
 
 		local.unusedCheck();
 

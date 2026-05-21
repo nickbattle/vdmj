@@ -155,6 +155,12 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
+	public Environment getNamedEnvironment(String name) throws Exception
+	{
+		return getGlobalEnvironment();	// Only sensible for VDM-SL
+	}
+
+	@Override
 	public String getDefaultName()
 	{
 		return defaultClass.name.getName();

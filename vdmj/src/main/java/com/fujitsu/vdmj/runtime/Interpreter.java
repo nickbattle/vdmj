@@ -135,6 +135,12 @@ abstract public class Interpreter
 	abstract public Environment getGlobalEnvironment();
 
 	/**
+	 * Get an environment for a particular module or class. This only really makes
+	 * sense for modules, and isn't used very often.
+	 */
+	abstract public Environment getNamedEnvironment(String name) throws Exception;
+
+	/**
 	 * @return The Interpreter instance.
 	 */
 	public static Interpreter getInstance()

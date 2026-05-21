@@ -158,9 +158,17 @@ public class ValueFactory
 	
 	private static TCType getType(String module, String name) throws ValueException
 	{
-		Interpreter i = Interpreter.getInstance();
 		TCNameToken tcname = new TCNameToken(LexLocation.ANY, module, name);
-		TCDefinition def = i.getGlobalEnvironment().findType(tcname, i.getDefaultName());
+		TCDefinition def = null;
+
+		try
+		{
+			def = Interpreter.getInstance().getNamedEnvironment(module).findType(tcname, module);
+		}
+		catch (Exception e)		// No such module
+		{
+			throw new ValueException(70, e.getMessage(), Context.javaContext());
+		}
 		
 		if (def == null)
 		{

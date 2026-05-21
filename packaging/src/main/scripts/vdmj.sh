@@ -4,11 +4,15 @@
 #####################################################################################
 
 # Change this to flip VDMJ version
-VERSION=${VDMJ_VERSION:-4.7.0-P}
+VERSION=${VDMJ_VERSION:-4.8.0-P-SNAPSHOT}
+EXE=$(which "$0")
+DIR=$(dirname "$EXE")
+VDMJ_JAR="$DIR/vdmj-${VERSION}.jar"
 
 function help()
 {
-    echo "Usage: $(basename $0) [-help] <VM and VDMJ options>"
+    echo "Usage: $(basename $0) [--help] <VM and VDMJ options>"
+	echo "Use -help for VDMJ options"
     exit 0
 }
 
@@ -23,7 +27,7 @@ VDMJOPTS="-annotations"
 while [ $# -gt 0 ]
 do
     case "$1" in
-	--help|-\?)
+	--help)
 	    help
 	    ;;
 	-D*|-X*)
@@ -36,11 +40,7 @@ do
     shift
 done
 
-EXE=$(which "$0")
-DIR=$(dirname "$EXE")
-
 # Locate the jars
-VDMJ_JAR="$DIR/vdmj-${VERSION}.jar"
 STDLIB_JAR="$DIR/stdlib-${VERSION}.jar"
 PLUGINS_JAR="$DIR/cmd-plugins-${VERSION}.jar"
 ANNOTATIONS_JAR="$DIR/annotations-${VERSION}.jar"

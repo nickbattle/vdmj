@@ -105,6 +105,10 @@ public class TCExportedFunction extends TCExport
 			{
 				report(3183, "Exported function " + name + " not defined in module");
 			}
+			else if (!def.isFunction())
+			{
+				report(3183, "Exported " + name + " is not a function");
+			}
 			else
 			{
 				TCType actualType = def.getType();

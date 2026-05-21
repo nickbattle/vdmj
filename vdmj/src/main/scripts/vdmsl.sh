@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip VDMJ version
-MVERSION=${VDMJ_VERSION:-4.7.0}
-PVERSION=${VDMJ_PVERSION:-4.7.0-P}
+MVERSION=${VDMJ_VERSION:-4.8.0-SNAPSHOT}
+PVERSION=${VDMJ_PVERSION:-4.8.0-P-SNAPSHOT}
 
 # The Maven repository directory containing VDMJ versions
 MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
@@ -17,7 +17,7 @@ VDMJOPTS=${VDMJ_OPTS:--strict -annotations}
 
 function help()
 {
-    echo "Usage: $0 [--help|-?] [-P] <VM and VDMJ options>"
+    echo "Usage: $0 [--help] [-P] <VM and VDMJ options>"
     echo "-P use high precision VDMJ ($PVERSION)"
     echo "Set \$VDMJ_VMOPTS and/or \$VDMJ_OPTS to override Java/tool options"
     echo "Set \$VDMJ_VERSION and \$VDMJ_PVERSION to change versions"
@@ -66,7 +66,7 @@ fi
 while [ $# -gt 0 ]
 do
     case "$1" in
-	--help|-\?)
+	--help)
 	    help
 	    ;;
 	-P)

@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONotExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionOperationExtractor;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.LoopInvariantObligation;
 import com.fujitsu.vdmj.pog.LoopMeasureObligation;
@@ -43,6 +44,7 @@ import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POGState;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.POLetDefContext;
+import com.fujitsu.vdmj.pog.POUncheckedContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -89,6 +91,17 @@ public class POWhileStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, POGState pogState, Environment env)
 	{
+		pogState.setAmbiguous(false);
+
+		POExpressionOperationExtractor visitor = new POExpressionOperationExtractor();
+		exp.apply(visitor);
+		
+		if (!visitor.getSubstitutions().keySet().isEmpty())		// condition has op calls
+		{
+			// Mark as Unchecked for following POs in this path.
+			ctxt.add(new POUncheckedContext("While condition is not pure", location));
+		}
+		
 		ProofObligationList obligations = exp.getProofObligations(ctxt, pogState, env);
 
 		POLoopInvariantList annotations = invariants.getList();

@@ -433,7 +433,17 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				detail2("Actual", efd.typeParams, "Expected", typeParams);
 			}
 
+			
 			TCFunctionType mtype = (TCFunctionType)measureDef.getType();
+			TCType result = mtype.result;
+			
+			while (result instanceof TCFunctionType)
+			{
+				TCFunctionType fr = (TCFunctionType)result;
+				result = fr.result;
+			}
+
+			TCFunctionType correct = type.getMeasureType(result,  isCurried);
 			
 			if (typeParams != null)		// Polymorphic, so compare "shape" of param signature
 			{
@@ -443,23 +453,17 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 					detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result, isCurried));
 				}
 			}
-			else if (isCurried && !(mtype.result instanceof TCFunctionType))
+
+			if (isCurried && !(mtype.result instanceof TCFunctionType))
 			{
 				mname.report(3303, "Measure parameters different to function");
 				detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result, isCurried));
 			}
-			else if (!TypeComparator.compatible(mtype.parameters, type.parameters))
+
+			if (!TypeComparator.compatible(mtype, correct))
 			{
 				mname.report(3303, "Measure parameters different to function");
-				detail2(mname.getName(), mtype.parameters, "Expected", type.parameters);
-			}
-			
-			TCType result = mtype.result;
-			
-			while (result instanceof TCFunctionType)
-			{
-				TCFunctionType fr = (TCFunctionType)result;
-				result = fr.result;
+				detail2(mname.getName(), mtype, "Expected", correct);
 			}
 			
 			checkMeasure(mname, result);

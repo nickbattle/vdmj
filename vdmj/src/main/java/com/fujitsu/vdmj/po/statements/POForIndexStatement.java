@@ -216,10 +216,13 @@ public class POForIndexStatement extends POStatement
 		/**
 		 * Finally, the loop may not have been entered if the range is empty, so we create
 		 * another alternative path with this condition and nothing else. The invariant
-		 * holds, because of the check before the loop.
+		 * holds, because of the check before the loop. And we set x=<from> because this could
+		 * be used in the invariant.
 		 */
 		ctxt.push(new POImpliesContext(isEmpty(efrom, eto, eby)));	// from > to =>
 		ctxt.push(new POCommentContext("Did not enter loop", location));
+		def = new POAssignmentDefinition(var, vardef.getType(), efrom, vardef.getType());
+		ctxt.push(new POLetDefContext(def));				// eg. let x = 1 in
 		ctxt.push(new POImpliesContext(invariant));			// invariant => ...
 		ctxt.popInto(popto, altCtxt.add());
 

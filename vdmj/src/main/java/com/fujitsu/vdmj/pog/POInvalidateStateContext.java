@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2024 Nick Battle.
+ *	Copyright (c) 2025 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,32 +24,35 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.lex.LexLocation;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * A context to label a stack as unchecked for POs below this point.
- */
-public class POUncheckedContext extends POContext
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+
+public class POInvalidateStateContext extends POContext
 {
-	private final String comment;
-	private final LexLocation location;
-	
-	public POUncheckedContext(String comment, LexLocation location)
+	private final TCNameToken to;
+	private final Set<String> modules;
+
+	public POInvalidateStateContext(TCNameToken to, Set<String> modules)
 	{
-		this.comment = comment;
-		this.location = location;
+		this.to = to;
+		this.modules = modules;
 	}
-	
+
+	@Override
+	public void updateStateMap(Map<String, String> stateMap)
+	{
+		for (String name: modules)
+		{
+			stateMap.remove(name);
+		}
+	}
+
 	@Override
 	public String getSource()
 	{
-		if (Character.isUpperCase(comment.charAt(0)))
-		{
-			return "-- Unchecked: " + comment + " at " + location.startLine + ":" + location.startPos;
-		}
-		else
-		{
-			return "-- Unchecked " + comment + " at " + location.startLine + ":" + location.startPos;
-		}
+		return "-- Call to " + to.toExplicitString(LexLocation.ANY) + " invalidates " + modules;
 	}
 }

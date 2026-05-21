@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Map;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -36,7 +37,7 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 public class POSaveStateContext extends POContext
 {
 	private static int count = 0;
-	private static POSaveStateContext last = null;
+	private static POSaveStateContext current = null;
 
 	private static final String OLDNAME = "$oldState";
 	private static final String NEWNAME = "$newState";
@@ -46,6 +47,10 @@ public class POSaveStateContext extends POContext
 	private final POClassDefinition clazz;
 	private final int number;
 	private final boolean oldAndNew;
+
+	public String moduleName = null;
+	public String moduleVar = null;
+	private String previousState = null;
 
 	public POSaveStateContext(PODefinition def, LexLocation from, boolean oldAndNew)
 	{
@@ -83,22 +88,33 @@ public class POSaveStateContext extends POContext
 			this.clazz = null;
 		}
 
-		last = this;
+		// If this is a remote module call, note the name of the module
+		// and variable name that will hold the module state after the
+		// postcondition call.
+
+		if (state != null && !state.location.sameModule(from))
+		{
+			moduleName = state.location.module;
+			moduleVar = newName();
+		}
+
+		current = this;
 	}
 
 	public static void reset()
 	{
 		count = 0;
+		current = null;
 	}
 
 	public static String getOldName()
 	{
-		return last == null ? null : last.oldName();
+		return current == null ? OLDNAME : current.oldName();
 	}
 
 	public static String getNewName()
 	{
-		return last == null ? null : last.newName();
+		return current == null ? NEWNAME : current.newName();
 	}
 
 	private String oldName()
@@ -109,6 +125,16 @@ public class POSaveStateContext extends POContext
 	private String newName()
 	{
 		return NEWNAME + (number == 0 ? "" : number);
+	}
+
+	@Override
+	public void updateStateMap(Map<String, String> stateMap)
+	{
+		if (moduleName != null)
+		{
+			previousState = stateMap.get(moduleName);	// Previous state for this module
+			stateMap.put(moduleName, moduleVar);		// New state after post_op
+		}
 	}
 
 	@Override
@@ -124,24 +150,45 @@ public class POSaveStateContext extends POContext
 				sb.append(oldName());
 				sb.append(" = ");
 				sb.append(state.toPattern(false, from));
-				sb.append(" in");
+				sb.append(" in ");
 			}
 			else
 			{
-				sb.append("forall ");
-				sb.append(oldName());
-				sb.append(":");
-				sb.append(state.name.toExplicitString(from));
+				boolean forall = false;
+
+				if (previousState != null)	// re-use an existing state value
+				{
+					sb.append("let ");
+					sb.append(oldName());
+					sb.append(" = ");
+					sb.append(previousState);
+					sb.append(" in ");
+					
+					if (oldAndNew)
+					{
+						sb.append("forall ");
+						forall = true;
+					}
+				}
+				else
+				{
+					sb.append("forall ");
+					sb.append(oldName());
+					sb.append(":");
+					sb.append(state.name.toExplicitString(from));
+					forall = true;
+				}
 
 				if (oldAndNew)
 				{
-					sb.append(", ");
+					if (previousState == null) sb.append(", ");
 					sb.append(newName());
 					sb.append(":");
 					sb.append(state.name.toExplicitString(from));
 				}
 
-				sb.append(" &");
+				if (forall) sb.append(" &");	// Could just be a "let"
+
 			}
 		}
 		else if (clazz != null)

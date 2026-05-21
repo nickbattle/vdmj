@@ -104,6 +104,10 @@ public class TCExportedOperation extends TCExport
 			{
 				report(3185, "Exported operation " + name + " not defined in module");
 			}
+			else if (!actual.isOperation())
+			{
+				report(3185, "Exported " + name + " is not an operation");
+			}
 			else
 			{
     			TCType actualType = actual.getType();

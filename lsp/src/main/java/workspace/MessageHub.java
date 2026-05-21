@@ -276,7 +276,7 @@ public class MessageHub
 								"range",	Utils.lexLocationToRange(message.location),
 								"severity", (message instanceof VDMError ? 1 : 2),
 								"code", 	message.number,
-								"source",	Settings.dialect.toString(),
+								"source",	Settings.dialect.toString() + "/" + pname,	// eg. "VDM_SL/TC"
 								"message",	message.toProblemString().replaceAll("\n", ", ")));
 						
 					}

@@ -345,7 +345,8 @@ abstract public class CMDPlugin extends AnalysisPlugin implements EventListener
 			case "list":
 			case "remove":		return new DebugCommand(line);
 			case "coverage":	return new CoverageCommand(line);
-			case "latex":		return new LatexCommand(line);
+			case "latex":
+			case "latexdoc":	return new LatexCommand(line);
 			case "word":		return new WordCommand(line);
 			case "save":		return new SaveCommand(line);
 

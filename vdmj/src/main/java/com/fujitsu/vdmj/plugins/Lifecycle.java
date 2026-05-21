@@ -141,7 +141,7 @@ public class Lifecycle
 		}
 	}
 
-	private void usage()
+	protected void usage()
 	{
 		println("Usage: VDMJ [-vdmsl | -vdmpp | -vdmrt] [<options>] [<files or dirs>]");
 		println("-vdmsl: parse files as VDM-SL (default)");
@@ -443,7 +443,7 @@ public class Lifecycle
 		return false;
 	}
 	
-	private int display(List<VDMMessage> messages, Class<? extends VDMMessage>type, boolean show)
+	protected int display(List<VDMMessage> messages, Class<? extends VDMMessage>type, boolean show)
 	{
 		int count = 0;
 
@@ -492,7 +492,7 @@ public class Lifecycle
 		return (nerrs == 0);	// Return "OK" if we can continue (ie. no errors)
 	}
 	
-	private ExitStatus startConsole()
+	protected ExitStatus startConsole()
 	{
 		try
 		{
@@ -507,7 +507,7 @@ public class Lifecycle
 		}
 	}
 
-	private void complete()
+	protected void complete()
 	{
 		try
 		{

@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCUntypedDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
@@ -113,7 +114,7 @@ public class TCExportedValue extends TCExport
 			{
 				report(3188, "Exported value " + name + " not defined in module");
 			}
-			else
+			else if (actual instanceof TCValueDefinition || actual instanceof TCLocalDefinition)
 			{
     			TCType actualType = actual.getType();
     			
@@ -122,6 +123,10 @@ public class TCExportedValue extends TCExport
 					report(3189, "Exported type does not match actual type");
 					detail2("Exported", type, "Actual", actualType);
 				}
+			}
+			else
+			{
+				report(3188, "Exported " + name + " is not a value");
 			}
 		}
 	}
