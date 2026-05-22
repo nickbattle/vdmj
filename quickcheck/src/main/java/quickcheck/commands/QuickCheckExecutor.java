@@ -271,7 +271,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 		// Always kick the (LSP) client, since the PO statuses may have been updated...
 		LSPServer lsp = LSPServer.getInstance();
 		lsp.writeMessage(RPCRequest.notification("slsp/POG/updated",
-				new JSONObject("successful", true)));
+				new JSONObject("successful", true, "quickcheck", !qc.hasErrors())));
 		
 		running = null;
 	}
