@@ -46,6 +46,7 @@ import dap.DAPResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPServer;
+import lsp.Utils;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.StrategyResults;
 import rpc.RPCMessageList;
@@ -170,7 +171,9 @@ public class QuickCheckExecutor extends AsyncExecutor
 
 				for (ProofObligation po: chosen)
 				{
-					numbers.add(po.number);
+					numbers.add(new JSONObject(
+						"id", po.number,
+						"location", Utils.lexLocationToLocation(po.location)));
 				}
 
 				JSONObject params = new JSONObject("obligations", numbers);
