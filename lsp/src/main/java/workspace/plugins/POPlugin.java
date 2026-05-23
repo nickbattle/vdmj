@@ -101,6 +101,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	private final Map<File, List<POCodeLens>> codeLenses;
 	private final Map<File, List<POInlayHint>> inlayHints;
 	protected ProofObligationList obligationList;
+	private int projectHash = 0;	// Set after CompleteCheckEvent
 
 	protected POPlugin()
 	{
@@ -157,8 +158,23 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			TCPlugin tc = registry.getPlugin("TC");
 			checkLoadedFiles(tc.getTC());
 			RPCMessageList results = new RPCMessageList();
-			results.add(RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("successful", !messagehub.hasErrors())));
+
+			LSPPlugin lsp = registry.getPlugin("LSP");
+			int hash = lsp.getProjectHash();
+
+			if (hash != projectHash)
+			{
+				projectHash = hash;
+				Diag.info("Project hash = %d", projectHash);
+
+				results.add(RPCRequest.notification("slsp/POG/updated",
+						new JSONObject("successful", !messagehub.hasErrors())));
+			}
+			else
+			{
+				Diag.info("Project hash has not changed");
+			}
+
 			return results;
 		}
 		else if (event instanceof CodeLensEvent)
