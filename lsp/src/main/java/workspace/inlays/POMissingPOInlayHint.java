@@ -24,21 +24,36 @@
 
  package workspace.inlays;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 import json.JSONObject;
 
-public class POMissingPOInlayHint extends InlayHint implements POInlayHint
+public class POMissingPOInlayHint extends POInlayHint
 {
 	private final LexLocation location;
 	private final String label;
 	private final String markup;
 	
-	public POMissingPOInlayHint(LexLocation location, String label, String markup)
+	public POMissingPOInlayHint(LexLocation location, String label, long paths, long missing)
 	{
 		this.location = location;
 		this.label = label;
-		this.markup = markup;
+		this.markup = getMissingPOMarkup(paths, missing);
+	}
+
+	private String getMissingPOMarkup(long paths, long missing)
+	{
+		return
+			"### This definition is too complex for POG\n" +
+			"There are " +
+			paths +
+			" possible execution paths through this definition, " +
+			"which exceeds the configured limit in the Java property vdmj.pog.max_alt_paths (" +
+			Properties.pog_max_alt_paths +
+			")\n\n" +
+			"The proof obligation generation (POG) has therefore omitted " + missing +
+			" POs. Try to simplify the definition, or increase the property value.";
 	}
 
 	@Override

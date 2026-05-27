@@ -29,12 +29,15 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.Utils;
 
 public class TCLetDefExpression extends TCExpression
@@ -85,10 +88,18 @@ public class TCLetDefExpression extends TCExpression
 			}
 			else
 			{
+				TCType declType = d.getType();
 				d.implicitDefinitions(local);
 				d.typeResolve(local);
 				d.typeCheck(local, scope);
 				local = new FlatCheckedEnvironment(d, local, scope);	// cumulative
+
+				if (declType instanceof TCUnknownType && d instanceof TCValueDefinition)
+				{
+					TCValueDefinition vdef = (TCValueDefinition)d;
+					TypeChecker.warning(5500, "Let definition is implicitly " + vdef.getExpType(),
+						vdef.pattern.location.after(vdef.pattern.toString().length()));
+				}
 			}
 		}
 

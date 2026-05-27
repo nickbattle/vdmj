@@ -531,24 +531,10 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 			rlist.add(reduction);
 			addInlayHint(def.location.file,
-				new POMissingPOInlayHint(def.location, "\u26A0\uFE0F", getMissingPOMarkup(paths, missing)));
+				new POMissingPOInlayHint(def.location, "\u26A0\uFE0F", paths, missing));
 		}
 
 		return rlist;
-	}
-
-	private String getMissingPOMarkup(long paths, long missing)
-	{
-		return
-			"### This definition is too complex for POG\n" +
-			"There are " +
-			paths +
-			" possible execution paths through this definition, " +
-			"which exceeds the configured limit in the Java property vdmj.pog.max_alt_paths (" +
-			Properties.pog_max_alt_paths +
-			")\n\n" +
-			"The proof obligation generation (POG) has therefore omitted " + missing +
-			" POs. Try to simplify the definition, or increase the property value.";
 	}
 
 	public void clearLenses(Class<?> type)

@@ -1013,3 +1013,5 @@ as the expected and actual values.
 5045, "Strict: RHS of '<stmt>' not an op call or a pure expression"
 5046, "Strict: ext clause missing 'wr' updates"
 5047, "Strict: pure operation updates state"
+
+5500, "Let definition is implicitly <type>"

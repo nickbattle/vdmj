@@ -191,6 +191,19 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 			return existing;
 		}
 	}
+
+	/**
+	 * Return a location on the same line, but after the range of this location.
+	 */
+	public LexLocation after()
+	{
+		return new LexLocation(file, module, endLine, endPos + 1, endLine, endPos + 1);
+	}
+	
+	public LexLocation after(int offset)
+	{
+		return new LexLocation(file, module, startLine, startPos + offset, startLine, startPos + offset);
+	}
 	
 	public boolean within(LexLocation span)
 	{
