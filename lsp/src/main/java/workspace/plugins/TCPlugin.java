@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -170,13 +169,18 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			while (iter.hasNext())
 			{
 				VDMMessage msg = iter.next();
+				String[] parts = msg.message.split("\\s*,\\s*");
 
 				switch (msg.number)
 				{
-					case 5500:	// "Let definition is implicitly <type>"
-						String type = msg.message.substring("Let definition is implicitly ".length());
-						addInlayHint(msg.location.file, new TCImplicitTypeInlayHint(msg.location, type));
-						iter.remove();
+					case 5500:	// "<Inlay hint name>, <arg>, ..."
+						switch (parts[0])
+						{
+							case "TCImplicitTypeInlayHint":
+								addInlayHint(msg.location.file, new TCImplicitTypeInlayHint(msg.location, parts[1]));
+								iter.remove();
+								break;
+						}
 						break;
 				}
 			}

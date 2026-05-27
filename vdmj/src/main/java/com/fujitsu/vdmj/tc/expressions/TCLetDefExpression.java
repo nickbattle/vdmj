@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -95,12 +96,12 @@ public class TCLetDefExpression extends TCExpression
 				d.typeCheck(local, scope);
 				local = new FlatCheckedEnvironment(d, local, scope);	// cumulative
 
-				if (VDMJMain.getMainName().equals(VDMJMain.LSP_MAIN) &&
+				if (Settings.getMainName().equals(VDMJMain.LSP_MAIN) &&
 					declType instanceof TCUnknownType &&
 					d instanceof TCValueDefinition)
 				{
 					TCValueDefinition vdef = (TCValueDefinition)d;
-					TypeChecker.warning(5500, "Let definition is implicitly " + vdef.getExpType(),
+					TypeChecker.warning(5500, "TCImplicitTypeInlayHint, " + vdef.getExpType(),
 						vdef.pattern.location.after(vdef.pattern.toString().length()));
 				}
 			}

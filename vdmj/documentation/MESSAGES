@@ -1014,4 +1014,5 @@ as the expected and actual values.
 5046, "Strict: ext clause missing 'wr' updates"
 5047, "Strict: pure operation updates state"
 
-5500, "Let definition is implicitly <type>"
+-- The following warnings are used to pass CSV information
+5500, "<inlay hint> [, <arg>]*"

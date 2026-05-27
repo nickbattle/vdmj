@@ -558,15 +558,15 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	public void addCodeLens(File file, POCodeLens lens)
 	{
-		List<POCodeLens> array = codeLenses.get(file);
+		List<POCodeLens> list = codeLenses.get(file);
 		
-		if (array == null)
+		if (list == null)
 		{
-			array = new Vector<POCodeLens>();
-			codeLenses.put(file, array);
+			list = new Vector<POCodeLens>();
+			codeLenses.put(file, list);
 		}
 		
-		array.add(lens);
+		list.add(lens);
 	}
 
 	private JSONArray getCodeLenses(File file)
@@ -584,17 +584,17 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return results;
 	}
 	
-	public void addInlayHint(File file, POInlayHint lens)
+	public void addInlayHint(File file, POInlayHint hint)
 	{
-		List<POInlayHint> array = inlayHints.get(file);
+		List<POInlayHint> list = inlayHints.get(file);
 		
-		if (array == null)
+		if (list == null)
 		{
-			array = new Vector<POInlayHint>();
-			inlayHints.put(file, array);
+			list = new Vector<POInlayHint>();
+			inlayHints.put(file, list);
 		}
 		
-		array.add(lens);
+		list.add(hint);
 	}
 
 	private JSONArray getInlayHints(File file, JSONObject range)

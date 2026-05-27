@@ -14,7 +14,7 @@ public class TCImplicitTypeInlayHint extends TCInlayHint
 	{
 		this.location = location;
 		this.label = ":" + type;
-		this.markup = "Implicit type created";
+		this.markup = "Implicit type added";
 	}
 
 	@Override
