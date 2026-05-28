@@ -36,14 +36,15 @@ abstract public class InlayHint
 	/**
 	 * These helper methods generate the inlay hint response body.
 	 */
-	protected JSONObject makeInlay(LexLocation location, String label, String markup)
+	protected JSONObject makeInlay(LexLocation location, String label, String markup, boolean padleft, boolean padright)
 	{
 		return new JSONObject(
 			"position", Utils.lexLocationToPosition(location),
 			"label", label,
 			"kind", 2L,	// 1 = Type, 2 = Parameter
 			"tooltip", new JSONObject("kind", "markdown", "value", markup),
-			"paddingRight", true);
+			"paddingLeft", padleft,
+			"paddingRight", padright);
 	}
 
 	/**

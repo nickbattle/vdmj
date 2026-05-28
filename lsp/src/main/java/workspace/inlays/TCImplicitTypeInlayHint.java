@@ -2,7 +2,9 @@ package workspace.inlays;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 
+import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 
 public class TCImplicitTypeInlayHint extends TCInlayHint
 {
@@ -20,7 +22,15 @@ public class TCImplicitTypeInlayHint extends TCInlayHint
 	@Override
 	public JSONObject getInlayHint()
 	{
-		return makeInlay(location, label, markup);
+		JSONObject inlay = makeInlay(location, label, markup, false, false);
+
+		JSONArray edits = new JSONArray(
+			new JSONObject(
+				"range", Utils.lexLocationToZeroRange(location),
+				"newText", label));
+
+		inlay.put("textEdits", edits);
+		return inlay;
 	}
 
 	@Override

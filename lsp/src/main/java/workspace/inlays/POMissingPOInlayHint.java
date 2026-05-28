@@ -59,6 +59,6 @@ public class POMissingPOInlayHint extends POInlayHint
 	@Override
 	public JSONObject getInlayHint()
 	{
-		return makeInlay(location, label, markup);
+		return makeInlay(location, label, markup, false, true);
 	}
 }
