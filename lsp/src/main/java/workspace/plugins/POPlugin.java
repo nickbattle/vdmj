@@ -600,12 +600,17 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	private JSONArray getInlayHints(File file, JSONObject range)
 	{
 		JSONArray results = new JSONArray();
+		ASTPlugin ast = registry.getPlugin("AST");
+		boolean dirty = ast.isDirty();
 		
 		if (inlayHints.containsKey(file))
 		{
 			for (POInlayHint hint: inlayHints.get(file))
 			{
-				results.add(hint.getInlayHint());
+				if (!dirty || hint.whenDirty())
+				{
+					results.add(hint.getInlayHint());
+				}
 			}
 		}
 		

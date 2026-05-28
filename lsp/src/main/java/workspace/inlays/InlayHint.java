@@ -50,4 +50,12 @@ abstract public class InlayHint
 	 * Return the inlay hint calculated.
 	 */
 	abstract public JSONObject getInlayHint();
+
+	/**
+	 * Return the hint, even when the buffer is dirty
+	 */
+	public boolean whenDirty()
+	{
+		return true;
+	}
 }

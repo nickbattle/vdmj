@@ -22,4 +22,10 @@ public class TCImplicitTypeInlayHint extends TCInlayHint
 	{
 		return makeInlay(location, label, markup);
 	}
+
+	@Override
+	public boolean whenDirty()
+	{
+		return false;	// Too confusing otherwise
+	}
 }
