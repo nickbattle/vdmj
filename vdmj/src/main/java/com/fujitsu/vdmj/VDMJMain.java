@@ -37,7 +37,10 @@ public interface VDMJMain
 	
 	/**
 	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about.
+	 * identifier. The constants above are the ones we know about. The mains
+	 * also set the mainClass field in Settings.
+	 * 
+	 * So to find your "main" type, call Settings.getMainName().
 	 */
 	public static String getMainName()
 	{
