@@ -101,6 +101,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	private final Map<File, List<POCodeLens>> codeLenses;
 	private final Map<File, List<POInlayHint>> inlayHints;
 	protected ProofObligationList obligationList;
+	private int projectHash = 0;	// Set after CompleteCheckEvent
 
 	protected POPlugin()
 	{
@@ -157,8 +158,23 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			TCPlugin tc = registry.getPlugin("TC");
 			checkLoadedFiles(tc.getTC());
 			RPCMessageList results = new RPCMessageList();
-			results.add(RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("successful", !messagehub.hasErrors())));
+
+			LSPPlugin lsp = registry.getPlugin("LSP");
+			int hash = lsp.getProjectHash();
+
+			if (hash != projectHash)
+			{
+				projectHash = hash;
+				Diag.info("Project hash = %d", projectHash);
+
+				results.add(RPCRequest.notification("slsp/POG/updated",
+						new JSONObject("successful", !messagehub.hasErrors())));
+			}
+			else
+			{
+				Diag.info("Project hash has not changed");
+			}
+
 			return results;
 		}
 		else if (event instanceof CodeLensEvent)
@@ -515,24 +531,10 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 			rlist.add(reduction);
 			addInlayHint(def.location.file,
-				new POMissingPOInlayHint(def.location, "\u26A0\uFE0F", getMissingPOMarkup(paths, missing)));
+				new POMissingPOInlayHint(def.location, "\u26A0\uFE0F", paths, missing));
 		}
 
 		return rlist;
-	}
-
-	private String getMissingPOMarkup(long paths, long missing)
-	{
-		return
-			"### This definition is too complex for POG\n" +
-			"There are " +
-			paths +
-			" possible execution paths through this definition, " +
-			"which exceeds the configured limit in the Java property vdmj.pog.max_alt_paths (" +
-			Properties.pog_max_alt_paths +
-			")\n\n" +
-			"The proof obligation generation (POG) has therefore omitted " + missing +
-			" POs. Try to simplify the definition, or increase the property value.";
 	}
 
 	public void clearLenses(Class<?> type)
@@ -556,15 +558,15 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	public void addCodeLens(File file, POCodeLens lens)
 	{
-		List<POCodeLens> array = codeLenses.get(file);
+		List<POCodeLens> list = codeLenses.get(file);
 		
-		if (array == null)
+		if (list == null)
 		{
-			array = new Vector<POCodeLens>();
-			codeLenses.put(file, array);
+			list = new Vector<POCodeLens>();
+			codeLenses.put(file, list);
 		}
 		
-		array.add(lens);
+		list.add(lens);
 	}
 
 	private JSONArray getCodeLenses(File file)
@@ -582,28 +584,33 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return results;
 	}
 	
-	public void addInlayHint(File file, POInlayHint lens)
+	public void addInlayHint(File file, POInlayHint hint)
 	{
-		List<POInlayHint> array = inlayHints.get(file);
+		List<POInlayHint> list = inlayHints.get(file);
 		
-		if (array == null)
+		if (list == null)
 		{
-			array = new Vector<POInlayHint>();
-			inlayHints.put(file, array);
+			list = new Vector<POInlayHint>();
+			inlayHints.put(file, list);
 		}
 		
-		array.add(lens);
+		list.add(hint);
 	}
 
 	private JSONArray getInlayHints(File file, JSONObject range)
 	{
 		JSONArray results = new JSONArray();
+		ASTPlugin ast = registry.getPlugin("AST");
+		boolean dirty = ast.isDirty();
 		
 		if (inlayHints.containsKey(file))
 		{
 			for (POInlayHint hint: inlayHints.get(file))
 			{
-				results.add(hint.getInlayHint());
+				if (!dirty || hint.whenDirty())
+				{
+					results.add(hint.getInlayHint());
+				}
 			}
 		}
 		

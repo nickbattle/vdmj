@@ -267,6 +267,19 @@ public class LSPPlugin extends AnalysisPlugin
 		return projectFiles;
 	}
 
+	public int getProjectHash()
+	{
+		int hash = 0;
+
+		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
+		{
+			hash = hash ^ entry.getKey().hashCode();
+			hash = hash ^ entry.getValue().toString().hashCode();	// Note: need the toString!
+		}
+
+		return hash;
+	}
+
 	public Map<File, LexLocation> getFileEndings()
 	{
 		return fileEndings;
