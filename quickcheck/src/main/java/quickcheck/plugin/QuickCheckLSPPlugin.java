@@ -24,6 +24,8 @@
 
 package quickcheck.plugin;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Vector;
 
@@ -35,6 +37,7 @@ import com.fujitsu.vdmj.util.Utils;
 
 import json.JSONArray;
 import json.JSONObject;
+import json.JSONReader;
 import lsp.CancellableThread;
 import quickcheck.QuickCheck;
 import quickcheck.commands.QCConsole;
@@ -235,8 +238,42 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		{
 			provider.put("quickCheckProvider", true);
 		}
+
+		JSONArray schemas = capabilities.getPath("experimental.pluginSchemas");
+
+		if (schemas == null)
+		{
+			schemas = new JSONArray();
+			JSONObject experimental = capabilities.get("experimental");
+			experimental.put("pluginSchemas", schemas);
+		}
+
+		schemas.add(getPluginSchema());
 	}
 	
+	private JSONObject getPluginSchema()
+	{
+		try
+		{
+			InputStream in = getClass().getResourceAsStream("/qcschema.json");
+
+			if (in != null)
+			{
+				InputStreamReader isr = new InputStreamReader(in, "UTF8");
+				JSONReader jr = new JSONReader(isr);
+				return jr.readObject();
+			}
+			else
+			{
+				return new JSONObject("error", "quickcheck.schema not found");
+			}
+		}
+		catch (Exception e)
+		{
+			return new JSONObject("error", e.toString());
+		}
+	}
+
 	@Override
 	public AnalysisCommand getCommand(String line)
 	{
