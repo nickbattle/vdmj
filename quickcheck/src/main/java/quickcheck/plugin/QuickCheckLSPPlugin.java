@@ -261,7 +261,9 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			{
 				InputStreamReader isr = new InputStreamReader(in, "UTF8");
 				JSONReader jr = new JSONReader(isr);
-				return jr.readObject();
+				JSONObject schema = jr.readObject();
+				isr.close();
+				return schema;
 			}
 			else
 			{
