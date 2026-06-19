@@ -30,23 +30,24 @@ import java.io.PrintWriter;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
-import examples.v2c.tr.TRNode;
-import examples.v2c.tr.definitions.TRClassList;
-import examples.v2c.tr.modules.TRModuleList;
+import commands.TranslateCommandLSP;
 import json.JSONObject;
 import lsp.Utils;
+import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import tr.TRNode;
+import tr.definitions.TRClassList;
+import tr.modules.TRModuleList;
+import vdmj.commands.AnalysisCommand;
 import workspace.Diag;
-import workspace.EventHub;
 import workspace.EventListener;
 import workspace.PluginRegistry;
-import workspace.events.LSPEvent;
-import workspace.events.UnknownMethodEvent;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -79,25 +80,9 @@ public class V2CPluginLSP extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(UnknownMethodEvent.class, this);
-	}
-	
-	/**
-	 * This method is called when unknownMethodEvent, slsp/v2c events are raised.
-	 * They go via the unknownMethod handler, which sends an unknownMethodEvent.
-	 */
-	@Override
-	public RPCMessageList handleEvent(LSPEvent event) throws Exception
-	{
-		if (event instanceof UnknownMethodEvent &&
-			event.request.getMethod().equals("slsp/v2c"))
-		{
-			return analyse(event.request);
-		}
-		else
-		{
-			return null;	// Not handled
-		}
+		// Register handler with RPCDispatcher
+		RPCDispatcher dispatcher = RPCDispatcher.getInstance();
+		dispatcher.register(new V2CHandler(), "slsp/v2c");
 	}
 
 	/**
@@ -105,7 +90,7 @@ public class V2CPluginLSP extends AnalysisPlugin implements EventListener
 	 * recognised by the handleEvent method above. It is passed the JSON request and
 	 * returns a list of JSON responses.
 	 */
-	private RPCMessageList analyse(RPCRequest request)
+	public RPCMessageList analyse(RPCRequest request)
 	{
 		try
 		{
@@ -145,5 +130,24 @@ public class V2CPluginLSP extends AnalysisPlugin implements EventListener
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+	}
+
+	@Override
+	public AnalysisCommand getCommand(String line)
+	{
+		String[] argv = line.split("\\s+");
+		
+		if (argv[0].equals("translate"))
+		{
+			return new TranslateCommandLSP(line);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList(TranslateCommandLSP.HELP);
 	}
 }

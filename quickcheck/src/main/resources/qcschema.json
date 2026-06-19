@@ -1,0 +1,13 @@
+{
+	"plugin": "QuickCheck",
+	"filename": "quickcheck.json",
+	"schema": {
+		"properties": {
+			"timeout": {
+				"type": "integer",
+				"title": "The timeout in milliseconds",
+				"default": 5000
+			}
+		}
+	}
+}
