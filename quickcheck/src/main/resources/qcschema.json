@@ -1,52 +1,61 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"plugin": "QuickCheck",
-	"filename": "quickcheck.json",
-	"schema": {
-		"type": "object",
-		"properties": {
-			"config": {
-				"type": "object",
-				"properties": {
-					"timeout": {
-						"type": "integer"
-					},
-					"obligations": {
-						"type": "array",
-						"items": {
-							"type": "integer"
-						}
-					}
-				},
-				"required": [
-					"timeout",
-					"obligations"
-				],
-				"additionalProperties": false
-			},
-			"strategies": {
-				"type": "array",
-				"items": {
+	"type": "object",
+	"properties": {
+		"plugin": {
+			"type": "string"
+		},
+		"filename": {
+			"type": "string"
+		},
+		"params": {
+			"type": "object",
+			"properties": {
+				"config": {
 					"type": "object",
 					"properties": {
-						"name": {
-							"type": "string"
+						"timeout": {
+							"type": "integer"
 						},
-						"enabled": {
-							"type": "boolean"
+						"obligations": {
+							"type": "array",
+							"items": {
+								"type": "integer"
+							}
 						}
 					},
 					"required": [
-						"name",
-						"enabled"
-					]
+						"timeout",
+						"obligations"
+					],
+					"additionalProperties": false
+				},
+				"strategies": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"enabled": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"name",
+							"enabled"
+						],
+						"additionalProperties": true
+					}
 				}
-			}
-		},
-		"required": [
-			"config",
-			"strategies"
-		],
-		"additionalProperties": false
-	}
+			},
+			"additionalProperties": false
+		}
+	},
+	"required": [
+		"plugin",
+		"filename",
+		"params"
+	]
 }
