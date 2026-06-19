@@ -36,7 +36,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
 import json.JSONObject;
-import lsp.UnknownHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 
@@ -64,7 +63,7 @@ public class TranslateTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		UnknownHandler handler = new UnknownHandler();
+		V2CHandler handler = new V2CHandler();
 		File empty = Files.createTempDirectory("test").toFile();
 
 		RPCRequest request = RPCRequest.create(123L, "slsp/v2c",
