@@ -1,13 +1,52 @@
 {
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"plugin": "QuickCheck",
 	"filename": "quickcheck.json",
 	"schema": {
+		"type": "object",
 		"properties": {
-			"timeout": {
-				"type": "integer",
-				"title": "The timeout in milliseconds",
-				"default": 5000
+			"config": {
+				"type": "object",
+				"properties": {
+					"timeout": {
+						"type": "integer"
+					},
+					"obligations": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				},
+				"required": [
+					"timeout",
+					"obligations"
+				],
+				"additionalProperties": false
+			},
+			"strategies": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"enabled": {
+							"type": "boolean"
+						}
+					},
+					"required": [
+						"name",
+						"enabled"
+					]
+				}
 			}
-		}
+		},
+		"required": [
+			"config",
+			"strategies"
+		],
+		"additionalProperties": false
 	}
 }
