@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,28 +22,33 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj;
+package tr.types;
 
-/**
- * An interface, implemented by all Java "main" providers, to help identify the
- * environment currently running. See Settings.mainClass.
- */
-public interface VDMJMain
+public class TRFunctionType extends TRType
 {
-	public static final String VDMJ_MAIN = "VDMJ";
-	public static final String LSP_MAIN = "LSP";
-	public static final String DBGP_MAIN = "DBGP";
-	public static final String UNDEFINED = "undefined";
+	private static final long serialVersionUID = 1L;
+	private final TRTypeList parameters;
+	private final TRType result;
 	
-	/**
-	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about. The mains
-	 * also set the mainClass field in Settings.
-	 * 
-	 * So to find your "main" type, call Settings.getMainName().
-	 */
-	public static String getMainName()
+	public TRFunctionType(TRTypeList parameters, TRType result)
 	{
-		return UNDEFINED;
+		this.parameters = parameters;
+		this.result = result;
+	}
+
+	@Override
+	public String translate()
+	{
+		return result.translate() + " (*)(" + parameters.translate() + ")";
+	}
+	
+	public TRTypeList getParameters()
+	{
+		return parameters;
+	}
+	
+	public TRType getResult()
+	{
+		return result;
 	}
 }

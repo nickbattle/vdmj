@@ -1013,3 +1013,6 @@ as the expected and actual values.
 5045, "Strict: RHS of '<stmt>' not an op call or a pure expression"
 5046, "Strict: ext clause missing 'wr' updates"
 5047, "Strict: pure operation updates state"
+
+-- The following warnings are used to pass CSV information
+5500, "<inlay hint> [, <arg>]*"

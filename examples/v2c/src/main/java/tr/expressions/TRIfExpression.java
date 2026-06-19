@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,28 +22,25 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj;
+package tr.expressions;
 
-/**
- * An interface, implemented by all Java "main" providers, to help identify the
- * environment currently running. See Settings.mainClass.
- */
-public interface VDMJMain
+public class TRIfExpression extends TRExpression
 {
-	public static final String VDMJ_MAIN = "VDMJ";
-	public static final String LSP_MAIN = "LSP";
-	public static final String DBGP_MAIN = "DBGP";
-	public static final String UNDEFINED = "undefined";
+	private static final long serialVersionUID = 1L;
+	private final TRExpression ifExp;
+	private final TRExpression thenExp;
+	private final TRExpression elseExp;
 	
-	/**
-	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about. The mains
-	 * also set the mainClass field in Settings.
-	 * 
-	 * So to find your "main" type, call Settings.getMainName().
-	 */
-	public static String getMainName()
+	public TRIfExpression(TRExpression ifExp, TRExpression thenExp, TRExpression elseExp)
 	{
-		return UNDEFINED;
+		this.ifExp = ifExp;
+		this.thenExp = thenExp;
+		this.elseExp = elseExp;
+	}
+
+	@Override
+	public String translate()
+	{
+		return "(" + ifExp.translate() + ") ? " + thenExp.translate() + " : " + elseExp.translate();
 	}
 }

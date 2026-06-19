@@ -171,6 +171,21 @@ public class QuickCheckThread extends CancellableThread
 				MessageHub.getInstance().addPluginMessages(pog, messages);
 				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
 				responses.add(RPCRequest.create("workspace/codeLens/refresh", null));
+
+				// Add a notification of the QC PO's processed by this call. This must be
+				// after the diagnostic responses
+				JSONArray numbers = new JSONArray();
+
+				for (ProofObligation po: chosenPOs)
+				{
+					numbers.add(new JSONObject(
+						"id", po.number,
+						"location", Utils.lexLocationToLocation(po.location)));
+				}
+
+				JSONObject params = new JSONObject("obligations", numbers);
+				responses.add(RPCRequest.notification("slsp/POG/qc", params));
+
 			}
 			
 			for (JSONObject message: responses)

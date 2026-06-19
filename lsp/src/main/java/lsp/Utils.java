@@ -65,6 +65,13 @@ public class Utils
 				"character", zero(location.startPos - 1));
 	}
 
+	public static JSONObject lexLocationToZeroRange(LexLocation location)
+	{
+		return new JSONObject(
+				"start", lexLocationToPosition(location),
+				"end",   lexLocationToPosition(location));
+	}
+	
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
 		if (location.endPos == 0)	// end is not set, so use a single char range

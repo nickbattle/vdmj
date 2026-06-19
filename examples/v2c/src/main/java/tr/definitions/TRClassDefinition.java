@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,28 +22,28 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj;
+package tr.definitions;
 
-/**
- * An interface, implemented by all Java "main" providers, to help identify the
- * environment currently running. See Settings.mainClass.
- */
-public interface VDMJMain
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+
+public class TRClassDefinition extends TRDefinition
 {
-	public static final String VDMJ_MAIN = "VDMJ";
-	public static final String LSP_MAIN = "LSP";
-	public static final String DBGP_MAIN = "DBGP";
-	public static final String UNDEFINED = "undefined";
+	private static final long serialVersionUID = 1L;
+	private final TCNameToken name;
+	private final TRDefinitionList definitions;
 	
-	/**
-	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about. The mains
-	 * also set the mainClass field in Settings.
-	 * 
-	 * So to find your "main" type, call Settings.getMainName().
-	 */
-	public static String getMainName()
+	public TRClassDefinition(LexCommentList comments, TCNameToken name, TRDefinitionList definitions)
 	{
-		return UNDEFINED;
+		super(comments);
+		this.name = name;
+		this.definitions = definitions;
+	}
+
+	@Override
+	public String translate()
+	{
+		String header = super.translate();
+		return (header.isEmpty() ? "// Class " + name + "\n" : header) + definitions.translate();
 	}
 }

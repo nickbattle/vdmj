@@ -23,9 +23,7 @@
  ******************************************************************************/
 package workspace.inlays;
 
-import json.JSONObject;
-
-public interface POInlayHint
+public abstract class POInlayHint extends InlayHint
 {
-	public JSONObject getInlayHint();
+	// Just to label PO hints
 }

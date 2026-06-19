@@ -21,29 +21,32 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+package plugins;
 
-package com.fujitsu.vdmj;
+import lsp.LSPHandler;
+import rpc.RPCErrors;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
+import workspace.Diag;
+import workspace.PluginRegistry;
 
 /**
- * An interface, implemented by all Java "main" providers, to help identify the
- * environment currently running. See Settings.mainClass.
+ * LSP Handler for translate requests
  */
-public interface VDMJMain
+public class V2CHandler extends LSPHandler
 {
-	public static final String VDMJ_MAIN = "VDMJ";
-	public static final String LSP_MAIN = "LSP";
-	public static final String DBGP_MAIN = "DBGP";
-	public static final String UNDEFINED = "undefined";
-	
-	/**
-	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about. The mains
-	 * also set the mainClass field in Settings.
-	 * 
-	 * So to find your "main" type, call Settings.getMainName().
-	 */
-	public static String getMainName()
+	@Override
+	public RPCMessageList request(RPCRequest request)
 	{
-		return UNDEFINED;
+		try
+		{
+			V2CPluginLSP qc = PluginRegistry.getInstance().getPlugin("V2C");
+			return qc.analyse(request);
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
 	}
 }

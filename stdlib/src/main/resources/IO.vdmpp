@@ -42,7 +42,7 @@ public
 freadval[@p]:seq1 of char -> bool * [@p]
 freadval(filename) ==
   is not yet specified
-  post let mk_(b,t) = RESULT in not b => t = nil;
+  post let mk_(b,t) : bool * [@p] = RESULT in not b => t = nil;
 
 operations
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,28 +22,35 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj;
+package tr;
 
-/**
- * An interface, implemented by all Java "main" providers, to help identify the
- * environment currently running. See Settings.mainClass.
- */
-public interface VDMJMain
+import java.util.List;
+
+import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.mapper.MappedList;
+
+public class TRMappedList<FROM extends Mappable, TO extends Mappable> extends MappedList<FROM, TO>
 {
-	public static final String VDMJ_MAIN = "VDMJ";
-	public static final String LSP_MAIN = "LSP";
-	public static final String DBGP_MAIN = "DBGP";
-	public static final String UNDEFINED = "undefined";
+	private static final long serialVersionUID = 1L;
 	
-	/**
-	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about. The mains
-	 * also set the mainClass field in Settings.
-	 * 
-	 * So to find your "main" type, call Settings.getMainName().
-	 */
-	public static String getMainName()
+	public TRMappedList(List<FROM> from) throws Exception
 	{
-		return UNDEFINED;
+		super(TRNode.MAPPINGS, from);
+	}
+	
+	public TRMappedList()
+	{
+		super();
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof TRMappedList)
+		{
+			return super.equals(other);
+		}
+		
+		return false;
 	}
 }

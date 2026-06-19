@@ -27,7 +27,7 @@
 #
 
 #############################################################################
-package com.fujitsu.vdmj.tc.definitions to examples.v2c.tr.definitions;
+package com.fujitsu.vdmj.tc.definitions to tr.definitions;
 #############################################################################
 
 map TCDefinition{} to TRDefinition();
@@ -38,7 +38,7 @@ map TCValueDefinition{comments, pattern, type, exp} to TRValueDefinition(comment
 map TCExplicitFunctionDefinition{comments, name, type, paramPatternList, body} to TRExplicitFunctionDefinition(comments, name, type, paramPatternList, body);
 
 #############################################################################
-package com.fujitsu.vdmj.tc.expressions to examples.v2c.tr.expressions;
+package com.fujitsu.vdmj.tc.expressions to tr.expressions;
 #############################################################################
 
 map TCExpression{} to TRExpression();
@@ -59,7 +59,7 @@ map TCGreaterEqualExpression{left, op, right} to TRCompareExpression(left, op, r
 map TCApplyExpression{root, args} to TRApplyExpression(root, args);
 
 #############################################################################
-package com.fujitsu.vdmj.tc.lex to examples.v2c.tr.lex;
+package com.fujitsu.vdmj.tc.lex to tr.lex;
 #############################################################################
 
 unmapped com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -71,21 +71,21 @@ unmapped com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexCommentList;
 
 #############################################################################
-package com.fujitsu.vdmj.tc.modules to examples.v2c.tr.modules;
+package com.fujitsu.vdmj.tc.modules to tr.modules;
 #############################################################################
 
 map TCModuleList{} to TRModuleList(this);
 map TCModule{name, defs} to TRModule(name, defs);
 
 #############################################################################
-package com.fujitsu.vdmj.tc.patterns to examples.v2c.tr.patterns;
+package com.fujitsu.vdmj.tc.patterns to tr.patterns;
 #############################################################################
 
 map TCPatternListList{} to TRParameterList(this); 
 unmapped com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 
 #############################################################################
-package com.fujitsu.vdmj.tc.types to examples.v2c.tr.types;
+package com.fujitsu.vdmj.tc.types to tr.types;
 #############################################################################
 
 map TCType{} to TRType();

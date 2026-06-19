@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -26,33 +26,34 @@ package commands;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
-import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
+import dap.DAPMessageList;
+import dap.DAPRequest;
+import json.JSONObject;
 import tr.TRNode;
 import tr.definitions.TRClassList;
 import tr.modules.TRModuleList;
+import vdmj.commands.AnalysisCommand;
+import workspace.PluginRegistry;
+import workspace.plugins.TCPlugin;
 
 /**
- * All command line plugins must extend AnalysisCommand and be in the class "plugins" by
- * default. The packages searched for plugins can be changed using the "vdmj.cmd.plugin_packages"
- * JVM property.
+ * All LSP console commands must extend AnalysisCommand.
  */
-public class TranslateCommand extends AnalysisCommand
+public class TranslateCommandLSP extends AnalysisCommand
 {
 	private final static String CMD = "translate";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = CMD + " - translate the VDM specification";
 
 	/**
-	 * The constructor is called from the command line interpreter when the user first types
-	 * "translate &lt;args&gt;". It is passed the whole line typed by the user, which is broken into
+	 * The constructor is called from the plugin's getCommand when the user types
+	 * "translate". It is passed the whole line typed by the user, which is broken into
 	 * an argv[] array by the superclass.
 	 */
-	public TranslateCommand(String line)
+	public TranslateCommandLSP(String line)
 	{
 		super(line);
 		
@@ -63,47 +64,56 @@ public class TranslateCommand extends AnalysisCommand
 	}
 	
 	/**
-	 * The run method is called whenever the user types "translate &lt;args&gt;" in the VDMJ command
-	 * line interpreter (CommandReader.java). Note that this class has access to the "argv"
-	 * array, which is created during construction (above).
+	 * The run method is called whenever the user types "translate" in the VSCode console.
+	 * Note that this class has access to the "argv" array, which is created during construction (above).
 	 * 
 	 * The example run method uses the ClassMapper to turn the type checked tree (from the TCPlugin)
 	 * into a "TR" tree. This uses the mappings file defined in the TRNode root class, which all
 	 * translatable classes must extend.
 	 * 
-	 * After converting the TC tree to a TR tree, this is then used to translate the specification
-	 * into "C". The result, a String, is just returned by the method, which appears in the user console
+	 * After converting the TC tree to a TR tree, this is used to translate the specification
+	 * into "C". The result, a String, is returned by the method, which appears in the user console
 	 * session.
 	 */
 	@Override
-	public String run(String line)
+	public DAPMessageList run(DAPRequest request)
 	{
 		try
 		{
 			TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+			String result = null;
 			
 			switch (Settings.dialect)
 			{
 				case VDM_SL:
-					TCModuleList tcModules = tc.getTC();
-					TRModuleList trModules = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(tcModules);
-					return trModules.translate();
-				
+					TCModuleList mlist = tc.getTC();
+					TRModuleList trModules = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(mlist);
+					result = trModules.translate();
+					break;
+					
 				case VDM_PP:
 				case VDM_RT:
-					TCClassList tcClasses = tc.getTC();
-					TRClassList trClasses = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(tcClasses);
-					return trClasses.translate();
-
+					TCClassList clist = tc.getTC();
+					TRClassList trClasses = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(clist);
+					result = trClasses.translate();
+					break;
+					
 				default:
-					return "Unknown interpreter type?";
+					return new DAPMessageList(request, false, "Unknown dialect?", null);
 			}
+
+			return new DAPMessageList(request, new JSONObject("result", result));
 		}
 		catch (Exception e)
 		{
-			System.out.println("Specification contains untranslatable clauses:");
-			System.out.println(e.getMessage());
-			return null;
+			return new DAPMessageList(request, false,
+				"Specification contains untranslatable clauses:\n" +e.getMessage(), null);
 		}
+	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
 	}
 }

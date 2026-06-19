@@ -31,12 +31,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
-
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -54,7 +55,6 @@ import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
-
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
@@ -64,7 +64,11 @@ import workspace.EventListener;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.events.CodeLensEvent;
+import workspace.events.InlayHintEvent;
 import workspace.events.LSPEvent;
+import workspace.inlays.InlayHint;
+import workspace.inlays.TCImplicitTypeInlayHint;
+import workspace.inlays.TCInlayHint;
 import workspace.lenses.TCCodeLens;
 import workspace.lenses.TCLaunchDebugLens;
 
@@ -88,12 +92,14 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	}
 
 	protected final Map<File, JSONArray> codeLenses;		// cache for efficiency
+	protected final Map<File, List<TCInlayHint>> inlayHints;		// cache for efficiency
 
 	protected TCPlugin()
 	{
 		super();
 
 		codeLenses = new HashMap<File, JSONArray>();
+		inlayHints = new HashMap<File, List<TCInlayHint>>();
 	}
 	
 	@Override
@@ -114,6 +120,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckTypeEvent.class, this);
 		eventhub.register(CodeLensEvent.class, this);
+		eventhub.register(InlayHintEvent.class, this);
 	}
 
 	@Override
@@ -128,12 +135,18 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		{
 			ASTPlugin ast = registry.getPlugin("AST");
 			checkLoadedFiles(ast.getAST(), (CheckTypeEvent)event);
+			warningsToHints();
 			return new RPCMessageList();
 		}
 		else if (event instanceof CodeLensEvent)
 		{
 			CodeLensEvent le = (CodeLensEvent)event;
 			return new RPCMessageList(le.request, getCodeLenses(le.file));
+		}
+		else if (event instanceof InlayHintEvent)
+		{
+			InlayHintEvent ihe = (InlayHintEvent)event;
+			return new RPCMessageList(ihe.request, getInlayHints(ihe.file, ihe.range));
 		}
 		else
 		{
@@ -142,10 +155,43 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
+	/**
+	 * Go through the list of TC warnings and convert some into inlay hints.
+	 */
+	private void warningsToHints()
+	{
+		Map<File, Set<VDMMessage>> messages = messagehub.getPluginMessages(this);
+
+		for (File file: messages.keySet())
+		{
+			Iterator<VDMMessage> iter = messages.get(file).iterator();
+
+			while (iter.hasNext())
+			{
+				VDMMessage msg = iter.next();
+				String[] parts = msg.message.split("\\s*,\\s*");
+
+				switch (msg.number)
+				{
+					case 5500:	// "<Inlay hint name>, <arg>, ..."
+						switch (parts[0])
+						{
+							case "TCImplicitTypeInlayHint":
+								addInlayHint(msg.location.file, new TCImplicitTypeInlayHint(msg.location, parts[1]));
+								iter.remove();
+								break;
+						}
+						break;
+				}
+			}
+		}
+	}
+
 	protected void preCheck(CheckPrepareEvent ev)
 	{
 		messagehub.clearPluginMessages(this);
 		codeLenses.clear();
+		inlayHints.clear();
 	}
 	
 	/**
@@ -165,6 +211,40 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 		
 		return lenses;
+	}
+
+		
+	public void addInlayHint(File file, TCInlayHint hint)
+	{
+		List<TCInlayHint> list = inlayHints.get(file);
+		
+		if (list == null)
+		{
+			list = new Vector<TCInlayHint>();
+			inlayHints.put(file, list);
+		}
+		
+		list.add(hint);
+	}
+
+	private JSONArray getInlayHints(File file, JSONObject range)
+	{
+		JSONArray results = new JSONArray();
+		ASTPlugin ast = registry.getPlugin("AST");
+		boolean dirty = ast.isDirty();
+
+		if (inlayHints.containsKey(file))
+		{
+			for (InlayHint hint: inlayHints.get(file))
+			{
+				if (!dirty || hint.whenDirty())
+				{
+					results.add(hint.getInlayHint());
+				}
+			}
+		}
+		
+		return results;
 	}
 	
 	public TCExpression checkExpression(ASTExpression ast, Environment env) throws Exception

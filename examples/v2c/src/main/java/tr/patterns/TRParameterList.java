@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,28 +22,23 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj;
+package tr.patterns;
 
-/**
- * An interface, implemented by all Java "main" providers, to help identify the
- * environment currently running. See Settings.mainClass.
- */
-public interface VDMJMain
+import java.util.Vector;
+
+import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.tc.patterns.TCPattern;
+import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
+
+public class TRParameterList extends Vector<String> implements Mappable
 {
-	public static final String VDMJ_MAIN = "VDMJ";
-	public static final String LSP_MAIN = "LSP";
-	public static final String DBGP_MAIN = "DBGP";
-	public static final String UNDEFINED = "undefined";
-	
-	/**
-	 * This method should be implemented in every VDMJMain, returning a useful
-	 * identifier. The constants above are the ones we know about. The mains
-	 * also set the mainClass field in Settings.
-	 * 
-	 * So to find your "main" type, call Settings.getMainName().
-	 */
-	public static String getMainName()
+	private static final long serialVersionUID = 1L;
+
+	public TRParameterList(TCPatternListList list)
 	{
-		return UNDEFINED;
+		for (TCPattern p: list.get(0))	// Only the first - no curried sets!
+		{
+			add(p.toString());
+		}
 	}
 }
