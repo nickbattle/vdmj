@@ -35,15 +35,15 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 import commands.TranslateCommandLSP;
-import examples.v2c.tr.TRNode;
-import examples.v2c.tr.definitions.TRClassList;
-import examples.v2c.tr.modules.TRModuleList;
 import json.JSONObject;
 import lsp.Utils;
 import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import tr.TRNode;
+import tr.definitions.TRClassList;
+import tr.modules.TRModuleList;
 import vdmj.commands.AnalysisCommand;
 import workspace.Diag;
 import workspace.EventListener;

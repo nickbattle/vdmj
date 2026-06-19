@@ -32,9 +32,9 @@ import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
-import examples.v2c.tr.TRNode;
-import examples.v2c.tr.definitions.TRClassList;
-import examples.v2c.tr.modules.TRModuleList;
+import tr.TRNode;
+import tr.definitions.TRClassList;
+import tr.modules.TRModuleList;
 
 /**
  * All command line plugins must extend AnalysisCommand and be in the class "plugins" by

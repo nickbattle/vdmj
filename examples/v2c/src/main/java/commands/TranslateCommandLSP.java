@@ -31,10 +31,10 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import examples.v2c.tr.TRNode;
-import examples.v2c.tr.definitions.TRClassList;
-import examples.v2c.tr.modules.TRModuleList;
 import json.JSONObject;
+import tr.TRNode;
+import tr.definitions.TRClassList;
+import tr.modules.TRModuleList;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.TCPlugin;
