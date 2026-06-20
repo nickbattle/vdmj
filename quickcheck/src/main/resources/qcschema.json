@@ -15,18 +15,12 @@
 					"type": "object",
 					"properties": {
 						"timeout": {
-							"type": "integer"
-						},
-						"obligations": {
-							"type": "array",
-							"items": {
-								"type": "integer"
-							}
+							"type": "integer",
+							"description": "The timeout in milliseconds"
 						}
 					},
 					"required": [
-						"timeout",
-						"obligations"
+						"timeout"
 					],
 					"additionalProperties": false
 				},
@@ -36,10 +30,12 @@
 						"type": "object",
 						"properties": {
 							"name": {
-								"type": "string"
+								"type": "string",
+								"description": "The strategy name"
 							},
 							"enabled": {
-								"type": "boolean"
+								"type": "boolean",
+								"description": "Whether the strategy is enabled"
 							}
 						},
 						"required": [

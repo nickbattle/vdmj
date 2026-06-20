@@ -160,26 +160,25 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		if (request.get("params") != null)
 		{
 			JSONObject params = request.get("params");
-			
+			JSONArray obligations = params.get("obligations");
+				
+			if (obligations != null && !obligations.isEmpty())
+			{
+				for (int i=0; i < obligations.size(); i++)
+				{
+					long po = obligations.index(i);
+					poList.add((int) po);
+				}
+			}
+			else
+			{
+				poNames.add(".*");
+			}
+
 			if (params.containsKey("config"))
 			{
 				JSONObject config = params.get("config");
 				result.putAll(config);
-
-				JSONArray obligations = config.get("obligations");
-				
-				if (obligations != null && !obligations.isEmpty())
-				{
-					for (int i=0; i < obligations.size(); i++)
-					{
-						long po = obligations.index(i);
-						poList.add((int) po);
-					}
-				}
-				else
-				{
-					poNames.add(".*");
-				}
 			}
 		}
 		
@@ -263,6 +262,9 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 				JSONReader jr = new JSONReader(isr);
 				JSONObject schema = jr.readObject();
 				isr.close();
+
+				// Now offer the schema to each QC plugin, to allow them to add extra
+				// fields - probably strategy options?
 				return schema;
 			}
 			else
