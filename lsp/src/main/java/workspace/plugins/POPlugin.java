@@ -135,7 +135,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void setServerCapabilities(JSONObject capabilities)
+	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		JSONObject experimental = capabilities.get("experimental");
 		

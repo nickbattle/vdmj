@@ -230,7 +230,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	}
 
 	@Override
-	public void setServerCapabilities(JSONObject capabilities)
+	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		JSONObject provider = capabilities.getPath("experimental.proofObligationProvider");
 		

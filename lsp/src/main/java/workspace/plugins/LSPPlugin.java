@@ -76,6 +76,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.GetResource;
 
+import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancelHandler;
@@ -337,6 +338,45 @@ public class LSPPlugin extends AnalysisPlugin
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+	}
+
+	/**
+	 * This is called via the LSPInitializeResponse construction.
+	 */
+	@Override
+	public void setLSPCapabilities(JSONObject cap)
+	{
+		cap.put("definitionProvider", true);			// Go to definition for F12
+		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
+
+		cap.put("completionProvider",							// Completions
+			new JSONObject(
+				"triggerCharacters", new JSONArray(".", "`"),
+				"resolveProvider", false));
+		
+		cap.put("textDocumentSync",
+			new JSONObject(
+				"openClose", true,
+				"save", !hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"),
+				"change", 2				// incremental
+			));
+		
+		cap.put("codeLensProvider",
+			new JSONObject("resolveProvider", false));
+		
+		cap.put("referencesProvider", true);
+		
+		cap.put("typeHierarchyProvider", true);
+
+		cap.put("inlayHintProvider",
+			new JSONObject("resolveProvider", false));
+
+		/**
+		 * Experimental responses are partly fixed, from the implicit Server functions, and
+		 * party added by registered plugins.
+		 */
+		cap.put("experimental",
+				new JSONObject("dapServer", new JSONObject("port", DAPServerSocket.getPort())));
 	}
 
 	/**

@@ -24,11 +24,8 @@
 
 package lsp;
 
-import dap.DAPServerSocket;
-import json.JSONArray;
 import json.JSONObject;
 import workspace.PluginRegistry;
-import workspace.plugins.LSPPlugin;
 
 public class LSPInitializeResponse extends JSONObject
 {
@@ -44,48 +41,8 @@ public class LSPInitializeResponse extends JSONObject
 
 	private JSONObject getServerCapabilities()
 	{
-		JSONObject cap = new JSONObject();
-		LSPPlugin manager = LSPPlugin.getInstance();
-		
-		
-		cap.put("definitionProvider", true);			// Go to definition for F12
-		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
-
-		cap.put("completionProvider",					// Completions
-			new JSONObject(
-				"triggerCharacters", new JSONArray(".", "`"),
-				"resolveProvider", false));
-		
-		cap.put("textDocumentSync",
-			new JSONObject(
-				"openClose", true,
-				"save", !manager.hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"),
-				"change", 2				// incremental
-			));
-		
-		cap.put("codeLensProvider",
-			new JSONObject("resolveProvider", false));
-		
-		cap.put("referencesProvider", true);
-		
-		cap.put("typeHierarchyProvider", true);
-
-		cap.put("inlayHintProvider",
-			new JSONObject("resolveProvider", false));
-
-		/**
-		 * Experimental responses are partly fixed, from the implicit Server functions, and
-		 * party added by registered plugins.
-		 */
-		cap.put("experimental",
-				new JSONObject(
-						"translateProvider", new JSONObject(
-								"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
-								"workDoneProgress", false),
-						"dapServer", new JSONObject("port", DAPServerSocket.getPort())));
-		
-		PluginRegistry.getInstance().setPluginCapabilities(cap);
-
+		JSONObject cap = new JSONObject("experimental", new JSONObject());
+		PluginRegistry.getInstance().setLSPCapabilities(cap);
 		return cap;
 	}
 }
