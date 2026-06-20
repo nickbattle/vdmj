@@ -43,6 +43,7 @@ import quickcheck.QuickCheck;
 import quickcheck.commands.QCConsole;
 import quickcheck.commands.QCRunLSPCommand;
 import quickcheck.commands.QuickCheckLSPCommand;
+import quickcheck.strategies.QCStrategy;
 import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -263,8 +264,19 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 				JSONObject schema = jr.readObject();
 				isr.close();
 
-				// Now offer the schema to each QC plugin, to allow them to add extra
-				// fields - probably strategy options?
+				// Now offer the schema to each strategy plugin, to allow them to add extra
+				// "strategy" items.
+
+				 QuickCheck qc = new QuickCheck();
+				 qc.loadStrategies(new Vector<String>());
+				 JSONArray oneOf = schema.getPath("properties.params.properties.strategies.oneOf");
+				 oneOf.remove(0);	// remove dummy entry
+
+				 for (QCStrategy strategy: qc.getAllStrategies())
+				 {
+					strategy.addStrategySchema(oneOf);
+				 }
+
 				return schema;
 			}
 			else

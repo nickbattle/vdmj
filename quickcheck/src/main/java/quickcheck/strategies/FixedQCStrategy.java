@@ -94,6 +94,8 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
+import json.JSONArray;
+import json.JSONObject;
 import quickcheck.QuickCheck;
 import quickcheck.QuickCheckException;
 import quickcheck.visitors.FixedRangeCreator;
@@ -177,6 +179,15 @@ public class FixedQCStrategy extends QCStrategy
 				errorCount++;
 			}
 		}
+	}
+
+	@Override
+	public JSONObject addStrategySchema(JSONArray oneOf)
+	{
+		JSONObject entry = super.addStrategySchema(oneOf);
+		JSONObject properties = entry.get("properties");
+		properties.put("size", new JSONObject("type", "integer"));
+		return entry;
 	}
 	
 	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException, ParserException

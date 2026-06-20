@@ -40,6 +40,8 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
 
+import json.JSONArray;
+import json.JSONObject;
 import quickcheck.QuickCheck;
 
 public class FiniteQCStrategy extends QCStrategy
@@ -104,6 +106,15 @@ public class FiniteQCStrategy extends QCStrategy
 	{
 		verbose("finite:size = %d\n", expansionLimit);
 		return true;
+	}
+
+	@Override
+	public JSONObject addStrategySchema(JSONArray oneOf)
+	{
+		JSONObject entry = super.addStrategySchema(oneOf);
+		JSONObject properties = entry.get("properties");
+		properties.put("size", new JSONObject("type", "integer"));
+		return entry;
 	}
 
 	@Override

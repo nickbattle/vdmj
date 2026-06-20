@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 
+import json.JSONArray;
+import json.JSONObject;
 import quickcheck.QuickCheck;
 
 abstract public class QCStrategy
@@ -66,5 +68,21 @@ abstract public class QCStrategy
 	public void maybeHeuristic(ProofObligation po)
 	{
 		return;		// Should update po.message
+	}
+
+	/**
+	 * Add the default name/enabled fields to a new oneOff schema entry
+	 */
+	public JSONObject addStrategySchema(JSONArray oneOf)
+	{
+		JSONObject entry = new JSONObject(
+			"type", "object",
+			"properties", new JSONObject(
+				"name", new JSONObject("const", getName()),
+				"enabled", new JSONObject("const", useByDefault())
+			));
+
+		oneOf.add(entry);
+		return entry;
 	}
 }

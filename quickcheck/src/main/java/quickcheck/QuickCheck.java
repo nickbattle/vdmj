@@ -220,6 +220,14 @@ public class QuickCheck
 	{
 		return disabled;
 	}
+
+	public List<QCStrategy> getAllStrategies()
+	{
+		Vector<QCStrategy> result = new Vector<QCStrategy>();
+		result.addAll(strategies);
+		result.addAll(disabled);
+		return result;
+	}
 	
 	public ProofObligationList getChosenPOs()
 	{

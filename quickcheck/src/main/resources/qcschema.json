@@ -3,10 +3,10 @@
 	"type": "object",
 	"properties": {
 		"plugin": {
-			"type": "string"
+			"const": "QC"
 		},
 		"filename": {
-			"type": "string"
+			"const": "quickcheck.json"
 		},
 		"params": {
 			"type": "object",
@@ -26,24 +26,10 @@
 				},
 				"strategies": {
 					"type": "array",
-					"items": {
-						"type": "object",
-						"properties": {
-							"name": {
-								"type": "string",
-								"description": "The strategy name"
-							},
-							"enabled": {
-								"type": "boolean",
-								"description": "Whether the strategy is enabled"
-							}
-						},
-						"required": [
-							"name",
-							"enabled"
-						],
-						"additionalProperties": true
-					}
+					"description": "Parameter options for each strategy",
+					"oneOf": [
+						{}
+					]
 				}
 			},
 			"additionalProperties": false
