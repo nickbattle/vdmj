@@ -35,7 +35,7 @@ public class And extends Expression
 		for (Source clause: clauses)
 		{
 			add(clause);	// Can't construct with varargs and fixed value
-			addConstraints(clause);
+			mergeConstraints(clause);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class And extends Expression
 		for (Source clause: clauses)
 		{
 			add(clause);	// Can't construct with varargs and fixed value
-			addConstraints(clause);
+			mergeConstraints(clause);
 		}
 	}
 }

@@ -105,7 +105,7 @@ public class SMTLIB
 			Expression forall = node.apply(new ExpressionToSMTConverter(), locals);
 			Bracketed binds = (Bracketed)forall.get(1);
 
-			// Add define-consts for the forall bindings
+			// Add declare-consts for the forall bindings
 			for (Source bind: binds)
 			{
 				Expression pair = (Expression)bind;
@@ -117,13 +117,14 @@ public class SMTLIB
 			script.addAll(tcexp.apply(new SMTExpressionAnalysis(), locals));
 			removeDuplicates(script);
 
-			// Add top level assertion if there are any qualifiers
+			// Add top level assertions if there are any constraints
 			Expression body = (Expression)forall.get(2);
+			Script topLevelConstraints = body.getConstraintAssertions();
 
-			if (body instanceof Implies)
+			if (!topLevelConstraints.isEmpty())
 			{
-				script.add(new AssertCommand(body.get(1)));
-				body = (Expression)body.get(2);
+				script.add(new Comment("Top level constraints", true));
+				script.addAll(topLevelConstraints);
 			}
 
 			script.add(new Comment("Obligation satisfiable?", true));

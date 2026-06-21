@@ -216,7 +216,7 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 
 		if (!qualifiers.isEmpty())
 		{
-			body = new Implies(new And(qualifiers), body);
+			body.addConstraints(qualifiers);
 		}
 
 		return new ForAll(binds, body);
@@ -255,9 +255,9 @@ public class ExpressionToSMTConverter extends TCExpressionVisitor<Expression, En
 			}
 		}
 
-		if (qualifiers != null)
+		if (!qualifiers.isEmpty())
 		{
-			body = new Implies(new And(qualifiers), body);
+			body.addConstraints(qualifiers);
 		}
 
 		return new Exists(binds, body);

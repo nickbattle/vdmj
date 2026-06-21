@@ -45,13 +45,13 @@ public class Expression extends SExp
 	public Expression(String operator, Source arg)
 	{
 		super(new Text(operator), arg);
-		addConstraints(arg);
+		mergeConstraints(arg);
 	}
 
 	public Expression(Source... args)
 	{
 		super(args);
-		addConstraints(args);
+		mergeConstraints(args);
 	}
 
 	public Expression(String operator, String arg)
@@ -62,7 +62,7 @@ public class Expression extends SExp
 	public Expression(String operator, Source left, Source right)
 	{
 		super(new Text(operator), left, right);
-		addConstraints(left, right);
+		mergeConstraints(left, right);
 	}
 
 	public Expression(String operator, String left, String right)
@@ -73,13 +73,13 @@ public class Expression extends SExp
 	public Expression(String operator, Source one, Source two, Source three)
 	{
 		super(new Text(operator), one, two, three);
-		addConstraints(one, two, three);
+		mergeConstraints(one, two, three);
 	}
 
 	/**
 	 * Add constraints from subexpressions.
 	 */
-	protected void addConstraints(Source... sources)
+	public void mergeConstraints(Source... sources)
 	{
 		for (Source source: sources)
 		{
@@ -89,6 +89,14 @@ public class Expression extends SExp
 				constraints.addAll(exp.constraints);
 			}
 		}
+	}
+
+	/**
+	 * Add explicit constraints.
+	 */
+	public void addConstraints(List<Expression> extra)
+	{
+		constraints.addAll(extra);
 	}
 
 	/**
@@ -107,5 +115,17 @@ public class Expression extends SExp
 			result.constraints.clear();
 			return result;
 		}
+	}
+
+	public Script getConstraintAssertions()
+	{
+		Script cmds = new Script();
+
+		for (Expression c: constraints)
+		{
+			cmds.add(new AssertCommand(c));
+		}
+
+		return cmds;
 	}
 }
