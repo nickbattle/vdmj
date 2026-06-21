@@ -102,17 +102,17 @@ public class PluginRegistry
 		return sorted;
 	}
 	
-	public void setPluginCapabilities(JSONObject capabilities)
+	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				plugin.setServerCapabilities(capabilities);
+				plugin.setLSPCapabilities(capabilities);
 			}
 			catch (Throwable e)
 			{
-				Diag.error("Exception in %s setServerCapabilities", plugin.getName());
+				Diag.error("Exception in %s setPluginCapabilities", plugin.getName());
 				Diag.error(e);
 			}
 		}
@@ -128,7 +128,7 @@ public class PluginRegistry
 			}
 			catch (Throwable e)
 			{
-				Diag.error("Exception in %s setServerCapabilities", plugin.getName());
+				Diag.error("Exception in %s setDAPCapabilities", plugin.getName());
 				Diag.error(e);
 			}
 		}

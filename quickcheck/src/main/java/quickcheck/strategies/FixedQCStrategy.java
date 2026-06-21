@@ -25,7 +25,7 @@
 package quickcheck.strategies;
 
 import static quickcheck.commands.QCConsole.println;
-import static quickcheck.commands.QCConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.io.File;
@@ -94,6 +94,8 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
+import json.JSONArray;
+import json.JSONObject;
 import quickcheck.QuickCheck;
 import quickcheck.QuickCheckException;
 import quickcheck.visitors.FixedRangeCreator;
@@ -177,6 +179,15 @@ public class FixedQCStrategy extends QCStrategy
 				errorCount++;
 			}
 		}
+	}
+
+	@Override
+	public JSONObject addStrategySchema(JSONArray oneOf)
+	{
+		JSONObject entry = super.addStrategySchema(oneOf);
+		JSONObject properties = entry.get("properties");
+		properties.put("size", new JSONObject("type", "integer", "description", "The number of values to try"));
+		return entry;
 	}
 	
 	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException, ParserException

@@ -1,13 +1,30 @@
 {
-	"plugin": "QuickCheck",
+	"plugin": "QC",
 	"filename": "quickcheck.json",
 	"schema": {
+		"$schema": "https://json-schema.org/draft/2020-12/schema",
+		"type": "object",
 		"properties": {
-			"timeout": {
-				"type": "integer",
-				"title": "The timeout in milliseconds",
-				"default": 5000
+			"config": {
+				"type": "object",
+				"properties": {
+					"timeout": {
+						"type": "integer",
+						"description": "The timeout in milliseconds"
+					}
+				},
+				"required": [
+					"timeout"
+				],
+				"additionalProperties": false
+			},
+			"strategies": {
+				"type": "array",
+				"description": "Parameter options for each strategy",
+				"oneOf": [
+				]
 			}
-		}
+		},
+		"additionalProperties": false
 	}
 }

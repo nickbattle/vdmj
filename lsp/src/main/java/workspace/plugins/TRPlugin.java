@@ -36,6 +36,7 @@ import java.util.Set;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.SourceFile;
 
+import json.JSONArray;
 import json.JSONObject;
 import lsp.lspx.TranslateHandler;
 import rpc.RPCErrors;
@@ -80,6 +81,16 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		lspDispatcher.register(new TranslateHandler(), "slsp/TR/translate");
+	}
+
+	@Override
+	public void setLSPCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+		experimental.put("translateProvider",
+			new JSONObject(
+			"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
+			"workDoneProgress", false));
 	}
 
 	/**

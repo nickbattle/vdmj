@@ -37,6 +37,8 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
+import json.JSONArray;
+import json.JSONObject;
 import quickcheck.QuickCheck;
 import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.RandomRangeCreator;
@@ -117,6 +119,15 @@ public class RandomQCStrategy extends QCStrategy
 		return true;
 	}
 
+	@Override
+	public JSONObject addStrategySchema(JSONArray oneOf)
+	{
+		JSONObject entry = super.addStrategySchema(oneOf);
+		JSONObject properties = entry.get("properties");
+		properties.put("size", new JSONObject("type", "integer", "description", "The number of values to try"));
+		properties.put("seed", new JSONObject("type", "integer", "description", "The PRNG seed to use"));
+		return entry;
+	}
 	@Override
 	public boolean useByDefault()
 	{
