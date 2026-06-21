@@ -25,7 +25,7 @@
 package quickcheck.strategies;
 
 import static quickcheck.commands.QCConsole.println;
-import static quickcheck.commands.QCConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.io.File;
@@ -186,7 +186,7 @@ public class FixedQCStrategy extends QCStrategy
 	{
 		JSONObject entry = super.addStrategySchema(oneOf);
 		JSONObject properties = entry.get("properties");
-		properties.put("size", new JSONObject("type", "integer"));
+		properties.put("size", new JSONObject("type", "integer", "description", "The number of values to try"));
 		return entry;
 	}
 	

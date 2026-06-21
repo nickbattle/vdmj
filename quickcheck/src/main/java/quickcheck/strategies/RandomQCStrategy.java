@@ -124,8 +124,8 @@ public class RandomQCStrategy extends QCStrategy
 	{
 		JSONObject entry = super.addStrategySchema(oneOf);
 		JSONObject properties = entry.get("properties");
-		properties.put("size", new JSONObject("type", "integer"));
-		properties.put("seed", new JSONObject("type", "integer"));
+		properties.put("size", new JSONObject("type", "integer", "description", "The number of values to try"));
+		properties.put("seed", new JSONObject("type", "integer", "description", "The PRNG seed to use"));
 		return entry;
 	}
 	@Override

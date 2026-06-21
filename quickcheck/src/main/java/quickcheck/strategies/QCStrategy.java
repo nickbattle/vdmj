@@ -78,8 +78,8 @@ abstract public class QCStrategy
 		JSONObject entry = new JSONObject(
 			"type", "object",
 			"properties", new JSONObject(
-				"name", new JSONObject("const", getName()),
-				"enabled", new JSONObject("const", useByDefault())
+				"name", new JSONObject("const", getName(), "description", "The strategy name"),
+				"enabled", new JSONObject("const", useByDefault(), "description", "Whether the strategy is included")
 			));
 
 		oneOf.add(entry);

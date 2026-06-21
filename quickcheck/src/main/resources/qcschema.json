@@ -1,43 +1,31 @@
 {
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"type": "object",
-	"properties": {
-		"plugin": {
-			"const": "QC"
-		},
-		"filename": {
-			"const": "quickcheck.json"
-		},
-		"params": {
-			"type": "object",
-			"properties": {
-				"config": {
-					"type": "object",
-					"properties": {
-						"timeout": {
-							"type": "integer",
-							"description": "The timeout in milliseconds"
-						}
-					},
-					"required": [
-						"timeout"
-					],
-					"additionalProperties": false
+	"plugin": "QC",
+	"filename": "quickcheck.json",
+	"schema": {
+		"$schema": "https://json-schema.org/draft/2020-12/schema",
+		"type": "object",
+		"properties": {
+			"config": {
+				"type": "object",
+				"properties": {
+					"timeout": {
+						"type": "integer",
+						"description": "The timeout in milliseconds"
+					}
 				},
-				"strategies": {
-					"type": "array",
-					"description": "Parameter options for each strategy",
-					"oneOf": [
-						{}
-					]
-				}
+				"required": [
+					"timeout"
+				],
+				"additionalProperties": false
 			},
-			"additionalProperties": false
-		}
-	},
-	"required": [
-		"plugin",
-		"filename",
-		"params"
-	]
+			"strategies": {
+				"type": "array",
+				"description": "Parameter options for each strategy",
+				"oneOf": [
+					{}
+				]
+			}
+		},
+		"additionalProperties": false
+	}
 }
