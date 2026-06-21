@@ -270,7 +270,6 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 				 QuickCheck qc = new QuickCheck();
 				 qc.loadStrategies(new Vector<String>());
 				 JSONArray oneOf = schema.getPath("schema.properties.strategies.oneOf");
-				 oneOf.remove(0);	// remove dummy entry
 
 				 for (QCStrategy strategy: qc.getAllStrategies())
 				 {

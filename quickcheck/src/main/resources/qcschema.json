@@ -22,7 +22,6 @@
 				"type": "array",
 				"description": "Parameter options for each strategy",
 				"oneOf": [
-					{}
 				]
 			}
 		},
