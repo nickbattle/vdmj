@@ -1,6 +1,0 @@
-{
-    "name": "smtlib",
-    "description": "SMTLIB solver verification plugin",
-    "dialects": [ "vdmsl" ],
-    "precision": "standard"
-}
