@@ -46,8 +46,7 @@ echo "**************************** Updating VSIX! ****************************"
     	$EXTRACT/$VDMJ/lsp-\*.jar \
     	$EXTRACT/$VDMJ/annotations/annotations-\*.jar \
     	$EXTRACT/$VDMJ/libs/stdlib-\*.jar \
-    	$EXTRACT/$VDMJ/plugins/quickcheck-\*.jar \
-    	$EXTRACT/$VDMJ/plugins/smtlib-\*.jar
+    	$EXTRACT/$VDMJ/plugins/quickcheck-\*.jar
     
     unzip -q "$VSIX" "$EXTRACT/$VDMJ/*"
     
@@ -58,7 +57,6 @@ echo "**************************** Updating VSIX! ****************************"
     cp -vf annotations-$VERSION.jar $EXTRACT/$VDMJ/annotations
     cp -vf stdlib-$VERSION.jar $EXTRACT/$VDMJ/libs
     cp -vf quickcheck-$VERSION.jar $EXTRACT/$VDMJ/plugins
-	cp -vf smtlib-$VERSION.jar $EXTRACT/$VDMJ/plugins
 
     zip -q "$VSIX" $(find $EXTRACT -type f)
     rm -rf extension
