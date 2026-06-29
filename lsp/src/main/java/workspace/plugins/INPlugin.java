@@ -42,6 +42,7 @@ import vdmj.commands.AnalysisCommand;
 import vdmj.commands.DefaultCommand;
 import vdmj.commands.HelpCommand;
 import vdmj.commands.InitCommand;
+import vdmj.commands.OrderCommand;
 import vdmj.commands.PluginsCommand;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.QuitCommand;
@@ -135,6 +136,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "init":		return new InitCommand(line);
 			case "plugins":		return new PluginsCommand(line);
 			case "script":		return new ScriptCommand(line);
+			case "order":		return new OrderCommand(line);
 			case "help":
 			case "?":			return new HelpCommand(line);
 			case "version":		return new VersionCommand(line);
@@ -159,6 +161,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			InitCommand.HELP,
 			PluginsCommand.HELP,
 			ScriptCommand.HELP,
+			OrderCommand.HELP,
 			QuitCommand.HELP,
 			HelpCommand.HELP,
 			VersionCommand.HELP
