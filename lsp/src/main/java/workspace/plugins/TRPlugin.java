@@ -89,8 +89,14 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 		JSONObject experimental = capabilities.get("experimental");
 		experimental.put("translateProvider",
 			new JSONObject(
-			"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
-			"workDoneProgress", false));
+			"languages", new JSONArray(
+					new JSONObject("name", "latex", "description", "VDM to LaTeX"),
+					new JSONObject("name", "word", "description", "VDM to MS Word HTML"),
+					new JSONObject("name", "coverage", "description", "VDM execution coverage"),
+					new JSONObject("name", "graphviz", "description", "VDM to GraphViz")
+				),
+				"workDoneProgress", false
+			));
 	}
 
 	/**
