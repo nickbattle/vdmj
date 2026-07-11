@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.runtime.SourceFile;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.lspx.CoverageHandler;
 import lsp.lspx.TranslateHandler;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -81,22 +82,25 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		lspDispatcher.register(new TranslateHandler(), "slsp/TR/translate");
+		lspDispatcher.register(new CoverageHandler(), "slsp/TR/coverage");
 	}
 
 	@Override
 	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		JSONObject experimental = capabilities.get("experimental");
+
 		experimental.put("translateProvider",
 			new JSONObject(
 			"languages", new JSONArray(
 					new JSONObject("name", "latex", "description", "VDM to LaTeX"),
 					new JSONObject("name", "word", "description", "VDM to MS Word HTML"),
-					new JSONObject("name", "coverage", "description", "VDM execution coverage"),
 					new JSONObject("name", "graphviz", "description", "VDM to GraphViz")
 				),
 				"workDoneProgress", false
 			));
+
+		experimental.put("coverageProvider", true);
 	}
 
 	/**
