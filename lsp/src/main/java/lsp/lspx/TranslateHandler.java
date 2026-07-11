@@ -105,9 +105,6 @@ public class TranslateHandler extends LSPHandler
 				case "word":
 					return tr.translateWord(request, file, saveUri, options);
 				
-				case "coverage":
-					return tr.translateCoverage(request, file, saveUri, options);
-				
 				case "graphviz":
 					return tr.translateGraphviz(request, file, saveUri, options);
 				
