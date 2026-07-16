@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.DependencyOrder;
 import com.fujitsu.vdmj.values.Value;
 
+import lsp.lspx.OrderHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
@@ -110,6 +111,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
+
+		lspDispatcher.register(new OrderHandler(), "slsp/ordering");
 	}
 
 	@Override
