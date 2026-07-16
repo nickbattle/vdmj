@@ -29,10 +29,11 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.INPlugin;
+import workspace.plugins.LSPPlugin;
 
-public class OrderHandler extends LSPHandler
+public class OrderingHandler extends LSPHandler
 {
-	public OrderHandler()
+	public OrderingHandler()
 	{
 		super();
 	}
@@ -40,6 +41,11 @@ public class OrderHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
+		if (!LSPPlugin.getInstance().hasClientCapability("experimental.orderingProvider"))
+		{
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, "Ordering is not enabled by client");
+		}
+
 		switch (request.getMethod())
 		{
 			case "slsp/ordering":

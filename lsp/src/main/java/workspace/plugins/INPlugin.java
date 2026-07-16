@@ -48,7 +48,8 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.DependencyOrder;
 import com.fujitsu.vdmj.values.Value;
 
-import lsp.lspx.OrderHandler;
+import json.JSONObject;
+import lsp.lspx.OrderingHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
@@ -112,7 +113,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 
-		lspDispatcher.register(new OrderHandler(), "slsp/ordering");
+		lspDispatcher.register(new OrderingHandler(), "slsp/ordering");
 	}
 
 	@Override
@@ -133,6 +134,17 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 
 		return null;
+	}
+	
+	@Override
+	public void setLSPCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("orderingProvider", true);
+		}
 	}
 
 	abstract protected void preCheck(CheckPrepareEvent event);

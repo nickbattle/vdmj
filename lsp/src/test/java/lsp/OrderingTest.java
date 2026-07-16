@@ -34,13 +34,14 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
 import json.JSONObject;
-import lsp.lspx.OrderHandler;
+import lsp.lspx.OrderingHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 
 public class OrderingTest extends LSPTest
 {
-	private JSONObject capabilities = new JSONObject("experimental", new JSONObject());
+	private JSONObject capabilities = new JSONObject("experimental",
+		new JSONObject("orderingProvider", true));
 
 	@Test
 	public void testSL() throws Exception
@@ -54,7 +55,7 @@ public class OrderingTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		OrderHandler handler = new OrderHandler();
+		OrderingHandler handler = new OrderingHandler();
 		RPCRequest request = RPCRequest.create(123L, "slsp/ordering", null);
 		
 		RPCMessageList response = handler.request(request);
@@ -76,7 +77,7 @@ public class OrderingTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		OrderHandler handler = new OrderHandler();
+		OrderingHandler handler = new OrderingHandler();
 		RPCRequest request = RPCRequest.create(123L, "slsp/ordering", null);
 		
 		RPCMessageList response = handler.request(request);

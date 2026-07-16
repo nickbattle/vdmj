@@ -95,7 +95,7 @@ public class OrderCommand extends AnalysisCommand
 			order.classOrder(tc.getTC());
 		}
 
-		return null;
+		return new DAPMessageList(request);
 	}
 
 	/**
