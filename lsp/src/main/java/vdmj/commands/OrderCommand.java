@@ -180,12 +180,11 @@ public class OrderCommand extends AnalysisCommand
 					if (module.equals(name))
 					{
 						File file = nameToFile.get(module);
-						String filename = file.toString();
-						
-						if (!filenames.contains(filename))	// files with >= two modules
+						String relative = root.relativize(file.toPath()).toString();
+
+						if (!filenames.contains(relative))	// files with >= two modules
 						{
-							Path relative = root.relativize(file.toPath());
-							filenames.add(relative.toString());
+							filenames.add(relative);
 						}
 						break;
 					}
