@@ -179,7 +179,7 @@ public class OrderCommand extends AnalysisCommand
 				{
 					if (module.equals(name))
 					{
-						File file = nameToFile.get(module);
+						File file = nameToFile.get(module).getAbsoluteFile();
 						String relative = root.relativize(file.toPath()).toString();
 
 						if (!filenames.contains(relative))	// files with >= two modules

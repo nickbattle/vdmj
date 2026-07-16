@@ -278,7 +278,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 				{
 					if (module.equals(name))
 					{
-						File file = nameToFile.get(module);
+						File file = nameToFile.get(module).getAbsoluteFile();
 						String relative = root.relativize(file.toPath()).toString();
 
 						if (!filenames.contains(relative))	// files with >= two modules
