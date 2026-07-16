@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import workspace.PluginRegistry;
+import workspace.plugins.LSPPlugin;
 import workspace.plugins.TCPlugin;
 
 /**
@@ -167,18 +169,23 @@ public class OrderCommand extends AnalysisCommand
 			
 			List<String> ordering = topologicalSort(startpoints);
 			List<String> filenames = new Vector<String>();
-			
+
+			LSPPlugin lsp = PluginRegistry.getInstance().getPlugin("LSP");
+			Path root = lsp.getRoot().toPath();
+
 			for (String name: ordering)
 			{
 				for (String module: nameToFile.keySet())
 				{
 					if (module.equals(name))
 					{
-						String file = nameToFile.get(module).toString();
+						File file = nameToFile.get(module);
+						String filename = file.toString();
 						
-						if (!filenames.contains(file))	// files with >= two modules
+						if (!filenames.contains(filename))	// files with >= two modules
 						{
-							filenames.add(file);
+							Path relative = root.relativize(file.toPath());
+							filenames.add(relative.toString());
 						}
 						break;
 					}
