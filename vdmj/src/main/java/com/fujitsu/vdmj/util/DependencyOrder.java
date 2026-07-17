@@ -97,37 +97,53 @@ public class DependencyOrder
 
 	public void moduleOrder(TCModuleList moduleList)
     {
-		for (TCModule m: moduleList)
+		if (moduleList.size() == 1 &&
+			moduleList.firstElement().name.getName().equals("DEFAULT"))
 		{
-	    	String myname = m.name.getName();
-	    	nameToFile.put(myname, m.name.getLocation().file);
-			
-			if (m.imports != null)
+			definitionOrder(moduleList.firstElement().defs);
+
+			for (String dname: nameToFile.keySet())
 			{
-		    	for (TCImportFromModule ifm: m.imports.imports)
-		    	{
-					add(myname, ifm.name.getName());
-		    	}
+				if (!uses.containsKey(dname))
+				{
+					uses.put(dname, new HashSet<String>());
+				}
 			}
-			else
+		}
+		else
+		{
+			for (TCModule m: moduleList)
 			{
-				uses.put(myname, new HashSet<String>());
+				String myname = m.name.getName();
+				nameToFile.put(myname, m.name.getLocation().file);
+				
+				if (m.imports != null)
+				{
+					for (TCImportFromModule ifm: m.imports.imports)
+					{
+						add(myname, ifm.name.getName());
+					}
+				}
+				else
+				{
+					uses.put(myname, new HashSet<String>());
+				}
 			}
-	    }
+		}
     }
 	
 	public void definitionOrder(TCDefinitionList definitions)
 	{
 		for (TCDefinition def: definitions.singleDefinitions())
 		{
-	    	String myname = def.name.getName();
-	    	nameToFile.put(myname, def.location.file);
+	    	String defname = def.name.getName();
+	    	nameToFile.put(defname, def.location.file);
 
 			TCNameSet freevars = def.getFreeVariables();
 	    	
 	    	for (TCNameToken dep: freevars)
 	    	{
-				add(myname, dep.getName());
+				add(defname, dep.getName());
 	    	}
 	    }		
 	}
