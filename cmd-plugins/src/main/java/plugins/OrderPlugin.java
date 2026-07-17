@@ -228,6 +228,11 @@ public class OrderPlugin extends AnalysisCommand
 	
 		private int removeCycles(String start, Stack<String> stack)
 		{
+			if (start.equals("CPU") || start.equals("BUS"))
+			{
+				return 0;
+			}
+
 	    	int count = 0;
 	    	Set<String> nextSet = new HashSet<String>(uses.get(start));
 	    	
