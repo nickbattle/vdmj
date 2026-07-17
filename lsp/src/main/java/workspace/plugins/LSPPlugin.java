@@ -1633,7 +1633,7 @@ public class LSPPlugin extends AnalysisPlugin
 				}
 			}
 		}
-		else
+		else if (projectFiles.containsKey(file))
 		{
 			StringBuilder buffer = projectFiles.get(file);
 			int position = Utils.findPosition(buffer, zline, zcol);
