@@ -1359,7 +1359,12 @@ public class LSPPlugin extends AnalysisPlugin
 			case DELETE:
 				// Since the file is deleted, we can't access any file attributes, so we
 				// just check for whether it is ignored/dotpath.
-				if (onDotPath(file))
+				if (file.equals(new File(rootUri, ORDERING)))	// On dot path!
+				{
+					Diag.info("Deleted ordering file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
+				else if (onDotPath(file))
 				{
 					Diag.info("Ignoring deleted file on dot path: %s", file);
 					actionCode = DO_NOTHING;
