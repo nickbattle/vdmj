@@ -180,11 +180,11 @@ public class SourceFile
 	public void printLatexCoverage(PrintWriter out, boolean headers,
 			boolean modelOnly, boolean markCoverage, boolean insertCoverageTables)
 	{
-		Map<Integer, List<LexLocation>> hits = null;
+		Map<Integer, List<LexLocation>> misses = null;
 		
 		if (markCoverage || insertCoverageTables)
 		{
-			hits = LexLocation.getMissLocations(filename);
+			misses = LexLocation.getMissLocations(filename);
 		}
 
 		if (headers)
@@ -224,8 +224,8 @@ public class SourceFile
 			
 			if (markCoverage)
 			{
-				List<LexLocation> list = hits.get(lnum);
-				out.println(markup(spaced, list));
+				List<LexLocation> missed = misses.get(lnum);
+				out.println(markup(spaced, missed));
 			}
 			else
 			{
@@ -283,9 +283,9 @@ public class SourceFile
 		}
 	}
 
-	private String markup(String line, List<LexLocation> list)
+	private String markup(String line, List<LexLocation> missed)
     {
-		if (list == null)
+		if (missed == null)
 		{
 			return line;
 		}
@@ -294,10 +294,10 @@ public class SourceFile
 			StringBuilder sb = new StringBuilder();
 			int p = 0;
 
-			for (LexLocation m: list)
+			for (LexLocation m: missed)
 			{
 				int start = m.startPos - 1;
-				int end = m.startLine == m.endLine ? m.endPos - 1 : line.length();
+				int end = m.startLine == m.endLine ? m.endPos : line.length();
 
 				if (start >= p)		// Backtracker produces duplicate tokens
 				{
