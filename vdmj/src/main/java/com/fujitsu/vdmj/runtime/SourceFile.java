@@ -339,7 +339,7 @@ public class SourceFile
 	
 	public void printWordCoverage(PrintWriter out, boolean modelOnly, boolean coverage)
 	{
-		Map<Integer, List<LexLocation>> hits =
+		Map<Integer, List<LexLocation>> misses =
 					LexLocation.getMissLocations(filename);
 
 		out.println("<html>");
@@ -371,8 +371,8 @@ public class SourceFile
 		{
 			String line = lines.get(lnum - 1);
 			String spaced = detab(line, Properties.parser_tabstop);
-			List<LexLocation> list = coverage ? hits.get(lnum) : null;
-			out.println(markupHTML(spaced, list));
+			List<LexLocation> missed = coverage ? misses.get(lnum) : null;
+			out.println(markupHTML(spaced, missed));
 		}
 
 		if (!modelOnly)
@@ -442,7 +442,7 @@ public class SourceFile
 		return sb.toString();
 	}
 
-	private String markupHTML(String line, List<LexLocation> list)
+	private String markupHTML(String line, List<LexLocation> missed)
     {
 		if (line.isEmpty())
 		{
@@ -452,12 +452,12 @@ public class SourceFile
 		StringBuilder sb = new StringBuilder(HTMLSTART);
 		int p = 0;
 
-		if (list != null)
+		if (missed != null)
 		{
-    		for (LexLocation m: list)
+    		for (LexLocation m: missed)
     		{
     			int start = m.startPos - 1;
-    			int end = m.startLine == m.endLine ? m.endPos - 1 : line.length();
+    			int end = m.startLine == m.endLine ? m.endPos : line.length();
 
     			if (start >= p)		// Backtracker produces duplicate tokens
     			{

@@ -35,7 +35,6 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.SourceFile;
-
 import json.JSONArray;
 import json.JSONObject;
 import lsp.lspx.CoverageHandler;
@@ -312,10 +311,10 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 		File outfile = new File(subfolder, wordname);
 		
 		PrintWriter out = new PrintWriter(outfile);
-		source.printWordCoverage(out, true, false);
+		source.printWordCoverage(out, true, true);
 		out.close();
 		
-		return  outfile;
+		return outfile;
 	}
 	
 	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri, JSONObject options)
