@@ -24,6 +24,8 @@
 
 package workspace.plugins;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
@@ -35,6 +37,10 @@ import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+
+import json.JSONArray;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import vdmj.commands.ClassesCommand;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.LogCommand;
@@ -135,5 +141,16 @@ public class INPluginPR extends INPlugin
 		}
 		
 		return results;
+	}
+
+	@Override
+	public RPCMessageList getOrder(RPCRequest request)
+	{
+		Order order = new Order();
+		TCPlugin tc = registry.getPlugin("TC");
+		order.classOrder(tc.getTC());
+		List<String> filenames = order.getOrder();
+		JSONArray array = new JSONArray(filenames);
+		return new RPCMessageList(request, array);
 	}
 }

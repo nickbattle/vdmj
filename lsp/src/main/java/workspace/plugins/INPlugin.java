@@ -24,6 +24,14 @@
 
 package workspace.plugins;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
@@ -33,15 +41,22 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.util.DependencyOrder;
 import com.fujitsu.vdmj.values.Value;
 
+import json.JSONObject;
+import lsp.lspx.OrderingHandler;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.DefaultCommand;
 import vdmj.commands.HelpCommand;
 import vdmj.commands.InitCommand;
+import vdmj.commands.OrderCommand;
 import vdmj.commands.PluginsCommand;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.QuitCommand;
@@ -97,6 +112,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
+
+		lspDispatcher.register(new OrderingHandler(), "slsp/ordering");
 	}
 
 	@Override
@@ -118,6 +135,17 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 
 		return null;
 	}
+	
+	@Override
+	public void setLSPCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("orderingProvider", true);
+		}
+	}
 
 	abstract protected void preCheck(CheckPrepareEvent event);
 	
@@ -135,6 +163,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "init":		return new InitCommand(line);
 			case "plugins":		return new PluginsCommand(line);
 			case "script":		return new ScriptCommand(line);
+			case "order":		return new OrderCommand(line);
 			case "help":
 			case "?":			return new HelpCommand(line);
 			case "version":		return new VersionCommand(line);
@@ -159,6 +188,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			InitCommand.HELP,
 			PluginsCommand.HELP,
 			ScriptCommand.HELP,
+			OrderCommand.HELP,
 			QuitCommand.HELP,
 			HelpCommand.HELP,
 			VersionCommand.HELP
@@ -197,4 +227,113 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	abstract public <T extends Mappable> Interpreter getInterpreter() throws Exception;
 
 	abstract public INDefinitionList findDefinition(String name);
+
+	abstract public RPCMessageList getOrder(RPCRequest request);
+
+
+	/**
+	 * Extend the VDMJ DependencyOrder so that we can add extract filenames.
+	 */
+	protected static class Order extends DependencyOrder
+	{
+		List<String> filenames = new Vector<String>();
+
+		public Order()
+		{
+			// Nothing
+		}
+
+		protected List<String> getOrder()
+		{
+			return filenames;
+		}
+
+		@Override
+		public void moduleOrder(TCModuleList moduleList)
+		{
+			super.moduleOrder(moduleList);
+			processGraph();
+		}
+
+		@Override
+		public void classOrder(TCClassList classList)
+		{
+			super.classOrder(classList);
+			processGraph();
+		}
+		
+	    private void processGraph()
+	    {
+			/**
+			 * First remove any cycles. For some reason it's not enough to search from
+			 * the startpoints, so we just search from everywhere. It's reasonably
+			 * quick.
+			 */
+			for (String start: nameToFile.keySet())
+			{
+				removeCycles(start, new Stack<String>());
+			}
+	
+			/*
+			 * The startpoints are where there are no incoming links to a node. So
+			 * the usedBy entry is blank (removed cycles) or null.
+			 */
+			List<String> startpoints = getStartpoints();
+			List<String> ordering = topologicalSort(startpoints);
+
+			LSPPlugin lsp = PluginRegistry.getInstance().getPlugin("LSP");
+			Path root = lsp.getRoot().toPath();
+
+			for (String name: ordering)
+			{
+				for (String module: nameToFile.keySet())
+				{
+					if (module.equals(name))
+					{
+						File file = nameToFile.get(module).getAbsoluteFile();
+						String relative = root.relativize(file.toPath()).toString();
+
+						if (!filenames.contains(relative))	// files with >= two modules
+						{
+							filenames.add(relative);
+						}
+						break;
+					}
+				}
+			}
+	    }
+	
+		private int removeCycles(String start, Stack<String> stack)
+		{
+			if (start.equals("CPU") || start.equals("BUS"))
+			{
+				return 0;
+			}
+
+	    	int count = 0;
+	    	Set<String> nextSet = new HashSet<String>(uses.get(start));
+	    	
+	    	if (!nextSet.isEmpty())
+	    	{
+		    	stack.push(start);
+		    	
+		    	for (String next: nextSet)
+		    	{
+		    		if (stack.contains(next))
+		    		{
+		    			delete(start, next);
+		    			count = count + 1;
+		    		}
+		    		else
+		    		{
+		    			count += removeCycles(next, stack);
+		    		}
+		    	}
+		    	
+		    	stack.pop();
+	    	}
+	    	
+	    	return count;
+		}
+	}
 }

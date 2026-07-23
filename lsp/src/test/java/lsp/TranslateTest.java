@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.lspx.CoverageHandler;
 import lsp.lspx.TranslateHandler;
 import plugins.ISAPluginSL;
 import rpc.RPCErrors;
@@ -48,7 +49,8 @@ import workspace.PluginRegistry;
 public class TranslateTest extends LSPTest
 {
 	private JSONObject capabilities = new JSONObject(
-			"experimental", new JSONObject("translateProvider", true));
+			"experimental", new JSONObject(
+				"translateProvider", true, "coverageProvider", true));
 	
 	@Before
 	public void setUp()
@@ -179,14 +181,15 @@ public class TranslateTest extends LSPTest
 			f.delete();
 		}
 		
+		CoverageHandler chandler = new CoverageHandler();
 		File coverage = new File(testdir, "pogtest.vdmsl");
-		request = RPCRequest.create(123L, "slsp/TR/translate",
+		request = RPCRequest.create(123L, "slsp/TR/coverage",
 				new JSONObject(
 					"uri", coverage.toURI().toString(),
 					"languageId", "coverage",
 					"saveUri",	empty.toURI().toString()));
 
-		response = handler.request(request);
+		response = chandler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		assertEquals(empty.toURI()+"pogtest.vdmsl.covtbl", response.get(0).getPath("result.uri"));

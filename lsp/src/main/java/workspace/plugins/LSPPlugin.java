@@ -76,6 +76,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.GetResource;
 
+import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancelHandler;
@@ -337,6 +338,45 @@ public class LSPPlugin extends AnalysisPlugin
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+	}
+
+	/**
+	 * This is called via the LSPInitializeResponse construction.
+	 */
+	@Override
+	public void setLSPCapabilities(JSONObject cap)
+	{
+		cap.put("definitionProvider", true);			// Go to definition for F12
+		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
+
+		cap.put("completionProvider",							// Completions
+			new JSONObject(
+				"triggerCharacters", new JSONArray(".", "`"),
+				"resolveProvider", false));
+		
+		cap.put("textDocumentSync",
+			new JSONObject(
+				"openClose", true,
+				"save", !hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"),
+				"change", 2				// incremental
+			));
+		
+		cap.put("codeLensProvider",
+			new JSONObject("resolveProvider", false));
+		
+		cap.put("referencesProvider", true);
+		
+		cap.put("typeHierarchyProvider", true);
+
+		cap.put("inlayHintProvider",
+			new JSONObject("resolveProvider", false));
+
+		/**
+		 * Experimental responses are partly fixed, from the implicit Server functions, and
+		 * party added by registered plugins.
+		 */
+		cap.put("experimental",
+				new JSONObject("dapServer", new JSONObject("port", DAPServerSocket.getPort())));
 	}
 
 	/**
@@ -1319,7 +1359,12 @@ public class LSPPlugin extends AnalysisPlugin
 			case DELETE:
 				// Since the file is deleted, we can't access any file attributes, so we
 				// just check for whether it is ignored/dotpath.
-				if (onDotPath(file))
+				if (file.equals(new File(rootUri, ORDERING)))	// On dot path!
+				{
+					Diag.info("Deleted ordering file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
+				else if (onDotPath(file))
 				{
 					Diag.info("Ignoring deleted file on dot path: %s", file);
 					actionCode = DO_NOTHING;
@@ -1588,7 +1633,7 @@ public class LSPPlugin extends AnalysisPlugin
 				}
 			}
 		}
-		else
+		else if (projectFiles.containsKey(file))
 		{
 			StringBuilder buffer = projectFiles.get(file);
 			int position = Utils.findPosition(buffer, zline, zcol);

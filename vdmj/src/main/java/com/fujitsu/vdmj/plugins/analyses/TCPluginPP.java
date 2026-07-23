@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -89,5 +91,11 @@ public class TCPluginPP extends TCPlugin
 	public <T extends Collection<?>> T getTC()
 	{
 		return (T)tcClassList;
+	}
+
+	@Override
+	public Environment getGlobalEnvironment()
+	{
+		return new PublicClassEnvironment(tcClassList);
 	}
 }

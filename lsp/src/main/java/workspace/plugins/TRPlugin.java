@@ -35,8 +35,9 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.SourceFile;
-
+import json.JSONArray;
 import json.JSONObject;
+import lsp.lspx.CoverageHandler;
 import lsp.lspx.TranslateHandler;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -80,6 +81,25 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		lspDispatcher.register(new TranslateHandler(), "slsp/TR/translate");
+		lspDispatcher.register(new CoverageHandler(), "slsp/TR/coverage");
+	}
+
+	@Override
+	public void setLSPCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+
+		experimental.put("translateProvider",
+			new JSONObject(
+			"languages", new JSONArray(
+					new JSONObject("name", "latex", "description", "VDM to LaTeX"),
+					new JSONObject("name", "word", "description", "VDM to MS Word HTML"),
+					new JSONObject("name", "graphviz", "description", "VDM to GraphViz")
+				),
+				"workDoneProgress", false
+			));
+
+		experimental.put("coverageProvider", true);
 	}
 
 	/**
@@ -291,10 +311,10 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 		File outfile = new File(subfolder, wordname);
 		
 		PrintWriter out = new PrintWriter(outfile);
-		source.printWordCoverage(out, true, false);
+		source.printWordCoverage(out, true, true);
 		out.close();
 		
-		return  outfile;
+		return outfile;
 	}
 	
 	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri, JSONObject options)

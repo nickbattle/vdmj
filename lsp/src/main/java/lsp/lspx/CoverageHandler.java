@@ -35,15 +35,12 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.EventHub;
-import workspace.MessageHub;
-import workspace.events.UnknownTranslationEvent;
 import workspace.plugins.LSPPlugin;
 import workspace.plugins.TRPlugin;
 
-public class TranslateHandler extends LSPHandler
+public class CoverageHandler extends LSPHandler
 {
-	public TranslateHandler()
+	public CoverageHandler()
 	{
 		super();
 	}
@@ -51,18 +48,18 @@ public class TranslateHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		if (!LSPPlugin.getInstance().hasClientCapability("experimental.translateProvider"))
+		if (!LSPPlugin.getInstance().hasClientCapability("experimental.coverageProvider"))
 		{
-			return new RPCMessageList(request, RPCErrors.MethodNotFound, "Translate capability is not enabled by client");
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, "Coverage capability is not enabled by client");
 		}
 
 		switch (request.getMethod())
 		{
-			case "slsp/TR/translate":
+			case "slsp/TR/coverage":
 				return translate(request);
 
 			default:
-				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected slsp/translate method");
+				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected coverage method");
 		}
 	}
 
@@ -73,7 +70,6 @@ public class TranslateHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
-			String language = params.get("languageId");
 			JSONObject options = params.get("options");
 			
 			if (saveUri.exists())
@@ -96,34 +92,7 @@ public class TranslateHandler extends LSPHandler
 			}
 			
 			TRPlugin tr = registry.getPlugin("TR");
-			
-			switch (language)
-			{
-				case "latex":
-					return tr.translateLaTeX(request, file, saveUri, options);
-				
-				case "word":
-					return tr.translateWord(request, file, saveUri, options);
-				
-				case "graphviz":
-					return tr.translateGraphviz(request, file, saveUri, options);
-				
-				default:
-					RPCMessageList result = EventHub.getInstance().publish(new UnknownTranslationEvent(request, language));
-					
-					if (result.isEmpty())	// Not handled
-					{
-						Diag.error("No external plugin registered for " + language);
-						return new RPCMessageList(request, RPCErrors.MethodNotFound, language);
-					}
-					else
-					{
-						// Allow translations to raise errors
-						result.addAll(MessageHub.getInstance().getDiagnosticResponses());
-					}
-					
-					return result;
-			}
+			return tr.translateCoverage(request, file, saveUri, options);
 			
 		}
 		catch (URISyntaxException e)

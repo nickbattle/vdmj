@@ -32,6 +32,8 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -54,6 +56,18 @@ public class MultiModuleEnvironment extends Environment
 		for (POModule m: modules)
 		{
 			moduleEnvs.add(new ModuleEnvironment(m.mappedFrom));
+		}
+	}
+
+	public MultiModuleEnvironment(TCModuleList modules)
+	{
+		super(null);
+		
+		moduleEnvs = new Vector<ModuleEnvironment>(modules.size());
+		
+		for (TCModule m: modules)
+		{
+			moduleEnvs.add(new ModuleEnvironment(m));
 		}
 	}
 

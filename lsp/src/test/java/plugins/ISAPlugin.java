@@ -88,7 +88,7 @@ public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 	abstract public RPCMessageList analyse(RPCRequest request);
 
 	@Override
-	public void setServerCapabilities(JSONObject capabilities)
+	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		JSONObject experimental = capabilities.get("experimental");
 		

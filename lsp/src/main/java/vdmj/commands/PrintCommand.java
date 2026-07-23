@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
+import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
@@ -96,9 +97,10 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 					Diag.info("Processing PO code lens...");
 					POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
 					
-					if (po != null)
+					if (po != null && Settings.dialect == Dialect.VDM_SL)
 					{
-						env = new MultiModuleEnvironment(po.getPO());
+						POModuleList modules = po.getPO();
+						env = new MultiModuleEnvironment(modules);
 					}
 				}
 				

@@ -104,7 +104,7 @@ abstract public class AnalysisPlugin
 	 * in the experimental section of the initialize response. They can also set regular
 	 * server capabilities, though this should be done with care!
 	 */
-	public void setServerCapabilities(JSONObject capabilities)
+	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		return;		// LSP capabilities
 	}

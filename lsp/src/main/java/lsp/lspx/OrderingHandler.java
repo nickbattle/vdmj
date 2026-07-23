@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,27 +22,43 @@
  *
  ******************************************************************************/
 
-package lsp;
+package lsp.lspx;
 
-import json.JSONObject;
-import workspace.PluginRegistry;
+import lsp.LSPHandler;
+import rpc.RPCErrors;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
+import workspace.plugins.INPlugin;
+import workspace.plugins.LSPPlugin;
 
-public class LSPInitializeResponse extends JSONObject
+public class OrderingHandler extends LSPHandler
 {
-	private static final long serialVersionUID = 1L;
-	
-	public LSPInitializeResponse()
+	public OrderingHandler()
 	{
-		String version = com.fujitsu.vdmj.util.Utils.getVersion();
-		if (version == null) version = "unknown";
-		put("serverInfo", new JSONObject("name", "VDMJ LSP Server", "version", version));
-		put("capabilities", getServerCapabilities());
+		super();
 	}
 
-	private JSONObject getServerCapabilities()
+	@Override
+	public RPCMessageList request(RPCRequest request)
 	{
-		JSONObject cap = new JSONObject("experimental", new JSONObject());
-		PluginRegistry.getInstance().setLSPCapabilities(cap);
-		return cap;
+		if (!LSPPlugin.getInstance().hasClientCapability("experimental.orderingProvider"))
+		{
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, "Ordering is not enabled by client");
+		}
+
+		switch (request.getMethod())
+		{
+			case "slsp/ordering":
+				return ordering(request);
+
+			default:
+				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected method");
+		}
+	}
+
+	private RPCMessageList ordering(RPCRequest request)
+	{
+		INPlugin in = registry.getPlugin("IN");
+		return in.getOrder(request);
 	}
 }

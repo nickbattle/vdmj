@@ -152,7 +152,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	 * responses that it wants to, by implementing this method.
 	 */
 	@Override
-	public void setServerCapabilities(JSONObject capabilities)
+	public void setLSPCapabilities(JSONObject capabilities)
 	{
 		// Just an example. See initialize response.
 		JSONObject experimental = capabilities.get("experimental");

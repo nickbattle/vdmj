@@ -1,6 +1,7 @@
+
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2026 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,12 +23,13 @@
  *
  ******************************************************************************/
 
-package plugins;
+package vdmj.commands;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,23 +40,26 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
-import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
+import dap.DAPMessageList;
+import dap.DAPRequest;
+import workspace.PluginRegistry;
+import workspace.plugins.LSPPlugin;
+import workspace.plugins.TCPlugin;
+
 /**
  * Attempt to produce an optimal ordering for modules and classes.
  */
-public class OrderPlugin extends AnalysisCommand
+public class OrderCommand extends AnalysisCommand
 {
 	private final static String CMD = "order [filename]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = CMD + " - print/save optimal module/class order";
 
-	public OrderPlugin(String line)
+	public OrderCommand(String line)
 	{
 		super(line);
 		
@@ -65,7 +70,7 @@ public class OrderPlugin extends AnalysisCommand
 	}
 
 	@Override
-	public String run(String line)
+	public DAPMessageList run(DAPRequest request)
 	{
 		String outputfile = null;
 		
@@ -75,7 +80,7 @@ public class OrderPlugin extends AnalysisCommand
 		}
 		else if (argv.length != 1)
 		{
-			return USAGE;
+			return new DAPMessageList(request, false, USAGE, null);
 		}
 		
 		Order order = new Order(outputfile);
@@ -90,7 +95,7 @@ public class OrderPlugin extends AnalysisCommand
 			order.classOrder(tc.getTC());
 		}
 
-		return null;
+		return new DAPMessageList(request);
 	}
 
 	/**
@@ -164,18 +169,22 @@ public class OrderPlugin extends AnalysisCommand
 			
 			List<String> ordering = topologicalSort(startpoints);
 			List<String> filenames = new Vector<String>();
-			
+
+			LSPPlugin lsp = PluginRegistry.getInstance().getPlugin("LSP");
+			Path root = lsp.getRoot().toPath();
+
 			for (String name: ordering)
 			{
 				for (String module: nameToFile.keySet())
 				{
 					if (module.equals(name))
 					{
-						String file = nameToFile.get(module).toString();
-						
-						if (!filenames.contains(file))	// files with >= two modules
+						File file = nameToFile.get(module).getAbsoluteFile();
+						String relative = root.relativize(file.toPath()).toString();
+
+						if (!filenames.contains(relative))	// files with >= two modules
 						{
-							filenames.add(file);
+							filenames.add(relative);
 						}
 						break;
 					}
@@ -259,5 +268,11 @@ public class OrderPlugin extends AnalysisCommand
 	    	
 	    	return count;
 		}
+	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
 	}
 }
