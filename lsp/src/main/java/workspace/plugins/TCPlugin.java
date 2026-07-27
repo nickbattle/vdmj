@@ -59,6 +59,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckPrepareEvent;
@@ -135,8 +136,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		{
 			ASTPlugin ast = registry.getPlugin("AST");
 			checkLoadedFiles(ast.getAST(), (CheckTypeEvent)event);
-			warningsToHints();
-			return new RPCMessageList();
+			return warningsToHints();
 		}
 		else if (event instanceof CodeLensEvent)
 		{
@@ -158,9 +158,11 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	/**
 	 * Go through the list of TC warnings and convert some into inlay hints.
 	 */
-	private void warningsToHints()
+	private RPCMessageList warningsToHints()
 	{
 		Map<File, Set<VDMMessage>> messages = messagehub.getPluginMessages(this);
+		RPCMessageList result = new RPCMessageList();
+		boolean refresh = false;
 
 		for (File file: messages.keySet())
 		{
@@ -179,12 +181,25 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 							case "TCImplicitTypeInlayHint":
 								addInlayHint(msg.location.file, new TCImplicitTypeInlayHint(msg.location, parts[1]));
 								iter.remove();
+								refresh = true;
 								break;
 						}
 						break;
 				}
 			}
 		}
+
+		if (refresh)	// ie. we added an inlay hint
+		{
+			LSPPlugin lsp = registry.getPlugin("LSP");
+
+			if (lsp.hasClientCapability("workspace.inlayHint.refreshSupport"))
+			{
+				result.add(RPCRequest.create("workspace/inlayHint/refresh", null));
+			}
+		}
+
+		return result;
 	}
 
 	protected void preCheck(CheckPrepareEvent ev)
