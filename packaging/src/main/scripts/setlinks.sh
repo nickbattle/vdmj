@@ -64,7 +64,7 @@ ln -sf $M2/vdmj/$SUITE$SNAPSHOT/vdmj-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj
 ln -sf $M2/lsp/$SUITE$SNAPSHOT/lsp-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj
 ln -sf $M2/stdlib/$SUITE$SNAPSHOT/stdlib-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj/libs
 ln -sf $M2/quickcheck/$SUITE$SNAPSHOT/quickcheck-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj/plugins
-ln -sf $M2/uml/0.3.0/uml-0.3.0.jar $RESOURCES/jars/vdmj/plugins
+ln -sf $M2/uml/$SUITE$SNAPSHOT/uml-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj/plugins
 echo "Created jars/vdmj links"
 
 ln -sf $M2/annotations/$SUITE-P$SNAPSHOT/annotations-$SUITE-P$SNAPSHOT.jar $RESOURCES/jars/vdmj_hp/annotations
