@@ -64,7 +64,7 @@ ln -sf $M2/vdmj/$SUITE$SNAPSHOT/vdmj-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj
 ln -sf $M2/lsp/$SUITE$SNAPSHOT/lsp-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj
 ln -sf $M2/stdlib/$SUITE$SNAPSHOT/stdlib-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj/libs
 ln -sf $M2/quickcheck/$SUITE$SNAPSHOT/quickcheck-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj/plugins
-ln -sf $M2/uml/$SUITE$SNAPSHOT/uml-$SUITE$SNAPSHOT.jar $RESOURCES/jars/vdmj/plugins
+ln -sf $M2/uml-standard/$SUITE$SNAPSHOT/uml-standard-$SUITE$SNAPSHOT-jar-with-dependencies.jar $RESOURCES/jars/vdmj/plugins
 echo "Created jars/vdmj links"
 
 ln -sf $M2/annotations/$SUITE-P$SNAPSHOT/annotations-$SUITE-P$SNAPSHOT.jar $RESOURCES/jars/vdmj_hp/annotations
@@ -72,6 +72,7 @@ ln -sf $M2/vdmj/$SUITE-P$SNAPSHOT/vdmj-$SUITE-P$SNAPSHOT.jar $RESOURCES/jars/vdm
 ln -sf $M2/lsp/$SUITE-P$SNAPSHOT/lsp-$SUITE-P$SNAPSHOT.jar $RESOURCES/jars/vdmj_hp
 ln -sf $M2/stdlib/$SUITE-P$SNAPSHOT/stdlib-$SUITE-P$SNAPSHOT.jar $RESOURCES/jars/vdmj_hp/libs
 ln -sf $M2/quickcheck/$SUITE-P$SNAPSHOT/quickcheck-$SUITE-P$SNAPSHOT.jar $RESOURCES/jars/vdmj_hp/plugins
+ln -sf $M2/uml-highprecision/$SUITE-P$SNAPSHOT/uml-highprecision-$SUITE-P$SNAPSHOT-jar-with-dependencies.jar $RESOURCES/jars/vdmj_hp/plugins
 echo "Created jars/vdmj_hp links"
 
 echo "Done"
