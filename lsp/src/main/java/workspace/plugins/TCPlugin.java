@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import java.util.Set;
 import java.util.Vector;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -68,7 +70,6 @@ import workspace.events.CodeLensEvent;
 import workspace.events.InlayHintEvent;
 import workspace.events.LSPEvent;
 import workspace.inlays.InlayHint;
-import workspace.inlays.TCImplicitTypeInlayHint;
 import workspace.inlays.TCInlayHint;
 import workspace.lenses.TCCodeLens;
 import workspace.lenses.TCLaunchDebugLens;
@@ -171,20 +172,28 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			while (iter.hasNext())
 			{
 				VDMMessage msg = iter.next();
-				String[] parts = msg.message.split("\\s*,\\s*");
 
-				switch (msg.number)
+				if (msg.number == 5500)		// <inlayhint class>, <argument string>
 				{
-					case 5500:	// "<Inlay hint name>, <arg>, ..."
-						switch (parts[0])
-						{
-							case "TCImplicitTypeInlayHint":
-								addInlayHint(msg.location.file, new TCImplicitTypeInlayHint(msg.location, parts[1]));
-								iter.remove();
-								refresh = true;
-								break;
-						}
+					String[] parts = msg.message.split("\\s*,\\s*");
+					String classname = "workspace.inlays." + parts[0];
+					String argument = parts[1];
+
+					try
+					{
+						Class<?> clazz = Class.forName(classname);
+						Constructor<?> ctor = clazz.getConstructor(LexLocation.class, String.class);
+						TCInlayHint inlay = (TCInlayHint)ctor.newInstance(msg.location, argument);
+
+						addInlayHint(msg.location.file, inlay);
+						iter.remove();
+						refresh = true;
 						break;
+					}
+					catch (Exception e)
+					{
+						Diag.warning("Malformed 5500 warning raised exception: ", e.getMessage());
+					}
 				}
 			}
 		}
