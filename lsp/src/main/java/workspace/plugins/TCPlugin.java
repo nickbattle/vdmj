@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import java.util.Set;
 import java.util.Vector;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -59,6 +61,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckPrepareEvent;
@@ -67,7 +70,6 @@ import workspace.events.CodeLensEvent;
 import workspace.events.InlayHintEvent;
 import workspace.events.LSPEvent;
 import workspace.inlays.InlayHint;
-import workspace.inlays.TCImplicitTypeInlayHint;
 import workspace.inlays.TCInlayHint;
 import workspace.lenses.TCCodeLens;
 import workspace.lenses.TCLaunchDebugLens;
@@ -135,8 +137,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		{
 			ASTPlugin ast = registry.getPlugin("AST");
 			checkLoadedFiles(ast.getAST(), (CheckTypeEvent)event);
-			warningsToHints();
-			return new RPCMessageList();
+			return warningsToHints();
 		}
 		else if (event instanceof CodeLensEvent)
 		{
@@ -158,9 +159,11 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	/**
 	 * Go through the list of TC warnings and convert some into inlay hints.
 	 */
-	private void warningsToHints()
+	private RPCMessageList warningsToHints()
 	{
 		Map<File, Set<VDMMessage>> messages = messagehub.getPluginMessages(this);
+		RPCMessageList result = new RPCMessageList();
+		boolean refresh = false;
 
 		for (File file: messages.keySet())
 		{
@@ -169,22 +172,43 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			while (iter.hasNext())
 			{
 				VDMMessage msg = iter.next();
-				String[] parts = msg.message.split("\\s*,\\s*");
 
-				switch (msg.number)
+				if (msg.number == 5500)		// <inlayhint class>, <argument string>
 				{
-					case 5500:	// "<Inlay hint name>, <arg>, ..."
-						switch (parts[0])
-						{
-							case "TCImplicitTypeInlayHint":
-								addInlayHint(msg.location.file, new TCImplicitTypeInlayHint(msg.location, parts[1]));
-								iter.remove();
-								break;
-						}
+					String[] parts = msg.message.split("\\s*,\\s*");
+					String classname = "workspace.inlays." + parts[0];
+					String argument = parts[1];
+
+					try
+					{
+						Class<?> clazz = Class.forName(classname);
+						Constructor<?> ctor = clazz.getConstructor(LexLocation.class, String.class);
+						TCInlayHint inlay = (TCInlayHint)ctor.newInstance(msg.location, argument);
+
+						addInlayHint(msg.location.file, inlay);
+						iter.remove();
+						refresh = true;
 						break;
+					}
+					catch (Exception e)
+					{
+						Diag.warning("Malformed 5500 warning raised exception: ", e.getMessage());
+					}
 				}
 			}
 		}
+
+		if (refresh)	// ie. we added an inlay hint
+		{
+			LSPPlugin lsp = registry.getPlugin("LSP");
+
+			if (lsp.hasClientCapability("workspace.inlayHint.refreshSupport"))
+			{
+				result.add(RPCRequest.create("workspace/inlayHint/refresh", null));
+			}
+		}
+
+		return result;
 	}
 
 	protected void preCheck(CheckPrepareEvent ev)

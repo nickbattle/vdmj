@@ -73,6 +73,7 @@ as the expected and actual values.
 1013, "Illegal nested block comment"
 1014, "Cannot convert <string> in base <n>"
 
+-- Preprocessor relate messages
 1500, "Unexpected #<directive>"
 1501, "Unexpected end of preprocessor stream"
 1502, "Expecting #ifdef <property>"
@@ -386,17 +387,17 @@ as the expected and actual values.
 2309, "Expecting 'stoplist'"
 2310, "Expecting 'stoplist('"
 2311, "Expecting ')' after stoplist objects"
-2312, "Expecting '(' after sporadic");
-2313, "Expecting ')' after sporadic arguments");
-2314, "Expecting '(' after sporadic(...)");
-2315, "Expecting (name) after sporadic(...)");
+2312, "Expecting '(' after sporadic"
+2313, "Expecting ')' after sporadic arguments"
+2314, "Expecting '(' after sporadic(...)"
+2315, "Expecting (name) after sporadic(...)"
 2316, "Periodic threads only available in VDM-RT"
 2317, "Sporadic threads only available in VDM-RT"
 2318, "Unexpected token after flat definitions"
 2319, "Expecting class name after obj_ in object pattern"
-2320, "Expecting '(' after obj_ pattern");
+2320, "Expecting '(' after obj_ pattern"
 2321, "Expecting '|->' in object pattern"
-2322, "Expecting ')' after obj_ pattern");
+2322, "Expecting ')' after obj_ pattern"
 2323, "Object patterns not available in VDM classic"
 2324, "Pure only permitted for operations"
 2325, "Pure operations are not available in classic"
@@ -1006,13 +1007,14 @@ as the expected and actual values.
 5038, "Trailing annotation ignored"
 5039, "Cannot evaluate type bind of size <n>"
 5040, "Cannot evaluate type bind, size exceeds long"
-5041, "Add explicit type <pattern : type> here");
-5042, "Missing type import for <name>";
+5041, "Add explicit type <pattern : type> here"
+5042, "Missing type import for <name>"
 5043, "Strict: Should not use 'DEFAULT' as a module name"
 5044, "Annotations: <syntax error>"
 5045, "Strict: RHS of '<stmt>' not an op call or a pure expression"
 5046, "Strict: ext clause missing 'wr' updates"
 5047, "Strict: pure operation updates state"
 
--- The following warnings are used to pass CSV information
-5500, "<inlay hint> [, <arg>]*"
+-- The following warnings are used to pass CSV information between plugins
+5500, "<arg> [, <arg>]*"
+
