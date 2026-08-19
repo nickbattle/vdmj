@@ -188,7 +188,6 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 						addInlayHint(msg.location.file, inlay);
 						iter.remove();
 						refresh = true;
-						break;
 					}
 					catch (Exception e)
 					{
