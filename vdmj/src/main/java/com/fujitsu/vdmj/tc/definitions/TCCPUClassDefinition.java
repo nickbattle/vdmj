@@ -68,20 +68,13 @@ public class TCCPUClassDefinition extends TCClassDefinition
 		"public setPriority: ? * nat ==> () " +
 		"	setPriority(opname, priority) == is not yet specified;";
 	
-	private static TCDefinitionList operationDefs = null;
-
 	private static TCDefinitionList operationDefs() throws Exception
 	{
-		if (operationDefs == null)
-		{
-			LexTokenReader ltr = new LexTokenReader(defs, Dialect.VDM_PP);
-			DefinitionReader dr = new DefinitionReader(ltr);
-			dr.setCurrentModule("CPU");
-			ASTDefinitionList ast = dr.readDefinitions();
-			operationDefs = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);	// NB. no init!!
-		}
-		
-		return operationDefs;
+		LexTokenReader ltr = new LexTokenReader(defs, Dialect.VDM_PP);
+		DefinitionReader dr = new DefinitionReader(ltr);
+		dr.setCurrentModule("CPU");
+		ASTDefinitionList ast = dr.readDefinitions();
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);	// NB. no init!!
 	}
 
 	@Override
