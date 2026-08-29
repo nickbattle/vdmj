@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.minimal;
 import java.io.File;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -35,8 +37,6 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCBUSClassDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCCPUClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -50,6 +50,8 @@ public class MinimalRT
 		LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_RT);
 		ClassReader mr = new ClassReader(ltr);
 		ASTClassList classes = mr.readClasses();
+		classes.add(new ASTCPUClassDefinition());
+		classes.add(new ASTBUSClassDefinition());
 
 		if (mr.getErrorCount() > 0)
 		{
@@ -70,9 +72,6 @@ public class MinimalRT
 		if (mr.getErrorCount() == 0)
 		{
 			TCClassList tclist = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(classes);
-			tclist.add(new TCCPUClassDefinition());
-			tclist.add(new TCBUSClassDefinition());
-
     		TypeChecker tc = new ClassTypeChecker(tclist);
 
     		try
