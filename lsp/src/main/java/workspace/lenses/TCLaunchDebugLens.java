@@ -101,6 +101,16 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 							ftype = (TCFunctionType)ftype.result;
 						}
 					}
+
+					if (exdef.predef != null)
+					{
+						results.addAll(getDefinitionLenses(exdef.predef, cls));
+					}
+
+					if (exdef.postdef != null)
+					{
+						results.addAll(getDefinitionLenses(exdef.postdef, cls));
+					}
 				}
 			}
 			else if (def instanceof TCImplicitFunctionDefinition)
@@ -114,6 +124,16 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					defaultName = imdef.name.getModule();
 					applyArgs = new JSONArray();
 					applyArgs.add(getParams(imdef.parameterPatterns));
+
+					if (imdef.predef != null)
+					{
+						results.addAll(getDefinitionLenses(imdef.predef, cls));
+					}
+
+					if (imdef.postdef != null)
+					{
+						results.addAll(getDefinitionLenses(imdef.postdef, cls));
+					}
 				}
 			}
 			else if (def instanceof TCExplicitOperationDefinition)
