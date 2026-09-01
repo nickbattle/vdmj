@@ -148,6 +148,19 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					TCOperationType ftype = (TCOperationType) exop.type;
 					applyArgs = new JSONArray();
 					applyArgs.add(getParams(exop.parameterPatterns, ftype.parameters));
+
+					if (Settings.dialect == Dialect.VDM_SL)
+					{
+						if (exop.predef != null)
+						{
+							results.addAll(getDefinitionLenses(exop.predef, cls));
+						}
+
+						if (exop.postdef != null)
+						{
+							results.addAll(getDefinitionLenses(exop.postdef, cls));
+						}
+					}
 				}
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
@@ -161,6 +174,19 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					defaultName = imop.name.getModule();
 					applyArgs = new JSONArray();
 					applyArgs.add(getParams(imop.parameterPatterns));
+
+					if (Settings.dialect == Dialect.VDM_SL)
+					{
+						if (imop.predef != null)
+						{
+							results.addAll(getDefinitionLenses(imop.predef, cls));
+						}
+
+						if (imop.postdef != null)
+						{
+							results.addAll(getDefinitionLenses(imop.postdef, cls));
+						}
+					}
 				}
 			}
 			
