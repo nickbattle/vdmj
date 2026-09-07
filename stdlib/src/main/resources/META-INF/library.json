@@ -87,6 +87,12 @@
 			"description": "The VDMUnit library",
 			"files": ["VDMUnit.vdmrt"],
 			"depends": ["IO"]
+		},
+		{
+			"name": "FMI",
+			"description": "The FMI library",
+			"files": ["Fmi.vdmrt"],
+			"depends": []
 		}
 	]
 }
