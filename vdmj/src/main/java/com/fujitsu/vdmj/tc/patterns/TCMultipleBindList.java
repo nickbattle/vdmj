@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.patterns;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.tc.TCMappedList;
+import com.fujitsu.vdmj.util.Utils;
 
 public class TCMultipleBindList extends TCMappedList<ASTMultipleBind, TCMultipleBind>
 {
@@ -40,5 +41,11 @@ public class TCMultipleBindList extends TCMappedList<ASTMultipleBind, TCMultiple
 	public TCMultipleBindList(ASTMultipleBindList from) throws Exception
 	{
 		super(from);
+	}
+
+	@Override
+	public synchronized String toString()
+	{
+		return Utils.listToString(this);
 	}
 }

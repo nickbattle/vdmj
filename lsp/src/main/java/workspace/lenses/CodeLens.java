@@ -68,6 +68,13 @@ abstract public class CodeLens
 	/**
 	 * These helper methods generate the lens response body.
 	 */
+	protected JSONObject makeLens(LexLocation location, String title)	// No command, used for ASTLaunch
+	{
+		return new JSONObject(
+				"range", Utils.lexLocationToRange(location),
+				"command", new JSONObject("title", title, "command", ""));
+	}
+	
 	protected JSONObject makeLens(LexLocation location, String title, String command)
 	{
 		return new JSONObject(

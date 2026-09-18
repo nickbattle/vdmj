@@ -48,6 +48,16 @@ public class TCExpressionList extends TCMappedList<ASTExpression, TCExpression>
 		super();
 		addAll(to);
 	}
+	
+	public TCExpressionList(TCExpression... list)  
+	{
+		super();
+
+		for (TCExpression exp: list)
+		{
+			add(exp);
+		}
+	}
 
 	@Override
 	public String toString()

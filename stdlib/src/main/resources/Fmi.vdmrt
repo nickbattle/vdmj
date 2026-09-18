@@ -1,0 +1,103 @@
+/******************************************************************************************************************************
+* FMI 2.0 interface for VDM
+*
+* The Port class is the base class for all ports. The following ports exists:
+* - IntPort
+* - BoolPort
+* - RealPort
+* - StringPort
+* These concrete ports must be used in the HardwareInterface class. All of them must contain a private 'value' field
+*  this field is accessed directly by the build-in FMI support in the simulator. The ports can be given as arguments to 
+*  other model elements. All access to the internal value must be done through set/getValue since this call insured that the
+*  simulator knows that the value have been read or written to and requires a co-simulation step for synchronization.
+*
+* A port can be instantiated with a value or with no values to use the library default value. 
+*
+* Version 0.0.2
+*
+******************************************************************************************************************************/
+
+class Port
+
+types
+	public String = seq of char;
+	public FmiPortType = bool | real | int | String;
+ 
+operations
+
+	public setValue : FmiPortType ==> ()
+	setValue(v) == is subclass responsibility;
+
+	public pure getValue : () ==> FmiPortType
+	getValue() == is subclass responsibility;
+
+end Port
+
+class IntPort is subclass of Port
+
+instance variables
+	value: int:=0;
+
+operations
+	public IntPort: int ==> IntPort
+	IntPort(v)==setValue(v);
+
+	public setValue : int ==> ()
+	setValue(v) ==value :=v;
+
+	public pure getValue : () ==> int
+	getValue() == return value;
+
+end IntPort
+
+class BoolPort is subclass of Port
+
+instance variables
+	value: bool:=false;
+
+operations
+	public BoolPort: bool ==> BoolPort
+	BoolPort(v)==setValue(v);
+
+	public setValue : bool ==> ()
+	setValue(v) ==value :=v;
+
+	public pure getValue : () ==> bool
+	getValue() == return value;
+
+end BoolPort
+
+class RealPort is subclass of Port
+
+instance variables
+	value: real:=0.0;
+
+operations
+	public RealPort: real ==> RealPort
+	RealPort(v)==setValue(v);
+
+	public setValue : real ==> ()
+	setValue(v) ==value :=v;
+
+	public pure getValue : () ==> real
+	getValue() == return value;
+
+end RealPort
+
+class StringPort is subclass of Port
+
+instance variables
+	value: String:="";
+
+operations
+	public StringPort: String ==> StringPort
+	StringPort(v)==setValue(v);
+
+	public setValue : String ==> ()
+	setValue(v) ==value :=v;
+
+	public pure getValue : () ==> String
+	getValue() == return value;
+
+end StringPort
+

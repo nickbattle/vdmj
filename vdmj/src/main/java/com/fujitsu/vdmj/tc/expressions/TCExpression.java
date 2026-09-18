@@ -47,7 +47,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 /**
  *	The parent class of all VDM expressions.
  */
-public abstract class TCExpression extends TCNode
+public abstract class TCExpression extends TCNode implements Comparable<TCExpression>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -111,6 +111,12 @@ public abstract class TCExpression extends TCNode
 	public int hashCode()
 	{
 		return toString().hashCode();
+	}
+
+	@Override
+	public int compareTo(TCExpression o)
+	{
+		return toString().compareTo(o.toString());
 	}
 
 	/**

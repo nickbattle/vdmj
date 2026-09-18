@@ -111,6 +111,18 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 							ftype = (ASTFunctionType)ftype.result;
 						}
 					}
+
+					if (exdef.precondition != null)
+					{
+						results.add(makeLens(exdef.precondition.location, "Launch"));
+						results.add(makeLens(exdef.precondition.location, "Debug"));
+					}
+
+					if (exdef.postcondition != null)
+					{
+						results.add(makeLens(exdef.postcondition.location, "Launch"));
+						results.add(makeLens(exdef.postcondition.location, "Debug"));
+					}
 				}
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
@@ -131,6 +143,18 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 						{
 							params.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 						}
+					}
+
+					if (imdef.precondition != null)
+					{
+						results.add(makeLens(imdef.precondition.location, "Launch"));
+						results.add(makeLens(imdef.precondition.location, "Debug"));
+					}
+
+					if (imdef.postcondition != null)
+					{
+						results.add(makeLens(imdef.postcondition.location, "Launch"));
+						results.add(makeLens(imdef.postcondition.location, "Debug"));
 					}
 				}
 			}
@@ -157,6 +181,21 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 						{
 							params.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
 						}
+
+						if (Settings.dialect == Dialect.VDM_SL)
+						{
+							if (exop.precondition != null)
+							{
+								results.add(makeLens(exop.precondition.location, "Launch"));
+								results.add(makeLens(exop.precondition.location, "Debug"));
+							}
+
+							if (exop.postcondition != null)
+							{
+								results.add(makeLens(exop.postcondition.location, "Launch"));
+								results.add(makeLens(exop.postcondition.location, "Debug"));
+							}
+						}
 					}
 				}
 			}
@@ -180,6 +219,21 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 							for (ASTPattern p: param.patterns)
 							{
 								params.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
+							}
+						}
+
+						if (Settings.dialect == Dialect.VDM_SL)
+						{
+							if (imop.precondition != null)
+							{
+								results.add(makeLens(imop.precondition.location, "Launch"));
+								results.add(makeLens(imop.precondition.location, "Debug"));
+							}
+
+							if (imop.postcondition != null)
+							{
+								results.add(makeLens(imop.postcondition.location, "Launch"));
+								results.add(makeLens(imop.postcondition.location, "Debug"));
 							}
 						}
 					}
