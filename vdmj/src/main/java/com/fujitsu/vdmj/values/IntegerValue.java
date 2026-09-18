@@ -44,6 +44,17 @@ public class IntegerValue extends RationalValue
 	}
 
 	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof Value)
+		{
+			return compareTo((Value)other) == 0;
+		}
+
+		return super.equals(other);
+	}
+
+	@Override
 	public int compareTo(Value other)
 	{
 		other = other.deref();

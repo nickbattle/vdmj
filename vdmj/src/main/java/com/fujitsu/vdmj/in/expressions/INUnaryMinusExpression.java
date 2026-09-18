@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NumericValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -53,8 +54,15 @@ public class INUnaryMinusExpression extends INUnaryExpression
 
 		try
 		{
-			double v = exp.eval(ctxt).realValue(ctxt);
-			return NumericValue.valueOf(-v, ctxt);
+			Value v = exp.eval(ctxt);
+
+			if (v instanceof IntegerValue)
+			{
+				IntegerValue iv = (IntegerValue)v;
+				return NumericValue.valueOf(-iv.intValue(ctxt), ctxt);
+			}
+
+			return NumericValue.valueOf(-v.realValue(ctxt), ctxt);
 		}
 		catch (ValueException e)
 		{
