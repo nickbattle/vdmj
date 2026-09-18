@@ -32,6 +32,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.annotations.TCOperationMeasureAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -48,7 +49,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
  * A class to hold recursive loop data, which is used to detect mutual recursion and
  * missing measure functions.
  */
-public class TCRecursiveCycles
+public class TCRecursiveCycles implements Mappable
 {
 	private static final int LOOP_SIZE_LIMIT = 8;
 	private static TCRecursiveCycles INSTANCE = null;
