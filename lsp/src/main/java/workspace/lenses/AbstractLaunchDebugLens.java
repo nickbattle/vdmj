@@ -30,6 +30,7 @@ import json.JSONObject;
 public abstract class AbstractLaunchDebugLens extends CodeLens
 {
 	protected final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
+	protected final String FAIL_LENS_COMMAND = "vdm-vscode.showMessage";
 
 	/**
 	 * Generate the command arguments for a code lens. This is used as the "arguments" passed to

@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 
 import json.JSONArray;
@@ -114,14 +115,12 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 
 					if (exdef.precondition != null)
 					{
-						results.add(makeLens(exdef.precondition.location, "Launch"));
-						results.add(makeLens(exdef.precondition.location, "Debug"));
+						results.addAll(makePrePost(exdef.precondition.location));
 					}
 
 					if (exdef.postcondition != null)
 					{
-						results.add(makeLens(exdef.postcondition.location, "Launch"));
-						results.add(makeLens(exdef.postcondition.location, "Debug"));
+						results.addAll(makePrePost(exdef.postcondition.location));
 					}
 				}
 			}
@@ -287,6 +286,20 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 		}
 		
 		return results;
+	}
+
+	/**
+	 * Show a message when the lens is clicked, telling the user to save the spec to
+	 * enable the pre/postcondition launchers to work.
+	 */
+	private JSONArray makePrePost(LexLocation location)
+	{
+		return new JSONArray(
+			makeLens(location, "Launch", FAIL_LENS_COMMAND,
+				new JSONArray(new JSONObject("message", "Save spec first!", "severity", "info"))),
+			makeLens(location, "Debug", FAIL_LENS_COMMAND,
+				new JSONArray(new JSONObject("message", "Save spec first!", "severity", "info")))
+		);
 	}
 
 	private JSONArray getParams(ASTPatternList patterns, ASTTypeList types)
