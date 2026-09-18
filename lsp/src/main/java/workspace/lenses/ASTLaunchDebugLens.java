@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
@@ -46,7 +47,6 @@ import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-
 import json.JSONArray;
 import json.JSONObject;
 
@@ -113,15 +113,8 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 						}
 					}
 
-					if (exdef.precondition != null)
-					{
-						results.addAll(makePrePost(exdef.precondition.location));
-					}
-
-					if (exdef.postcondition != null)
-					{
-						results.addAll(makePrePost(exdef.postcondition.location));
-					}
+					results.addAll(makePrePost(exdef.precondition));
+					results.addAll(makePrePost(exdef.postcondition));
 				}
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
@@ -144,17 +137,8 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 						}
 					}
 
-					if (imdef.precondition != null)
-					{
-						results.add(makeLens(imdef.precondition.location, "Launch"));
-						results.add(makeLens(imdef.precondition.location, "Debug"));
-					}
-
-					if (imdef.postcondition != null)
-					{
-						results.add(makeLens(imdef.postcondition.location, "Launch"));
-						results.add(makeLens(imdef.postcondition.location, "Debug"));
-					}
+					results.addAll(makePrePost(imdef.precondition));
+					results.addAll(makePrePost(imdef.postcondition));
 				}
 			}
 			else if (def instanceof ASTExplicitOperationDefinition)
@@ -183,17 +167,8 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 
 						if (Settings.dialect == Dialect.VDM_SL)
 						{
-							if (exop.precondition != null)
-							{
-								results.add(makeLens(exop.precondition.location, "Launch"));
-								results.add(makeLens(exop.precondition.location, "Debug"));
-							}
-
-							if (exop.postcondition != null)
-							{
-								results.add(makeLens(exop.postcondition.location, "Launch"));
-								results.add(makeLens(exop.postcondition.location, "Debug"));
-							}
+							results.addAll(makePrePost(exop.precondition));
+							results.addAll(makePrePost(exop.postcondition));
 						}
 					}
 				}
@@ -223,17 +198,8 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 
 						if (Settings.dialect == Dialect.VDM_SL)
 						{
-							if (imop.precondition != null)
-							{
-								results.add(makeLens(imop.precondition.location, "Launch"));
-								results.add(makeLens(imop.precondition.location, "Debug"));
-							}
-
-							if (imop.postcondition != null)
-							{
-								results.add(makeLens(imop.postcondition.location, "Launch"));
-								results.add(makeLens(imop.postcondition.location, "Debug"));
-							}
+							results.addAll(makePrePost(imop.precondition));
+							results.addAll(makePrePost(imop.postcondition));
 						}
 					}
 				}
@@ -292,14 +258,21 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 	 * Show a message when the lens is clicked, telling the user to save the spec to
 	 * enable the pre/postcondition launchers to work.
 	 */
-	private JSONArray makePrePost(LexLocation location)
+	private JSONArray makePrePost(ASTExpression prepost)
 	{
-		return new JSONArray(
-			makeLens(location, "Launch", FAIL_LENS_COMMAND,
-				new JSONArray(new JSONObject("message", "Save spec first!", "severity", "info"))),
-			makeLens(location, "Debug", FAIL_LENS_COMMAND,
-				new JSONArray(new JSONObject("message", "Save spec first!", "severity", "info")))
-		);
+		JSONArray lenses = new JSONArray();
+
+		if (prepost != null)
+		{
+			LexLocation location = prepost.location;
+
+			lenses.add(makeLens(location, "Launch", FAIL_LENS_COMMAND,
+					new JSONArray(new JSONObject("message", "Save spec first!", "severity", "info"))));
+			lenses.add(makeLens(location, "Debug", FAIL_LENS_COMMAND,
+					new JSONArray(new JSONObject("message", "Save spec first!", "severity", "info"))));
+		}
+
+		return lenses;
 	}
 
 	private JSONArray getParams(ASTPatternList patterns, ASTTypeList types)
