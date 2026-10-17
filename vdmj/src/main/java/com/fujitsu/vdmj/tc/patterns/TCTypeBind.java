@@ -29,7 +29,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class TCTypeBind extends TCBind
+public class TCTypeBind extends TCBind implements Comparable<TCTypeBind>
 {
 	private static final long serialVersionUID = 1L;
 	public TCType type;
@@ -68,5 +68,11 @@ public class TCTypeBind extends TCBind
 	public <R, S> R apply(TCBindVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseTypeBind(this, arg);
+	}
+
+	@Override
+	public int compareTo(TCTypeBind o)
+	{
+		return this.toString().compareTo(o.toString());
 	}
 }
