@@ -50,7 +50,7 @@ public class PODefStatement extends POStatement
 	@Override
 	public String toString()
 	{
-		return "def " + Utils.listToString(equalsDefs) + " in " + statement;
+		return "def " + Utils.listToString(equalsDefs, "; ") + " in " + statement;
 	}
 
 	@Override
