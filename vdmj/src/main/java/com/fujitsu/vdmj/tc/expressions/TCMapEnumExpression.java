@@ -66,11 +66,6 @@ public class TCMapEnumExpression extends TCMapExpression
 		domtypes = new TCTypeList();
 		rngtypes = new TCTypeList();
 
-		if (members.isEmpty())
-		{
-			return setType(new TCMapType(location));
-		}
-
 		TCTypeSet dom = new TCTypeSet();
 		TCTypeSet rng = new TCTypeSet();
 
@@ -81,6 +76,18 @@ public class TCMapEnumExpression extends TCMapExpression
 		{
 			domConstraint = constraint.getMap().from;
 			rngConstraint = constraint.getMap().to;
+		}
+
+		if (members.isEmpty())
+		{
+			if (domConstraint != null && rngConstraint != null)
+			{
+				return setType(new TCMapType(location, domConstraint, rngConstraint, true));
+			}
+			else
+			{
+				return setType(new TCMapType(location));
+			}
 		}
 
 		for (TCMapletExpression ex: members)

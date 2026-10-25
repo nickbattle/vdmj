@@ -37,6 +37,14 @@ public class TCMapType extends TCType
 	public TCType to;
 	public final boolean empty;
 
+	public TCMapType(LexLocation location, TCType from, TCType to, boolean empty)
+	{
+		super(location);
+		this.from = from;
+		this.to = to;
+		this.empty = empty;
+	}
+
 	public TCMapType(LexLocation location, TCType from, TCType to)
 	{
 		super(location);
@@ -44,7 +52,6 @@ public class TCMapType extends TCType
 		this.to = to;
 		this.empty = false;
 	}
-
 	public TCMapType(LexLocation location)
 	{
 		super(location);
