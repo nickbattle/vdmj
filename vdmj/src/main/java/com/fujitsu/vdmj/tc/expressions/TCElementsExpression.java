@@ -74,7 +74,7 @@ public class TCElementsExpression extends TCUnaryExpression
 			exp.warning(5037, "Function equality cannot be reliably computed");
 		}
 
-		return setType(seq.empty ? new TCSetType(location) : new TCSetType(location, seq.seqof));
+		return setType(new TCSetType(location, seq.seqof, seq.empty));
 	}
 
 	@Override
