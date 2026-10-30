@@ -48,6 +48,8 @@ public class TCEqualsExpression extends TCBinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
+		checkEmptySetSeq();
+		
 		if (ltype.isUnion(location))
 		{
 			checkMultipleEqualities(ltype);
