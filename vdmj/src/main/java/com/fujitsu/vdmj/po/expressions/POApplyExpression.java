@@ -26,8 +26,6 @@ package com.fujitsu.vdmj.po.expressions;
 
 import java.math.BigInteger;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;

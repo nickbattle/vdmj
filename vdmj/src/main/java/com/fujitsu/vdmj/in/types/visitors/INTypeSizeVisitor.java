@@ -70,10 +70,6 @@ import com.fujitsu.vdmj.values.Value;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 {
 	/**
