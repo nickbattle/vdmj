@@ -34,12 +34,12 @@
 		<dependency>
 			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.8.0-SNAPSHOT</version>
+			<version>4.8.0-P-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>lsp</artifactId>
-			<version>4.8.0-SNAPSHOT</version>
+			<version>4.8.0-P-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

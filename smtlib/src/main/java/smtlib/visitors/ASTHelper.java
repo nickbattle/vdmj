@@ -49,7 +49,7 @@ public interface ASTHelper
 	public static LexToken INSET = new LexKeywordToken(Token.INSET, ANYWHERE);
 	public static LexToken DIVIDE = new LexKeywordToken(Token.DIVIDE, LexLocation.ANY);
 	public static LexToken DIV = new LexKeywordToken(Token.DIV, LexLocation.ANY);
-	public static LexIntegerToken ZEROT = new LexIntegerToken(0, LexLocation.ANY);
+	public static LexIntegerToken ZEROT = LexIntegerToken.ZERO;
 	
 	public static TCIntegerLiteralExpression ZERO = new TCIntegerLiteralExpression(ZEROT);
 }

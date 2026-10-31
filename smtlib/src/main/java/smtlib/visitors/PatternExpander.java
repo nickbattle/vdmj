@@ -25,6 +25,7 @@
 package smtlib.visitors;
 
 import java.util.Map.Entry;
+import java.math.BigInteger;
 import java.util.TreeMap;
 
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
@@ -175,7 +176,7 @@ public class PatternExpander extends TCPatternVisitor<Object, TCExpression> impl
 
 		for (int i=0; i < node.plist.size(); i++)
 		{
-			LexIntegerToken fld = new LexIntegerToken(Long.valueOf(i + 1), ANYWHERE);
+			LexIntegerToken fld = new LexIntegerToken(BigInteger.valueOf(i + 1), ANYWHERE);
 			TCExpression subexp = new TCFieldNumberExpression(arg, fld);
 			subexp.setType(product.types.get(i));
 			node.plist.get(i).apply(this, subexp);
@@ -192,7 +193,7 @@ public class PatternExpander extends TCPatternVisitor<Object, TCExpression> impl
 		for (TCPattern p: node.plist)
 		{
 			TCExpressionList args = new TCExpressionList(
-				new TCIntegerLiteralExpression(new LexIntegerToken(indx, ANYWHERE)));
+				new TCIntegerLiteralExpression(new LexIntegerToken(BigInteger.valueOf(indx), ANYWHERE)));
 
 			TCExpression subexp = new TCApplyExpression(arg, args);
 			TCSeqType stype = arg.getType().getSeq();

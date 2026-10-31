@@ -24,6 +24,7 @@
 
 package smtlib.visitors;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -389,9 +390,9 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 			TCIntegerLiteralExpression last = (TCIntegerLiteralExpression)node.last;
 			TCExpressionList list = new TCExpressionList();
 
-			for (long i=first.value.value; i <= last.value.value; i++)
+			for (long i=first.value.value.longValue(); i <= last.value.value.longValue(); i++)
 			{
-				list.add(new TCIntegerLiteralExpression(new LexIntegerToken(i, LexLocation.ANY)));
+				list.add(new TCIntegerLiteralExpression(new LexIntegerToken(BigInteger.valueOf(i), LexLocation.ANY)));
 			}
 
 			return setElems(list, node.getType(), env);
