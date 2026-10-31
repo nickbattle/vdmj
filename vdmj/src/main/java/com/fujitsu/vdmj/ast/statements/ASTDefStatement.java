@@ -46,7 +46,7 @@ public class ASTDefStatement extends ASTStatement
 	@Override
 	public String toString()
 	{
-		return "def " + Utils.listToString(localDefs) + " in " + statement;
+		return "def " + Utils.listToString(localDefs, "; ") + " in " + statement;
 	}
 
 	@Override

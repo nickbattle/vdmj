@@ -80,10 +80,11 @@ public class TCSetEnumExpression extends TCSetExpression
 			}
 		}
 
-		TCType rt = members.isEmpty() ? new TCSetType(location) :
-						Settings.release == Release.CLASSIC ?
-							new TCSetType(location, ts.getType(location)) :
-							new TCSet1Type(location, ts.getType(location));
+		TCType rt = members.isEmpty() ?
+				new TCSetType(location, elemConstraint, true) :
+				Settings.release == Release.CLASSIC ?
+					new TCSetType(location, ts.getType(location)) :
+					new TCSet1Type(location, ts.getType(location));
 		
 		return possibleConstraint(constraint, rt);
 	}

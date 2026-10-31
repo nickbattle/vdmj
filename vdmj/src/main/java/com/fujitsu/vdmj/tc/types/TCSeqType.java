@@ -36,10 +36,17 @@ public class TCSeqType extends TCType
 	public TCType seqof;
 	public final boolean empty;
 
-	public TCSeqType(LexLocation location, TCType type)
+	public TCSeqType(LexLocation location, TCType seqof, boolean empty)
 	{
 		super(location);
-		this.seqof = type;
+		this.seqof = seqof == null ? new TCUnknownType(location) : seqof;
+		this.empty = empty;
+	}
+
+	public TCSeqType(LexLocation location, TCType seqof)
+	{
+		super(location);
+		this.seqof = seqof;
 		this.empty = false;
 	}
 
@@ -95,7 +102,7 @@ public class TCSeqType extends TCType
 	@Override
 	public String toDisplay()
 	{
-		return empty ? "seq of ?" : "seq of (" + seqof + ")";
+		return "seq of (" + seqof + ")";
 	}
 
 	@Override

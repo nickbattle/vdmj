@@ -51,7 +51,7 @@ public class PODefExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return "def " + Utils.listToString(localDefs) + " in\n" + expression;
+		return "def " + Utils.listToString(localDefs, "; ") + " in\n" + expression;
 	}
 
 	@Override

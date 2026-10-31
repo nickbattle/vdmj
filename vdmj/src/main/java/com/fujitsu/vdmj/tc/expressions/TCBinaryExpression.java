@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -102,6 +104,68 @@ abstract public class TCBinaryExpression extends TCExpression
 		if (equality.size() > 1)
 		{
 			warning(5021, "Multiple union members define eq clauses, " + equality);
+		}
+	}
+
+	/**
+	 * (In)equality checks where a "[ ]" or "{ }" literal need more type info from
+	 * the other part of the equality check, if available.
+	 */
+	protected void checkEmptySetSeq()
+	{
+		checkEmptySeqs();
+		checkEmptySets();
+	}
+
+	private void checkEmptySets()
+	{
+		if (left.getType().isSet(location) && right.getType().isSet(location))
+		{
+			TCSetType lstype = left.getType().getSet();
+			TCSetType rstype = right.getType().getSet();
+
+			if (lstype.empty)
+			{
+				if (!rstype.empty)
+				{
+					left.setType(rstype);
+					ltype = rstype;
+				}
+			}
+			else if (rstype.empty)
+			{
+				if (!lstype.empty)
+				{
+					right.setType(lstype);
+					rtype = lstype;
+				}
+			}
+		}
+	}
+
+	private void checkEmptySeqs()
+	{
+		if (left.getType().isSeq(location) && right.getType().isSeq(location))
+		{
+			TCSeqType lstype = left.getType().getSeq();
+			TCSeqType rstype = right.getType().getSeq();
+
+			if (lstype.empty)
+			{
+				if (!rstype.empty)
+				{
+					left.setType(rstype);
+					ltype = rstype;
+				}
+			}
+			else if (rstype.empty)
+			{
+				if (!lstype.empty)
+				{
+					right.setType(lstype);
+					rtype = lstype;
+				}
+			}
 		}
 	}
 }

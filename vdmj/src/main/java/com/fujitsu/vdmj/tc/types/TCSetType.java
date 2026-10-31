@@ -39,7 +39,7 @@ public class TCSetType extends TCType
 	public TCSetType(LexLocation location, TCType setof, boolean empty)
 	{
 		super(location);
-		this.setof = setof;
+		this.setof = setof == null ? new TCUnknownType(location) : setof;
 		this.empty = empty;
 	}
 
@@ -102,7 +102,7 @@ public class TCSetType extends TCType
 	@Override
 	public String toDisplay()
 	{
-		return empty ? "set of ?" : "set of (" + setof + ")";
+		return "set of (" + setof + ")";
 	}
 
 	@Override
