@@ -45,7 +45,7 @@ import smtlib.solvers.Solver;
 public class SMTCommand extends AnalysisCommand
 {
 	private final static String CMD = "smt [-v][-<solver>] all | <PO#> [<PO#>...]";
-	private final static String SHORT = "smt [-v][-<solver] all | <PO#> [<PO#>...]";
+	private final static String SHORT = "smt [-v][-<solver>] all | <PO#> [<PO#>...]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - experimental SMT solver PO verification";
 
