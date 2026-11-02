@@ -30,7 +30,6 @@ import java.util.Vector;
 public abstract class SExp extends Vector<Source> implements Source
 {
 	protected boolean oneLine = false;
-	private String comment = null;
 
 	public SExp(Source... sources)
 	{
@@ -61,11 +60,6 @@ public abstract class SExp extends Vector<Source> implements Source
 		}
 
 		return super.equals(other);
-	}
-
-	public void setComment(String comment)
-	{
-		this.comment = comment;
 	}
 
 	@Override
@@ -111,13 +105,6 @@ public abstract class SExp extends Vector<Source> implements Source
 			sb.append("(");
 			Iterator<Source> iter = iterator();
 			sb.append(iter.next().toSource());
-
-			if (comment != null)
-			{
-				sb.append("   ; ");
-				sb.append(comment);
-			}
-
 			sb.append("\n");
 
 			while (iter.hasNext())

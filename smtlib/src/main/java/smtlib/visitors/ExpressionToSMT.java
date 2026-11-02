@@ -171,7 +171,18 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 			root = env.findName(var.name, NameScope.NAMESANDSTATE);
 		}
 
-		if (root instanceof TCExplicitFunctionDefinition)
+		if (root.name.getModule().equals("$SMT-LIB"))
+		{
+			Expression call = new Expression(root.name.getName());
+
+			for (TCExpression arg: node.args)
+			{
+				call.add(arg.apply(this, env));
+			}
+
+			return call;
+		}
+		else if (root instanceof TCExplicitFunctionDefinition)
 		{
 			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)root;
 
@@ -579,6 +590,7 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 
 		return new Expression(new Text("seq.extract"),
 				seq,
+				new Text("1"),
 				new Expression("-",
 					new Expression("seq.len", seq),
 					new Text("1")));
@@ -837,15 +849,7 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 			throw new UnsupportedOperationException("No definition for " + var);
 		}
 
-		QualifiedSort qsort = def.getType().apply(new TypeToSMT(var), env);
-		Expression exp = new Expression(var);
-
-		if (qsort.qualifier != null)
-		{
-			qsort.qualifier.setComment(var + ":" + def.getType());
-		}
-
-		return exp;
+		return new Expression(var);
 	}
 
 	@Override

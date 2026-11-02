@@ -31,8 +31,6 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionSet;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
-import com.fujitsu.vdmj.tc.expressions.TCGreaterEqualExpression;
-import com.fujitsu.vdmj.tc.expressions.TCGreaterExpression;
 import com.fujitsu.vdmj.tc.expressions.TCImpliesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCInSetExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLenExpression;
@@ -50,14 +48,17 @@ import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
+
 import smtlib.ast.DeclareType;
 import smtlib.ast.Expression;
 import smtlib.ast.Text;
@@ -90,7 +91,9 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	{
 		return new QualifiedType(
 			INT,
-			new TCGreaterEqualExpression(VAR, GE, ZERO));
+			applyInv("inv_nat",
+				new TCExpressionList(VAR),
+				new TCTypeList(new TCIntegerType(ANYWHERE))));
 	}
 
 	@Override
@@ -98,7 +101,9 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	{
 		return new QualifiedType(
 			INT,
-			new TCGreaterExpression(VAR, GT, ZERO));
+			applyInv("inv_nat1",
+				new TCExpressionList(VAR),
+				new TCTypeList(new TCIntegerType(ANYWHERE))));
 	}
 
 	@Override
@@ -315,5 +320,11 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 		}
 
 		return new QualifiedType(node, qualifier);
+	}
+
+	private TCApplyExpression applyInv(String name, TCExpressionList args, TCTypeList typelist)
+	{
+		TCNameToken fname = new TCNameToken(ANYWHERE, "$SMT-LIB", name);
+		return new TCApplyExpression(new TCVariableExpression(ANYWHERE, fname, name), args);
 	}
 }

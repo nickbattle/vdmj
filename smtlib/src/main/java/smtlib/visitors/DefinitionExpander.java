@@ -188,7 +188,6 @@ public class DefinitionExpander
 
 				Environment local = new FlatCheckedEnvironment(pdefs, env, NameScope.NAMES);
 				TCExpression expanded = fbody.apply(new ExpressionExpander(local), new TCExpressionSet());
-				define.setExpanded(expanded);
 				expanded.typeCheck(local, null, NameScope.NAMES, ftype.result);
 				functionToSMT(fname, plist, ftype, expanded);
 			}
@@ -249,6 +248,7 @@ public class DefinitionExpander
 
 		// (define-fun g (Int a) Int <exp>)
 		DefineFun define = globals.getFunction(fname);
+		define.setExpanded(fbody);
 		define.set(params, qsort.sort, qbody);
 	}
 

@@ -27,10 +27,24 @@ package smtlib.visitors;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCIntegerType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import smtlib.ast.AssertCommand;
+import smtlib.ast.Bracketed;
 import smtlib.ast.Comment;
 import smtlib.ast.DeclareType;
 import smtlib.ast.DefineFun;
+import smtlib.ast.Expression;
+import smtlib.ast.GE;
+import smtlib.ast.GT;
 import smtlib.ast.SExp;
 import smtlib.ast.Script;
 import smtlib.ast.Sort;
@@ -39,6 +53,11 @@ import smtlib.ast.Undefined;
 public class Globals
 {
 	private static Globals INSTANCE = null;
+
+	private Globals()
+	{
+		setInternalEnvironment();
+	}
 	
 	public static Globals getInstance()
 	{
@@ -54,6 +73,8 @@ public class Globals
 	private List<DeclareType> datatypes = new Vector<DeclareType>();
 	private List<DefineFun> functions = new Vector<DefineFun>();
 	private List<AssertCommand> assertions = new Vector<AssertCommand>();
+
+	private TCDefinitionList environment = new TCDefinitionList();
 
 	public void reset()
 	{
@@ -125,10 +146,46 @@ public class Globals
 		}
 	}
 
+	private void setInternalEnvironment()
+	{
+		TCNameToken fname = new TCNameToken(LexLocation.ANY, "$SMT-LIB", "inv_nat");
+		TCFunctionType ftype = new TCFunctionType(LexLocation.ANY, new TCTypeList(new TCIntegerType(LexLocation.ANY)), false, new TCBooleanType(LexLocation.ANY));
+		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
+
+		fname = new TCNameToken(LexLocation.ANY, "$SMT-LIB", "inv_nat1");
+		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
+	}
+
+	public Environment getEnvironment(Environment outer)
+	{
+		return new FlatEnvironment(environment, outer);
+	}
+
+	private Script getInternals()
+	{
+		Script script = new Script();
+
+		script.add(new DefineFun(
+					"inv_nat",
+					new Bracketed(new Expression("i", "Int")),
+					new Sort("Bool"),
+					new GE("i", "0")));
+
+		script.add(new DefineFun(
+					"inv_nat1",
+					new Bracketed(new Expression("i", "Int")),
+					new Sort("Bool"),
+					new GT("i", "0")));
+
+		return script;
+	}
+
 	public Script globalList()
 	{
 		Script script = new Script();
+
 		script.add(new Comment("\nGlobal function definitions"));
+		script.addAll(getInternals());
 
 		for (DefineFun constant: constants)
 		{

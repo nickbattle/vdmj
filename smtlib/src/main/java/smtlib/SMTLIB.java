@@ -106,8 +106,9 @@ public class SMTLIB
 
 		try
 		{
+			Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
 			TCExpressionSet constraints = new TCExpressionSet();
-			expanded = tcexp.apply(new ExpressionExpander(env), constraints);
+			expanded = tcexp.apply(new ExpressionExpander(smtenv), constraints);
 
 			if (!constraints.isEmpty())
 			{
@@ -115,7 +116,7 @@ public class SMTLIB
 			}
 
 			TypeChecker.clearErrors();
-			expanded.typeCheck(env, null, NameScope.NAMES, null);
+			expanded.typeCheck(smtenv, null, NameScope.NAMES, null);
 			script.add(new Comment("Expanded PO: " + Utils.expandOneLine(expanded)));
 
 			for (VDMError err: TypeChecker.getErrors())
@@ -130,7 +131,7 @@ public class SMTLIB
 				TCForAllExpression node = (TCForAllExpression)expanded;
 
 				script.add(new Comment("\nTop level forall variables"));
-				Expression forall = node.apply(new ExpressionToSMT(), env);
+				Expression forall = node.apply(new ExpressionToSMT(), smtenv);
 				Bracketed binds = (Bracketed)forall.get(1);
 
 				// Add declare-consts for the forall bindings, to get a model
@@ -148,7 +149,7 @@ public class SMTLIB
 			{
 				TCExistsExpression node = (TCExistsExpression)expanded;
 
-				Expression exists = node.apply(new ExpressionToSMT(), env);
+				Expression exists = node.apply(new ExpressionToSMT(), smtenv);
 				Bracketed binds = (Bracketed)exists.get(1);
 				script.add(new Comment("\nTop level exists variables"));
 
@@ -166,7 +167,7 @@ public class SMTLIB
 			else if (expanded.getType() instanceof TCBooleanType)	// eg. inv_T(args)
 			{
 				script.add(new Comment("\nObligation satisfiable?"));
-				Expression apply = expanded.apply(new ExpressionToSMT(), env);
+				Expression apply = expanded.apply(new ExpressionToSMT(), smtenv);
 				script.add(new AssertCommand(new Not(apply)));
 			}
 			else

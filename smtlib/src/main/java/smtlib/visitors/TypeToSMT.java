@@ -87,13 +87,13 @@ public class TypeToSMT extends TCTypeVisitor<QualifiedSort, Environment>
 	@Override
 	public QualifiedSort caseNaturalType(TCNaturalType node, Environment env)
 	{
-		return new QualifiedSort(new Sort("Int"), new GE(varname, new Text("0")));
+		return new QualifiedSort(new Sort("Int"), new Expression(new Text("inv_nat"), varname));
 	}
 
 	@Override
 	public QualifiedSort caseNaturalOneType(TCNaturalOneType node, Environment env)
 	{
-		return new QualifiedSort(new Sort("Int"), new GT(varname, new Text("0")));
+		return new QualifiedSort(new Sort("Int"), new Expression(new Text("inv_nat1"), varname));
 	}
 
 	@Override
