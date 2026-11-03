@@ -30,6 +30,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -53,6 +54,7 @@ import smtlib.ast.Undefined;
 public class Globals
 {
 	private static Globals INSTANCE = null;
+	private static final String INTERNAL_MODULE = "$SMT-LIB";
 
 	private Globals()
 	{
@@ -154,6 +156,16 @@ public class Globals
 
 		fname = new TCNameToken(LexLocation.ANY, "$SMT-LIB", "inv_nat1");
 		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
+	}
+
+	public TCNameToken getInternalName(String name)
+	{
+		return new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, "inv_nat");
+	}
+
+	public TCVariableExpression getInteralVariable(String name)
+	{
+		return new TCVariableExpression(LexLocation.ANY, getInternalName(name), name);
 	}
 
 	public Environment getEnvironment(Environment outer)

@@ -48,14 +48,12 @@ import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
-import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -91,9 +89,9 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	{
 		return new QualifiedType(
 			INT,
-			applyInv("inv_nat",
-				new TCExpressionList(VAR),
-				new TCTypeList(new TCIntegerType(ANYWHERE))));
+			new TCApplyExpression(
+				globals.getInteralVariable("inv_nat"),
+				new TCExpressionList(VAR)));
 	}
 
 	@Override
@@ -101,9 +99,9 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	{
 		return new QualifiedType(
 			INT,
-			applyInv("inv_nat1",
-				new TCExpressionList(VAR),
-				new TCTypeList(new TCIntegerType(ANYWHERE))));
+			new TCApplyExpression(
+				globals.getInteralVariable("inv_nat1"),
+				new TCExpressionList(VAR)));
 	}
 
 	@Override
@@ -320,11 +318,5 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 		}
 
 		return new QualifiedType(node, qualifier);
-	}
-
-	private TCApplyExpression applyInv(String name, TCExpressionList args, TCTypeList typelist)
-	{
-		TCNameToken fname = new TCNameToken(ANYWHERE, "$SMT-LIB", name);
-		return new TCApplyExpression(new TCVariableExpression(ANYWHERE, fname, name), args);
 	}
 }

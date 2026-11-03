@@ -575,7 +575,14 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	@Override
 	public TCExpression caseStringLiteralExpression(TCStringLiteralExpression node, TCExpressionSet arg)
 	{
-		return node;
+		TCExpressionList members = new TCExpressionList();
+
+		for (byte ch: node.value.value.getBytes())
+		{
+			members.add(new TCIntegerLiteralExpression(new LexIntegerToken((long)ch, ANYWHERE)));
+		}
+
+		return new TCSeqEnumExpression(ANYWHERE, members);
 	}
 
 	@Override

@@ -879,7 +879,7 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 	@Override
 	public Expression caseCharLiteralExpression(TCCharLiteralExpression node, Environment arg)
 	{
-		return new Expression(Character.toString(node.value.unicode));	// eg. 'A' becomes 65
+		return new Expression(Long.toString(node.value.unicode));	// eg. 'A' becomes 65
 	}
 
 	@Override

@@ -24,7 +24,9 @@
 
 package smtlib.visitors;
 
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
@@ -56,15 +58,47 @@ public class TypeCast extends TCTypeVisitor<TCExpression, TCExpression> implemen
 		{
 			return null;
 		}
+		else if (atype instanceof TCIntegerType)
+		{
+			return new TCApplyExpression(
+				Globals.getInstance().getInteralVariable("inv_nat"),
+				new TCExpressionList(arg));
+		}
 		else if (atype instanceof TCRealType ||
-				 atype instanceof TCRationalType ||
-				 atype instanceof TCIntegerType)
+				 atype instanceof TCRationalType)
 		{
 			return new TCIsExpression(ANYWHERE, null, node, arg);
 		}
 		else
 		{
 			throw new UnsupportedOperationException("Argument is not a nat: " + arg);
+		}
+	}
+
+	@Override
+	public TCExpression caseNaturalOneType(TCNaturalOneType node, TCExpression arg)
+	{
+		TCType atype = arg.getType();
+
+		if (atype instanceof TCNaturalOneType)
+		{
+			return null;
+		}
+		else if (atype instanceof TCNaturalType ||
+				 atype instanceof TCIntegerType)
+		{
+			return new TCApplyExpression(
+				Globals.getInstance().getInteralVariable("inv_nat1"),
+				new TCExpressionList(arg));
+		}
+		else if (atype instanceof TCRealType ||
+				 atype instanceof TCRationalType)
+		{
+			return new TCIsExpression(ANYWHERE, null, node, arg);
+		}
+		else
+		{
+			throw new UnsupportedOperationException("Argument is not a nat1: " + arg);
 		}
 	}
 }
