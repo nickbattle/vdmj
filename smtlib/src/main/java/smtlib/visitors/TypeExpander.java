@@ -66,6 +66,11 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	private final TCExpression VAR;
 	private final Globals globals;
 
+	public TypeExpander()
+	{
+		this(new TCNameToken(ANYWHERE, "?", "?"));
+	}
+
 	public TypeExpander(TCNameToken var)
 	{
 		this.VAR = new TCVariableExpression(ANYWHERE, var, var.toString());
@@ -272,9 +277,12 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 
 		if (node.invdef != null)
 		{
-			qualifier = new TCApplyExpression(
-				new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
-				new TCExpressionList(VAR));
+			if (!node.isMaximal())
+			{
+				qualifier = new TCApplyExpression(
+					new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
+					new TCExpressionList(VAR));
+			}
 
 			DefinitionExpander.getInstance().expandFunction(node.invdef);
 		}
@@ -287,7 +295,7 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 			
 			for (TCField field: node.fields)
 			{
-				QualifiedSort qsort = field.type.apply(new TypeToSMT(typename), env);
+				QualifiedSort qsort = field.type.apply(new TypeToSMT("?"), env);
 				ctor.add(new Expression(new Text(field.tag), qsort.sort));
 				field.type.apply(this, env);
 			}
@@ -305,17 +313,19 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 
 		if (node.invdef != null)
 		{
-			qualifier = new TCApplyExpression(
-				new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
-				new TCExpressionList(VAR));
+			if (!node.isMaximal())
+			{
+				qualifier = new TCApplyExpression(
+					new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
+					new TCExpressionList(VAR));
+			}
 
 			DefinitionExpander.getInstance().expandFunction(node.invdef);
 		}
 
-		if (!globals.containsType(node.typename.getName()))
-		{
-			globals.addType(new DeclareType(node.typename.getName()));
-		}
+		node.type.apply(this, env);		// Process any dependent types
+		QualifiedSort qsort = node.type.apply(new TypeToSMT("?"), env);
+		globals.addType(new DeclareType(node.typename.getName(), qsort.sort));
 
 		return new QualifiedType(node, qualifier);
 	}

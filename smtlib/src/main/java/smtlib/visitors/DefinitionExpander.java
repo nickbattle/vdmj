@@ -183,7 +183,9 @@ public class DefinitionExpander
 
 				for (int p=0; p<plist.size(); p++)
 				{
-					pdefs.addAll(plist.get(p).getDefinitions(ftype.parameters.get(p), NameScope.NAMES));
+					TCType ptype = ftype.parameters.get(p);
+					pdefs.addAll(plist.get(p).getDefinitions(ptype, NameScope.NAMES));
+					ptype.apply(new TypeExpander(), env);
 				}
 
 				Environment local = new FlatCheckedEnvironment(pdefs, env, NameScope.NAMES);
@@ -211,6 +213,8 @@ public class DefinitionExpander
 		{
 			TCPattern pattern = patterns.get(i);
 			TCType ptype = ftype.parameters.get(i);
+			ptype.apply(new TypeExpander(), env);		// Add any type defs needed
+
 			TCIdentifierPattern p2 = Utils.checkPattern(pattern, ptype, letquals, env);
 			QualifiedSort qsort = ptype.apply(new TypeToSMT(p2.name.getName()), env);
 			params.add(new Bracketed(new Text(p2.name.getName()), qsort.sort));

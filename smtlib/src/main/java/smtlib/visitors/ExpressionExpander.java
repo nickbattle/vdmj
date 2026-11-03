@@ -298,6 +298,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				TCType updatedType = mtbind.type;
 				TCPatternList updatedPlist = new TCPatternList();
 				updatedPlist.addAll(mtbind.plist);
+				mtbind.type.apply(new TypeExpander(), env);		// Add any type defs needed
 
 				for (int i=0; i < mtbind.plist.size(); i++)
 				{
@@ -324,6 +325,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				TCType updatedType = stype.seqof;
 				TCPatternList updatedPlist = new TCPatternList();
 				updatedPlist.addAll(msbind.plist);
+				stype.apply(new TypeExpander(), env);		// Add any type defs needed
 
 				for (int i=0; i < msbind.plist.size(); i++)
 				{
@@ -356,7 +358,8 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				TCType updatedType = stype.setof;
 				TCPatternList updatedPlist = new TCPatternList();
 				updatedPlist.addAll(msbind.plist);
-
+				stype.apply(new TypeExpander(), env);		// Add any type defs needed
+				
 				for (int i=0; i < msbind.plist.size(); i++)
 				{
 					TCIdentifierPattern p2 = Utils.checkPattern(msbind.plist.get(i), stype.setof, letquals, env);
