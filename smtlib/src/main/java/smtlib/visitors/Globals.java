@@ -287,7 +287,27 @@ public class Globals
 
 						if (!set.isEmpty())
 						{
-							recursiveSets.add(set);
+							// merge if there are overlaps
+							boolean merged = false;
+
+							for (TCDefinitionSet group: recursiveSets)
+							{
+								for (TCDefinition func: set)
+								{
+									if (group.contains(func))
+									{
+										group.addAll(set);
+										merged = true;
+										break;
+									}
+								}
+							}
+
+							// else we have a new set
+							if (!merged)
+							{
+								recursiveSets.add(set);
+							}
 						}
 					}
 				}
