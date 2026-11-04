@@ -54,7 +54,7 @@ import smtlib.ast.Undefined;
 public class Globals
 {
 	private static Globals INSTANCE = null;
-	private static final String INTERNAL_MODULE = "$SMT-LIB";
+	public static final String INTERNAL_MODULE = "$SMT-LIB";
 
 	private Globals()
 	{
@@ -150,11 +150,11 @@ public class Globals
 
 	private void setInternalEnvironment()
 	{
-		TCNameToken fname = new TCNameToken(LexLocation.ANY, "$SMT-LIB", "inv_nat");
+		TCNameToken fname = new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, "inv_nat");
 		TCFunctionType ftype = new TCFunctionType(LexLocation.ANY, new TCTypeList(new TCIntegerType(LexLocation.ANY)), false, new TCBooleanType(LexLocation.ANY));
 		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
 
-		fname = new TCNameToken(LexLocation.ANY, "$SMT-LIB", "inv_nat1");
+		fname = new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, "inv_nat1");
 		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
 	}
 

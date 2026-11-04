@@ -171,7 +171,7 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 			root = env.findName(var.name, NameScope.NAMESANDSTATE);
 		}
 
-		if (root.name.getModule().equals("$SMT-LIB"))
+		if (root.name.getModule().equals(Globals.INTERNAL_MODULE))
 		{
 			Expression call = new Expression(root.name.getName());
 
