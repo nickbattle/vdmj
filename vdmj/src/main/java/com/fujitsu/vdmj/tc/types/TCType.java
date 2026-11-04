@@ -503,7 +503,9 @@ public abstract class TCType extends TCNode implements Comparable<TCType>
 
 	public boolean isRecursive()
 	{
-		return !this.apply(new TCRecursiveTypeFinder(), this).isEmpty();
+		TCRecursiveTypeFinder finder = new TCRecursiveTypeFinder();
+		this.apply(finder, this);
+		return finder.isRecursive();
 	}
 
 	public void report(int number, String msg)
