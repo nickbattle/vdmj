@@ -42,6 +42,7 @@ import rpc.RPCRequest;
 import smtlib.SMTLIB;
 import smtlib.ast.Script;
 import smtlib.solvers.Solver;
+import smtlib.visitors.Globals;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
@@ -128,6 +129,9 @@ public class SMTLSPCommand extends AnalysisCommand
 		try
 		{
 			TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+
+			Globals.getInstance().findRecursiveSets(tc.getTC());
+
 			SMTLIB smtlib = new SMTLIB(tc.getGlobalEnvironment(), Solver.getInstance(type), verbose);
 
 			for (int number: numbers)

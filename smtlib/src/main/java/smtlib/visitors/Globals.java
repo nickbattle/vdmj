@@ -24,14 +24,24 @@
 
 package smtlib.visitors;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
@@ -77,6 +87,7 @@ public class Globals
 	private List<AssertCommand> assertions = new Vector<AssertCommand>();
 
 	private TCDefinitionList environment = new TCDefinitionList();
+	private HashSet<TCDefinitionSet> recursiveSets = null;
 
 	public void reset()
 	{
@@ -233,5 +244,78 @@ public class Globals
 		}
 
 		return null;
+	}
+
+	public void findRecursiveSets(TCModuleList moduleList)
+	{
+		recursiveSets = new HashSet<TCDefinitionSet>();
+
+		for (TCModule module: moduleList)
+		{
+			for (TCDefinition def: module.defs)
+			{
+				if (def.isFunction())
+				{
+					TCExpression body = null;
+					
+					if (def instanceof TCExplicitFunctionDefinition)
+					{
+						TCExplicitFunctionDefinition exfn = (TCExplicitFunctionDefinition)def;
+						body = exfn.body;
+					}
+					else if (def instanceof TCImplicitFunctionDefinition)
+					{
+						TCImplicitFunctionDefinition imfn = (TCImplicitFunctionDefinition)def;
+						body = imfn.body;
+					}
+
+					if (body != null)
+					{
+						List<TCApplyExpression> applies = body.apply(new ApplyFinder(), null);
+						TCDefinitionSet set = new TCDefinitionSet();
+
+						for (TCApplyExpression apply: applies)
+						{
+							if (apply.recursiveCycles != null)
+							{
+								for (TCDefinitionList cycle: apply.recursiveCycles)
+								{
+									set.addAll(cycle);
+								}
+							}
+						}
+
+						if (!set.isEmpty())
+						{
+							recursiveSets.add(set);
+						}
+					}
+				}
+			}
+		}
+
+		printRecursiveSets();	// TODO Remove me!
+	}
+
+	private void printRecursiveSets()
+	{
+		if (recursiveSets != null && !recursiveSets.isEmpty())
+		{
+			Console.out.println("Recursive function sets:");
+
+			for (TCDefinitionSet set: recursiveSets)
+			{
+				Console.out.print("[");
+				String sep = "";
+				
+				for (TCDefinition def: set)
+				{
+					Console.out.printf("%s%s", sep, def.name.toString());
+					sep = ", ";
+				}
+
+				Console.out.print("]\n");
+			}
+		}
 	}
 }
