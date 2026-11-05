@@ -161,17 +161,14 @@ public class Globals
 
 	private void setInternalEnvironment()
 	{
-		TCNameToken fname = new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, "inv_nat");
 		TCFunctionType ftype = new TCFunctionType(LexLocation.ANY, new TCTypeList(new TCIntegerType(LexLocation.ANY)), false, new TCBooleanType(LexLocation.ANY));
-		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
-
-		fname = new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, "inv_nat1");
-		environment.add(new TCLocalDefinition(LexLocation.ANY, fname, ftype));
+		environment.add(new TCLocalDefinition(LexLocation.ANY, getInternalName("inv_nat"), ftype));
+		environment.add(new TCLocalDefinition(LexLocation.ANY, getInternalName("inv_nat1"), ftype));
 	}
 
 	public TCNameToken getInternalName(String name)
 	{
-		return new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, "inv_nat");
+		return new TCNameToken(LexLocation.ANY, INTERNAL_MODULE, name);
 	}
 
 	public TCVariableExpression getInteralVariable(String name)

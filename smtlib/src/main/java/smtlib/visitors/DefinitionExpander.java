@@ -173,7 +173,7 @@ public class DefinitionExpander
 			try
 			{
 				stack.push(fname);
-				DefineFun define = new DefineFun(fname);	// Adds placeholder. Updated in expandCommon
+				DefineFun define = new DefineFun(fname);	// Adds placeholder. Updated in functionToSMT
 				globals.addFunction(define);
 
 				// Expand any functions called by this one first. Create a local env to include
@@ -202,16 +202,15 @@ public class DefinitionExpander
 
 	private void functionToSMT(String fname, TCPatternList plist, TCFunctionType ftype, TCExpression fbody)
 	{
-		TCPatternList patterns = plist;
 		Bracketed params = new Bracketed();		// eg. (x Int)
 		Bracketed psorts = new Bracketed();		// eg. (Int)
 		List<Expression> qualifiers = new Vector<Expression>();
 		TCDefinitionList locals = new TCDefinitionList();
 		TCExpressionList letquals = new TCExpressionList();
 
-		for (int i=0; i < patterns.size(); i++)
+		for (int i=0; i < plist.size(); i++)
 		{
-			TCPattern pattern = patterns.get(i);
+			TCPattern pattern = plist.get(i);
 			TCType ptype = ftype.parameters.get(i);
 			ptype.apply(new TypeExpander(), env);		// Add any type defs needed
 
