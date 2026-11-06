@@ -130,7 +130,8 @@ public class SMTLSPCommand extends AnalysisCommand
 		{
 			TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 
-			Globals.getInstance().findRecursiveSets(tc.getTC());
+			Globals.reset();
+			Globals.getInstance().findrecursiveGroups(tc.getTC());
 
 			SMTLIB smtlib = new SMTLIB(tc.getGlobalEnvironment(), Solver.getInstance(type), verbose);
 

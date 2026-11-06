@@ -24,8 +24,10 @@
 
 package smtlib.visitors;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -53,6 +55,7 @@ import smtlib.ast.Bracketed;
 import smtlib.ast.Comment;
 import smtlib.ast.DeclareType;
 import smtlib.ast.DefineFun;
+import smtlib.ast.DefineFunsRec;
 import smtlib.ast.Expression;
 import smtlib.ast.GE;
 import smtlib.ast.GT;
@@ -70,14 +73,14 @@ public class Globals
 	{
 		setInternalEnvironment();
 	}
-	
+
 	public static Globals getInstance()
 	{
 		if (INSTANCE == null)
 		{
 			INSTANCE = new Globals();
 		}
-		
+
 		return INSTANCE;
 	}
 
@@ -87,11 +90,24 @@ public class Globals
 	private List<AssertCommand> assertions = new Vector<AssertCommand>();
 
 	private TCDefinitionList environment = new TCDefinitionList();
-	private HashSet<TCDefinitionSet> recursiveSets = null;
+	private Map<DefineFunsRec, TCDefinitionSet> recursiveGroups = null;
 
-	public void reset()
+	public static void reset()
 	{
 		INSTANCE = null;
+	}
+
+	public void init()		// Start of each PO
+	{
+		for (DefineFunsRec group : recursiveGroups.keySet())
+		{
+			group.init();
+		}
+	
+		constants.clear();
+		datatypes.clear();
+		functions.clear();
+		assertions.clear();
 	}
 
 	public boolean containsType(String name)
@@ -101,7 +117,7 @@ public class Globals
 
 	private <T extends SExp> boolean contains(String name, List<T> list)
 	{
-		for (T known: list)
+		for (T known : list)
 		{
 			if (known.get(1).toString().equals(name))
 			{
@@ -112,11 +128,27 @@ public class Globals
 		return false;
 	}
 
-	public void addFunction(DefineFun func)
+	public void createFunction(TCNameToken name)
 	{
-		if (!contains(func.getName(), functions))
+		DefineFun define = new DefineFun(name); // Placeholder
+		DefineFunsRec group = findGroup(name);
+
+		if (group != null)
 		{
-			functions.add(0, func);
+			if (!group.added)
+			{
+				functions.add(group);
+				group.added = true;
+			}
+
+			group.addMember(define);
+		}
+		else
+		{
+			if (!contains(name.getName(), functions))
+			{
+				functions.add(0, define);
+			}
 		}
 	}
 
@@ -132,7 +164,7 @@ public class Globals
 
 	public void addAssert(AssertCommand assertCommand)
 	{
-		for (AssertCommand cmd: assertions)
+		for (AssertCommand cmd : assertions)
 		{
 			if (cmd.equals(assertCommand))
 			{
@@ -186,13 +218,13 @@ public class Globals
 		Script script = new Script();
 
 		script.add(new DefineFun(
-					"inv_nat",
+					getInternalName("inv_nat"),
 					new Bracketed(new Expression("i", "Int")),
 					new Sort("Bool"),
 					new GE("i", "0")));
 
 		script.add(new DefineFun(
-					"inv_nat1",
+					getInternalName("inv_nat1"),
 					new Bracketed(new Expression("i", "Int")),
 					new Sort("Bool"),
 					new GT("i", "0")));
@@ -230,31 +262,65 @@ public class Globals
 		return script;
 	}
 
-	public DefineFun getFunction(String fname)
+	public DefineFun findFunction(TCNameToken fname)
 	{
-		for (DefineFun known: functions)
+		DefineFunsRec group = findGroup(fname);
+
+		if (group != null)
 		{
-			if (known.getName().equals(fname))
+			for (DefineFun member : group.members)
 			{
-				return known;
+				if (member.getName().equals(fname.getName()))
+				{
+					return member;
+				}
+			}
+		}
+		else
+		{
+			for (DefineFun known : functions)
+			{
+				if (known.getName().equals(fname.getName()))
+				{
+					return known;
+				}
 			}
 		}
 
 		return null;
 	}
 
-	public void findRecursiveSets(TCModuleList moduleList)
+	private DefineFunsRec findGroup(TCNameToken name)
 	{
-		recursiveSets = new HashSet<TCDefinitionSet>();
-
-		for (TCModule module: moduleList)
+		if (recursiveGroups != null)
 		{
-			for (TCDefinition def: module.defs)
+			for (DefineFunsRec group : recursiveGroups.keySet())
+			{
+				for (TCDefinition tcdef : recursiveGroups.get(group))
+				{
+					if (tcdef.name.equals(name))
+					{
+						return group;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public void findrecursiveGroups(TCModuleList moduleList)
+	{
+		HashSet<TCDefinitionSet> groups = new HashSet<TCDefinitionSet>();
+
+		for (TCModule module : moduleList)
+		{
+			for (TCDefinition def : module.defs)
 			{
 				if (def.isFunction())
 				{
 					TCExpression body = null;
-					
+
 					if (def instanceof TCExplicitFunctionDefinition)
 					{
 						TCExplicitFunctionDefinition exfn = (TCExplicitFunctionDefinition)def;
@@ -271,11 +337,11 @@ public class Globals
 						List<TCApplyExpression> applies = body.apply(new ApplyFinder(), null);
 						TCDefinitionSet set = new TCDefinitionSet();
 
-						for (TCApplyExpression apply: applies)
+						for (TCApplyExpression apply : applies)
 						{
 							if (apply.recursiveCycles != null)
 							{
-								for (TCDefinitionList cycle: apply.recursiveCycles)
+								for (TCDefinitionList cycle : apply.recursiveCycles)
 								{
 									set.addAll(cycle);
 								}
@@ -287,9 +353,9 @@ public class Globals
 							// merge if there are overlaps
 							boolean merged = false;
 
-							for (TCDefinitionSet group: recursiveSets)
+							for (TCDefinitionSet group : groups)
 							{
-								for (TCDefinition func: set)
+								for (TCDefinition func : set)
 								{
 									if (group.contains(func))
 									{
@@ -303,29 +369,37 @@ public class Globals
 							// else we have a new set
 							if (!merged)
 							{
-								recursiveSets.add(set);
+								groups.add(set);
 							}
+						}
+
+						recursiveGroups = new HashMap<DefineFunsRec, TCDefinitionSet>();
+						int id = 1;
+
+						for (TCDefinitionSet group : groups)
+						{
+							recursiveGroups.put(new DefineFunsRec(id), group);
 						}
 					}
 				}
 			}
 		}
 
-		printRecursiveSets();	// TODO Remove me!
+		printrecursiveGroups(); // TODO Remove me!
 	}
 
-	private void printRecursiveSets()
+	private void printrecursiveGroups()
 	{
-		if (recursiveSets != null && !recursiveSets.isEmpty())
+		if (recursiveGroups != null && !recursiveGroups.isEmpty())
 		{
 			Console.out.println("Recursive function sets:");
 
-			for (TCDefinitionSet set: recursiveSets)
+			for (TCDefinitionSet group : recursiveGroups.values())
 			{
 				Console.out.print("[");
 				String sep = "";
-				
-				for (TCDefinition def: set)
+
+				for (TCDefinition def : group)
 				{
 					Console.out.printf("%s%s", sep, def.name.toString());
 					sep = ", ";

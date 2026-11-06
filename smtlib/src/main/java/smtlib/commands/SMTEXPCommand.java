@@ -53,6 +53,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 import smtlib.SMTLIB;
 import smtlib.ast.Script;
 import smtlib.solvers.Solver;
+import smtlib.visitors.Globals;
 
 public class SMTEXPCommand extends AnalysisCommand
 {
@@ -146,6 +147,8 @@ public class SMTEXPCommand extends AnalysisCommand
 		try
 		{
 			TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+			Globals.reset();
+			Globals.getInstance().findrecursiveGroups(tc.getTC());
 			Environment env = tc.getGlobalEnvironment();
 			SMTLIB smtlib = new SMTLIB(env, Solver.getInstance(type), true);
 

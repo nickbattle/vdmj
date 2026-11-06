@@ -25,6 +25,7 @@
 package smtlib.ast;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import smtlib.visitors.Utils;
 
@@ -32,19 +33,35 @@ public class DefineFun extends Command
 {
 	private String expanded = null;
 
-	public DefineFun(String name, Bracketed params, Sort type, Expression body)
+	public DefineFun(TCNameToken name, Bracketed params, Sort type, Expression body)
 	{
-		super(new Text("define-fun"), new Text(name), params, type, body);
+		super(new Text("define-fun"), smtName(name), params, type, body);
 	}
 
-	public DefineFun(String name)	// Placeholder, updated by set below
+	public DefineFun(TCNameToken name)	// Placeholder, updated by set below
 	{
-		super(new Text("define-fun"), new Text(name), null, null, null);
+		super(new Text("define-fun"), smtName(name), null, null, null);
 	}
 
 	public DefineFun(String name, Sort type, Expression body)	// Constant
 	{
 		super(new Text("define-fun"), new Text(name), new Bracketed(), type, body);
+	}
+
+	public DefineFun(TCNameToken name, Sort type, Expression body)	// Constant
+	{
+		super(new Text("define-fun"), smtName(name), new Bracketed(), type, body);
+	}
+
+	// Used by DefineGroup to add "define-funcs-rec"
+	protected DefineFun(int id)
+	{
+		super(new Text("define-funcs-rec"), new Text("ID" + id));
+	}
+
+	private static Text smtName(TCNameToken vdmName)
+	{
+		return new Text(vdmName.getName());
 	}
 
 	public String getName()
@@ -59,14 +76,20 @@ public class DefineFun extends Command
 		this.set(4, body);
 	}
 
-	public void setRecursive()
-	{
-		this.set(0, new Text("define-fun-rec"));
-	}
-
 	public void setExpanded(TCExpression expanded)
 	{
 		this.expanded = Utils.expandOneLine(expanded);
+	}
+
+	// These are used by DefineFunsRec
+	public Source toSignature()
+	{
+		return new Expression(get(1), get(2), get(3));
+	}
+
+	public Source toBody()
+	{
+		return get(4);
 	}
 
 	@Override
@@ -110,5 +133,23 @@ public class DefineFun extends Command
 		sb.append(")");
 
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof DefineFun)
+		{
+			DefineFun df = (DefineFun)other;
+			return df.getName().equals(this.getName());
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return getName().hashCode();
 	}
 }

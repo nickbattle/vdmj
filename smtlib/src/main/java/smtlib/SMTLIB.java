@@ -100,13 +100,14 @@ public class SMTLIB
 		TCExpression tcexp = po.getCheckedExpression();
 		Script script = new Script();
 		LocalNames.reset();
-		Globals.getInstance().reset();
-		DefinitionExpander.init(env);
+		Globals.getInstance().init();
+
+		Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
+		DefinitionExpander.init(smtenv);
 		TCExpression expanded = null;
 
 		try
 		{
-			Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
 			TCExpressionSet constraints = new TCExpressionSet();
 			expanded = tcexp.apply(new ExpressionExpander(smtenv), constraints);
 

@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -57,7 +58,7 @@ public class DefinitionExpander
 	private static DefinitionExpander INSTANCE = null;
 
 	private final Environment env;
-	private final Stack<String> stack;
+	private final Stack<TCNameToken> stack;
 	private final Globals globals;
 
 	public static void init(Environment env)
@@ -73,13 +74,13 @@ public class DefinitionExpander
 	private DefinitionExpander(Environment env)
 	{
 		this.env = env;
-		this.stack = new Stack<String>();
+		this.stack = new Stack<TCNameToken>();
 		this.globals = Globals.getInstance();
 	}
 
 	public void expandFunction(TCExplicitFunctionDefinition exfn)
 	{
-		expandFunction(exfn.name.getName(),
+		expandFunction(exfn.name,
 			exfn.paramPatternList.firstElement(),
 			exfn.type,
 			exfn.body);
@@ -88,7 +89,7 @@ public class DefinitionExpander
 		{
 			TCExplicitFunctionDefinition pdef = exfn.predef;
 
-			expandFunction(pdef.name.getName(),
+			expandFunction(pdef.name,
 				pdef.paramPatternList.firstElement(),
 				pdef.type,
 				pdef.body);
@@ -98,7 +99,7 @@ public class DefinitionExpander
 		{
 			TCExplicitFunctionDefinition pdef = exfn.postdef;
 
-			expandFunction(pdef.name.getName(),
+			expandFunction(pdef.name,
 				pdef.paramPatternList.firstElement(),
 				pdef.type,
 				pdef.body);
@@ -108,7 +109,7 @@ public class DefinitionExpander
 		{
 			TCExplicitFunctionDefinition mdef = exfn.measureDef;
 
-			expandFunction(mdef.name.getName(),
+			expandFunction(mdef.name,
 				mdef.paramPatternList.firstElement(),
 				mdef.type,
 				mdef.body);
@@ -119,7 +120,7 @@ public class DefinitionExpander
 	{
 		if (imfn.body != null)
 		{
-			expandFunction(imfn.name.getName(),
+			expandFunction(imfn.name,
 				imfn.getParamPatternList().firstElement(),
 				imfn.type,
 				imfn.body);
@@ -129,7 +130,7 @@ public class DefinitionExpander
 		{
 			TCExplicitFunctionDefinition pdef = imfn.predef;
 
-			expandFunction(pdef.name.getName(),
+			expandFunction(pdef.name,
 				pdef.paramPatternList.firstElement(),
 				pdef.type,
 				pdef.body);
@@ -139,7 +140,7 @@ public class DefinitionExpander
 		{
 			TCExplicitFunctionDefinition pdef = imfn.postdef;
 
-			expandFunction(pdef.name.getName(),
+			expandFunction(pdef.name,
 				pdef.paramPatternList.firstElement(),
 				pdef.type,
 				pdef.body);
@@ -149,32 +150,21 @@ public class DefinitionExpander
 		{
 			TCExplicitFunctionDefinition mdef = imfn.measureDef;
 
-			expandFunction(mdef.name.getName(),
+			expandFunction(mdef.name,
 				mdef.paramPatternList.firstElement(),
 				mdef.type,
 				mdef.body);
 		}
 	}
 
-	private void expandFunction(String fname, TCPatternList plist, TCFunctionType ftype, TCExpression fbody)
+	private void expandFunction(TCNameToken fname, TCPatternList plist, TCFunctionType ftype, TCExpression fbody)
 	{
-		if (stack.contains(fname))
-		{
-			if (!stack.peek().equals(fname))
-			{
-				throw new UnsupportedOperationException("Only supports simple recursion: " + fname);
-			}
-
-			DefineFun rec = globals.getFunction(fname);		// May be a placeholder
-			rec.setRecursive();
-		}
-		else
+		if (!stack.contains(fname))
 		{
 			try
 			{
 				stack.push(fname);
-				DefineFun define = new DefineFun(fname);	// Adds placeholder. Updated in functionToSMT
-				globals.addFunction(define);
+				globals.createFunction(fname);	// Claim position. Updated in functionToSMT
 
 				// Expand any functions called by this one first. Create a local env to include
 				// any parameter definitions, for the fbody typecheck.
@@ -193,6 +183,10 @@ public class DefinitionExpander
 				expanded.typeCheck(local, null, NameScope.NAMES, ftype.result);
 				functionToSMT(fname, plist, ftype, expanded);
 			}
+			catch (Throwable th)
+			{
+				throw th;
+			}
 			finally
 			{
 				stack.pop();
@@ -200,7 +194,7 @@ public class DefinitionExpander
 		}
 	}
 
-	private void functionToSMT(String fname, TCPatternList plist, TCFunctionType ftype, TCExpression fbody)
+	private void functionToSMT(TCNameToken fname, TCPatternList plist, TCFunctionType ftype, TCExpression fbody)
 	{
 		Bracketed params = new Bracketed();		// eg. (x Int)
 		Bracketed psorts = new Bracketed();		// eg. (Int)
@@ -250,7 +244,7 @@ public class DefinitionExpander
 		}
 
 		// (define-fun g (Int a) Int <exp>)
-		DefineFun define = globals.getFunction(fname);
+		DefineFun define = globals.findFunction(fname);
 		define.setExpanded(fbody);
 		define.set(params, qsort.sort, qbody);
 	}
@@ -262,7 +256,7 @@ public class DefinitionExpander
 		rhs.apply(new ExpressionExpander(env), new TCExpressionSet());	// Analyse RHS variables needed
 		Expression body = rhs.apply(new ExpressionToSMT(), env);
 		QualifiedSort qtype = ldef.getType().apply(new TypeToSMT(vname), env);
-		globals.addConstant(new DefineFun(vname, qtype.sort, body));	// const
+		globals.addConstant(new DefineFun(ldef.name, qtype.sort, body));
 
 		if (qtype.qualifier != null)
 		{

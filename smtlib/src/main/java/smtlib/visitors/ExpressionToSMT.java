@@ -310,6 +310,7 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 	public Expression caseLetDefExpression(TCLetDefExpression node, Environment env)
 	{
 		Bracketed binds = new Bracketed();
+		FlatEnvironment local = new FlatEnvironment(node.localDefs, env);
 
 		for (TCDefinition def: node.localDefs)
 		{
@@ -320,7 +321,7 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 				if (vdef.pattern instanceof TCIdentifierPattern)
 				{
 					String var = vdef.pattern.toString();
-					binds.add(new Expression(var, vdef.exp.apply(this, env)));
+					binds.add(new Expression(var, vdef.exp.apply(this, local)));
 				}
 				else if (vdef.pattern instanceof TCRecordPattern)
 				{
@@ -337,7 +338,6 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 			}
 		}
 
-		FlatEnvironment local = new FlatEnvironment(node.localDefs, env);
 		Expression body = node.expression.apply(this, local);
 
 		return new Let(binds, body);

@@ -28,6 +28,6 @@ public class Undefined extends DefineFun
 {
 	public Undefined(Sort sort)
 	{
-		super("undefined" + sort, new Bracketed(), sort, sort.undefinedConst());
+		super("undefined" + sort, sort, sort.undefinedConst());
 	}
 }
