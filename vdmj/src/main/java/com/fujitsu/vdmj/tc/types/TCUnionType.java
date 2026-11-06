@@ -838,7 +838,12 @@ public class TCUnionType extends TCType
 		
 		for (TCType member: types)
 		{
-			if (qualifier.matches(member))
+			if (member.isUnion(location))
+			{
+				TCUnionType utype = member.getUnion();
+				set.addAll(utype.getMatches(qualifier));
+			}
+			else if (qualifier.matches(member))
 			{
 				set.add(member);
 			}
