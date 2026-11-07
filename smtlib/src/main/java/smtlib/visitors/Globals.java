@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
@@ -53,9 +52,10 @@ import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import smtlib.ast.AssertCommand;
 import smtlib.ast.Bracketed;
 import smtlib.ast.Comment;
-import smtlib.ast.DeclareType;
+import smtlib.ast.DeclareDataType;
 import smtlib.ast.DefineFun;
 import smtlib.ast.DefineFunsRec;
+import smtlib.ast.DefineSort;
 import smtlib.ast.Expression;
 import smtlib.ast.GE;
 import smtlib.ast.GT;
@@ -85,7 +85,8 @@ public class Globals
 	}
 
 	private List<DefineFun> constants = new Vector<DefineFun>();
-	private List<DeclareType> datatypes = new Vector<DeclareType>();
+	private List<DeclareDataType> datatypes = new Vector<DeclareDataType>();
+	private List<DefineSort> sorts = new Vector<DefineSort>();
 	private List<DefineFun> functions = new Vector<DefineFun>();
 	private List<AssertCommand> assertions = new Vector<AssertCommand>();
 
@@ -99,13 +100,17 @@ public class Globals
 
 	public void init()		// Start of each PO
 	{
-		for (DefineFunsRec group : recursiveGroups.keySet())
+		if (recursiveGroups != null)
 		{
-			group.init();
+			for (DefineFunsRec group : recursiveGroups.keySet())
+			{
+				group.init();
+			}
 		}
 	
 		constants.clear();
 		datatypes.clear();
+		sorts.clear();
 		functions.clear();
 		assertions.clear();
 	}
@@ -175,11 +180,19 @@ public class Globals
 		assertions.add(assertCommand);
 	}
 
-	public void addType(DeclareType type)
+	public void addDataType(DeclareDataType type)
 	{
 		if (!contains(type.getName(), datatypes))
 		{
 			datatypes.add(0, type);
+		}
+	}
+
+	public void addSort(DefineSort sort)
+	{
+		if (!contains(sort.getName(), sorts))
+		{
+			sorts.add(0, sort);
 		}
 	}
 
@@ -244,7 +257,7 @@ public class Globals
 			script.add(constant);
 		}
 
-		for (DeclareType type: datatypes)
+		for (DeclareDataType type: datatypes)
 		{
 			script.add(type);
 		}
@@ -385,28 +398,28 @@ public class Globals
 			}
 		}
 
-		printrecursiveGroups(); // TODO Remove me!
+		// printrecursiveGroups();
 	}
 
-	private void printrecursiveGroups()
-	{
-		if (recursiveGroups != null && !recursiveGroups.isEmpty())
-		{
-			Console.out.println("Recursive function sets:");
+	// private void printrecursiveGroups()
+	// {
+	// 	if (recursiveGroups != null && !recursiveGroups.isEmpty())
+	// 	{
+	// 		Console.out.println("Recursive function sets:");
 
-			for (TCDefinitionSet group : recursiveGroups.values())
-			{
-				Console.out.print("[");
-				String sep = "";
+	// 		for (TCDefinitionSet group : recursiveGroups.values())
+	// 		{
+	// 			Console.out.print("[");
+	// 			String sep = "";
 
-				for (TCDefinition def : group)
-				{
-					Console.out.printf("%s%s", sep, def.name.toString());
-					sep = ", ";
-				}
+	// 			for (TCDefinition def : group)
+	// 			{
+	// 				Console.out.printf("%s%s", sep, def.name.toString());
+	// 				sep = ", ";
+	// 			}
 
-				Console.out.print("]\n");
-			}
-		}
-	}
+	// 			Console.out.print("]\n");
+	// 		}
+	// 	}
+	// }
 }

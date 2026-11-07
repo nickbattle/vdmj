@@ -57,7 +57,8 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-import smtlib.ast.DeclareType;
+import smtlib.ast.DeclareDataType;
+import smtlib.ast.DefineSort;
 import smtlib.ast.Expression;
 import smtlib.ast.Text;
 
@@ -300,7 +301,7 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 				field.type.apply(this, env);
 			}
 				
-			globals.addType(new DeclareType(typename, ctor));
+			globals.addDataType(new DeclareDataType(node.name, ctor));
 		}
 
 		return new QualifiedType(node, qualifier);
@@ -325,7 +326,7 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 
 		node.type.apply(this, env);		// Process any dependent types
 		QualifiedSort qsort = node.type.apply(new TypeToSMT("?"), env);
-		globals.addType(new DeclareType(node.typename.getName(), qsort.sort));
+		globals.addSort(new DefineSort(node.typename, qsort.sort));
 
 		return new QualifiedType(node, qualifier);
 	}

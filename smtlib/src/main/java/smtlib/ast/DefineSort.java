@@ -24,16 +24,13 @@
 
 package smtlib.ast;
 
-public class DeclareType extends Command
-{
-	public DeclareType(String type, Source... ctors)
-	{
-		super(new Text("declare-datatype"), new Text(type), new Bracketed(ctors));
-	}
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-	public DeclareType(String type)
+public class DefineSort extends Command
+{
+	public DefineSort(TCNameToken type, Source sort)
 	{
-		super(new Text("declare-sort"), new Text(type), new Text("0"));
+		super(new Text("define-sort"), new Text(type.getName()), new Bracketed(), sort);
 	}
 
 	public String getName()
