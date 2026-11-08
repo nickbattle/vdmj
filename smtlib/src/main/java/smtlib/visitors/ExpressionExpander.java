@@ -244,7 +244,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		TCExpressionSet bodyConstraints = new TCExpressionSet();
 		TCExpression body = expression.apply(this, bodyConstraints);
 
-		// [<qualifiers> (=>/and) [<bodyConstraints> and]] <translated body>
+		// [<qualifiers> and [<bodyConstraints> and]] <translated body>
 
 		if (!bodyConstraints.isEmpty())
 		{
@@ -253,7 +253,21 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 
 		if (!qualifiers.isEmpty())
 		{
-			body = new TCImpliesExpression(Utils.andOf(qualifiers), IMPLIES, body);
+			if (body.getType() instanceof TCBooleanType)
+			{
+				body = new TCAndExpression(Utils.andOf(qualifiers), AND, body);
+			}
+			else
+			{
+				QualifiedSort qsort = body.getType().apply(new TypeToSMT("?"), env);
+				globals.addUndefined(qsort.sort);
+
+				body = new TCIfExpression(ANYWHERE,
+					Utils.andOf(qualifiers),
+					body,
+					new TCElseIfExpressionList(),
+					new TCUndefinedExpression(ANYWHERE));
+			}
 		}
 
 		if (!letquals.isEmpty())
