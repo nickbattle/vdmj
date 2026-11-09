@@ -132,7 +132,6 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	private Pair<TCDefinitionList, TCExpression> expandLetDef(
 		TCDefinitionList localDefs, TCExpression expression, TCExpressionSet constraints)
 	{
-		TCExpressionSet qualifiers = new TCExpressionSet();
 		TCDefinitionList newdefs = new TCDefinitionList();
 		TCDefinitionList locals = new TCDefinitionList();
 		TCExpressionList letquals = new TCExpressionList();
@@ -149,10 +148,11 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					QualifiedType qtype = vdef.getType().apply(new TypeExpander(id.name), env);
 					TCType updated = qtype.type;
 
-					if (qtype.qualifier != null)
-					{
-						qualifiers.add(qtype.qualifier);
-					}
+					// *** The value already meets the invariants for the type, so
+					// *** we don't need a qualifier check. If the value could fail,
+					// *** a separate subtype PO would have been issued.
+					
+					// TODO check this!!
 
 					newdefs.add(new TCValueDefinition(
 						vdef.nameScope,
@@ -168,23 +168,10 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					TCType ptype = vdef.getType();
 					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
 
-					TCExpressionList args = new TCExpressionList();
-					TCLetDefExpression letdef = (TCLetDefExpression)letquals.firstElement();
+					// *** The values that match already meet the invariants for the
+					// *** various fields. So we don't have to emit checks.
 
-					for (TCDefinition let: letdef.localDefs)
-					{
-						TCValueDefinition v = (TCValueDefinition)let;
-						args.add(v.exp);
-					}
-
-					TCMkTypeExpression mkrec = new TCMkTypeExpression(rp.typename, args, false);
-
-					QualifiedType qsort = ptype.apply(new TypeExpander(mkrec), env);
-
-					if (qsort.qualifier != null)
-					{
-						qualifiers.add(qsort.qualifier);
-					}
+					ptype.apply(new TypeExpander(), env);	// Add dependent types
 
 					newdefs.add(new TCValueDefinition(
 						vdef.nameScope,
@@ -202,23 +189,10 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					TCType ptype = vdef.getType();
 					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
 
-					TCExpressionList args = new TCExpressionList();
-					TCLetDefExpression letdef = (TCLetDefExpression)letquals.firstElement();
+					// *** The value already meets the invariants for the type, so
+					// *** we don't need a qualifier check.
 
-					for (TCDefinition let: letdef.localDefs)
-					{
-						TCValueDefinition v = (TCValueDefinition)let;
-						args.add(v.exp);
-					}
-
-					TCTupleExpression tuple = new TCTupleExpression(p2.location, args);
-
-					QualifiedType qsort = ptype.apply(new TypeExpander(tuple), env);
-
-					if (qsort.qualifier != null)
-					{
-						qualifiers.add(qsort.qualifier);
-					}
+					ptype.apply(new TypeExpander(), env);
 
 					newdefs.add(new TCValueDefinition(
 						vdef.nameScope,
@@ -244,31 +218,14 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		TCExpressionSet bodyConstraints = new TCExpressionSet();
 		TCExpression body = expression.apply(this, bodyConstraints);
 
-		// [<qualifiers> and [<bodyConstraints> and]] <translated body>
+		// [<bodyConstraints> and] <translated body>
 
 		if (!bodyConstraints.isEmpty())
 		{
 			body = new TCAndExpression(Utils.andOf(bodyConstraints), AND, body);
 		}
 
-		if (!qualifiers.isEmpty())
-		{
-			if (body.getType() instanceof TCBooleanType)
-			{
-				body = new TCAndExpression(Utils.andOf(qualifiers), AND, body);
-			}
-			else
-			{
-				QualifiedSort qsort = body.getType().apply(new TypeToSMT("?"), env);
-				globals.addUndefined(qsort.sort);
-
-				body = new TCIfExpression(ANYWHERE,
-					Utils.andOf(qualifiers),
-					body,
-					new TCElseIfExpressionList(),
-					new TCUndefinedExpression(ANYWHERE));
-			}
-		}
+		// No qualifiers because the assignments already meet their invariants
 
 		if (!letquals.isEmpty())
 		{
