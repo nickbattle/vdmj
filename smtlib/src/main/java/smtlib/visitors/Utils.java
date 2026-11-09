@@ -121,6 +121,11 @@ public class Utils implements ASTHelper
 	
 	public static TCExpression andOf(Collection<TCExpression> qualifiers)
 	{
+		if (qualifiers.isEmpty())
+		{
+			return null;
+		}
+
 		Iterator<TCExpression> iter = qualifiers.iterator();
 		TCExpression head = iter.next();
 
@@ -141,6 +146,11 @@ public class Utils implements ASTHelper
 
 	public static Expression andOfAll(Collection<Expression> qualifiers)
 	{
+		if (qualifiers.isEmpty())
+		{
+			return null;
+		}
+		
 		Iterator<Expression> iter = qualifiers.iterator();
 		Expression head = iter.next();
 

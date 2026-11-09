@@ -255,6 +255,7 @@ public class DefinitionExpander
 		TCExpression rhs = ldef.valueDefinition.exp;
 		rhs.apply(new ExpressionExpander(env), new TCExpressionSet());	// Analyse RHS variables needed
 		Expression body = rhs.apply(new ExpressionToSMT(), env);
+		ldef.getType().apply(new TypeExpander(), env);
 		QualifiedSort qtype = ldef.getType().apply(new TypeToSMT(vname), env);
 		globals.addConstant(new DefineFun(ldef.name, qtype.sort, body));
 

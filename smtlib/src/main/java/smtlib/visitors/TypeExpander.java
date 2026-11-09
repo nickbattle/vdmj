@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.expressions.TCCardinalityExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionSet;
+import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCImpliesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCInSetExpression;
@@ -37,6 +38,7 @@ import com.fujitsu.vdmj.tc.expressions.TCLenExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMapDomainExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
@@ -274,15 +276,15 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	@Override
 	public QualifiedType caseRecordType(TCRecordType node, Environment env)
 	{
-		TCExpression qualifier = null;
+		TCExpressionList qualifiers = new TCExpressionList();
 
 		if (node.invdef != null)
 		{
 			if (!node.isMaximal())
 			{
-				qualifier = new TCApplyExpression(
+				qualifiers.add(new TCApplyExpression(
 					new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
-					new TCExpressionList(VAR));
+					new TCExpressionList(VAR)));
 			}
 
 			DefinitionExpander.getInstance().expandFunction(node.invdef);
@@ -299,12 +301,23 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 				QualifiedSort qsort = field.type.apply(new TypeToSMT("?"), env);
 				ctor.add(new Expression(new Text(field.tag), qsort.sort));
 				field.type.apply(this, env);
+
+				TCFieldExpression fexp = new TCFieldExpression(VAR,
+					new TCIdentifierToken(ANYWHERE, field.tag, false),
+					field.tagname);
+
+				QualifiedType qtype = field.type.apply(new TypeExpander(fexp), env);
+
+				if (qtype.qualifier != null)
+				{
+					qualifiers.add(qtype.qualifier);
+				}
 			}
 				
 			globals.addDataType(new DeclareDataType(node.name, ctor));
 		}
 
-		return new QualifiedType(node, qualifier);
+		return new QualifiedType(node, Utils.andOf(qualifiers));
 	}
 
 	@Override

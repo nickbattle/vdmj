@@ -82,14 +82,14 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	public TCExpression caseForAllExpression(TCForAllExpression node, TCExpressionSet constraints)
 	{
 		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(true, node.bindList, node.predicate, constraints);
-		return new TCForAllExpression(node.location, pair.first, pair.second);
+		return copyType(node, new TCForAllExpression(node.location, pair.first, pair.second));
 	}
 
 	@Override
 	public TCExpression caseExistsExpression(TCExistsExpression node, TCExpressionSet constraints)
 	{
 		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(false, node.bindList, node.predicate, constraints);
-		return new TCExistsExpression(node.location, pair.first, pair.second);
+		return copyType(node, new TCExistsExpression(node.location, pair.first, pair.second));
 	}
 
 	@Override
@@ -102,19 +102,19 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		{
 			TCMultipleTypeBind mtbind = (TCMultipleTypeBind)bind;
 			TCTypeBind tbind = new TCTypeBind(mtbind.plist.firstElement(), mtbind.type);
-			return new TCExists1Expression(node.location, tbind, pair.second);
+			return copyType(node, new TCExists1Expression(node.location, tbind, pair.second));
 		}
 		else if (bind instanceof TCMultipleSeqBind)
 		{
 			TCMultipleSeqBind msbind = (TCMultipleSeqBind)bind;
 			TCSeqBind sbind = new TCSeqBind(msbind.plist.firstElement(), msbind.sequence);
-			return new TCExists1Expression(node.location, sbind, pair.second);
+			return copyType(node, new TCExists1Expression(node.location, sbind, pair.second));
 		}
 		else if (bind instanceof TCMultipleSetBind)
 		{
 			TCMultipleSetBind msbind = (TCMultipleSetBind)bind;
 			TCSetBind sbind = new TCSetBind(msbind.plist.firstElement(), msbind.set);
-			return new TCExists1Expression(node.location, sbind, pair.second);
+			return copyType(node, new TCExists1Expression(node.location, sbind, pair.second));
 		}
 		else
 		{
@@ -126,7 +126,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	public TCExpression caseLetDefExpression(TCLetDefExpression node, TCExpressionSet constraints)
 	{
 		Pair<TCDefinitionList,TCExpression> pair = expandLetDef(node.localDefs, node.expression, constraints);
-		return new TCLetDefExpression(node.location, pair.first, pair.second);
+		return copyType(node, new TCLetDefExpression(node.location, pair.first, pair.second));
 	}
 
 	private Pair<TCDefinitionList, TCExpression> expandLetDef(
@@ -295,7 +295,8 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			constraints.add(suchThat);	// Moved into body exp
 		}
 		
-		return new TCLetBeStExpression(node.location, pair.first.firstElement(), null, pair.second);
+		return copyType(node,
+			new TCLetBeStExpression(node.location, pair.first.firstElement(), null, pair.second));
 	}
 
 	private Pair<TCMultipleBindList, TCExpression> expandQuantifier(boolean forall, TCMultipleBindList bindList, TCExpression predicate, TCExpressionSet constraints)
@@ -478,9 +479,9 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					postargs));
 			}
 
-			return new TCApplyExpression(
+			return copyType(node, new TCApplyExpression(
 				node.root.apply(this, constraints),
-				expargs);
+				expargs));
 		}
 		else if (def instanceof TCImplicitFunctionDefinition)
 		{
@@ -515,9 +516,9 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					postargs));
 			}
 
-			return new TCApplyExpression(
+			return copyType(node, new TCApplyExpression(
 				node.root.apply(this, constraints),
-				expargs);
+				expargs));
 		}
 		else if (node.root.getType().isSeq(node.location))
 		{
@@ -531,7 +532,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					new TCLessExpression(index, LE, new TCLenExpression(node.location, node.root)));
 
 			constraints.add(defined);
-			return new TCApplyExpression(root, new TCExpressionList(index));
+			return copyType(node, new TCApplyExpression(root, new TCExpressionList(index)));
 		}
 		else if (node.root.getType().isMap(node.location))
 		{
@@ -545,7 +546,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				new TCMapDomainExpression(node.location, map));
 
 			constraints.add(defined);
-			return new TCApplyExpression(map, new TCExpressionList(key));
+			return copyType(node, new TCApplyExpression(map, new TCExpressionList(key)));
 		}
 		
 		return node;
@@ -624,7 +625,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		{
 			// Call the node type's constructor, passing left right and the operator.
 			Constructor<?> ctor = clazz.getConstructor(TCExpression.class, LexToken.class, TCExpression.class);
-			return (TCExpression)ctor.newInstance(left, node.op, right);
+			return copyType(node, (TCExpression)ctor.newInstance(left, node.op, right));
 		}
 		catch (Exception e)
 		{
@@ -648,7 +649,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		{
 			// Call the node type's constructor, passing the exp.
 			Constructor<?> ctor = clazz.getConstructor(LexLocation.class, TCExpression.class);
-			return (TCExpression)ctor.newInstance(node.location, exp);
+			return copyType(node, (TCExpression)ctor.newInstance(node.location, exp));
 		}
 		catch (Exception e)
 		{
@@ -665,7 +666,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		TCExpression left = node.left.apply(this, constraints);
 		TCExpression right = subconstrain(node.right);
 
-		return new TCImpliesExpression(left, IMPLIES, right);
+		return copyType(node, new TCImpliesExpression(left, IMPLIES, right));
 	}
 
 	@Override
@@ -676,7 +677,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		TCExpression left = node.left.apply(this, constraints);
 		TCExpression right = subconstrain(node.right);
 
-		return new TCOrExpression(left, OR, right);
+		return copyType(node, new TCOrExpression(left, OR, right));
 	}
 
 	@Override
@@ -691,11 +692,11 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			newList.add((TCElseIfExpression)elif.apply(this, constraints));
 		}
 
-		return new TCIfExpression(node.location,
+		return copyType(node, new TCIfExpression(node.location,
 			node.ifExp.apply(this, constraints),
 			subconstrain(node.thenExp),
 			newList,
-			subconstrain(node.elseExp));
+			subconstrain(node.elseExp)));
 	}
 
 	@Override
@@ -725,10 +726,10 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				subconstrain(alt.result)));
 		}
 
-		return new TCCasesExpression(node.location,
+		return copyType(node, new TCCasesExpression(node.location,
 			node.exp.apply(this, constraints),
 			newCaseList,
-			others);
+			others));
 	}
 
 	@Override
@@ -770,7 +771,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				updated.add(e.apply(this, constraints));
 			}
 
-			return new TCSetEnumExpression(node.location, updated);
+			return copyType(node, new TCSetEnumExpression(node.location, updated));
 		}
 	}
 
@@ -790,7 +791,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				updated.add(e.apply(this, constraints));
 			}
 
-			return new TCSeqEnumExpression(node.location, updated);
+			return copyType(node, new TCSeqEnumExpression(node.location, updated));
 		}
 	}
 
@@ -802,7 +803,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			NE,
 			new TCSeqEnumExpression(node.location, new TCExpressionList())));
 
-		return new TCHeadExpression(node.location, node.exp.apply(this, constraints));
+		return copyType(node, new TCHeadExpression(node.location, node.exp.apply(this, constraints)));
 	}
 
 	@Override
@@ -813,13 +814,14 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			NE,
 			new TCSeqEnumExpression(node.location, new TCExpressionList())));
 
-		return new TCTailExpression(node.location, node.exp.apply(this, constraints));
+		return copyType(node, new TCTailExpression(node.location, node.exp.apply(this, constraints)));
 	}
 
  	@Override
 	public TCExpression caseAnnotatedExpression(TCAnnotatedExpression node, TCExpressionSet constraints)
 	{
-		return new TCAnnotatedExpression(node.location, node.annotation, node.expression.apply(this, constraints));
+		return copyType(node,
+			new TCAnnotatedExpression(node.location, node.annotation, node.expression.apply(this, constraints)));
 	}
 
  	@Override
@@ -841,7 +843,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			NE,
 			new TCIntegerLiteralExpression(LexIntegerToken.ZERO)));
 
-		return new TCDivExpression(left, DIV, right);
+		return copyType(node, new TCDivExpression(left, DIV, right));
 	}
 
  	@Override
@@ -856,33 +858,33 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			NE,
 			new TCIntegerLiteralExpression(LexIntegerToken.ZERO)));
 
-		return new TCDivideExpression(left, DIVIDE, right);
+		return copyType(node, new TCDivideExpression(left, DIVIDE, right));
 	}
 
  	@Override
 	public TCExpression caseElseIfExpression(TCElseIfExpression node, TCExpressionSet constraints)
 	{
-		return new TCElseIfExpression(node.location,
+		return copyType(node, new TCElseIfExpression(node.location,
 			node.elseIfExp.apply(this, constraints),
-			subconstrain(node.thenExp));
+			subconstrain(node.thenExp)));
 	}
 
  	@Override
 	public TCExpression caseFieldExpression(TCFieldExpression node, TCExpressionSet constraints)
 	{
-		return new TCFieldExpression(node.object.apply(this, constraints), node.field, node.memberName);
+		return copyType(node, new TCFieldExpression(node.object.apply(this, constraints), node.field, node.memberName));
 	}
 
  	@Override
 	public TCExpression caseFieldNumberExpression(TCFieldNumberExpression node, TCExpressionSet constraints)
 	{
-		return new TCFieldNumberExpression(node.tuple.apply(this, constraints), node.field);
+		return copyType(node, new TCFieldNumberExpression(node.tuple.apply(this, constraints), node.field));
 	}
 
  	@Override
 	public TCExpression caseMkBasicExpression(TCMkBasicExpression node, TCExpressionSet constraints)
 	{
-		return new TCMkBasicExpression(node.type, node.arg.apply(this, constraints));
+		return copyType(node, new TCMkBasicExpression(node.type, node.arg.apply(this, constraints)));
 	}
 
  	@Override
@@ -897,13 +899,14 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 
 		node.getType().apply(new TypeExpander(node), env);
 
-		return new TCMkTypeExpression(node.typename, args, false);
+		return copyType(node, new TCMkTypeExpression(node.typename, args, false));
 	}
 
  	@Override
 	public TCExpression caseMuExpression(TCMuExpression node, TCExpressionSet constraints)
 	{
-		return new TCMuExpression(node.location, node.record.apply(this, constraints), node.modifiers);
+		return copyType(node,
+			new TCMuExpression(node.location, node.record.apply(this, constraints), node.modifiers));
 	}
 
  	@Override
@@ -911,7 +914,8 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	{
 		if (node.basictype != null)
 		{
-			return new TCIsExpression(node.location, node.typename, node.basictype, node.test.apply(this, constraints));
+			return copyType(node,
+				new TCIsExpression(node.location, node.typename, node.basictype, node.test.apply(this, constraints)));
 		}
 		else
 		{
@@ -920,7 +924,8 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			if (def instanceof TCTypeDefinition)
 			{
 				TCTypeDefinition tdef = (TCTypeDefinition)def;
-				return new TCIsExpression(node.location, node.typename, tdef.type, node.test.apply(this, constraints));
+				return copyType(node,
+					new TCIsExpression(node.location, node.typename, tdef.type, node.test.apply(this, constraints)));
 			}
 
 			throw new UnsupportedOperationException("Cannot expand def: " + def);
@@ -951,7 +956,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					e.right.apply(this, constraints)));
 			}
 
-			return new TCMapEnumExpression(node.location, updated);
+			return copyType(node, new TCMapEnumExpression(node.location, updated));
 		}
 	}
 
@@ -971,25 +976,25 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 				updated.add(e.apply(this, constraints));
 			}
 
-			return new TCTupleExpression(node.location, updated);
+			return copyType(node, new TCTupleExpression(node.location, updated));
 		}
 	}
 
  	@Override
 	public TCExpression caseSetRangeExpression(TCSetRangeExpression node, TCExpressionSet constraints)
 	{
-		return new TCSetRangeExpression(node.location,
+		return copyType(node, new TCSetRangeExpression(node.location,
 			node.first.apply(this, constraints),
-			node.last.apply(this, constraints));
+			node.last.apply(this, constraints)));
 	}
 
  	@Override
 	public TCExpression caseSubseqExpression(TCSubseqExpression node, TCExpressionSet constraints)
 	{
-		return new TCSubseqExpression(
+		return copyType(node, new TCSubseqExpression(
 			node.seq.apply(this, constraints),
 			node.from.apply(this, constraints),
-			node.to.apply(this, constraints));
+			node.to.apply(this, constraints)));
 	}
 
 	@Override
@@ -1113,6 +1118,12 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		}
 
 		return result;
+	}
+
+	private TCExpression copyType(TCExpression from, TCExpression to)
+	{
+		to.setType(from.getType());
+		return to;
 	}
 
 	private TCDefinition findApplyDefinition(TCApplyExpression node, Environment env)

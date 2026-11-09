@@ -159,12 +159,7 @@ public class Globals
 
 	public void addUndefined(Sort sort)
 	{
-		DefineFun undef = new Undefined(sort);
-
-		if (!contains(undef.getName(), constants))
-		{
-			constants.add(0, undef);
-		}
+		addConstant(new Undefined(sort));
 	}
 
 	public void addAssert(AssertCommand assertCommand)
@@ -184,7 +179,7 @@ public class Globals
 	{
 		if (!contains(type.getName(), datatypes))
 		{
-			datatypes.add(0, type);
+			datatypes.add(type);
 		}
 	}
 
@@ -192,7 +187,7 @@ public class Globals
 	{
 		if (!contains(sort.getName(), sorts))
 		{
-			sorts.add(0, sort);
+			sorts.add(sort);
 		}
 	}
 
@@ -258,6 +253,11 @@ public class Globals
 		}
 
 		for (DeclareDataType type: datatypes)
+		{
+			script.add(type);
+		}
+
+		for (DefineSort type: sorts)
 		{
 			script.add(type);
 		}
