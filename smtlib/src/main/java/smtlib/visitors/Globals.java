@@ -201,9 +201,17 @@ public class Globals
 
 	private void setInternalEnvironment()
 	{
-		TCFunctionType ftype = new TCFunctionType(LexLocation.ANY, new TCTypeList(new TCIntegerType(LexLocation.ANY)), false, new TCBooleanType(LexLocation.ANY));
-		environment.add(new TCLocalDefinition(LexLocation.ANY, getInternalName("inv_nat"), ftype));
-		environment.add(new TCLocalDefinition(LexLocation.ANY, getInternalName("inv_nat1"), ftype));
+		environment.add(new TCLocalDefinition(LexLocation.ANY, getInternalName("inv_nat"),
+			new TCFunctionType(LexLocation.ANY,
+				new TCTypeList(new TCIntegerType(LexLocation.ANY)),
+				false,
+				new TCBooleanType(LexLocation.ANY))));
+
+		environment.add(new TCLocalDefinition(LexLocation.ANY, getInternalName("inv_nat1"),
+			new TCFunctionType(LexLocation.ANY,
+				new TCTypeList(new TCIntegerType(LexLocation.ANY)),
+				false,
+				new TCBooleanType(LexLocation.ANY))));
 	}
 
 	public TCNameToken getInternalName(String name)
