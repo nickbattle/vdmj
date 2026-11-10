@@ -165,7 +165,7 @@ public class SMTLIB
 				Expression body = (Expression) exists.get(2);
 				script.add(new AssertCommand(body));
 			}
-			else if (expanded.getType() instanceof TCBooleanType)	// eg. inv_T(args)
+			else if (tcexp.getType() instanceof TCBooleanType)	// eg. original inv_T(args)
 			{
 				script.add(new Comment("\nObligation satisfiable?"));
 				Expression apply = expanded.apply(new ExpressionToSMT(), smtenv);
@@ -173,7 +173,7 @@ public class SMTLIB
 			}
 			else
 			{
-				throw new UnsupportedOperationException("Obligation not a boolean: " + expanded);
+				throw new UnsupportedOperationException("Obligation not a boolean: " + tcexp);
 			}
 		}
 		catch (Exception e)
