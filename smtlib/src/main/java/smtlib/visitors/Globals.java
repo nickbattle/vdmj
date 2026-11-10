@@ -177,6 +177,8 @@ public class Globals
 
 	public void addDataType(DeclareDataType type)
 	{
+		checkBuiltIns(type.getName());
+
 		if (!contains(type.getName(), datatypes))
 		{
 			datatypes.add(type);
@@ -185,6 +187,8 @@ public class Globals
 
 	public void addSort(DefineSort sort)
 	{
+		checkBuiltIns(sort.getName());
+
 		if (!contains(sort.getName(), sorts))
 		{
 			sorts.add(sort);
@@ -196,6 +200,18 @@ public class Globals
 		if (!contains(constant.getName(), constants))
 		{
 			constants.add(0, constant);
+		}
+	}
+
+	private void checkBuiltIns(String name)
+	{
+		switch (name)
+		{
+			case "String":
+				throw new UnsupportedOperationException("Cannot use built-in name " + name);
+
+			default:
+				// not a builtin
 		}
 	}
 
@@ -405,29 +421,5 @@ public class Globals
 				}
 			}
 		}
-
-		// printrecursiveGroups();
 	}
-
-	// private void printrecursiveGroups()
-	// {
-	// 	if (recursiveGroups != null && !recursiveGroups.isEmpty())
-	// 	{
-	// 		Console.out.println("Recursive function sets:");
-
-	// 		for (TCDefinitionSet group : recursiveGroups.values())
-	// 		{
-	// 			Console.out.print("[");
-	// 			String sep = "";
-
-	// 			for (TCDefinition def : group)
-	// 			{
-	// 				Console.out.printf("%s%s", sep, def.name.toString());
-	// 				sep = ", ";
-	// 			}
-
-	// 			Console.out.print("]\n");
-	// 		}
-	// 	}
-	// }
 }
