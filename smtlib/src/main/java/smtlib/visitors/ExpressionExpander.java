@@ -125,16 +125,17 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	@Override
 	public TCExpression caseLetDefExpression(TCLetDefExpression node, TCExpressionSet constraints)
 	{
-		Pair<TCDefinitionList,TCExpression> pair = expandLetDef(node.localDefs, node.expression, constraints);
+		Pair<TCDefinitionList,TCExpression> pair = expandLetDef(node.localDefs, node.expression);
 		return copyType(node, new TCLetDefExpression(node.location, pair.first, pair.second));
 	}
 
 	private Pair<TCDefinitionList, TCExpression> expandLetDef(
-		TCDefinitionList localDefs, TCExpression expression, TCExpressionSet constraints)
+		TCDefinitionList localDefs, TCExpression expression)
 	{
 		TCDefinitionList newdefs = new TCDefinitionList();
 		TCDefinitionList locals = new TCDefinitionList();
 		TCExpressionList letquals = new TCExpressionList();
+		TCExpressionSet  qualifiers = new TCExpressionSet();
 
 		for (TCDefinition def: localDefs)
 		{
@@ -148,11 +149,10 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					QualifiedType qtype = vdef.getType().apply(new TypeExpander(id.name), env);
 					TCType updated = qtype.type;
 
-					// *** The value already meets the invariants for the type, so
-					// *** we don't need a qualifier check. If the value could fail,
-					// *** a separate subtype PO would have been issued.
-					
-					// TODO check this!!
+					if (qtype.qualifier != null)
+					{
+						qualifiers.add(qtype.qualifier);
+					}
 
 					newdefs.add(new TCValueDefinition(
 						vdef.nameScope,
@@ -160,7 +160,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 						vdef.accessSpecifier,
 						vdef.pattern,
 						updated,
-						vdef.exp.apply(this, constraints)));
+						vdef.exp.apply(this, qualifiers)));
 				}
 				else if (vdef.pattern instanceof TCRecordPattern)
 				{
@@ -168,10 +168,12 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					TCType ptype = vdef.getType();
 					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
 
-					// *** The values that match already meet the invariants for the
-					// *** various fields. So we don't have to emit checks.
+					QualifiedType qtype = ptype.apply(new TypeExpander(), env);	// Add dependent types
 
-					ptype.apply(new TypeExpander(), env);	// Add dependent types
+					if (qtype.qualifier != null)
+					{
+						qualifiers.add(qtype.qualifier);
+					}
 
 					newdefs.add(new TCValueDefinition(
 						vdef.nameScope,
@@ -179,7 +181,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 						vdef.accessSpecifier,
 						p2,
 						ptype,
-						vdef.exp.apply(this, constraints)));
+						vdef.exp.apply(this, qualifiers)));
 
 					locals.addAll(p2.getDefinitions(ptype, NameScope.LOCAL));
 				}
@@ -189,10 +191,12 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					TCType ptype = vdef.getType();
 					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
 
-					// *** The value already meets the invariants for the type, so
-					// *** we don't need a qualifier check.
+					QualifiedType qtype = ptype.apply(new TypeExpander(), env);
 
-					ptype.apply(new TypeExpander(), env);
+					if (qtype.qualifier != null)
+					{
+						qualifiers.add(qtype.qualifier);
+					}
 
 					newdefs.add(new TCValueDefinition(
 						vdef.nameScope,
@@ -200,7 +204,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 						vdef.accessSpecifier,
 						p2,
 						ptype,
-						vdef.exp.apply(this, constraints)));
+						vdef.exp.apply(this, qualifiers)));
 
 					locals.addAll(p2.getDefinitions(ptype, NameScope.LOCAL));
 				}
@@ -215,17 +219,25 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			}
 		}
 
-		TCExpressionSet bodyConstraints = new TCExpressionSet();
-		TCExpression body = expression.apply(this, bodyConstraints);
+		TCExpression body = expression.apply(this, qualifiers);
 
-		// [<bodyConstraints> and] <translated body>
+		// <qualifiers> and <body> or if <qualifiers> then <body> else undefined
 
-		if (!bodyConstraints.isEmpty())
+		if (!qualifiers.isEmpty())
 		{
-			body = new TCAndExpression(Utils.andOf(bodyConstraints), AND, body);
+			if (expression.getType() instanceof TCBooleanType)
+			{
+				body = new TCAndExpression(Utils.andOf(qualifiers), AND, body);
+			}
+			else
+			{
+				body = copyType(expression, new TCIfExpression(ANYWHERE,
+					Utils.andOf(qualifiers),
+					expression,
+					new TCElseIfExpressionList(),
+					new TCUndefinedExpression(ANYWHERE)));
+			}
 		}
-
-		// No qualifiers because the assignments already meet their invariants
 
 		if (!letquals.isEmpty())
 		{
@@ -233,8 +245,6 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			body = Utils.combineQualifiers(letquals, body);
 			body.typeCheck(env2, null, NameScope.NAMES, null);
 		}
-
-		constraints.clear();	// For callers?
 
 		return new Pair<TCDefinitionList, TCExpression>(newdefs, body);
 	}
@@ -784,7 +794,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
  	@Override
 	public TCExpression caseDefExpression(TCDefExpression node, TCExpressionSet constraints)
 	{
-		Pair<TCDefinitionList,TCExpression> pair = expandLetDef(node.localDefs, node.expression, constraints);
+		Pair<TCDefinitionList,TCExpression> pair = expandLetDef(node.localDefs, node.expression);
 		return new TCDefExpression(node.location, pair.first, pair.second);
 	}
 
