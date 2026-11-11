@@ -59,7 +59,7 @@ public class Sort extends SExp
 			case "Real":	return new Expression("0.0");
 
 			default:
-				throw new UnsupportedOperationException("Missing undefinedConst for: " + type);
+				return new Expression("undefined" + type);	// For invariant types
 		}
 	}
 }

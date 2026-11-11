@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 import smtlib.ast.AssertCommand;
 import smtlib.ast.Bracketed;
+import smtlib.ast.DefineConst;
 import smtlib.ast.DefineFun;
 import smtlib.ast.Expression;
 import smtlib.ast.ITE;
@@ -257,7 +258,7 @@ public class DefinitionExpander
 		Expression body = rhs.apply(new ExpressionToSMT(), env);
 		ldef.getType().apply(new TypeExpander(), env);
 		QualifiedSort qtype = ldef.getType().apply(new TypeToSMT(vname), env);
-		globals.addConstant(new DefineFun(ldef.name, qtype.sort, body));
+		globals.addConstant(new DefineConst(ldef.name, qtype.sort, body));
 
 		if (qtype.qualifier != null)
 		{

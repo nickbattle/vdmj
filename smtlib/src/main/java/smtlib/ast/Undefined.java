@@ -24,7 +24,7 @@
 
 package smtlib.ast;
 
-public class Undefined extends DefineFun
+public class Undefined extends DefineConst
 {
 	public Undefined(Sort sort)
 	{

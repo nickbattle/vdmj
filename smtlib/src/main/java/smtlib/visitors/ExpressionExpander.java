@@ -129,13 +129,13 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 		return copyType(node, new TCLetDefExpression(node.location, pair.first, pair.second));
 	}
 
-	private Pair<TCDefinitionList, TCExpression> expandLetDef(
-		TCDefinitionList localDefs, TCExpression expression)
+	private Pair<TCDefinitionList, TCExpression> expandLetDef(TCDefinitionList localDefs, TCExpression expression)
 	{
 		TCDefinitionList newdefs = new TCDefinitionList();
 		TCDefinitionList locals = new TCDefinitionList();
 		TCExpressionList letquals = new TCExpressionList();
 		TCExpressionSet  qualifiers = new TCExpressionSet();
+		TCExpressionSet  constraints = new TCExpressionSet();
 
 		for (TCDefinition def: localDefs)
 		{
@@ -160,7 +160,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 						vdef.accessSpecifier,
 						vdef.pattern,
 						updated,
-						vdef.exp.apply(this, qualifiers)));
+						vdef.exp.apply(this, constraints)));
 				}
 				else if (vdef.pattern instanceof TCRecordPattern)
 				{
@@ -181,7 +181,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 						vdef.accessSpecifier,
 						p2,
 						ptype,
-						vdef.exp.apply(this, qualifiers)));
+						vdef.exp.apply(this, constraints)));
 
 					locals.addAll(p2.getDefinitions(ptype, NameScope.LOCAL));
 				}
@@ -204,7 +204,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 						vdef.accessSpecifier,
 						p2,
 						ptype,
-						vdef.exp.apply(this, qualifiers)));
+						vdef.exp.apply(this, constraints)));
 
 					locals.addAll(p2.getDefinitions(ptype, NameScope.LOCAL));
 				}
@@ -219,21 +219,35 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			}
 		}
 
-		TCExpression body = expression.apply(this, qualifiers);
+		TCExpression body = expression.apply(this, constraints);
 
-		// <qualifiers> and <body> or if <qualifiers> then <body> else undefined
+		// Just <body> or
+		// <qualifiers> => <constraints> and <body> or
+		// if <qualifiers> and <constraints> then <body> else undefined
 
-		if (!qualifiers.isEmpty())
+		if (!qualifiers.isEmpty() || !constraints.isEmpty())
 		{
 			if (expression.getType() instanceof TCBooleanType)
 			{
-				body = new TCAndExpression(Utils.andOf(qualifiers), AND, body);
+				if (!constraints.isEmpty())
+				{
+					body = new TCAndExpression(Utils.andOf(constraints), AND, body);
+				}
+
+				if (!qualifiers.isEmpty())
+				{
+					body = new TCImpliesExpression(Utils.andOf(qualifiers), IMPLIES, body);
+				}
 			}
-			else
+			else 
 			{
+				TCExpressionSet both = new TCExpressionSet();
+				both.addAll(qualifiers);
+				both.addAll(constraints);
+
 				body = copyType(expression, new TCIfExpression(ANYWHERE,
-					Utils.andOf(qualifiers),
-					expression,
+					Utils.andOf(both),
+					body,
 					new TCElseIfExpressionList(),
 					new TCUndefinedExpression(ANYWHERE)));
 			}

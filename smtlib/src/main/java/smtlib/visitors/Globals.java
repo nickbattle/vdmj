@@ -53,6 +53,7 @@ import smtlib.ast.AssertCommand;
 import smtlib.ast.Bracketed;
 import smtlib.ast.Comment;
 import smtlib.ast.DeclareDataType;
+import smtlib.ast.DefineConst;
 import smtlib.ast.DefineFun;
 import smtlib.ast.DefineFunsRec;
 import smtlib.ast.DefineSort;
@@ -84,7 +85,7 @@ public class Globals
 		return INSTANCE;
 	}
 
-	private List<DefineFun> constants = new Vector<DefineFun>();
+	private List<DefineConst> constants = new Vector<DefineConst>();
 	private List<DeclareDataType> datatypes = new Vector<DeclareDataType>();
 	private List<DefineSort> sorts = new Vector<DefineSort>();
 	private List<DefineFun> functions = new Vector<DefineFun>();
@@ -195,7 +196,7 @@ public class Globals
 		}
 	}
 
-	public void addConstant(DefineFun constant)
+	public void addConstant(DefineConst constant)
 	{
 		if (!contains(constant.getName(), constants))
 		{
@@ -271,11 +272,6 @@ public class Globals
 		script.add(new Comment("\nGlobal function definitions"));
 		script.addAll(getInternals());
 
-		for (DefineFun constant: constants)
-		{
-			script.add(constant);
-		}
-
 		for (DeclareDataType type: datatypes)
 		{
 			script.add(type);
@@ -284,6 +280,11 @@ public class Globals
 		for (DefineSort type: sorts)
 		{
 			script.add(type);
+		}
+
+		for (DefineConst constant: constants)
+		{
+			script.add(constant);
 		}
 
 		for (DefineFun function: functions)
