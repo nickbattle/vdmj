@@ -81,21 +81,21 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	@Override
 	public TCExpression caseForAllExpression(TCForAllExpression node, TCExpressionSet constraints)
 	{
-		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(true, node.bindList, node.predicate, constraints);
+		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(true, node.bindList, node.predicate);
 		return copyType(node, new TCForAllExpression(node.location, pair.first, pair.second));
 	}
 
 	@Override
 	public TCExpression caseExistsExpression(TCExistsExpression node, TCExpressionSet constraints)
 	{
-		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(false, node.bindList, node.predicate, constraints);
+		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(false, node.bindList, node.predicate);
 		return copyType(node, new TCExistsExpression(node.location, pair.first, pair.second));
 	}
 
 	@Override
 	public TCExpression caseExists1Expression(TCExists1Expression node, TCExpressionSet constraints)
 	{
-		Pair<TCMultipleBindList, TCExpression> pair = expandQuantifier(false, node.bind.getMultipleBindList(), node.predicate, constraints);
+		Pair<TCMultipleBindList, TCExpression> pair = expandQuantifier(false, node.bind.getMultipleBindList(), node.predicate);
 		TCMultipleBind bind = pair.first.firstElement();
 
 		if (bind instanceof TCMultipleTypeBind)
@@ -168,7 +168,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					TCType ptype = vdef.getType();
 					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
 
-					QualifiedType qtype = ptype.apply(new TypeExpander(), env);	// Add dependent types
+					QualifiedType qtype = ptype.apply(new TypeExpander(p2), env);	// Add dependent types
 
 					if (qtype.qualifier != null)
 					{
@@ -191,7 +191,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 					TCType ptype = vdef.getType();
 					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
 
-					QualifiedType qtype = ptype.apply(new TypeExpander(), env);
+					QualifiedType qtype = ptype.apply(new TypeExpander(p2), env);
 
 					if (qtype.qualifier != null)
 					{
@@ -268,7 +268,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 	{
 		TCMultipleBindList bindList = new TCMultipleBindList();
 		bindList.add(node.bind);
-		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(false, bindList, node.value, constraints);
+		Pair<TCMultipleBindList,TCExpression> pair = expandQuantifier(false, bindList, node.value);
 
 		if (node.suchThat != null)
 		{
@@ -280,11 +280,12 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			new TCLetBeStExpression(node.location, pair.first.firstElement(), null, pair.second));
 	}
 
-	private Pair<TCMultipleBindList, TCExpression> expandQuantifier(boolean forall, TCMultipleBindList bindList, TCExpression predicate, TCExpressionSet constraints)
+	private Pair<TCMultipleBindList, TCExpression> expandQuantifier(boolean forall, TCMultipleBindList bindList, TCExpression predicate)
 	{
 		TCExpressionSet qualifiers = new TCExpressionSet();
 		TCExpressionList letquals = new TCExpressionList();
 		TCMultipleBindList newBindList = new TCMultipleBindList();
+		TCExpressionSet bodyConstraints = new TCExpressionSet();
 		
 		for (TCMultipleBind bind: bindList)
 		{
@@ -340,7 +341,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 
 					// And p2 in set elems S
 					TCVariableExpression pvar = new TCVariableExpression(p2.location, p2.name, p2.toString());
-					TCElementsExpression elems = new TCElementsExpression(p2.location, msbind.sequence.apply(this, constraints));
+					TCElementsExpression elems = new TCElementsExpression(p2.location, msbind.sequence.apply(this, bodyConstraints));
 					qualifiers.add(new TCInSetExpression(pvar, INSET, elems));
 				}
 
@@ -373,7 +374,7 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 
 					// And p2 in set S
 					TCVariableExpression pvar = new TCVariableExpression(p2.location, p2.name, p2.toString());
-					qualifiers.add(new TCInSetExpression(pvar, INSET, msbind.set.apply(this, constraints)));
+					qualifiers.add(new TCInSetExpression(pvar, INSET, msbind.set.apply(this, bodyConstraints)));
 				}
 
 				// Turn x in set S into x:T, given qualifier above
@@ -385,7 +386,6 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			}
 		}
 
-		TCExpressionSet bodyConstraints = new TCExpressionSet();
 		TCExpression body = predicate.apply(this, bodyConstraints);
 
 		// [<qualifiers> (=>/and) [<bodyConstraints> and]] <translated body>
@@ -412,8 +412,6 @@ public class ExpressionExpander extends TCExpressionVisitor<TCExpression, TCExpr
 			body = Utils.combineQualifiers(letquals, body);
 		}
 		
-		constraints.clear();	// For callers?
-
 		return new Pair<TCMultipleBindList, TCExpression>(newBindList, body);
 	}
 

@@ -88,6 +88,11 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 		this.globals = Globals.getInstance();
 	}
 
+	public TypeExpander(TCIdentifierPattern pattern)
+	{
+		this(pattern.name);
+	}
+
 	@Override
 	public QualifiedType caseType(TCType node, Environment env)
 	{
