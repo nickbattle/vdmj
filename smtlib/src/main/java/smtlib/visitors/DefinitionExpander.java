@@ -275,9 +275,9 @@ public class DefinitionExpander
 
 	public void expandType(TCInvariantType node)
 	{
-		if (node.invdef != null)
+		if (node.orddef != null)
 		{
-			expandFunction(node.invdef);
+			expandFunction(node.orddef);
 		}
 
 		if (node.eqdef != null)
@@ -285,9 +285,9 @@ public class DefinitionExpander
 			expandFunction(node.eqdef);
 		}
 
-		if (node.orddef != null)
+		if (node.invdef != null)
 		{
-			expandFunction(node.orddef);
+			expandFunction(node.invdef);
 		}
 
 		if (node instanceof TCRecordType)
