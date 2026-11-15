@@ -39,7 +39,11 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
@@ -48,10 +52,13 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 import smtlib.ast.AssertCommand;
 import smtlib.ast.Bracketed;
+import smtlib.ast.DeclareDataType;
 import smtlib.ast.DefineConst;
 import smtlib.ast.DefineFun;
+import smtlib.ast.DefineSort;
 import smtlib.ast.Expression;
 import smtlib.ast.ITE;
+import smtlib.ast.Sort;
 import smtlib.ast.Text;
 
 public class DefinitionExpander
@@ -263,6 +270,49 @@ public class DefinitionExpander
 		if (qtype.qualifier != null)
 		{
 			globals.addAssert(new AssertCommand(qtype.qualifier));		// eg. nat is >=0
+		}
+	}
+
+	public void expandType(TCInvariantType node)
+	{
+		if (node.invdef != null)
+		{
+			expandFunction(node.invdef);
+		}
+
+		if (node.eqdef != null)
+		{
+			expandFunction(node.eqdef);
+		}
+
+		if (node.orddef != null)
+		{
+			expandFunction(node.orddef);
+		}
+
+		if (node instanceof TCRecordType)
+		{
+			TCRecordType rec = (TCRecordType)node;
+			String typename = rec.name.getName();
+			Expression ctor = new Expression(new Text("mk_" + typename));
+			
+			for (TCField field: rec.fields)
+			{
+				QualifiedSort qsort = field.type.apply(new TypeToSMT("?"), env);
+				ctor.add(new Expression(new Text(field.tag), qsort.sort));
+			}
+
+			String uname = "undefined" + typename;
+				
+			globals.addDataType(new DeclareDataType(rec.name, ctor, new Expression("mk_" + uname)));
+			globals.addConstant(new DefineConst(uname, new Sort(typename), new Expression("mk_" + uname)));
+		}
+		else if (node instanceof TCNamedType)
+		{
+			TCNamedType ntype = (TCNamedType)node;
+			QualifiedSort qsort = ntype.type.apply(new TypeToSMT("?"), env);
+			globals.addSort(new DefineSort(ntype.typename, qsort.sort));
+			globals.addConstant(new DefineConst("undefined" + ntype.typename, qsort.sort, qsort.sort.undefinedConst()));
 		}
 	}
 }

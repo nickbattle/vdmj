@@ -59,13 +59,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-import smtlib.ast.DeclareDataType;
-import smtlib.ast.DefineSort;
-import smtlib.ast.DefineConst;
-import smtlib.ast.Expression;
-import smtlib.ast.Sort;
-import smtlib.ast.Text;
-
 public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> implements ASTHelper
 {
 	private final TCExpression VAR;
@@ -293,18 +286,11 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 					new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
 					new TCExpressionList(VAR)));
 			}
-
-			DefinitionExpander.getInstance().expandFunction(node.invdef);
 		}
 
-		String typename = node.name.getName();
-		Expression ctor = new Expression(new Text("mk_" + typename));
-		
 		for (TCField field: node.fields)
 		{
-			QualifiedSort qsort = field.type.apply(new TypeToSMT("?"), env);
-			ctor.add(new Expression(new Text(field.tag), qsort.sort));
-			field.type.apply(this, env);
+			field.type.apply(this, env);	// Process any dependent types
 
 			TCFieldExpression fexp = new TCFieldExpression(VAR,
 				new TCIdentifierToken(ANYWHERE, field.tag, false),
@@ -318,10 +304,7 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 			}
 		}
 
-		String uname = "undefined" + typename;
-			
-		globals.addDataType(new DeclareDataType(node.name, ctor, new Expression("mk_" + uname)));
-		globals.addConstant(new DefineConst(uname, new Sort(typename), new Expression("mk_" + uname)));
+		DefinitionExpander.getInstance().expandType(node);
 
 		return new QualifiedType(node, Utils.andOf(qualifiers));
 	}
@@ -339,14 +322,11 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 					new TCVariableExpression(ANYWHERE, node.invdef.name, node.invdef.name.getName()),
 					new TCExpressionList(VAR));
 			}
-
-			DefinitionExpander.getInstance().expandFunction(node.invdef);
 		}
 
 		node.type.apply(this, env);		// Process any dependent types
-		QualifiedSort qsort = node.type.apply(new TypeToSMT("?"), env);
-		globals.addSort(new DefineSort(node.typename, qsort.sort));
-		globals.addConstant(new DefineConst("undefined" + node.typename, qsort.sort, qsort.sort.undefinedConst()));
+		
+		DefinitionExpander.getInstance().expandType(node);
 
 		return new QualifiedType(node, qualifier);
 	}
