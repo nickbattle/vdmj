@@ -200,11 +200,15 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 	        File relativeParent = sourceBase.relativize(pathSource).toFile().getParentFile();
 
 	        String section = pfile.getName().replaceAll("\\.vdm..$", "");
+			section = section.replace("\\", "/");	// Windows paths
+			section = section.replace("_", "\\_");
 			String texname = section + ".tex";
 			File outfile = relativeParent == null ? new File(texname) : new File(relativeParent, texname);
+			String outstr = outfile.toString().replace("\\", "/");	// Windows paths
+			outstr = outstr.replace("_", "\\_");
 			
 			out.println("\\section{" + section + "}"); 
-			out.println("\\input{" + outfile + "}");
+			out.println("\\input{" + outstr + "}");
 			out.println();
 		}
 		
