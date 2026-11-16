@@ -71,8 +71,7 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 
 	public TypeExpander(TCNameToken var)
 	{
-		this.VAR = new TCVariableExpression(ANYWHERE, var, var.toString());
-		this.globals = Globals.getInstance();
+		this(new TCVariableExpression(ANYWHERE, var, var.toString()));
 	}
 
 	public TypeExpander(TCExpression var)
@@ -290,8 +289,6 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 
 		for (TCField field: node.fields)
 		{
-			field.type.apply(this, env);	// Process any dependent types
-
 			TCFieldExpression fexp = new TCFieldExpression(VAR,
 				new TCIdentifierToken(ANYWHERE, field.tag, false),
 				field.tagname);
@@ -314,6 +311,8 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 	{
 		TCExpression qualifier = null;
 
+		node.type.apply(this, env);		// Expand any dependent types
+		
 		if (node.invdef != null)
 		{
 			if (!node.isMaximal())
@@ -324,8 +323,6 @@ public class TypeExpander extends TCTypeVisitor<QualifiedType, Environment> impl
 			}
 		}
 
-		node.type.apply(this, env);		// Process any dependent types
-		
 		DefinitionExpander.getInstance().expandType(node);
 
 		return new QualifiedType(node, qualifier);

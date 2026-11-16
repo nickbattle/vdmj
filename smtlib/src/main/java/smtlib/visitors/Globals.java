@@ -200,7 +200,7 @@ public class Globals
 	{
 		if (!contains(constant.getName(), constants))
 		{
-			constants.add(0, constant);
+			constants.add(constant);
 		}
 	}
 
