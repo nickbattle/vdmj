@@ -33,6 +33,13 @@ public class DeclareDataType extends Command
 		super(new Text("declare-datatype"), new Text(type.getName()), new Bracketed(ctors));
 	}
 
+	public DeclareDataType(TCNameToken type, String param, Source... ctors)
+	{
+		super(new Text("declare-datatype"),
+			new Text(type.getName()),
+			new Expression("par", new Bracketed(new Text(param)), new Bracketed(ctors)));
+	}
+
 	public String getName()
 	{
 		return get(1).toString();
