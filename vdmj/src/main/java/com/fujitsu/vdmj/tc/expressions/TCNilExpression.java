@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -51,7 +53,40 @@ public class TCNilExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		return checkConstraint(constraint, new TCOptionalType(location, new TCUnknownType(location)));
+		TCType actual = null;
+		
+		if (constraint == null)
+		{
+			actual = new TCOptionalType(location, new TCUnknownType(location));
+		}
+		else if (constraint instanceof TCUnionType)
+		{
+			TCUnionType utype = (TCUnionType)constraint;
+			TCTypeSet set = new TCTypeSet();
+
+			for (TCType u: utype.types)
+			{
+				if (u instanceof TCOptionalType)
+				{
+					set.add(u);		// Pick out union of optional types
+				}
+			}
+
+			if (set.isEmpty())
+			{
+				actual = new TCOptionalType(location, constraint);
+			}
+			else
+			{
+				actual = new TCOptionalType(location, set.getType(location));
+			}
+		}
+		else
+		{
+			actual = new TCOptionalType(location, constraint);
+		}
+
+		return checkConstraint(constraint, actual);
 	}
 
 	@Override

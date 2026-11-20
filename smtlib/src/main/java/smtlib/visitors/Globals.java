@@ -63,6 +63,7 @@ import smtlib.ast.GT;
 import smtlib.ast.SExp;
 import smtlib.ast.Script;
 import smtlib.ast.Sort;
+import smtlib.ast.Text;
 import smtlib.ast.Undefined;
 
 public class Globals
@@ -261,6 +262,18 @@ public class Globals
 					new Bracketed(new Expression("i", "Int")),
 					new Sort("Bool"),
 					new GT("i", "0")));
+
+		script.add(new DeclareDataType(
+					getInternalName("Maybe"),
+					"T",
+					new Bracketed(new Text("undefined")),
+					new Bracketed(new Text("defined"), new Expression("value", "T"))));
+
+		script.add(new DeclareDataType(
+					getInternalName("Option"),
+					"T",
+					new Bracketed(new Text("nil")),
+					new Bracketed(new Text("some"), new Expression("value", "T"))));
 
 		return script;
 	}

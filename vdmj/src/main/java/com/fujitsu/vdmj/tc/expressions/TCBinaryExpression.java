@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -109,12 +110,14 @@ abstract public class TCBinaryExpression extends TCExpression
 
 	/**
 	 * (In)equality checks where a "[ ]" or "{ }" literal need more type info from
-	 * the other part of the equality check, if available.
+	 * the other part of the equality check, if available. Similarly, a "nil" can
+	 * pick up information from the other side.
 	 */
 	protected void checkEmptySetSeq()
 	{
 		checkEmptySeqs();
 		checkEmptySets();
+		checkNilValues();
 	}
 
 	private void checkEmptySets()
@@ -166,6 +169,18 @@ abstract public class TCBinaryExpression extends TCExpression
 					rtype = lstype;
 				}
 			}
+		}
+	}
+
+	private void checkNilValues()
+	{
+		if (left instanceof TCNilExpression && right.getType() instanceof TCOptionalType)
+		{
+			left.setType(right.getType());
+		}
+		else if (left.getType() instanceof TCOptionalType && right instanceof TCNilExpression)
+		{
+			right.setType(left.getType());
 		}
 	}
 }
