@@ -251,6 +251,12 @@ public class Globals
 	{
 		Script script = new Script();
 
+		script.add(new DeclareDataType(
+					getInternalName("Option"),
+					"T",
+					new Bracketed(new Text("nil")),
+					new Bracketed(new Text("some"), new Expression("opt", "T"))));
+
 		script.add(new DefineFun(
 					getInternalName("inv_nat"),
 					new Bracketed(new Expression("i", "Int")),
@@ -262,18 +268,6 @@ public class Globals
 					new Bracketed(new Expression("i", "Int")),
 					new Sort("Bool"),
 					new GT("i", "0")));
-
-		script.add(new DeclareDataType(
-					getInternalName("Maybe"),
-					"T",
-					new Bracketed(new Text("undefined")),
-					new Bracketed(new Text("defined"), new Expression("value", "T"))));
-
-		script.add(new DeclareDataType(
-					getInternalName("Option"),
-					"T",
-					new Bracketed(new Text("nil")),
-					new Bracketed(new Text("some"), new Expression("value", "T"))));
 
 		return script;
 	}

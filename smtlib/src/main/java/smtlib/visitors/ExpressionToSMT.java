@@ -72,6 +72,7 @@ import com.fujitsu.vdmj.tc.expressions.TCMapRangeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkBasicExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCModExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNilExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotInSetExpression;
@@ -995,6 +996,13 @@ public class ExpressionToSMT extends TCExpressionVisitor<Expression, Environment
 	{
 		QualifiedSort qsort = node.getType().apply(new TypeToSMT("?"), arg);
 		return new Expression("undefined" + qsort.sort);
+	}
+
+	@Override
+	public Expression caseNilExpression(TCNilExpression node, Environment arg)
+	{
+		QualifiedSort qsort = node.getType().apply(new TypeToSMT("?"), arg);
+		return new Expression(new Text("as"), new Text("nil"), qsort.sort);
 	}
 
 	@Override

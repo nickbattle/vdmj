@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRationalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
@@ -328,5 +329,12 @@ public class TypeToSMT extends TCTypeVisitor<QualifiedSort, Environment>
 		}
 
 		throw new UnsupportedOperationException("Cannot find type: " + node.typename);
+	}
+
+	@Override
+	public QualifiedSort caseOptionalType(TCOptionalType node, Environment arg)
+	{
+		QualifiedSort qsort = node.type.apply(this, arg);
+		return new QualifiedSort(new Sort("Option", qsort.sort), qsort.qualifier);
 	}
 }
