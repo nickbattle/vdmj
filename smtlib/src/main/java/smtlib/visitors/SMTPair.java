@@ -24,7 +24,7 @@
 
 package smtlib.visitors;
 
-import java.util.List;
+import java.util.Arrays;
 
 import smtlib.ast.And;
 import smtlib.ast.Expression;
@@ -45,19 +45,45 @@ public class SMTPair
 		this(value, null);
 	}
 
-	public static Expression deltas(List<SMTPair> pairs)
+	public static Expression deltas(Object... terms)
+	{
+		return deltas(Arrays.asList(terms));
+	}
+
+	public static Expression deltas(Iterable<Object> terms)
 	{
 		Expression result = null;
 
-		for (SMTPair pair: pairs)
+		for (Object term: terms)
 		{
+			Expression exp = null;
+
+			if (term == null)
+			{
+				continue;
+			}
+			else if (term instanceof Expression)
+			{
+				exp = (Expression)term;
+			}
+			else if (term instanceof SMTPair)
+			{
+				SMTPair pair = (SMTPair)term;
+				exp = pair.delta;
+			}
+
+			if (exp == null)
+			{
+				continue;
+			}
+
 			if (result == null)
 			{
-				result = pair.delta;
+				result = exp;
 			}
 			else
 			{
-				result = new And(result, pair.delta);
+				result = new And(result, exp);
 			}
 		}
 
