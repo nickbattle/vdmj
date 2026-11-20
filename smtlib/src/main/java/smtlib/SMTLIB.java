@@ -62,8 +62,10 @@ import smtlib.visitors.ASTHelper;
 import smtlib.visitors.DefinitionExpander;
 import smtlib.visitors.ExpressionExpander;
 import smtlib.visitors.ExpressionToSMT;
+import smtlib.visitors.ExpressionToSMTPair;
 import smtlib.visitors.Globals;
 import smtlib.visitors.LocalNames;
+import smtlib.visitors.SMTPair;
 import smtlib.visitors.Utils;
 
 public class SMTLIB
@@ -105,6 +107,10 @@ public class SMTLIB
 		Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
 		DefinitionExpander.init(smtenv);
 		TCExpression expanded = null;
+
+		// TODO remove me!
+		SMTPair smtpair = tcexp.apply(new ExpressionToSMTPair(), env);
+		Console.out.println("PAIR: " + smtpair.delta + " => " + smtpair.value);
 
 		try
 		{
