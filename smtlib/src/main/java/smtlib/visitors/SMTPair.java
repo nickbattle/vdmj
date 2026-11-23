@@ -24,69 +24,29 @@
 
 package smtlib.visitors;
 
-import java.util.Arrays;
-
-import smtlib.ast.And;
 import smtlib.ast.Expression;
+import smtlib.ast.ExpressionSet;
 
 public class SMTPair
 {
 	public final Expression value;
-	public final Expression delta;
+	public final ExpressionSet delta;
 
 	public SMTPair(Expression value, Expression delta)
 	{
 		this.value = value;
-		this.delta = delta;
+		this.delta = new ExpressionSet(delta);
 	}
 
 	public SMTPair(Expression value)
 	{
-		this(value, null);
+		this.value = value;
+		this.delta = new ExpressionSet();
 	}
 
-	public static Expression deltas(Object... terms)
+	public SMTPair(Expression value, ExpressionSet delta)
 	{
-		return deltas(Arrays.asList(terms));
-	}
-
-	public static Expression deltas(Iterable<Object> terms)
-	{
-		Expression result = null;
-
-		for (Object term: terms)
-		{
-			Expression exp = null;
-
-			if (term == null)
-			{
-				continue;
-			}
-			else if (term instanceof Expression)
-			{
-				exp = (Expression)term;
-			}
-			else if (term instanceof SMTPair)
-			{
-				SMTPair pair = (SMTPair)term;
-				exp = pair.delta;
-			}
-
-			if (exp == null)
-			{
-				continue;
-			}
-
-			if (result == null)
-			{
-				result = exp;
-			}
-			else
-			{
-				result = new And(result, exp);
-			}
-		}
-
-		return result;
+		this.value = value;
+		this.delta = delta;
 	}
 }

@@ -24,17 +24,9 @@
 
 package smtlib.visitors;
 
-import java.util.Vector;
-
 import smtlib.ast.Expression;
 
-/**
- * SMTPairList
- */
-public class SMTPairList extends Vector<SMTPair>
+public interface SMTHelper
 {
-	public Expression deltas()
-	{
-		return SMTPair.deltas(this);
-	}
+	public static Expression TRUE = new Expression("true");
 }

@@ -28,16 +28,19 @@ import com.fujitsu.vdmj.tc.expressions.TCBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHeadExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 import smtlib.ast.Expression;
+import smtlib.ast.ExpressionSet;
 import smtlib.ast.GT;
+import smtlib.ast.ITE;
 import smtlib.ast.Text;
 
-public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environment>
+public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environment> implements SMTHelper
 {
 	@Override
 	public SMTPair caseExpression(TCExpression node, Environment env)
@@ -73,16 +76,16 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		else
 		{
 			Expression result = new Expression("seq.++");
-			SMTPairList pairs = new SMTPairList();
+			ExpressionSet deltas = new ExpressionSet();
 
 			for (TCExpression e: node.members)
 			{
 				SMTPair pair = e.apply(this, env);
 				result.add(new Expression("seq.unit", pair.value));
-				pairs.add(pair);
+				deltas.addAll(pair.delta);
 			}
 
-			return new SMTPair(result, pairs.deltas());
+			return new SMTPair(result, deltas);
 		}
 	}
 
@@ -96,7 +99,7 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 				new Text("seq.nth"),
 				seq.value,
 				new Text("0")),
-			SMTPair.deltas(
+			new ExpressionSet(
 					seq.delta,
 					new GT(
 						new Expression("seq.len", seq.value),
@@ -111,6 +114,33 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 
 		return new SMTPair(
 			new Expression(node.op.toString(), left.value, right.value),
-			SMTPair.deltas(left, right));
+			new ExpressionSet(left.delta, right.delta));
+	}
+
+	@Override
+	public SMTPair caseIfExpression(TCIfExpression node, Environment env)
+	{
+		SMTPair ifExp = node.ifExp.apply(this, env);
+		SMTPair thenExp = node.thenExp.apply(this, env);
+		SMTPair elseExp = node.elseExp.apply(this, env);
+
+		// TODO elseif list
+
+		ITE value = new ITE(ifExp.value, thenExp.value, elseExp.value);
+		ExpressionSet delta = new ExpressionSet();
+
+		if (ifExp.delta != null)
+		{
+			delta.addAll(ifExp.delta);
+		}
+
+		if (!thenExp.delta.isEmpty() || !elseExp.delta.isEmpty())
+		{
+			delta.add(new ITE(ifExp.value,
+				thenExp.delta.andOf(),
+				elseExp.delta.andOf()));
+		}
+
+		return new SMTPair(value, delta);
 	}
 }
