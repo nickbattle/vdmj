@@ -65,7 +65,6 @@ import smtlib.visitors.ExpressionToSMT;
 import smtlib.visitors.ExpressionToSMTPair;
 import smtlib.visitors.Globals;
 import smtlib.visitors.LocalNames;
-import smtlib.visitors.SMTPair;
 import smtlib.visitors.Utils;
 
 public class SMTLIB
@@ -109,8 +108,7 @@ public class SMTLIB
 		TCExpression expanded = null;
 
 		// TODO remove me!
-		SMTPair smtpair = tcexp.apply(new ExpressionToSMTPair(), env);
-		Console.out.println("PAIR: " + smtpair.delta + " => " + smtpair.value);
+		Console.out.println("SMTPAIR: " + tcexp.apply(new ExpressionToSMTPair(), env));
 
 		try
 		{

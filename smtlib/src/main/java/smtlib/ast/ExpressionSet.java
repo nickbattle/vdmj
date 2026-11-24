@@ -47,10 +47,7 @@ public class ExpressionSet extends HashSet<Expression> implements SMTHelper
 	{
 		for (ExpressionSet term: terms)
 		{
-			if (term != null)
-			{
-				this.addAll(term);
-			}
+			this.addAll(term);
 		}
 	}
 
@@ -58,18 +55,21 @@ public class ExpressionSet extends HashSet<Expression> implements SMTHelper
 	{
 		for (Object term: terms)
 		{
-			if (term != null)
+			if (term instanceof Expression)
 			{
-				if (term instanceof Expression)
-				{
-					this.add((Expression)term);
-				}
-				else if (term instanceof ExpressionSet)
-				{
-					this.addAll((ExpressionSet)term);
-				}
+				this.add((Expression)term);
+			}
+			else if (term instanceof ExpressionSet)
+			{
+				this.addAll((ExpressionSet)term);
 			}
 		}
+	}
+
+	@Override
+	public boolean add(Expression e)
+	{
+		return (e != null) ? super.add(e) : false;
 	}
 
 	public Expression andOf()

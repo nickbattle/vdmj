@@ -29,4 +29,5 @@ import smtlib.ast.Expression;
 public interface SMTHelper
 {
 	public static Expression TRUE = new Expression("true");
+	public static Expression FALSE = new Expression("false");
 }

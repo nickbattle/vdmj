@@ -49,4 +49,17 @@ public class SMTPair
 		this.value = value;
 		this.delta = delta;
 	}
+
+	@Override
+	public String toString()
+	{
+		if (delta.isEmpty())
+		{
+			return value.toSource();
+		}
+		else
+		{
+			return delta.andOf().toSource() + " => " + value.toSource();
+		}
+	}
 }

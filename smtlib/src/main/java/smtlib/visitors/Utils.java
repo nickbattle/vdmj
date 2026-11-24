@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
@@ -47,7 +48,9 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 import smtlib.ast.And;
+import smtlib.ast.Bracketed;
 import smtlib.ast.Expression;
+import smtlib.ast.Let;
 
 public class Utils implements ASTHelper
 {
@@ -117,6 +120,37 @@ public class Utils implements ASTHelper
 		}
 
 		return result;
+	}
+
+	public static SMTPair combineQualifiers(TCExpressionList letquals, Expression value)
+	{
+		Let result = null;
+
+		for (TCExpression qual: letquals)
+		{
+			TCLetDefExpression letqual = (TCLetDefExpression)qual;
+			Bracketed binds = new Bracketed();
+
+			for (TCDefinition def: letqual.localDefs)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)def;
+				TCIdentifierPattern p = (TCIdentifierPattern)vdef.pattern;
+
+				QualifiedSort qsort = vdef.getType().apply(new TypeToSMT("?"), null);
+				binds.add(new Expression(p.name.getName(), qsort.sort));
+			}
+
+			if (result == null)
+			{
+				result = new Let(binds, value);
+			}
+			else
+			{
+				result = new Let(binds, result);
+			}
+		}
+
+		return new SMTPair(result);
 	}
 	
 	public static TCExpression andOf(Collection<TCExpression> qualifiers)

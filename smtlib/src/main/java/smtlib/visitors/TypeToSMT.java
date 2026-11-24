@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCCharacterType;
 import com.fujitsu.vdmj.tc.types.TCField;
@@ -76,6 +77,12 @@ public class TypeToSMT extends TCTypeVisitor<QualifiedSort, Environment>
 	public TypeToSMT(Source source)
 	{
 		this.varname = source;					// The "name" of the variable being qualified
+		this.solver = Solver.getInstance();
+	}
+
+	public TypeToSMT(TCNameToken var)
+	{
+		this.varname = new Text(var.getName());		// The "name" of the variable being qualified
 		this.solver = Solver.getInstance();
 	}
 

@@ -26,9 +26,9 @@ package smtlib.ast;
 
 public class Exists extends Expression
 {
-	public Exists(Bracketed binds, Expression predictate)
+	public Exists(Bracketed binds, Expression predicate)
 	{
-		super(new Text("exists"), binds, predictate);
+		super(new Text("exists"), binds, predicate);
 	}
 
 	@Override
