@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHeadExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
@@ -49,7 +50,6 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Pair;
 
-import smtlib.ast.And;
 import smtlib.ast.Bracketed;
 import smtlib.ast.Exists;
 import smtlib.ast.Expression;
@@ -57,7 +57,6 @@ import smtlib.ast.ExpressionSet;
 import smtlib.ast.ForAll;
 import smtlib.ast.GT;
 import smtlib.ast.ITE;
-import smtlib.ast.Implies;
 import smtlib.ast.Text;
 
 public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environment> implements SMTHelper
@@ -97,7 +96,7 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		else if (node.members.size() == 1)
 		{
 			SMTPair first = node.members.firstElement().apply(this, env);
-			return new SMTPair(new Expression("seq.unit", first.value), first.delta);
+			return new SMTPair(new Expression("seq.unit", first.value), first.deltas);
 		}
 		else
 		{
@@ -108,7 +107,7 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 			{
 				SMTPair pair = e.apply(this, env);
 				result.add(new Expression("seq.unit", pair.value));
-				deltas.addAll(pair.delta);
+				deltas.addAll(pair.deltas);
 			}
 
 			return new SMTPair(result, deltas);
@@ -126,10 +125,17 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 				seq.value,
 				new Text("0")),
 			new ExpressionSet(
-					seq.delta,
+					seq.deltas,
 					new GT(
 						new Expression("seq.len", seq.value),
 						new Text("0"))));
+	}
+
+	@Override
+	public SMTPair caseFieldExpression(TCFieldExpression node, Environment env)
+	{
+		SMTPair object = node.object.apply(this, env);
+		return new SMTPair(new Expression(new Text(node.field.getName()), object.value), object.deltas);
 	}
 
 	@Override
@@ -140,7 +146,7 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 
 		return new SMTPair(
 			new Expression(node.op.toString(), left.value, right.value),
-			new ExpressionSet(left.delta, right.delta));
+			new ExpressionSet(left.deltas, right.deltas));
 	}
 
 	@Override
@@ -155,16 +161,16 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		ITE value = new ITE(ifExp.value, thenExp.value, elseExp.value);
 		ExpressionSet delta = new ExpressionSet();
 
-		if (ifExp.delta != null)
+		if (ifExp.deltas != null)
 		{
-			delta.addAll(ifExp.delta);
+			delta.addAll(ifExp.deltas);
 		}
 
-		if (!thenExp.delta.isEmpty() || !elseExp.delta.isEmpty())
+		if (!thenExp.deltas.isEmpty() || !elseExp.deltas.isEmpty())
 		{
 			delta.add(new ITE(ifExp.value,
-				thenExp.delta.andOf(),
-				elseExp.delta.andOf()));
+				thenExp.deltas.andOf(),
+				elseExp.deltas.andOf()));
 		}
 
 		return new SMTPair(value, delta);
@@ -173,18 +179,18 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 	@Override
 	public SMTPair caseForAllExpression(TCForAllExpression node, Environment env)
 	{
-		Pair<Bracketed, Expression> pair = expandQuantifier(true, node.bindList, node.predicate, env);
-		return new SMTPair(new ForAll(pair.first, pair.second));
+		Pair<Bracketed, SMTPair> pair = expandQuantifier(true, node.bindList, node.predicate, env);
+		return new SMTPair(new ForAll(pair.first, pair.second.value), pair.second.deltas);
 	}
 
 	@Override
 	public SMTPair caseExistsExpression(TCExistsExpression node, Environment env)
 	{
-		Pair<Bracketed, Expression> pair = expandQuantifier(false, node.bindList, node.predicate, env);
-		return new SMTPair(new Exists(pair.first, pair.second));
+		Pair<Bracketed, SMTPair> pair = expandQuantifier(false, node.bindList, node.predicate, env);
+		return new SMTPair(new Exists(pair.first, pair.second.value), pair.second.deltas);
 	}
 
-	private Pair<Bracketed, Expression> expandQuantifier(
+	private Pair<Bracketed, SMTPair> expandQuantifier(
 		boolean forall, TCMultipleBindList bindList, TCExpression predicate, Environment env)
 	{
 		ExpressionSet qualifiers = new ExpressionSet();
@@ -301,30 +307,24 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 
 		SMTPair body = predicate.apply(this, env);
 
-		// [<qualifiers> (=>/and) [<bodyConstraints> and]] <translated body>
+		// [<qualifiers> (=>/and) [<deltas> and]] <translated body>
 
-		if (!body.delta.isEmpty())
+		body = body.andDeltas();
+
+		if (forall)
 		{
-			body = new SMTPair(new And(body.delta.andOf(), body.value));
+			body = body.impliedBy(qualifiers);
 		}
-
-		if (!qualifiers.isEmpty())
+		else
 		{
-			if (forall)
-			{
-				body = new SMTPair(new Implies(qualifiers.andOf(), body.value));
-			}
-			else
-			{
-				body = new SMTPair(new And(qualifiers.andOf(), body.value));
-			}
+			body = body.andWith(qualifiers);
 		}
 
 		if (!letquals.isEmpty())
 		{
-			body = Utils.combineQualifiers(letquals, body.value);
+			body = Utils.combineQualifiers(letquals, body.value, env);
 		}
 
-		return new Pair<Bracketed, Expression>(newBindList, body.value);
+		return new Pair<Bracketed, SMTPair>(newBindList, body);
 	}
 }

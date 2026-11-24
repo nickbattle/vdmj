@@ -24,42 +24,80 @@
 
 package smtlib.visitors;
 
+import smtlib.ast.And;
 import smtlib.ast.Expression;
 import smtlib.ast.ExpressionSet;
+import smtlib.ast.Implies;
 
 public class SMTPair
 {
 	public final Expression value;
-	public final ExpressionSet delta;
+	public final ExpressionSet deltas;
 
 	public SMTPair(Expression value, Expression delta)
 	{
 		this.value = value;
-		this.delta = new ExpressionSet(delta);
+		this.deltas = new ExpressionSet(delta);
 	}
 
 	public SMTPair(Expression value)
 	{
 		this.value = value;
-		this.delta = new ExpressionSet();
+		this.deltas = new ExpressionSet();
 	}
 
-	public SMTPair(Expression value, ExpressionSet delta)
+	public SMTPair(Expression value, ExpressionSet deltas)
 	{
 		this.value = value;
-		this.delta = delta;
+		this.deltas = deltas;
+	}
+
+	public SMTPair andDeltas()
+	{
+		if (deltas.isEmpty())
+		{
+			return this;
+		}
+		else
+		{
+			return new SMTPair(new And(deltas.andOf(), value));
+		}
+	}
+
+	public SMTPair impliedBy(ExpressionSet clauses)
+	{
+		if (clauses.isEmpty())
+		{
+			return this;
+		}
+		else
+		{
+			return new SMTPair(new Implies(clauses.andOf(), value));
+		}
+	}
+
+	public SMTPair andWith(ExpressionSet clauses)
+	{
+		if (clauses.isEmpty())
+		{
+			return this;
+		}
+		else
+		{
+			return new SMTPair(new And(clauses.andOf(), value));
+		}
 	}
 
 	@Override
 	public String toString()
 	{
-		if (delta.isEmpty())
+		if (deltas.isEmpty())
 		{
 			return value.toSource();
 		}
 		else
 		{
-			return delta.andOf().toSource() + " => " + value.toSource();
+			return deltas.andOf().toSource() + " => " + value.toSource();
 		}
 	}
 }

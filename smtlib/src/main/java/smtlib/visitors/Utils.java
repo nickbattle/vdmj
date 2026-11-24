@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 import smtlib.ast.And;
 import smtlib.ast.Bracketed;
 import smtlib.ast.Expression;
+import smtlib.ast.ExpressionSet;
 import smtlib.ast.Let;
 
 public class Utils implements ASTHelper
@@ -122,35 +123,27 @@ public class Utils implements ASTHelper
 		return result;
 	}
 
-	public static SMTPair combineQualifiers(TCExpressionList letquals, Expression value)
+	public static SMTPair combineQualifiers(TCExpressionList letquals, Expression body, Environment env)
 	{
-		Let result = null;
+		Bracketed binds = new Bracketed();
+		ExpressionSet deltas = new ExpressionSet();
 
 		for (TCExpression qual: letquals)
 		{
 			TCLetDefExpression letqual = (TCLetDefExpression)qual;
-			Bracketed binds = new Bracketed();
 
 			for (TCDefinition def: letqual.localDefs)
 			{
 				TCValueDefinition vdef = (TCValueDefinition)def;
 				TCIdentifierPattern p = (TCIdentifierPattern)vdef.pattern;
 
-				QualifiedSort qsort = vdef.getType().apply(new TypeToSMT("?"), null);
-				binds.add(new Expression(p.name.getName(), qsort.sort));
-			}
-
-			if (result == null)
-			{
-				result = new Let(binds, value);
-			}
-			else
-			{
-				result = new Let(binds, result);
+				SMTPair rhs = vdef.exp.apply(new ExpressionToSMTPair(), env);
+				binds.add(new Expression(p.name.getName(), rhs.value));
+				deltas.addAll(rhs.deltas);
 			}
 		}
 
-		return new SMTPair(result);
+		return new SMTPair(new Let(binds, body), deltas);
 	}
 	
 	public static TCExpression andOf(Collection<TCExpression> qualifiers)
