@@ -123,9 +123,9 @@ public class Utils implements ASTHelper
 		return result;
 	}
 
-	public static SMTPair combineQualifiers(TCExpressionList letquals, Expression body, Environment env)
+	public static SMTPair combineLets(TCExpressionList letquals, Expression body, Environment env)
 	{
-		Bracketed binds = new Bracketed();
+		Expression result = null;
 		ExpressionSet deltas = new ExpressionSet();
 
 		for (TCExpression qual: letquals)
@@ -138,12 +138,21 @@ public class Utils implements ASTHelper
 				TCIdentifierPattern p = (TCIdentifierPattern)vdef.pattern;
 
 				SMTPair rhs = vdef.exp.apply(new ExpressionToSMTPair(), env);
-				binds.add(new Expression(p.name.getName(), rhs.value));
+				Bracketed bind = new Bracketed(new Expression(p.name.getName(), rhs.value));
 				deltas.addAll(rhs.deltas);
+
+				if (result == null)
+				{
+					result = new Let(bind, body);
+				}
+				else
+				{
+					result = new Let(bind, result);
+				}
 			}
 		}
 
-		return new SMTPair(new Let(binds, body), deltas);
+		return new SMTPair(result, deltas);
 	}
 	
 	public static TCExpression andOf(Collection<TCExpression> qualifiers)

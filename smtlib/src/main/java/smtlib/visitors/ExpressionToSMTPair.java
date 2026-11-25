@@ -24,7 +24,12 @@
 
 package smtlib.visitors;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
@@ -35,6 +40,8 @@ import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHeadExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
@@ -45,6 +52,8 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
+import com.fujitsu.vdmj.tc.patterns.TCRecordPattern;
+import com.fujitsu.vdmj.tc.patterns.TCTuplePattern;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -57,6 +66,7 @@ import smtlib.ast.ExpressionSet;
 import smtlib.ast.ForAll;
 import smtlib.ast.GT;
 import smtlib.ast.ITE;
+import smtlib.ast.Let;
 import smtlib.ast.Text;
 
 public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environment> implements SMTHelper
@@ -136,6 +146,22 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 	{
 		SMTPair object = node.object.apply(this, env);
 		return new SMTPair(new Expression(new Text(node.field.getName()), object.value), object.deltas);
+	}
+
+	@Override
+	public SMTPair caseMkTypeExpression(TCMkTypeExpression node, Environment env)
+	{
+		Expression mkexp = new Expression(new Text("mk_" + node.typename));
+		ExpressionSet deltas = new ExpressionSet();
+
+		for (TCExpression arg: node.args)
+		{
+			SMTPair pair = arg.apply(this, env);
+			mkexp.add(pair.value);
+			deltas.addAll(pair.deltas);
+		}
+
+		return new SMTPair(mkexp, deltas);
 	}
 
 	@Override
@@ -234,6 +260,7 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 				}
 
 			}
+			
 			// else if (bind instanceof TCMultipleSeqBind)
 			// {
 			// 	TCMultipleSeqBind msbind = (TCMultipleSeqBind)bind;
@@ -267,6 +294,8 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 			// 	// Turn x in seq S into x:T, given qualifier above
 			// 	newBindList.add(new TCMultipleTypeBind(updatedPlist, updatedType));
 			// }
+
+
 			// else if (bind instanceof TCMultipleSetBind)
 			// {
 			// 	TCMultipleSetBind msbind = (TCMultipleSetBind)bind;
@@ -322,9 +351,112 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 
 		if (!letquals.isEmpty())
 		{
-			body = Utils.combineQualifiers(letquals, body.value, env);
+			body = Utils.combineLets(letquals, body.value, env);
 		}
 
 		return new Pair<Bracketed, SMTPair>(newBindList, body);
+	}
+
+	@Override
+	public SMTPair caseLetDefExpression(TCLetDefExpression node, Environment env)
+	{
+		return expandLetDef(node.localDefs, node.expression, env);
+	}
+
+	private SMTPair expandLetDef(
+		TCDefinitionList localDefs, TCExpression expression, Environment env)
+	{
+		ExpressionSet qualifiers = new ExpressionSet();
+		List<Bracketed> newBindList = new Vector<Bracketed>();
+		TCExpressionList letquals = new TCExpressionList();
+
+		for (TCDefinition def: localDefs)
+		{
+			if (def instanceof TCValueDefinition)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)def;
+				String varname = null;
+
+				if (vdef.pattern instanceof TCIdentifierPattern)
+				{
+					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
+					varname = id.toString();
+				}
+				else if (vdef.pattern instanceof TCRecordPattern)
+				{
+					TCRecordPattern rp = (TCRecordPattern)vdef.pattern;
+					TCType ptype = vdef.getType();
+					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
+					varname = p2.toString();
+				}
+				else if (vdef.pattern instanceof TCTuplePattern)
+				{
+					TCTuplePattern rp = (TCTuplePattern)vdef.pattern;
+					TCType ptype = vdef.getType();
+					TCIdentifierPattern p2 = Utils.checkPattern(rp, ptype, letquals, env);
+					varname = p2.toString();
+				}
+				else
+				{
+					throw new UnsupportedOperationException("Cannot expand pattern: " + def);
+				}
+
+				QualifiedSort qsort = vdef.getType().apply(new TypeToSMT(varname), env);
+
+				if (qsort.qualifier != null)
+				{
+					qualifiers.add(qsort.qualifier);
+				}
+
+				SMTPair pair = vdef.exp.apply(this, env);
+				newBindList.add(0, new Bracketed(new Text(varname), pair.value));
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Cannot expand let: " + def);
+			}
+		}
+
+		SMTPair body = expression.apply(this, env);
+		body.deltas.addAll(qualifiers);
+
+		// Create a let cascade for all the bindings
+		Expression resultValue = letCascade(newBindList, body.value);
+		ExpressionSet resultDeltas = new ExpressionSet();
+
+		if (!body.deltas.isEmpty())
+		{
+			// Add a let clause to the body delta, so we can propagate up,
+			resultDeltas.add(letCascade(newBindList, body.deltas.andOf()));
+		}
+
+		if (!letquals.isEmpty())
+		{
+			// Adds deltas for the rhs of the pattern let expressions
+			SMTPair lets = Utils.combineLets(letquals, body.value, env);
+			resultValue = lets.value;
+			resultDeltas.addAll(lets.deltas);	// Outside the delta's let
+		}
+
+		return new SMTPair(resultValue, resultDeltas);
+	}
+
+	private Let letCascade(List<Bracketed> binds, Expression body)
+	{
+		Let cascade = null;
+
+		for (Bracketed bind: binds)	// Keep lets in order
+		{
+			if (cascade == null)
+			{
+				cascade = new Let(bind, body);
+			}
+			else
+			{
+				cascade = new Let(bind, cascade);
+			}
+		}
+
+		return cascade;
 	}
 }
