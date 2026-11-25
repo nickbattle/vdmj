@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -51,6 +52,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 import smtlib.SMTLIB;
+import smtlib.SMTLIB2;
 import smtlib.ast.Script;
 import smtlib.solvers.Solver;
 import smtlib.visitors.Globals;
@@ -84,29 +86,39 @@ public class SMTEXPCommand extends AnalysisCommand
 				}
 			});
 
-			String defname = Interpreter.getInstance().getDefaultName();
+			boolean saved = Properties.parser_maximal_types;
 
-			LexTokenReader ltr = new LexTokenReader(expression, Dialect.VDM_SL, LexLocation.ANY);
-			ExpressionReader er = new ExpressionReader(ltr);
-			er.setCurrentModule(defname);
-			ASTExpression ast = er.readExpression();
-			TCExpression exp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
-
-			TypeChecker.clearErrors();
-			exp.typeCheck(env, null, NameScope.NAMES, null);
-
-			if (TypeChecker.getErrorCount() > 0)
+			try
 			{
-				for (VDMError err: TypeChecker.getErrors())
+				Properties.parser_maximal_types = true;
+				String defname = Interpreter.getInstance().getDefaultName();
+
+				LexTokenReader ltr = new LexTokenReader(expression, Dialect.VDM_SL, LexLocation.ANY);
+				ExpressionReader er = new ExpressionReader(ltr);
+				er.setCurrentModule(defname);
+				ASTExpression ast = er.readExpression();
+				TCExpression exp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
+
+				TypeChecker.clearErrors();
+				exp.typeCheck(env, null, NameScope.NAMES, null);
+
+				if (TypeChecker.getErrorCount() > 0)
 				{
-					Console.out.println(err.toString());
+					for (VDMError err: TypeChecker.getErrors())
+					{
+						Console.out.println(err.toString());
+					}
+
+					throw new Exception("Expression has type errors");
 				}
 
-				throw new Exception("Expression has type errors");
+				setCheckedExpression(exp);
+				source = exp.toString() + "\n";
 			}
-
-			setCheckedExpression(exp);
-			source = exp.toString() + "\n";
+			finally
+			{
+				Properties.parser_maximal_types = saved;
+			}
 		}
 	}
 
@@ -150,7 +162,10 @@ public class SMTEXPCommand extends AnalysisCommand
 			Globals.reset();
 			Globals.getInstance().findrecursiveGroups(tc.getTC());
 			Environment env = tc.getGlobalEnvironment();
-			SMTLIB smtlib = new SMTLIB(env, Solver.getInstance(type), true);
+
+			// TODO This is for testing the new SMTLIB2
+			Console.out.println("Using SMTLIB2!");
+			SMTLIB smtlib = new SMTLIB2(env, Solver.getInstance(type), true);
 
 			ProofObligation po = new DummyObligation(expression, env);
 			Script script = smtlib.generate(po);

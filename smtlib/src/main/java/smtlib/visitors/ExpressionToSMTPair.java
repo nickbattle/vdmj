@@ -29,7 +29,10 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
@@ -40,6 +43,7 @@ import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHeadExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
@@ -54,23 +58,37 @@ import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCRecordPattern;
 import com.fujitsu.vdmj.tc.patterns.TCTuplePattern;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Pair;
 
+import smtlib.ast.And;
 import smtlib.ast.Bracketed;
+import smtlib.ast.EQ;
 import smtlib.ast.Exists;
 import smtlib.ast.Expression;
 import smtlib.ast.ExpressionSet;
 import smtlib.ast.ForAll;
+import smtlib.ast.GE;
 import smtlib.ast.GT;
 import smtlib.ast.ITE;
+import smtlib.ast.LE;
+import smtlib.ast.LT;
 import smtlib.ast.Let;
 import smtlib.ast.Text;
+import smtlib.solvers.Solver;
 
 public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environment> implements SMTHelper
 {
+	private Solver solver = Solver.getInstance();
+
 	@Override
 	public SMTPair caseExpression(TCExpression node, Environment env)
 	{
@@ -149,6 +167,79 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 	}
 
 	@Override
+	public SMTPair caseIsExpression(TCIsExpression node, Environment env)
+	{
+		if (node.basictype != null)
+		{
+			TCNumericType numeric = node.test.getType().getNumeric();
+			boolean isNumeric = numeric != null;
+			boolean isFloat = isNumeric && numeric.getWeight() > 2;
+			boolean isBool = node.test.getType() instanceof TCBooleanType;
+
+			if (node.basictype instanceof TCNaturalType)
+			{
+				Expression test = node.test.apply(this, env).value;
+
+				if (isFloat)
+				{
+					return new SMTPair(new And(
+						new EQ(new Expression("to_int", test), test),
+						new GE(test, new Text("0"))));
+				}
+				else if (isNumeric)
+				{
+					return new SMTPair(new GE(test, new Text("0")));
+				}
+				else
+				{
+					return new SMTPair(new Expression("false"));
+				}
+			}
+			else if (node.basictype instanceof TCNaturalOneType)
+			{
+				Expression test = node.test.apply(this, env).value;
+
+				if (isFloat)
+				{
+					return new SMTPair(new And(
+						new EQ(new Expression("to_int", test), test),
+						new GT(test, new Text("0"))));
+				}
+				else if (isNumeric)
+				{
+					return new SMTPair(new GT(test, new Text("0")));
+				}
+				else
+				{
+					return new SMTPair(new Expression("false"));
+				}
+			}
+			else if (node.basictype instanceof TCRealType)
+			{
+				return new SMTPair(new Expression(Boolean.toString(isFloat)));
+			}
+			else if (node.basictype instanceof TCBooleanType)
+			{
+				if (node.test instanceof TCApplyExpression)		// pre_ or post_
+				{
+					TCApplyExpression apply = (TCApplyExpression)node.test;
+
+					if (apply.type instanceof TCFunctionType)
+					{
+						TCFunctionType ftype = (TCFunctionType)apply.type;
+						return new SMTPair(new Expression(Boolean.toString(
+							ftype.result instanceof TCBooleanType && !ftype.partial)));
+					}
+				}
+				
+				return new SMTPair(new Expression(Boolean.toString(isBool)));
+			}
+		}
+		
+		throw new UnsupportedOperationException("Cannot convert: " + node);
+	}
+
+	@Override
 	public SMTPair caseMkTypeExpression(TCMkTypeExpression node, Environment env)
 	{
 		Expression mkexp = new Expression(new Text("mk_" + node.typename));
@@ -162,6 +253,150 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		}
 
 		return new SMTPair(mkexp, deltas);
+	}
+
+
+	@Override
+	public SMTPair caseApplyExpression(TCApplyExpression node, Environment env)
+	{
+		TCDefinition root = null;
+
+		if (node.root instanceof TCVariableExpression)	// Must be s(i)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.root;
+			root = env.findName(var.name, NameScope.NAMESANDSTATE);
+		}
+
+		if (root.name.getModule().equals(Globals.INTERNAL_MODULE))
+		{
+			Expression call = new Expression(root.name.getName());
+			ExpressionSet deltas = new ExpressionSet();
+
+			for (TCExpression arg: node.args)
+			{
+				SMTPair pair = arg.apply(this, env);
+				call.add(pair.value);
+				deltas.addAll(pair.deltas);
+			}
+
+			return new SMTPair(call, deltas);
+		}
+		else if (root instanceof TCExplicitFunctionDefinition)
+		{
+			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)root;
+
+			if (def.paramPatternList.size() == 1)	// Not curried
+			{
+				Expression call = new Expression(def.name.getName());
+				ExpressionSet deltas = new ExpressionSet();
+
+				for (TCExpression arg: node.args)
+				{
+					SMTPair pair = arg.apply(this, env);
+					call.add(pair.value);
+					deltas.addAll(pair.deltas);
+				}
+
+				// Add a delta condition to call <name>_defined(args), which is
+				// created from the SMTPair's delta when the function is translated.
+
+				deltas.add(new Expression(def.name.getName() + "_defined"));
+
+				if (def.predef != null)
+				{
+					Expression precall = new Expression();
+					precall.addAll(call);
+					precall.set(0, new Text(def.predef.name.getName()));
+					deltas.add(precall);
+				}
+
+				if (def.postdef != null)
+				{
+					Expression postcall = new Expression();
+					postcall.addAll(call);
+					postcall.set(0, new Text(def.postdef.name.getName()));
+					postcall.add(call);
+					deltas.add(postcall);
+				}
+
+				return new SMTPair(call, deltas);
+			}
+		}
+		else if (root instanceof TCImplicitFunctionDefinition)
+		{
+			TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)root;
+			Expression call = new Expression(def.name.getName());
+			ExpressionSet deltas = new ExpressionSet();
+
+			for (TCExpression arg: node.args)
+			{
+				SMTPair pair = arg.apply(this, env);
+				call.add(pair.value);
+				deltas.addAll(pair.deltas);
+			}
+
+			// Add a delta condition to call <name>_defined(args), which is
+			// created from the SMTPair's delta when the function is translated.
+
+			deltas.add(new Expression(def.name.getName() + "_defined"));
+
+			if (def.predef != null)
+			{
+				Expression precall = new Expression();
+				precall.addAll(call);
+				precall.set(0, new Text(def.predef.name.getName()));
+				deltas.add(precall);
+			}
+
+			if (def.postdef != null)
+			{
+				Expression postcall = new Expression();
+				postcall.addAll(call);
+				postcall.set(0, new Text(def.postdef.name.getName()));
+				postcall.add(call);
+				deltas.add(postcall);
+			}
+
+			return new SMTPair(call, deltas);
+		}
+		else if (node.root.getType().isSeq(node.location))
+		{
+			SMTPair sequence = node.root.apply(this, env);
+			SMTPair index = node.args.get(0).apply(this, env);
+
+			// (seq.nth s (- i 1)
+			Expression result = new Expression(new Text("seq.nth"),
+				sequence.value,
+				new Expression(new Text("-"), index.value, new Text("1")));
+
+			ExpressionSet deltas = new ExpressionSet(sequence.deltas, index.deltas);
+
+			// s(i) only defined when 0 < i <= len s
+			deltas.add(new And(
+					new LT(new Text("0"), index.value),
+					new LE(index.value, new Expression("seq.len", sequence.value))));
+
+			return new SMTPair(result, deltas);
+		}
+		else if (node.root.getType().isMap(node.location))
+		{
+			SMTPair map = node.root.apply(this, env);
+			SMTPair key = node.args.get(0).apply(this, env);
+
+			// (select m k)
+			Expression result = new Expression("select", map.value, key.value);
+
+			ExpressionSet deltas = new ExpressionSet(map.deltas, key.deltas);
+
+			// m(k) only defined when k in set dom m
+			deltas.add(solver.setMember(
+					key.value,
+					new Expression("vdm.dom", map.value)));
+
+			return new SMTPair(result, deltas);
+		}
+
+		throw new UnsupportedOperationException("Cannot convert: " + node);
 	}
 
 	@Override
@@ -258,7 +493,6 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 						newBindList.add(new Expression(pdef.name.getName(), qsort.sort));
 					}
 				}
-
 			}
 			
 			// else if (bind instanceof TCMultipleSeqBind)
@@ -328,6 +562,7 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 			// 	// Turn x in set S into x:T, given qualifier above
 			// 	newBindList.add(new TCMultipleTypeBind(updatedPlist, updatedType));
 			// }
+
 			else
 			{
 				throw new UnsupportedOperationException("Cannot expand: " + bind);

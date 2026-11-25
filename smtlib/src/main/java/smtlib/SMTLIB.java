@@ -62,16 +62,15 @@ import smtlib.visitors.ASTHelper;
 import smtlib.visitors.DefinitionExpander;
 import smtlib.visitors.ExpressionExpander;
 import smtlib.visitors.ExpressionToSMT;
-import smtlib.visitors.ExpressionToSMTPair;
 import smtlib.visitors.Globals;
 import smtlib.visitors.LocalNames;
 import smtlib.visitors.Utils;
 
 public class SMTLIB
 {
-	private final Environment env;
-	private final Solver solver;
-	private final boolean verbose;
+	protected final Environment env;
+	protected final Solver solver;
+	protected final boolean verbose;
 
 	public SMTLIB(Environment env, Solver solver, boolean verbose)
 	{
@@ -96,7 +95,7 @@ public class SMTLIB
 		return script;
 	}
 
-	private Script topLevelDefinitions(ProofObligation po)
+	protected Script topLevelDefinitions(ProofObligation po)
 	{
 		TCExpression tcexp = po.getCheckedExpression();
 		Script script = new Script();
@@ -106,9 +105,6 @@ public class SMTLIB
 		Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
 		DefinitionExpander.init(smtenv);
 		TCExpression expanded = null;
-
-		// TODO remove me!
-		Console.out.println("SMTPAIR: " + tcexp.apply(new ExpressionToSMTPair(), env));
 
 		try
 		{
@@ -292,7 +288,7 @@ public class SMTLIB
 		}
 	}
 
-	private void printScript(Script script)
+	protected void printScript(Script script)
 	{
 		int n = 1;
 
