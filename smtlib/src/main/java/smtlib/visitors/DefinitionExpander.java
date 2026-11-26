@@ -46,7 +46,6 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -57,7 +56,6 @@ import smtlib.ast.DefineConst;
 import smtlib.ast.DefineFun;
 import smtlib.ast.DefineSort;
 import smtlib.ast.Expression;
-import smtlib.ast.ITE;
 import smtlib.ast.Sort;
 import smtlib.ast.Text;
 
@@ -173,23 +171,25 @@ public class DefinitionExpander
 			{
 				stack.push(fname);
 				globals.createFunction(fname);	// Claim position. Updated in functionToSMT
+				globals.createFunction(definedName(fname));
 
-				// Expand any functions called by this one first. Create a local env to include
-				// any parameter definitions, for the fbody typecheck.
+				// // Expand any functions called by this one first. Create a local env to include
+				// // any parameter definitions, for the fbody typecheck.
 
-				TCDefinitionList pdefs = new TCDefinitionList();
+				// TCDefinitionList pdefs = new TCDefinitionList();
 
-				for (int p=0; p<plist.size(); p++)
-				{
-					TCType ptype = ftype.parameters.get(p);
-					pdefs.addAll(plist.get(p).getDefinitions(ptype, NameScope.NAMES));
-					ptype.apply(new TypeExpander(), env);
-				}
+				// for (int p=0; p<plist.size(); p++)
+				// {
+				// 	TCType ptype = ftype.parameters.get(p);
+				// 	pdefs.addAll(plist.get(p).getDefinitions(ptype, NameScope.NAMES));
+				// 	ptype.apply(new TypeExpander(), env);
+				// }
 
-				Environment local = new FlatCheckedEnvironment(pdefs, env, NameScope.NAMES);
-				TCExpression expanded = fbody.apply(new ExpressionExpander(local), new TCExpressionSet());
-				expanded.typeCheck(local, null, NameScope.NAMES, ftype.result);
-				functionToSMT(fname, plist, ftype, expanded);
+				// Environment local = new FlatCheckedEnvironment(pdefs, env, NameScope.NAMES);
+				// TCExpression expanded = fbody.apply(new ExpressionExpander(local), new TCExpressionSet());
+				// expanded.typeCheck(local, null, NameScope.NAMES, ftype.result);
+
+				functionToSMT(fname, plist, ftype, fbody);
 			}
 			catch (Throwable th)
 			{
@@ -235,26 +235,19 @@ public class DefinitionExpander
 		}
 		
 		Environment paramenv = new FlatEnvironment(locals, env);
-		fbody.typeCheck(paramenv, null, NameScope.NAMES, ftype.result);
+		// fbody.typeCheck(paramenv, null, NameScope.NAMES, ftype.result);
 
-		Expression body = fbody.apply(new ExpressionToSMT(), paramenv);
+		SMTPair body = fbody.apply(new ExpressionToSMTPair(), paramenv);
 		QualifiedSort qsort = ftype.result.apply(new TypeToSMT("RESULT"), paramenv);
-		Expression qbody = null;
-
-		if (qualifiers.isEmpty())
-		{
-			qbody = body;
-		}
-		else
-		{
-			qbody = new ITE(Utils.andOfAll(qualifiers), body, new Text("undefined" + qsort.sort));
-			globals.addUndefined(qsort.sort);
-		}
+		body.deltas.addAll(qualifiers);
 
 		// (define-fun g (Int a) Int <exp>)
 		DefineFun define = globals.findFunction(fname);
-		define.setExpanded(fbody);
-		define.set(params, qsort.sort, qbody);
+		define.set(params, qsort.sort, body.value);
+
+		// (define-fun g_defined (Int a) Bool <exp>)
+		DefineFun define2 = globals.findFunction(definedName(fname));
+		define2.set(params, new Sort("Bool"), body.deltas.andOf());
 	}
 
 	public void expandValue(TCLocalDefinition ldef)
@@ -314,5 +307,10 @@ public class DefinitionExpander
 			globals.addSort(new DefineSort(ntype.typename, qsort.sort));
 			globals.addConstant(new DefineConst("undefined" + ntype.typename, qsort.sort, qsort.sort.undefinedConst()));
 		}
+	}
+
+	private TCNameToken definedName(TCNameToken name)
+	{
+		return new TCNameToken(name.getLocation(), name.getModule(), name.getName() + "_defined");
 	}
 }

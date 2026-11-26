@@ -38,11 +38,13 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -59,7 +61,7 @@ import smtlib.visitors.Globals;
 
 public class SMTEXPCommand extends AnalysisCommand
 {
-	private final static String CMD = "smtexp [-<solver>] <expression>";
+	private final static String CMD = "smtexp [-<solver>] <expression> | PO#";
 	private final static String SHORT = CMD;
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - SMT solver testing";
@@ -163,11 +165,29 @@ public class SMTEXPCommand extends AnalysisCommand
 			Globals.getInstance().findrecursiveGroups(tc.getTC());
 			Environment env = tc.getGlobalEnvironment();
 
-			// TODO This is for testing the new SMTLIB2
 			Console.out.println("Using SMTLIB2!");
 			SMTLIB smtlib = new SMTLIB2(env, Solver.getInstance(type), true);
+			ProofObligation po = null;
 
-			ProofObligation po = new DummyObligation(expression, env);
+			if (expression.matches("\\d+"))
+			{
+				POPlugin plugin = PluginRegistry.getInstance().getPlugin("PO");
+				int ponum = Integer.parseInt(expression);
+				ProofObligationList list = plugin.getProofObligations();
+
+				if (ponum < 1 || ponum > list.size())
+				{
+					Console.out.println("No such PO number: " + ponum);
+					return null;
+				}
+
+				po = list.get(ponum - 1);
+			}
+			else
+			{
+				po = new DummyObligation(expression, env);
+			}
+
 			Script script = smtlib.generate(po);
 
 			long before = System.currentTimeMillis();

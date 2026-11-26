@@ -74,6 +74,7 @@ import smtlib.ast.Bracketed;
 import smtlib.ast.EQ;
 import smtlib.ast.Exists;
 import smtlib.ast.Expression;
+import smtlib.ast.ExpressionList;
 import smtlib.ast.ExpressionSet;
 import smtlib.ast.ForAll;
 import smtlib.ast.GE;
@@ -255,7 +256,6 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		return new SMTPair(mkexp, deltas);
 	}
 
-
 	@Override
 	public SMTPair caseApplyExpression(TCApplyExpression node, Environment env)
 	{
@@ -283,38 +283,50 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		}
 		else if (root instanceof TCExplicitFunctionDefinition)
 		{
-			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)root;
-
-			if (def.paramPatternList.size() == 1)	// Not curried
+			TCExplicitFunctionDefinition exfn = (TCExplicitFunctionDefinition)root;
+			
+			if (exfn.isCurried)
 			{
-				Expression call = new Expression(def.name.getName());
+				throw new UnsupportedOperationException("Cannot expand curried fn: " + node);
+			}
+
+			DefinitionExpander.getInstance().expandFunction(exfn);
+
+			if (exfn.paramPatternList.size() == 1)	// Not curried
+			{
+				ExpressionList args = new ExpressionList();
 				ExpressionSet deltas = new ExpressionSet();
 
 				for (TCExpression arg: node.args)
 				{
 					SMTPair pair = arg.apply(this, env);
-					call.add(pair.value);
+					args.add(pair.value);
 					deltas.addAll(pair.deltas);
 				}
+
+				Expression call = new Expression(exfn.name.getName());
+				call.addAll(args);
 
 				// Add a delta condition to call <name>_defined(args), which is
 				// created from the SMTPair's delta when the function is translated.
 
-				deltas.add(new Expression(def.name.getName() + "_defined"));
+				Expression call2 = new Expression(exfn.name.getName() + "_defined");
+				call2.addAll(args);
+				deltas.add(call2);
 
-				if (def.predef != null)
+				if (exfn.predef != null)
 				{
 					Expression precall = new Expression();
 					precall.addAll(call);
-					precall.set(0, new Text(def.predef.name.getName()));
+					precall.set(0, new Text(exfn.predef.name.getName()));
 					deltas.add(precall);
 				}
 
-				if (def.postdef != null)
+				if (exfn.postdef != null)
 				{
 					Expression postcall = new Expression();
 					postcall.addAll(call);
-					postcall.set(0, new Text(def.postdef.name.getName()));
+					postcall.set(0, new Text(exfn.postdef.name.getName()));
 					postcall.add(call);
 					deltas.add(postcall);
 				}
@@ -324,8 +336,10 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		}
 		else if (root instanceof TCImplicitFunctionDefinition)
 		{
-			TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)root;
-			Expression call = new Expression(def.name.getName());
+			TCImplicitFunctionDefinition imfn = (TCImplicitFunctionDefinition)root;
+			DefinitionExpander.getInstance().expandFunction(imfn);
+
+			Expression call = new Expression(imfn.name.getName());
 			ExpressionSet deltas = new ExpressionSet();
 
 			for (TCExpression arg: node.args)
@@ -338,21 +352,21 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 			// Add a delta condition to call <name>_defined(args), which is
 			// created from the SMTPair's delta when the function is translated.
 
-			deltas.add(new Expression(def.name.getName() + "_defined"));
+			deltas.add(new Expression(imfn.name.getName() + "_defined"));
 
-			if (def.predef != null)
+			if (imfn.predef != null)
 			{
 				Expression precall = new Expression();
 				precall.addAll(call);
-				precall.set(0, new Text(def.predef.name.getName()));
+				precall.set(0, new Text(imfn.predef.name.getName()));
 				deltas.add(precall);
 			}
 
-			if (def.postdef != null)
+			if (imfn.postdef != null)
 			{
 				Expression postcall = new Expression();
 				postcall.addAll(call);
-				postcall.set(0, new Text(def.postdef.name.getName()));
+				postcall.set(0, new Text(imfn.postdef.name.getName()));
 				postcall.add(call);
 				deltas.add(postcall);
 			}

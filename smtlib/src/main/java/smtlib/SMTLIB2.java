@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionSet;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -44,7 +43,6 @@ import smtlib.ast.Script;
 import smtlib.ast.Source;
 import smtlib.solvers.Solver;
 import smtlib.visitors.DefinitionExpander;
-import smtlib.visitors.ExpressionExpander;
 import smtlib.visitors.ExpressionToSMTPair;
 import smtlib.visitors.Globals;
 import smtlib.visitors.LocalNames;
@@ -65,13 +63,11 @@ public class SMTLIB2 extends SMTLIB
 		LocalNames.reset();
 		Globals.getInstance().init();
 		Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
-
 		DefinitionExpander.init(smtenv);
-		tcexp.apply(new ExpressionExpander(smtenv), new TCExpressionSet());
 
 		try
 		{
-			script.addAll(Globals.getInstance().globalList());
+			
 
 			if (tcexp instanceof TCForAllExpression)
 			{
@@ -79,7 +75,10 @@ public class SMTLIB2 extends SMTLIB
 
 				script.add(new Comment("\nTop level forall variables"));
 				SMTPair forall = node.apply(new ExpressionToSMTPair(), smtenv);
+				script.addAll(Globals.getInstance().globalList());
+
 				Bracketed binds = (Bracketed)forall.value.get(1);
+				script.add(new Comment("\nTop level forall variables"));
 
 				// Add declare-consts for the forall bindings, to get a model
 				for (Source bind: binds)
@@ -105,6 +104,8 @@ public class SMTLIB2 extends SMTLIB
 				TCExistsExpression node = (TCExistsExpression)tcexp;
 
 				SMTPair exists = node.apply(new ExpressionToSMTPair(), smtenv);
+				script.addAll(Globals.getInstance().globalList());
+
 				Bracketed binds = (Bracketed)exists.value.get(1);
 				script.add(new Comment("\nTop level exists variables"));
 
