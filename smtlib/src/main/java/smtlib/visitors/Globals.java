@@ -137,8 +137,8 @@ public class Globals
 
 	public void createFunction(TCNameToken name)
 	{
-		DefineFun define = new DefineFun(name); // Placeholder
-		DefineFunsRec group = findGroup(name);
+		DefineFun define = new DefineFun(name);						// Placeholder
+		DefineFunsRec group = findGroup(Utils.directName(name));	// based on base name
 
 		if (group != null)
 		{
@@ -423,7 +423,7 @@ public class Globals
 
 						for (TCDefinitionSet group : groups)
 						{
-							recursiveGroups.put(new DefineFunsRec(id), group);
+							recursiveGroups.put(new DefineFunsRec(id++), group);
 						}
 					}
 				}

@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionSet;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
@@ -208,5 +209,23 @@ public class Utils implements ASTHelper
 	public static String expandOneLine(TCExpression exp)
 	{
 		return exp.toString().replace("\n", " ");
+	}
+
+	public static TCNameToken definedName(TCNameToken name)
+	{
+		return new TCNameToken(name.getLocation(), name.getModule(), name.getName() + "_defined");
+	}
+
+	public static TCNameToken directName(TCNameToken name)
+	{
+		if (name.getName().endsWith("_defined"))
+		{
+			String direct = name.getName().replace("_defined", "");
+			return new TCNameToken(name.getLocation(), name.getModule(), direct);
+		}
+		else
+		{
+			return name;
+		}
 	}
 }
