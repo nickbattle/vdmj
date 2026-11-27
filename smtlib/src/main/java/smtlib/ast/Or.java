@@ -24,7 +24,7 @@
 
 package smtlib.ast;
 
-import java.util.List;
+import java.util.Collection;
 
 public class Or extends Expression
 {
@@ -38,7 +38,7 @@ public class Or extends Expression
 		}
 	}
 
-	public Or(List<Expression> clauses)
+	public Or(Collection<Expression> clauses)
 	{
 		super(new Text("or"));
 

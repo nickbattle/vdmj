@@ -87,4 +87,20 @@ public class ExpressionSet extends HashSet<Expression> implements SMTHelper
 			return new And(this);
 		}
 	}
+
+	public Expression orOf()
+	{
+		if (isEmpty())
+		{
+			return TRUE;
+		}
+		else if (size() == 1)
+		{
+			return iterator().next();
+		}
+		else
+		{
+			return new Or(this);
+		}
+	}
 }

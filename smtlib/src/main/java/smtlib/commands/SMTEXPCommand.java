@@ -115,7 +115,7 @@ public class SMTEXPCommand extends AnalysisCommand
 				}
 
 				setCheckedExpression(exp);
-				source = exp.toString() + "\n";
+				source = exp.toString().replace("\n", " ") + "\n";
 			}
 			finally
 			{

@@ -24,8 +24,7 @@
 
 package smtlib.ast;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
 public class And extends Expression
 {
@@ -39,17 +38,7 @@ public class And extends Expression
 		}
 	}
 
-	public And(List<Expression> clauses)
-	{
-		super(new Text("and"));
-
-		for (Source clause: clauses)
-		{
-			add(clause);	// Can't construct with varargs and fixed value
-		}
-	}
-
-	public And(Set<Expression> clauses)
+	public And(Collection<Expression> clauses)
 	{
 		super(new Text("and"));
 

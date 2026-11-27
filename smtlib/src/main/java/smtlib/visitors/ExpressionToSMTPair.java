@@ -25,6 +25,7 @@
 package smtlib.visitors;
 
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -32,30 +33,61 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCAbsoluteExpression;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBooleanLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCCardinalityExpression;
+import com.fujitsu.vdmj.tc.expressions.TCCaseAlternative;
+import com.fujitsu.vdmj.tc.expressions.TCCasesExpression;
+import com.fujitsu.vdmj.tc.expressions.TCCharLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCDefExpression;
+import com.fujitsu.vdmj.tc.expressions.TCDistConcatExpression;
+import com.fujitsu.vdmj.tc.expressions.TCDistIntersectExpression;
+import com.fujitsu.vdmj.tc.expressions.TCDistMergeExpression;
+import com.fujitsu.vdmj.tc.expressions.TCDistUnionExpression;
+import com.fujitsu.vdmj.tc.expressions.TCElementsExpression;
+import com.fujitsu.vdmj.tc.expressions.TCElseIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
+import com.fujitsu.vdmj.tc.expressions.TCFloorExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHeadExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIndicesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLenExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapDomainExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapInverseExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapRangeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNotExpression;
+import com.fujitsu.vdmj.tc.expressions.TCPowerSetExpression;
+import com.fujitsu.vdmj.tc.expressions.TCQuoteLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCRealLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCReverseExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCTailExpression;
+import com.fujitsu.vdmj.tc.expressions.TCUnaryExpression;
+import com.fujitsu.vdmj.tc.expressions.TCUnaryMinusExpression;
+import com.fujitsu.vdmj.tc.expressions.TCUnaryPlusExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCBooleanPattern;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
+import com.fujitsu.vdmj.tc.patterns.TCIntegerPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
+import com.fujitsu.vdmj.tc.patterns.TCRealPattern;
 import com.fujitsu.vdmj.tc.patterns.TCRecordPattern;
 import com.fujitsu.vdmj.tc.patterns.TCTuplePattern;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -66,6 +98,7 @@ import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Pair;
 
@@ -80,9 +113,12 @@ import smtlib.ast.ForAll;
 import smtlib.ast.GE;
 import smtlib.ast.GT;
 import smtlib.ast.ITE;
+import smtlib.ast.Implies;
 import smtlib.ast.LE;
 import smtlib.ast.LT;
 import smtlib.ast.Let;
+import smtlib.ast.Not;
+import smtlib.ast.Source;
 import smtlib.ast.Text;
 import smtlib.solvers.Solver;
 
@@ -97,163 +133,20 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 	}
 
 	@Override
-	public SMTPair caseVariableExpression(TCVariableExpression node, Environment arg)
+	public SMTPair caseBinaryExpression(TCBinaryExpression node, Environment env)
 	{
-		return new SMTPair(new Expression(node.name.toString()));
-	}
-
-	@Override
-	public SMTPair caseIntegerLiteralExpression(TCIntegerLiteralExpression node, Environment env)
-	{
-		return new SMTPair(new Expression(Long.toString(node.value.value)));
-	}
-
-	@Override
-	public SMTPair caseBooleanLiteralExpression(TCBooleanLiteralExpression node, Environment env)
-	{
-		return new SMTPair(new Expression(Boolean.toString(node.value.value)));
-	}
-
-	@Override
-	public SMTPair caseSeqEnumExpression(TCSeqEnumExpression node, Environment env)
-	{
-		if (node.members.isEmpty())
-		{
-			QualifiedSort qsort = node.getType().apply(new TypeToSMT("?"), env);
-			return new SMTPair(new Expression("as", new Text("seq.empty"), qsort.sort));
-		}
-		else if (node.members.size() == 1)
-		{
-			SMTPair first = node.members.firstElement().apply(this, env);
-			return new SMTPair(new Expression("seq.unit", first.value), first.deltas);
-		}
-		else
-		{
-			Expression result = new Expression("seq.++");
-			ExpressionSet deltas = new ExpressionSet();
-
-			for (TCExpression e: node.members)
-			{
-				SMTPair pair = e.apply(this, env);
-				result.add(new Expression("seq.unit", pair.value));
-				deltas.addAll(pair.deltas);
-			}
-
-			return new SMTPair(result, deltas);
-		}
-	}
-
-	@Override
-	public SMTPair caseHeadExpression(TCHeadExpression node, Environment env)
-	{
-		SMTPair seq = node.exp.apply(this, env);
+		SMTPair left = node.left.apply(this, env);
+		SMTPair right = node.right.apply(this, env);
 
 		return new SMTPair(
-			new Expression(
-				new Text("seq.nth"),
-				seq.value,
-				new Text("0")),
-			new ExpressionSet(
-					seq.deltas,
-					new GT(
-						new Expression("seq.len", seq.value),
-						new Text("0"))));
+			new Expression(node.op.toString(), left.value, right.value),
+			new ExpressionSet(left.deltas, right.deltas));
 	}
 
-	@Override
-	public SMTPair caseFieldExpression(TCFieldExpression node, Environment env)
+	private SMTPair caseUnaryExpression(String op, TCUnaryExpression node, Environment env)
 	{
-		SMTPair object = node.object.apply(this, env);
-		return new SMTPair(new Expression(new Text(node.field.getName()), object.value), object.deltas);
-	}
-
-	@Override
-	public SMTPair caseIsExpression(TCIsExpression node, Environment env)
-	{
-		if (node.basictype != null)
-		{
-			TCNumericType numeric = node.test.getType().getNumeric();
-			boolean isNumeric = numeric != null;
-			boolean isFloat = isNumeric && numeric.getWeight() > 2;
-			boolean isBool = node.test.getType() instanceof TCBooleanType;
-
-			if (node.basictype instanceof TCNaturalType)
-			{
-				Expression test = node.test.apply(this, env).value;
-
-				if (isFloat)
-				{
-					return new SMTPair(new And(
-						new EQ(new Expression("to_int", test), test),
-						new GE(test, new Text("0"))));
-				}
-				else if (isNumeric)
-				{
-					return new SMTPair(new GE(test, new Text("0")));
-				}
-				else
-				{
-					return new SMTPair(new Expression("false"));
-				}
-			}
-			else if (node.basictype instanceof TCNaturalOneType)
-			{
-				Expression test = node.test.apply(this, env).value;
-
-				if (isFloat)
-				{
-					return new SMTPair(new And(
-						new EQ(new Expression("to_int", test), test),
-						new GT(test, new Text("0"))));
-				}
-				else if (isNumeric)
-				{
-					return new SMTPair(new GT(test, new Text("0")));
-				}
-				else
-				{
-					return new SMTPair(new Expression("false"));
-				}
-			}
-			else if (node.basictype instanceof TCRealType)
-			{
-				return new SMTPair(new Expression(Boolean.toString(isFloat)));
-			}
-			else if (node.basictype instanceof TCBooleanType)
-			{
-				if (node.test instanceof TCApplyExpression)		// pre_ or post_
-				{
-					TCApplyExpression apply = (TCApplyExpression)node.test;
-
-					if (apply.type instanceof TCFunctionType)
-					{
-						TCFunctionType ftype = (TCFunctionType)apply.type;
-						return new SMTPair(new Expression(Boolean.toString(
-							ftype.result instanceof TCBooleanType && !ftype.partial)));
-					}
-				}
-				
-				return new SMTPair(new Expression(Boolean.toString(isBool)));
-			}
-		}
-		
-		throw new UnsupportedOperationException("Cannot convert: " + node);
-	}
-
-	@Override
-	public SMTPair caseMkTypeExpression(TCMkTypeExpression node, Environment env)
-	{
-		Expression mkexp = new Expression(new Text("mk_" + node.typename));
-		ExpressionSet deltas = new ExpressionSet();
-
-		for (TCExpression arg: node.args)
-		{
-			SMTPair pair = arg.apply(this, env);
-			mkexp.add(pair.value);
-			deltas.addAll(pair.deltas);
-		}
-
-		return new SMTPair(mkexp, deltas);
+		SMTPair pair = node.exp.apply(this, env);
+		return new SMTPair(new Expression(op, pair.value), pair.deltas);
 	}
 
 	@Override
@@ -265,6 +158,16 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		{
 			TCVariableExpression var = (TCVariableExpression)node.root;
 			root = env.findName(var.name, NameScope.NAMESANDSTATE);
+
+			if (root == null && var.name.getName().startsWith("measure_"))
+			{
+				throw new UnsupportedOperationException("Missing measure definition: " + node);
+			}
+		}
+
+		if (root == null)
+		{
+			throw new UnsupportedOperationException("Unknown definition: " + node);
 		}
 
 		if (root.name.getModule().equals(Globals.INTERNAL_MODULE))
@@ -413,15 +316,334 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		throw new UnsupportedOperationException("Cannot convert: " + node);
 	}
 
+	/**
+	 * Literals.
+	 */
+
 	@Override
-	public SMTPair caseBinaryExpression(TCBinaryExpression node, Environment env)
+	public SMTPair caseVariableExpression(TCVariableExpression node, Environment env)
 	{
-		SMTPair left = node.left.apply(this, env);
-		SMTPair right = node.right.apply(this, env);
+		return new SMTPair(new Expression(node.name.toString()));
+	}
+
+	@Override
+	public SMTPair caseIntegerLiteralExpression(TCIntegerLiteralExpression node, Environment env)
+	{
+		return new SMTPair(new Expression(Long.toString(node.value.value)));
+	}
+
+	@Override
+	public SMTPair caseBooleanLiteralExpression(TCBooleanLiteralExpression node, Environment env)
+	{
+		return new SMTPair(new Expression(Boolean.toString(node.value.value)));
+	}
+
+	@Override
+	public SMTPair caseRealLiteralExpression(TCRealLiteralExpression node, Environment env)
+	{
+		return new SMTPair(new Expression(Double.toString(node.value.value)));
+	}
+
+	@Override
+	public SMTPair caseCharLiteralExpression(TCCharLiteralExpression node, Environment env)
+	{
+		return new SMTPair(new Expression(Long.toString(node.value.unicode)));
+	}
+
+	@Override
+	public SMTPair caseStringLiteralExpression(TCStringLiteralExpression node, Environment env)
+	{
+		return new SMTPair(new Expression("\"" + node.toString() + "\""));	// "quoted value"
+	}
+
+	@Override
+	public SMTPair caseQuoteLiteralExpression(TCQuoteLiteralExpression node, Environment env)
+	{
+		return new SMTPair(new Expression(node.type.value));	// eg. <ABC> is ABC
+	}
+
+	/**
+	 * Boolean expressions.
+	 */
+
+	@Override
+	public SMTPair caseNotExpression(TCNotExpression node, Environment env)
+	{
+		return caseUnaryExpression("not", node, env);
+	}
+
+	/**
+	 * Misc numerics.
+	 */
+
+	@Override
+	public SMTPair caseAbsoluteExpression(TCAbsoluteExpression node, Environment env)
+	{
+		return caseUnaryExpression("abs", node, env);
+	}
+
+	@Override
+	public SMTPair caseFloorExpression(TCFloorExpression node, Environment env)
+	{
+		return caseUnaryExpression("floor", node, env);
+	}
+
+	@Override
+	public SMTPair caseUnaryMinusExpression(TCUnaryMinusExpression node, Environment env)
+	{
+		return caseUnaryExpression("-", node, env);
+	}
+
+	@Override
+	public SMTPair caseUnaryPlusExpression(TCUnaryPlusExpression node, Environment env)
+	{
+		return caseUnaryExpression("+", node, env);
+	}
+
+	/**
+	 * Sets.
+	 */
+
+	@Override
+	public SMTPair caseCardinalityExpression(TCCardinalityExpression node, Environment env)
+	{
+		return caseUnaryExpression("card", node, env);
+	}
+
+	@Override
+	public SMTPair caseDistUnionExpression(TCDistUnionExpression node, Environment env)
+	{
+		return caseUnaryExpression("dunion", node, env);
+	}
+
+	@Override
+	public SMTPair caseDistIntersectExpression(TCDistIntersectExpression node, Environment env)
+	{
+		return caseUnaryExpression("inter", node, env);
+	}
+
+	@Override
+	public SMTPair caseElementsExpression(TCElementsExpression node, Environment env)
+	{
+		return caseUnaryExpression("elems", node, env);
+	}
+
+	@Override
+	public SMTPair casePowerSetExpression(TCPowerSetExpression node, Environment env)
+	{
+		return caseUnaryExpression("power", node, env);
+	}
+
+	/**
+	 * Maps.
+	 */
+
+	@Override
+	public SMTPair caseDistMergeExpression(TCDistMergeExpression node, Environment env)
+	{
+		return caseUnaryExpression("merge", node, env);
+	}
+
+	@Override
+	public SMTPair caseMapDomainExpression(TCMapDomainExpression node, Environment env)
+	{
+		return caseUnaryExpression("dom", node, env);
+	}
+
+	@Override
+	public SMTPair caseMapInverseExpression(TCMapInverseExpression node, Environment env)
+	{
+		return caseUnaryExpression("inverse", node, env);
+	}
+
+	@Override
+	public SMTPair caseMapRangeExpression(TCMapRangeExpression node, Environment env)
+	{
+		return caseUnaryExpression("rng", node, env);
+	}
+
+	/**
+	 * Sequences.
+	 */
+
+	@Override
+	public SMTPair caseSeqEnumExpression(TCSeqEnumExpression node, Environment env)
+	{
+		if (node.members.isEmpty())
+		{
+			QualifiedSort qsort = node.getType().apply(new TypeToSMT("?"), env);
+			return new SMTPair(new Expression("as", new Text("seq.empty"), qsort.sort));
+		}
+		else if (node.members.size() == 1)
+		{
+			SMTPair first = node.members.firstElement().apply(this, env);
+			return new SMTPair(new Expression("seq.unit", first.value), first.deltas);
+		}
+		else
+		{
+			Expression result = new Expression("seq.++");
+			ExpressionSet deltas = new ExpressionSet();
+
+			for (TCExpression e: node.members)
+			{
+				SMTPair pair = e.apply(this, env);
+				result.add(new Expression("seq.unit", pair.value));
+				deltas.addAll(pair.deltas);
+			}
+
+			return new SMTPair(result, deltas);
+		}
+	}
+
+	@Override
+	public SMTPair caseHeadExpression(TCHeadExpression node, Environment env)
+	{
+		SMTPair seq = node.exp.apply(this, env);
 
 		return new SMTPair(
-			new Expression(node.op.toString(), left.value, right.value),
-			new ExpressionSet(left.deltas, right.deltas));
+			new Expression(
+				new Text("seq.nth"),
+				seq.value,
+				new Text("0")),
+			new ExpressionSet(
+					seq.deltas,
+					new GT(
+						new Expression("seq.len", seq.value),
+						new Text("0"))));
+	}
+
+	@Override
+	public SMTPair caseIndicesExpression(TCIndicesExpression node, Environment env)
+	{
+		return caseUnaryExpression("inds", node, env);
+	}
+
+	@Override
+	public SMTPair caseLenExpression(TCLenExpression node, Environment env)
+	{
+		return caseUnaryExpression("len", node, env);
+	}
+
+	@Override
+	public SMTPair caseDistConcatExpression(TCDistConcatExpression node, Environment env)
+	{
+		return caseUnaryExpression("conc", node, env);
+	}
+
+	@Override
+	public SMTPair caseReverseExpression(TCReverseExpression node, Environment env)
+	{
+		return caseUnaryExpression("reverse", node, env);
+	}
+
+	@Override
+	public SMTPair caseTailExpression(TCTailExpression node, Environment env)
+	{
+		return caseUnaryExpression("tail", node, env);
+	}
+
+	/**
+	 * Records and tuples.
+	 */
+
+	@Override
+	public SMTPair caseMkTypeExpression(TCMkTypeExpression node, Environment env)
+	{
+		Expression mkexp = new Expression(new Text("mk_" + node.typename));
+		ExpressionSet deltas = new ExpressionSet();
+
+		for (TCExpression arg: node.args)
+		{
+			SMTPair pair = arg.apply(this, env);
+			mkexp.add(pair.value);
+			deltas.addAll(pair.deltas);
+		}
+
+		return new SMTPair(mkexp, deltas);
+	}
+
+	@Override
+	public SMTPair caseFieldExpression(TCFieldExpression node, Environment env)
+	{
+		SMTPair object = node.object.apply(this, env);
+		return new SMTPair(new Expression(new Text(node.field.getName()), object.value), object.deltas);
+	}
+
+	/**
+	 * Conditionals
+	 */
+
+	@Override
+	public SMTPair caseIsExpression(TCIsExpression node, Environment env)
+	{
+		if (node.basictype != null)
+		{
+			TCNumericType numeric = node.test.getType().getNumeric();
+			boolean isNumeric = numeric != null;
+			boolean isFloat = isNumeric && numeric.getWeight() > 2;
+			boolean isBool = node.test.getType() instanceof TCBooleanType;
+
+			if (node.basictype instanceof TCNaturalType)
+			{
+				Expression test = node.test.apply(this, env).value;
+
+				if (isFloat)
+				{
+					return new SMTPair(new And(
+						new EQ(new Expression("to_int", test), test),
+						new GE(test, new Text("0"))));
+				}
+				else if (isNumeric)
+				{
+					return new SMTPair(new GE(test, new Text("0")));
+				}
+				else
+				{
+					return new SMTPair(new Expression("false"));
+				}
+			}
+			else if (node.basictype instanceof TCNaturalOneType)
+			{
+				Expression test = node.test.apply(this, env).value;
+
+				if (isFloat)
+				{
+					return new SMTPair(new And(
+						new EQ(new Expression("to_int", test), test),
+						new GT(test, new Text("0"))));
+				}
+				else if (isNumeric)
+				{
+					return new SMTPair(new GT(test, new Text("0")));
+				}
+				else
+				{
+					return new SMTPair(new Expression("false"));
+				}
+			}
+			else if (node.basictype instanceof TCRealType)
+			{
+				return new SMTPair(new Expression(Boolean.toString(isFloat)));
+			}
+			else if (node.basictype instanceof TCBooleanType)
+			{
+				if (node.test instanceof TCApplyExpression)		// pre_ or post_
+				{
+					TCApplyExpression apply = (TCApplyExpression)node.test;
+
+					if (apply.type instanceof TCFunctionType)
+					{
+						TCFunctionType ftype = (TCFunctionType)apply.type;
+						return new SMTPair(new Expression(Boolean.toString(
+							ftype.result instanceof TCBooleanType && !ftype.partial)));
+					}
+				}
+				
+				return new SMTPair(new Expression(Boolean.toString(isBool)));
+			}
+		}
+		
+		throw new UnsupportedOperationException("Cannot convert: " + node);
 	}
 
 	@Override
@@ -431,25 +653,94 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		SMTPair thenExp = node.thenExp.apply(this, env);
 		SMTPair elseExp = node.elseExp.apply(this, env);
 
-		// TODO elseif list
+		ExpressionSet deltas = new ExpressionSet(ifExp.deltas);
+
+		if (!node.elseList.isEmpty())
+		{
+			ListIterator<TCElseIfExpression> iter = node.elseList.listIterator(node.elseList.size());
+			Expression tail = elseExp.value;
+			
+			while (iter.hasPrevious())
+			{
+				TCElseIfExpression elif = iter.previous();
+				SMTPair ifex = elif.elseIfExp.apply(this, env);
+				SMTPair thenex = elif.thenExp.apply(this, env);
+
+				tail = new ITE(ifex.value, thenex.value, tail);
+			}
+		}
 
 		ITE value = new ITE(ifExp.value, thenExp.value, elseExp.value);
-		ExpressionSet delta = new ExpressionSet();
-
-		if (ifExp.deltas != null)
-		{
-			delta.addAll(ifExp.deltas);
-		}
 
 		if (!thenExp.deltas.isEmpty() || !elseExp.deltas.isEmpty())
 		{
-			delta.add(new ITE(ifExp.value,
+			deltas.add(new ITE(ifExp.value,
 				thenExp.deltas.andOf(),
 				elseExp.deltas.andOf()));
 		}
 
-		return new SMTPair(value, delta);
+		return new SMTPair(value, deltas);
 	}
+
+	@Override
+	public SMTPair caseCasesExpression(TCCasesExpression node, Environment env)
+	{
+		Expression tail = null;
+		ExpressionSet deltas = new ExpressionSet();
+
+		SMTPair test = node.exp.apply(this, env);
+
+		ListIterator<TCCaseAlternative> iter = node.cases.listIterator(node.cases.size());
+		SMTPair others = null;
+
+		if (node.others != null)
+		{
+			others = node.others.apply(this, env);
+			tail = others.value;
+		}
+
+		ExpressionSet allcases = new ExpressionSet();
+		
+		while (iter.hasPrevious())
+		{
+			TCCaseAlternative calt = iter.previous();
+			TCDefinitionList defs = calt.pattern.getAllDefinitions(node.exp.getType(), NameScope.LOCAL);
+			FlatEnvironment local = new FlatEnvironment(defs, env);
+			SMTPair pair = calt.result.apply(this, local);
+			EQ match = new EQ(test.value, patternToExpression(calt.pattern));
+
+			allcases.add(match);
+
+			if (tail == null)		// No others clause
+			{
+				tail = pair.value;	// Just use last case's value
+			}
+			else
+			{
+				tail = new ITE(match, pair.value, tail);
+			}
+			
+			if (!pair.deltas.isEmpty())
+			{
+				deltas.add(new Implies(match, pair.deltas.andOf()));
+			}
+		}
+
+		if (others != null)
+		{
+			deltas.add(new Implies(new Not(allcases.andOf()), others.deltas.andOf()));
+		}
+		else
+		{
+			deltas.add(allcases.orOf());	// Must match one
+		}
+
+		return new SMTPair(tail, deltas);
+	}
+
+	/**
+	 * Quantifiers
+	 */
 
 	@Override
 	public SMTPair caseForAllExpression(TCForAllExpression node, Environment env)
@@ -606,8 +897,18 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		return new Pair<Bracketed, SMTPair>(newBindList, body);
 	}
 
+	/**
+	 * Let/def expressions
+	 */
+
 	@Override
 	public SMTPair caseLetDefExpression(TCLetDefExpression node, Environment env)
+	{
+		return expandLetDef(node.localDefs, node.expression, env);
+	}
+
+	@Override
+	public SMTPair caseDefExpression(TCDefExpression node, Environment env)
 	{
 		return expandLetDef(node.localDefs, node.expression, env);
 	}
@@ -690,6 +991,9 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		return new SMTPair(resultValue, resultDeltas);
 	}
 
+	/**
+	 * Private methods
+	 */
 	private Let letCascade(List<Bracketed> binds, Expression body)
 	{
 		Let cascade = null;
@@ -707,5 +1011,20 @@ public class ExpressionToSMTPair extends TCExpressionVisitor<SMTPair, Environmen
 		}
 
 		return cascade;
+	}
+
+	private Source patternToExpression(TCPattern pattern)
+	{
+		if (pattern instanceof TCIntegerPattern ||
+			pattern instanceof TCRealPattern ||
+			pattern instanceof TCBooleanPattern ||
+			pattern instanceof TCIdentifierPattern)
+		{
+			return new Expression(pattern.toString());
+		}
+		else
+		{
+			throw new UnsupportedOperationException("Cannot convert pattern: " + pattern);
+		}
 	}
 }

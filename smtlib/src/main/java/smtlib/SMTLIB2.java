@@ -67,8 +67,6 @@ public class SMTLIB2 extends SMTLIB
 
 		try
 		{
-			
-
 			if (tcexp instanceof TCForAllExpression)
 			{
 				TCForAllExpression node = (TCForAllExpression)tcexp;
