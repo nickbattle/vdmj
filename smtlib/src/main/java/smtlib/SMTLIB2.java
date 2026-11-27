@@ -73,7 +73,6 @@ public class SMTLIB2 extends SMTLIB
 			{
 				TCForAllExpression node = (TCForAllExpression)tcexp;
 
-				script.add(new Comment("\nTop level forall variables"));
 				SMTPair forall = node.apply(new ExpressionToSMTPair(), smtenv);
 				script.addAll(Globals.getInstance().globalList());
 

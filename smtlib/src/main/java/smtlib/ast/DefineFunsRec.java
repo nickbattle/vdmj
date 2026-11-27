@@ -103,6 +103,7 @@ public class DefineFunsRec extends DefineFun
 
 		for (DefineFun member: members)
 		{
+			sb.append("\n; Body of function " + member.toSignature() + "\n");
 			sb.append(member.toBody().toFormat(4));
 			sb.append("\n");
 		}

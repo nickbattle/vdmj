@@ -309,7 +309,7 @@ public class Globals
 
 	public DefineFun findFunction(TCNameToken fname)
 	{
-		DefineFunsRec group = findGroup(fname);
+		DefineFunsRec group = findGroup(Utils.directName(fname));
 
 		if (group != null)
 		{
