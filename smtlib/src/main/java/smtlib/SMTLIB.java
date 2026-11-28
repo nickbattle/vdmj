@@ -30,20 +30,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
-import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionSet;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
-import com.fujitsu.vdmj.typechecker.TypeChecker;
-
+import smtlib.ast.And;
 import smtlib.ast.AssertCommand;
 import smtlib.ast.Bracketed;
 import smtlib.ast.CheckSat;
@@ -58,13 +53,11 @@ import smtlib.ast.Script;
 import smtlib.ast.SetOption;
 import smtlib.ast.Source;
 import smtlib.solvers.Solver;
-import smtlib.visitors.ASTHelper;
 import smtlib.visitors.DefinitionExpander;
-import smtlib.visitors.ExpressionExpander;
-import smtlib.visitors.ExpressionToSMT;
+import smtlib.visitors.ExpressionToSMTPair;
 import smtlib.visitors.Globals;
 import smtlib.visitors.LocalNames;
-import smtlib.visitors.Utils;
+import smtlib.visitors.SMTPair;
 
 public class SMTLIB
 {
@@ -101,39 +94,20 @@ public class SMTLIB
 		Script script = new Script();
 		LocalNames.reset();
 		Globals.getInstance().init();
-
 		Environment smtenv = Globals.getInstance().getEnvironment(env);		// Includes invs
 		DefinitionExpander.init(smtenv);
-		TCExpression expanded = null;
 
 		try
 		{
-			TCExpressionSet constraints = new TCExpressionSet();
-			expanded = tcexp.apply(new ExpressionExpander(smtenv), constraints);
-
-			if (!constraints.isEmpty())
+			if (tcexp instanceof TCForAllExpression)
 			{
-				expanded = new TCAndExpression(Utils.andOf(constraints), ASTHelper.AND, expanded);
-			}
+				TCForAllExpression node = (TCForAllExpression)tcexp;
 
-			TypeChecker.clearErrors();
-			expanded.typeCheck(smtenv, null, NameScope.NAMES, null);
-			script.add(new Comment("Expanded PO: " + Utils.expandOneLine(expanded)));
+				SMTPair forall = node.apply(new ExpressionToSMTPair(), smtenv);
+				script.addAll(Globals.getInstance().globalList());
 
-			for (VDMError err: TypeChecker.getErrors())
-			{
-				script.add(new Comment(err.message));	// Should be none!
-			}
-
-			script.addAll(Globals.getInstance().globalList());
-
-			if (expanded instanceof TCForAllExpression)
-			{
-				TCForAllExpression node = (TCForAllExpression)expanded;
-
+				Bracketed binds = (Bracketed)forall.value.get(1);
 				script.add(new Comment("\nTop level forall variables"));
-				Expression forall = node.apply(new ExpressionToSMT(), smtenv);
-				Bracketed binds = (Bracketed)forall.get(1);
 
 				// Add declare-consts for the forall bindings, to get a model
 				for (Source bind: binds)
@@ -143,15 +117,25 @@ public class SMTLIB
 				}
 
 				script.add(new Comment("\nObligation satisfiable?"));
-				Expression body = (Expression) forall.get(2);
-				script.add(new AssertCommand(new Not(body)));
-			}
-			else if (expanded instanceof TCExistsExpression)
-			{
-				TCExistsExpression node = (TCExistsExpression)expanded;
+				Expression body = (Expression) forall.value.get(2);
 
-				Expression exists = node.apply(new ExpressionToSMT(), smtenv);
-				Bracketed binds = (Bracketed)exists.get(1);
+				if (forall.deltas.isEmpty())
+				{
+					script.add(new AssertCommand(new Not(body)));
+				}
+				else
+				{
+					script.add(new AssertCommand(new Not(new And(forall.deltas.andOf(), body))));
+				}
+			}
+			else if (tcexp instanceof TCExistsExpression)
+			{
+				TCExistsExpression node = (TCExistsExpression)tcexp;
+
+				SMTPair exists = node.apply(new ExpressionToSMTPair(), smtenv);
+				script.addAll(Globals.getInstance().globalList());
+
+				Bracketed binds = (Bracketed)exists.value.get(1);
 				script.add(new Comment("\nTop level exists variables"));
 
 				// Add define-consts for the exists bindings, to get a model
@@ -162,14 +146,30 @@ public class SMTLIB
 				}
 
 				script.add(new Comment("\nObligation satisfiable?"));
-				Expression body = (Expression) exists.get(2);
-				script.add(new AssertCommand(body));
+				Expression body = (Expression) exists.value.get(2);
+
+				if (exists.deltas.isEmpty())
+				{
+					script.add(new AssertCommand(body));
+				}
+				else
+				{
+					script.add(new AssertCommand(new And(exists.deltas.andOf(), body)));
+				}
 			}
 			else if (tcexp.getType() instanceof TCBooleanType)	// eg. original inv_T(args)
 			{
 				script.add(new Comment("\nObligation satisfiable?"));
-				Expression apply = expanded.apply(new ExpressionToSMT(), smtenv);
-				script.add(new AssertCommand(new Not(apply)));
+				SMTPair apply = tcexp.apply(new ExpressionToSMTPair(), smtenv);
+
+				if (apply.deltas.isEmpty())
+				{
+					script.add(new AssertCommand(new Not(apply.value)));
+				}
+				else
+				{
+					script.add(new AssertCommand(new Not(new And(apply.deltas.andOf(), apply.value))));
+				}
 			}
 			else
 			{
@@ -180,9 +180,9 @@ public class SMTLIB
 		{
 			if (verbose)
 			{
-				if (expanded != null)
+				if (tcexp != null)
 				{
-					Console.out.println("Expanded: " + expanded.toString().replace("\n", " "));
+					Console.out.println("Expanded: " + tcexp.toString().replace("\n", " "));
 					Console.out.println("----");
 				}
 
